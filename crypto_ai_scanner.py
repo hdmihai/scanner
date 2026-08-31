@@ -37,7 +37,7 @@ from datetime import datetime, timezone
 
 # ============================== CONFIG ==============================
 CONFIG = {
-    "exchange_id": "okx",       # binance blocheaza IP-urile de cloud/GitHub Actions cu eroare
+    "exchange_id": "KuCoin",       # binance blocheaza IP-urile de cloud/GitHub Actions cu eroare
                                 # 451 "restricted location" - bybit/okx/kucoin/gateio nu au
                                 # aceasta problema pt date publice. Schimbi doar acest string
                                 # daca vrei alt exchange.
@@ -108,8 +108,7 @@ def atr(highs, lows, closes, period=14):
 
 
 def ema_series_full(values, period):
-    """La fel ca ema(), dar returneaza toata seria (pentru desenat pe grafic
-    in dashboard), nu doar ultima valoare."""
+    """La fel ca ema(), dar returneaza toata seria (pentru desenat pe grafic in dashboard), nu doar ultima valoare."""
     if len(values) < period:
         return [None] * len(values)
     k = 2 / (period + 1)
@@ -129,8 +128,7 @@ def ema_series_full(values, period):
 # propria ta logica din AI_Dashboard_v10.pine.
 
 def find_swing_points(highs, lows, lookback=5):
-    """Puncte de swing simple: un maxim/minim local mai extrem decat
-    'lookback' lumanari de fiecare parte."""
+    """Puncte de swing simple: un maxim/minim local mai extrem decat 'lookback' lumanari de fiecare parte."""
     swing_highs, swing_lows = [], []
     for i in range(lookback, len(highs) - lookback):
         if highs[i] == max(highs[i - lookback:i + lookback + 1]):
@@ -141,8 +139,7 @@ def find_swing_points(highs, lows, lookback=5):
 
 
 def compute_structure_levels(highs, lows, n_levels=3):
-    """Niveluri simple de suport/rezistenta, din cele mai recente puncte
-    de swing (echivalentul S1-S3 / R1-R3 din poza ta)."""
+    """Niveluri simple de suport/rezistenta, din cele mai recente puncte de swing (echivalentul S1-S3 / R1-R3 din poza ta)."""
     swing_highs, swing_lows = find_swing_points(highs, lows)
     resistance = sorted(set(round(h, 6) for h in swing_highs[-12:]), reverse=True)[:n_levels]
     support = sorted(set(round(l, 6) for l in swing_lows[-12:]), reverse=True)[-n_levels:]
@@ -150,8 +147,7 @@ def compute_structure_levels(highs, lows, n_levels=3):
 
 
 def compute_fibonacci(highs, lows, lookback=100):
-    """Retracement + extensie Fibonacci pe ultimul swing major (high/low)
-    din fereastra de lookback."""
+    """Retracement + extensie Fibonacci pe ultimul swing major (high/low) din fereastra de lookback."""
     swing_high = max(highs[-lookback:])
     swing_low = min(lows[-lookback:])
     diff = swing_high - swing_low
@@ -161,8 +157,7 @@ def compute_fibonacci(highs, lows, lookback=100):
 
 
 def compute_trade_plan(direction, price, atr_val, structure, fib):
-    """Plan de tranzactionare: SL pe baza de ATR, TP1 la prima structura
-    relevanta, TP2 la extensia Fibonacci 1.618 (echivalentul casetei
+    """Plan de tranzactionare: SL pe baza de ATR, TP1 la prima structura relevanta, TP2 la extensia Fibonacci 1.618 (echivalentul casetei
     AI PLAN: entry/SL/TP1/TP2 din poza ta)."""
     ext_1618 = fib["extension"]["1.618"]
     if direction == "LONG":
@@ -189,8 +184,7 @@ def compute_trade_plan(direction, price, atr_val, structure, fib):
 # =============================== SCOR =================================
 
 def score_symbol(ohlcv, weights):
-    """Primeste lumanari OHLCV brute de la exchange si returneaza un scor,
-    directie si componente, sau None daca nu exista semnal clar."""
+    """Primeste lumanari OHLCV brute de la exchange si returneaza un scor, directie si componente, sau None daca nu exista semnal clar."""
     closes = [c[4] for c in ohlcv]
     highs = [c[2] for c in ohlcv]
     lows = [c[3] for c in ohlcv]
@@ -449,8 +443,9 @@ def main():
         structure = compute_structure_levels(highs, lows)
         fib = compute_fibonacci(highs, lows)
         plan = compute_trade_plan(best["direction"], best["price"], best["atr"], structure, fib)
-        liquidity = fetch_liquidity_levels(exchange, best["symbol"])
-        deep_analysis = {"structure": structure, "fibonacci": fib, "plan": plan, "liquidity": liquidity}
+        # liquidity = fetch_liquidity_levels(exchange, best["symbol"])
+        # deep_analysis = {"structure": structure, "fibonacci": fib, "plan": plan, "liquidity": liquidity}
+        deep_analysis = {"structure": structure, "fibonacci": fib, "plan": plan}
 
         n = CONFIG["chart_candles"]
         save_json(CHART_FILE, {
