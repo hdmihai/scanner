@@ -27,13 +27,19 @@ jobs:
           cache: 'pip'
 
       - name: Instaleaza dependinte
-        run: pip install -r requirements.txt
+        run: pip install ccxt requests
 
       - name: Ruleaza scanerul
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python crypto_ai_scanner.py
+
+      - name: Actualizeaza metadata proiecte (CoinGecko + optional Gemini)
+        env:
+          COINGECKO_API_KEY: ${{ secrets.COINGECKO_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python update_token_metadata.py
 
       - name: Genereaza pagina dashboard (docs/index.html)
         run: python generate_dashboard.py
