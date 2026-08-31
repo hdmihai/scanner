@@ -249,18 +249,18 @@ def score_symbol(ohlcv, weights):
 # sunt un concept central in Smart Money Concepts: zone unde e probabil sa
 # reactioneze pretul, pentru ca acolo sta volumul mare de ordine.
 
-def fetch_liquidity_levels(exchange, symbol, depth=50, top_n=3):
-    try:
-        ob = exchange.fetch_order_book(symbol, limit=depth)
-    except Exception as e:
-        print(f"[!] order book {symbol}: {e}")
-        return None
-    bids = sorted(ob.get("bids", []), key=lambda x: x[1], reverse=True)[:top_n]
-    asks = sorted(ob.get("asks", []), key=lambda x: x[1], reverse=True)[:top_n]
-    return {
-        "bids": [{"price": round(p, 6), "amount": round(a, 4)} for p, a in bids],
-        "asks": [{"price": round(p, 6), "amount": round(a, 4)} for p, a in asks],
-    }
+#def fetch_liquidity_levels(exchange, symbol, depth=50, top_n=3):
+#    try:
+#        ob = exchange.fetch_order_book(symbol, limit=depth)
+#    except Exception as e:
+#        print(f"[!] order book {symbol}: {e}")
+#        return None
+#    bids = sorted(ob.get("bids", []), key=lambda x: x[1], reverse=True)[:top_n]
+#    asks = sorted(ob.get("asks", []), key=lambda x: x[1], reverse=True)[:top_n]
+#    return {
+#        "bids": [{"price": round(p, 6), "amount": round(a, 4)} for p, a in bids],
+#        "asks": [{"price": round(p, 6), "amount": round(a, 4)} for p, a in asks],
+#    }
 
 
 # =========================== PERSISTENTA JSON ==========================
@@ -443,10 +443,11 @@ def main():
         structure = compute_structure_levels(highs, lows)
         fib = compute_fibonacci(highs, lows)
         plan = compute_trade_plan(best["direction"], best["price"], best["atr"], structure, fib)
+        deep_analysis = {"structure": structure, "fibonacci": fib, "plan": plan}
+       
         # liquidity = fetch_liquidity_levels(exchange, best["symbol"])
         # deep_analysis = {"structure": structure, "fibonacci": fib, "plan": plan, "liquidity": liquidity}
-        deep_analysis = {"structure": structure, "fibonacci": fib, "plan": plan}
-
+             
         n = CONFIG["chart_candles"]
         save_json(CHART_FILE, {
             "symbol": best["symbol"],
