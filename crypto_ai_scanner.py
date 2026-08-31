@@ -37,6 +37,10 @@ from datetime import datetime, timezone
 
 # ============================== CONFIG ==============================
 CONFIG = {
+    "exchange_id": "bybit",    # binance blocheaza IP-urile de cloud/GitHub Actions cu eroare
+                                # 451 "restricted location" - bybit/okx/kucoin/gateio nu au
+                                # aceasta problema pt date publice. Schimbi doar acest string
+                                # daca vrei alt exchange.
     "quote": "USDT",
     "universe_size": 40,       # cate simboluri (dupa volum) intra in scanare
     "timeframe": "1h",
@@ -358,16 +362,16 @@ def format_message(scan):
         ]
         return "```\n" + "\n".join([header] + body) + "\n```" if rows else "_(niciun semnal)_"
 
-    parts = [f"ðŸ“Š *Scan {scan['scan_time']}* â€” universe {scan['universe_size']}"]
-    parts.append("\nðŸŸ¢ *TOP LONG*")
+    parts = [f"📊 *Scan {scan['scan_time']}* — universe {scan['universe_size']}"]
+    parts.append("\n🟢 *TOP LONG*")
     parts.append(table(scan["top_long"]))
-    parts.append("\nðŸ”´ *TOP SHORT*")
+    parts.append("\n🔴 *TOP SHORT*")
     parts.append(table(scan["top_short"]))
     if scan.get("best_candidate"):
         b = scan["best_candidate"]
         parts.append(
-            f"\nâ­ *Best candidate:* {b['symbol']} {b['direction']} Â· "
-            f"conf {b['probability']}% Â· exp {b['expected_r']}R"
+            f"\n⭐ *Best candidate:* {b['symbol']} {b['direction']} · "
+            f"conf {b['probability']}% · exp {b['expected_r']}R"
         )
     return "\n".join(parts)
 
@@ -375,9 +379,22 @@ def format_message(scan):
 # ================================ MAIN ===================================
 
 def main():
-    exchange = ccxt.binance({"enableRateLimit": True})
-    markets = exchange.load_markets()
-    all_tickers = exchange.fetch_tickers()
+    try:
+        exchange_class = getattr(ccxt, CONFIG["exchange_id"])
+    except AttributeError:
+        raise SystemExit(f"[EROARE] '{CONFIG['exchange_id']}' nu e un exchange valid in ccxt.")
+
+    exchange = exchange_class({"enableRateLimit": True})
+
+    try:
+        markets = exchange.load_markets()
+        all_tickers = exchange.fetch_tickers()
+    except Exception as e:
+        print(f"[EROARE FATALA] Nu pot contacta {CONFIG['exchange_id']}: {e}")
+        print("Daca vezi '451' sau 'restricted location': exchange-ul blocheaza IP-ul "
+              "serverului (frecvent la Binance, din cauza IP-urilor de cloud/GitHub Actions). "
+              "Schimba CONFIG['exchange_id'] cu alt exchange, ex: 'okx', 'kucoin', 'gateio', 'mexc'.")
+        raise
 
     usdt_pairs = [
         s for s, m in markets.items()
