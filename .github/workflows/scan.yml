@@ -27,7 +27,7 @@ jobs:
           cache: 'pip'
 
       - name: Instaleaza dependinte
-        run: pip install ccxt requests
+        run: pip install -r requirements.txt
 
       - name: Ruleaza scanerul
         env:
