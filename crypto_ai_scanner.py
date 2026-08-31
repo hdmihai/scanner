@@ -37,7 +37,7 @@ from datetime import datetime, timezone
 
 # ============================== CONFIG ==============================
 CONFIG = {
-    "exchange_id": "bybit",    # binance blocheaza IP-urile de cloud/GitHub Actions cu eroare
+    "exchange_id": "okx",       # binance blocheaza IP-urile de cloud/GitHub Actions cu eroare
                                 # 451 "restricted location" - bybit/okx/kucoin/gateio nu au
                                 # aceasta problema pt date publice. Schimbi doar acest string
                                 # daca vrei alt exchange.
