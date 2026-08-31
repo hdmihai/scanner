@@ -33,6 +33,9 @@ OUTPUT_FILE = os.path.join(DOCS_DIR, "index.html")
 MIN_SAMPLES_FOR_VALIDATION = 100
 
 
+TOKEN_METADATA_FILE = os.path.join(DATA_DIR, "token_metadata.json")
+
+
 def load_json(path, default):
     if not os.path.exists(path):
         return default
@@ -187,6 +190,24 @@ def render_liquidity(deep):
     return f'<div class="liq-list">{bid_rows}{ask_rows}</div>'
 
 
+def render_similar_projects(token_meta, narrative):
+    if not token_meta:
+        return '<p class="dim">Fara date inca &mdash; ruleaza update_token_metadata.py.</p>'
+    labs_badge = ' <span class="badge-labs">BINANCE LABS</span>' if token_meta.get("binance_labs") else ""
+    cats = ", ".join(token_meta.get("categories", [])[:4]) or "-"
+    similar = token_meta.get("similar") or []
+    sim_html = "".join(
+        f'<div class="sim-row"><span>{s}</span><span class="dim">{round(v * 100)}% overlap</span></div>'
+        for s, v in similar
+    ) or '<p class="dim">Niciun proiect similar gasit inca in universul scanat.</p>'
+    narrative_html = ""
+    if narrative:
+        narrative_html = f'<p class="narrative">{narrative["text"]}</p>'
+    return f'''<div class="cats">{cats}{labs_badge}</div>
+    <div class="sim-list">{sim_html}</div>
+    {narrative_html}'''
+
+
 def render_levels(deep):
     if not deep:
         return '<p class="dim">Fara analiza detaliata inca &mdash; apare dupa prima scanare cu semnal.</p>'
@@ -230,10 +251,11 @@ def render_plan(best, deep):
 
 # --------------------------------- PAGINA -----------------------------------
 
-def build_html(scan, best, deep, chart, health, weights, session):
+def build_html(scan, best, deep, chart, health, weights, session, token_meta, narrative):
     plan_html = render_plan(best, deep)
     levels_html = render_levels(deep)
     liquidity_html = render_liquidity(deep)
+    similar_html = render_similar_projects(token_meta, narrative)
     chart_svg = render_svg_chart(chart)
     weight_bars = render_weight_bars(weights)
     long_rows = render_opportunity_rows(scan.get("top_long", []))
@@ -320,6 +342,15 @@ header{{display:flex;justify-content:space-between;align-items:baseline;
 .liq-bid span:first-child{{color:var(--bull);}}
 .liq-ask span:first-child{{color:var(--bear);}}
 
+.cats{{font-size:12px;color:var(--text-dim);margin-bottom:10px;}}
+.badge-labs{{font-family:var(--font-mono);font-size:10px;background:rgba(230,180,80,.15);
+  color:var(--amber);padding:2px 7px;border-radius:5px;margin-left:6px;}}
+.sim-list{{display:flex;flex-direction:column;gap:5px;font-family:var(--font-mono);font-size:12px;}}
+.sim-row{{display:flex;justify-content:space-between;background:var(--panel-2);
+  border-radius:6px;padding:6px 9px;}}
+.narrative{{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);
+  font-size:13px;line-height:1.6;color:var(--text);}}
+
 .weight-row{{display:grid;grid-template-columns:80px 1fr 54px;align-items:center;
   gap:10px;margin-bottom:10px;font-size:12px;}}
 .weight-label{{text-transform:uppercase;letter-spacing:.06em;color:var(--text-dim);}}
@@ -398,6 +429,11 @@ footer{{margin-top:26px;color:var(--text-dim);font-size:11px;line-height:1.6;}}
       </div>
 
       <div class="card">
+        <h2>Similar projects</h2>
+        {similar_html}
+      </div>
+
+      <div class="card">
         <h2>Adaptive weights &middot; model health</h2>
         {weight_bars}
         <div class="health-row">
@@ -430,6 +466,7 @@ def main():
     history = load_json(HISTORY_FILE, [])
     weights = load_json(WEIGHTS_FILE, {"trend": 1.0, "momentum": 1.0, "volatility": 1.0, "volume": 1.0})
     chart = load_json(CHART_FILE, None)
+    token_metadata = load_json(TOKEN_METADATA_FILE, {})
 
     scan = history[-1] if history else {"scan_time": "-", "universe_size": 0, "top_long": [], "top_short": []}
     best = scan.get("best_candidate")
@@ -437,8 +474,15 @@ def main():
     health = compute_model_health(history)
     session = get_session_info()
 
+    token_meta = None
+    narrative = token_metadata.get("narrative")
+    if best and token_metadata.get("tokens"):
+        token_meta = token_metadata["tokens"].get(best["symbol"])
+        if narrative and narrative.get("symbol") != best["symbol"]:
+            narrative = None  # narativul e vechi, pt alt candidat - nu-l arat ca fiind curent
+
     os.makedirs(DOCS_DIR, exist_ok=True)
-    html = build_html(scan, best, deep, chart, health, weights, session)
+    html = build_html(scan, best, deep, chart, health, weights, session, token_meta, narrative)
     with open(OUTPUT_FILE, "w") as f:
         f.write(html)
     print(f"Dashboard generat: {OUTPUT_FILE}")
