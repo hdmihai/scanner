@@ -37,12 +37,15 @@ from datetime import datetime, timezone
 
 # ============================== CONFIG ==============================
 CONFIG = {
-    "exchange_id": "KuCoin",       # binance blocheaza IP-urile de cloud/GitHub Actions cu eroare
-                                # 451 "restricted location" - bybit/okx/kucoin/gateio nu au
-                                # aceasta problema pt date publice. Schimbi doar acest string
-                                # daca vrei alt exchange.
+    "exchange_fallback": ["kraken", "okx", "kucoin", "gateio", "mexc"],
+    # Incearca pe rand, primul care raspunde e folosit - vezi connect_exchange().
+    # Kraken primul (serveste SUA, nu are motiv sa geo-blocheze); restul sunt
+    # rezerve. NU mai modifica sursa fisierului la runtime (spre deosebire de
+    # run_scanner_with_exchange_fallback.py, care trebuie sters - vezi nota
+    # din raspuns).
     "quote": "USDT",
-    "universe_size": 40,       # cate simboluri (dupa volum) intra in scanare
+    "universe_size": 200,      # cate simboluri intra efectiv in scanare (scor + persistenta)
+    "coingecko_scope": 200,    # doar proiectele din top N CoinGecko dupa market cap sunt eligibile
     "timeframe": "1h",
     "candles": 200,
     "lookahead_hours": 24,     # dupa cate ore evaluam daca un semnal a "nimerit"
@@ -56,6 +59,7 @@ CONFIG = {
 
 HISTORY_FILE = os.path.join(CONFIG["data_dir"], "scan_history.json")
 WEIGHTS_FILE = os.path.join(CONFIG["data_dir"], "weights.json")
+WEIGHTS_HISTORY_FILE = os.path.join(CONFIG["data_dir"], "weights_history.json")
 CHART_FILE = os.path.join(CONFIG["data_dir"], "latest_chart.json")
 
 DEFAULT_WEIGHTS = {"trend": 1.0, "momentum": 1.0, "volatility": 1.0, "volume": 1.0}
@@ -249,18 +253,39 @@ def score_symbol(ohlcv, weights):
 # sunt un concept central in Smart Money Concepts: zone unde e probabil sa
 # reactioneze pretul, pentru ca acolo sta volumul mare de ordine.
 
-#def fetch_liquidity_levels(exchange, symbol, depth=50, top_n=3):
-#    try:
-#        ob = exchange.fetch_order_book(symbol, limit=depth)
-#    except Exception as e:
-#        print(f"[!] order book {symbol}: {e}")
-#        return None
-#    bids = sorted(ob.get("bids", []), key=lambda x: x[1], reverse=True)[:top_n]
-#    asks = sorted(ob.get("asks", []), key=lambda x: x[1], reverse=True)[:top_n]
-#    return {
-#        "bids": [{"price": round(p, 6), "amount": round(a, 4)} for p, a in bids],
-#        "asks": [{"price": round(p, 6), "amount": round(a, 4)} for p, a in asks],
-#    }
+def fetch_liquidity_levels(exchange, symbol, depth=50, top_n=3):
+    try:
+        ob = exchange.fetch_order_book(symbol, limit=depth)
+    except Exception as e:
+        print(f"[!] order book {symbol}: {e}")
+        return None
+    bids = sorted(ob.get("bids", []), key=lambda x: x[1], reverse=True)[:top_n]
+    asks = sorted(ob.get("asks", []), key=lambda x: x[1], reverse=True)[:top_n]
+    return {
+        "bids": [{"price": round(p, 6), "amount": round(a, 4)} for p, a in bids],
+        "asks": [{"price": round(p, 6), "amount": round(a, 4)} for p, a in asks],
+    }
+
+
+def fetch_coingecko_top_symbols(top_n=200):
+    """Simbolurile din top N CoinGecko dupa market cap (nu dupa volum de
+    schimb) - folosite ca sa restrangem universul la proiecte relevante
+    fundamental, nu doar la ce are volum mare pe termen scurt."""
+    symbols = set()
+    per_page = 250
+    pages = (top_n + per_page - 1) // per_page
+    for page in range(1, pages + 1):
+        url = (f"https://api.coingecko.com/api/v3/coins/markets"
+               f"?vs_currency=usd&order=market_cap_desc&per_page={per_page}&page={page}")
+        try:
+            resp = requests.get(url, timeout=20)
+            resp.raise_for_status()
+            for coin in resp.json():
+                symbols.add(coin["symbol"].upper())
+        except Exception as e:
+            print(f"[!] CoinGecko top-{top_n} (pagina {page}): {e}")
+            break
+    return symbols
 
 
 # =========================== PERSISTENTA JSON ==========================
@@ -356,44 +381,70 @@ def format_message(scan):
         ]
         return "```\n" + "\n".join([header] + body) + "\n```" if rows else "_(niciun semnal)_"
 
-    parts = [f"📊 *Scan {scan['scan_time']}* — universe {scan['universe_size']}"]
-    parts.append("\n🟢 *TOP LONG*")
+    parts = [f"ðŸ“Š *Scan {scan['scan_time']}* â€” universe {scan['universe_size']}"]
+    parts.append("\nðŸŸ¢ *TOP LONG*")
     parts.append(table(scan["top_long"]))
-    parts.append("\n🔴 *TOP SHORT*")
+    parts.append("\nðŸ”´ *TOP SHORT*")
     parts.append(table(scan["top_short"]))
     if scan.get("best_candidate"):
         b = scan["best_candidate"]
         parts.append(
-            f"\n⭐ *Best candidate:* {b['symbol']} {b['direction']} · "
-            f"conf {b['probability']}% · exp {b['expected_r']}R"
+            f"\nâ­ *Best candidate:* {b['symbol']} {b['direction']} Â· "
+            f"conf {b['probability']}% Â· exp {b['expected_r']}R"
         )
     return "\n".join(parts)
 
 
 # ================================ MAIN ===================================
 
+def connect_exchange():
+    """Incearca exchange-urile din CONFIG['exchange_fallback'] in ordine, la
+    runtime, fara sa modifice fisierul sursa (spre deosebire de
+    run_scanner_with_exchange_fallback.py). Necesar pentru ca Binance (451)
+    SI Bybit (403 CloudFront) s-au dovedit blocate din runner-ul GitHub
+    Actions - motive diferite, acelasi rezultat."""
+    last_error = None
+    for exchange_id in CONFIG["exchange_fallback"]:
+        exchange_class = getattr(ccxt, exchange_id, None)
+        if exchange_class is None:
+            print(f"[!] '{exchange_id}' nu exista in ccxt, sar peste.")
+            continue
+        exchange = exchange_class({"enableRateLimit": True})
+        try:
+            markets = exchange.load_markets()
+            tickers = exchange.fetch_tickers()
+            print(f"[OK] Conectat la {exchange_id} ({len(markets)} piete).")
+            return exchange, markets, tickers, exchange_id
+        except Exception as e:
+            print(f"[!] {exchange_id} indisponibil din acest runner: {e}")
+            last_error = e
+            continue
+
+    raise SystemExit(
+        f"[EROARE FATALA] Niciun exchange din {CONFIG['exchange_fallback']} nu "
+        f"a raspuns din acest runner. Ultima eroare: {last_error}\n"
+        "Adauga alt exchange in CONFIG['exchange_fallback'], sau ruleaza "
+        "scriptul de pe un server/PC/telefon cu IP rezidential (nu de cloud)."
+    )
+
+
 def main():
-    try:
-        exchange_class = getattr(ccxt, CONFIG["exchange_id"])
-    except AttributeError:
-        raise SystemExit(f"[EROARE] '{CONFIG['exchange_id']}' nu e un exchange valid in ccxt.")
-
-    exchange = exchange_class({"enableRateLimit": True})
-
-    try:
-        markets = exchange.load_markets()
-        all_tickers = exchange.fetch_tickers()
-    except Exception as e:
-        print(f"[EROARE FATALA] Nu pot contacta {CONFIG['exchange_id']}: {e}")
-        print("Daca vezi '451' sau 'restricted location': exchange-ul blocheaza IP-ul "
-              "serverului (frecvent la Binance, din cauza IP-urilor de cloud/GitHub Actions). "
-              "Schimba CONFIG['exchange_id'] cu alt exchange, ex: 'okx', 'kucoin', 'gateio', 'mexc'.")
-        raise
+    exchange, markets, all_tickers, exchange_id = connect_exchange()
 
     usdt_pairs = [
         s for s, m in markets.items()
         if s.endswith("/" + CONFIG["quote"]) and m.get("active", True)
     ]
+
+    coingecko_scope = fetch_coingecko_top_symbols(CONFIG["coingecko_scope"])
+    if coingecko_scope:
+        before = len(usdt_pairs)
+        usdt_pairs = [s for s in usdt_pairs if s.split("/")[0].upper() in coingecko_scope]
+        print(f"Scope CoinGecko top-{CONFIG['coingecko_scope']}: {before} -> {len(usdt_pairs)} "
+              f"perechi eligibile pe {exchange_id}.")
+    else:
+        print("[!] Nu am putut lua lista CoinGecko - continui fara filtrul de scope.")
+
     ranked = sorted(
         usdt_pairs,
         key=lambda s: all_tickers.get(s, {}).get("quoteVolume", 0) or 0,
@@ -443,11 +494,9 @@ def main():
         structure = compute_structure_levels(highs, lows)
         fib = compute_fibonacci(highs, lows)
         plan = compute_trade_plan(best["direction"], best["price"], best["atr"], structure, fib)
-        deep_analysis = {"structure": structure, "fibonacci": fib, "plan": plan}
-       
-        # liquidity = fetch_liquidity_levels(exchange, best["symbol"])
-        # deep_analysis = {"structure": structure, "fibonacci": fib, "plan": plan, "liquidity": liquidity}
-             
+        liquidity = fetch_liquidity_levels(exchange, best["symbol"])
+        deep_analysis = {"structure": structure, "fibonacci": fib, "plan": plan, "liquidity": liquidity}
+
         n = CONFIG["chart_candles"]
         save_json(CHART_FILE, {
             "symbol": best["symbol"],
@@ -472,6 +521,10 @@ def main():
 
     save_json(WEIGHTS_FILE, weights)
     save_json(HISTORY_FILE, history)
+
+    weights_history = load_json(WEIGHTS_HISTORY_FILE, [])
+    weights_history.append({"ts": now_ts, "time": scan_record["scan_time"], **weights})
+    save_json(WEIGHTS_HISTORY_FILE, weights_history)
 
     msg = format_message(scan_record)
     print(msg)
