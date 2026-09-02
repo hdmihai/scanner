@@ -28,6 +28,7 @@ DOCS_DIR = "docs"
 HISTORY_FILE = os.path.join(DATA_DIR, "scan_history.json")
 WEIGHTS_FILE = os.path.join(DATA_DIR, "weights.json")
 WEIGHTS_HISTORY_FILE = os.path.join(DATA_DIR, "weights_history.json")
+AGENT_MODEL_FILE = os.path.join(DATA_DIR, "agent_model.json")
 CHART_FILE = os.path.join(DATA_DIR, "latest_chart.json")
 OUTPUT_FILE = os.path.join(DOCS_DIR, "index.html")
 
@@ -299,7 +300,53 @@ def render_line_chart_svg(series_dict, width=640, height=150, pad=12, y_min=None
     return "\n".join(parts)
 
 
-def render_learning_curve(history, weights_history, health):
+def render_agent_card(agent_state):
+    if not agent_state or not agent_state.get("agent", {}).get("total"):
+        return ('<p class="dim">Agentul nu s-a antrenat inca &mdash; ruleaza ai_agent.py '
+                'dupa prima scanare cu rezultate evaluate.</p>')
+
+    a = agent_state["agent"]
+    status = agent_state.get("status", "SHADOW")
+    reason = agent_state.get("status_reason", "")
+    ba = agent_state.get("balanced_agent")
+    bb = agent_state.get("balanced_baseline")
+    status_cls = "ok" if status == "ACTIVE" else "warn"
+
+    dir_rows = ""
+    for d in ("LONG", "SHORT"):
+        s = (agent_state.get("by_direction") or {}).get(d, {})
+        if s.get("total"):
+            dir_rows += (
+                f'<div class="liq-row"><span>{d}</span>'
+                f'<span>agent {100*s["agent"]/s["total"]:.0f}%</span>'
+                f'<span class="dim">eur. {100*s["baseline"]/s["total"]:.0f}%</span></div>'
+            )
+
+    weights = (agent_state.get("model") or {}).get("weights", {})
+    w_rows = "".join(
+        f'<div class="fib-row"><span>{k}</span><span>{v:+.2f}</span></div>'
+        for k, v in weights.items()
+    )
+
+    bal_line = (f'{ba:.1f}% vs euristica {bb:.1f}%' if ba is not None else "in curs de acumulare")
+
+    return f'''
+    <div class="agent-status agent-{status_cls}">
+      <strong>{status}</strong> &middot; {reason}
+    </div>
+    <div class="agent-metrics">
+      <div><span class="dim">Exemple invatate</span><br>{a["total"]}</div>
+      <div><span class="dim">Zile acoperite</span><br>{agent_state.get("days_covered", 0)}</div>
+    </div>
+    <p class="dim" style="margin:12px 0 6px;">Acuratete echilibrata (media LONG/SHORT)</p>
+    <div class="agent-balanced">{bal_line}</div>
+    <div class="liq-list" style="margin-top:10px;">{dir_rows}</div>
+    <p class="dim" style="margin:14px 0 6px;">Greutati invatate din date</p>
+    <div class="fib-list">{w_rows}</div>
+    '''
+
+
+def render_learning_curve(history, weights_history, health, agent_state=None):
     hit_curve = compute_hit_rate_curve(history)
     hit_svg = render_line_chart_svg({"hit_rate": hit_curve}, y_min=0, y_max=100)
 
@@ -314,6 +361,23 @@ def render_learning_curve(history, weights_history, health):
         for n, c in zip(comps, ["var(--ema20)", "var(--bull)", "var(--amber)", "var(--bear)"])
     )
 
+    agent_block = ""
+    curve = (agent_state or {}).get("curve") or []
+    if len(curve) >= 2:
+        agent_svg = render_line_chart_svg({
+            "agent": [p["agent"] for p in curve],
+            "baseline": [p["baseline"] for p in curve],
+        }, y_min=0, y_max=100)
+        agent_block = f'''
+    <div class="lc-block">
+      <h3>Agent AI vs euristica <span class="dim">(acuratete cumulativa)</span></h3>
+      {agent_svg}
+      <div class="legend">
+        <span><i class="dot" style="background:var(--ema20)"></i>agent AI</span>
+        <span><i class="dot" style="background:var(--bull)"></i>euristica</span>
+      </div>
+    </div>'''
+
     return f'''
     <div class="lc-block">
       <h3>Hit-rate cumulativ <span class="dim">({health["evaluated"]} semnale evaluate)</span></h3>
@@ -323,16 +387,17 @@ def render_learning_curve(history, weights_history, health):
       <h3>Evolutia ponderilor adaptive</h3>
       {w_svg}
       <div class="legend">{legend}</div>
-    </div>
+    </div>{agent_block}
     '''
 
 
-def build_html(scan, best, deep, chart, health, weights, session, token_meta, narrative, history, weights_history):
+def build_html(scan, best, deep, chart, health, weights, session, token_meta, narrative, history, weights_history, agent_state):
     plan_html = render_plan(best, deep)
     levels_html = render_levels(deep)
     liquidity_html = render_liquidity(deep)
     similar_html = render_similar_projects(token_meta, narrative)
-    learning_curve_html = render_learning_curve(history, weights_history, health)
+    learning_curve_html = render_learning_curve(history, weights_history, health, agent_state)
+    agent_html = render_agent_card(agent_state)
     chart_svg = render_svg_chart(chart)
     weight_bars = render_weight_bars(weights)
     long_rows = render_opportunity_rows(scan.get("top_long", []))
@@ -433,6 +498,15 @@ header{{display:flex;justify-content:space-between;align-items:baseline;
   color:var(--text-dim);font-weight:500;margin:0 0 8px;}}
 .chart-svg-sm{{width:100%;height:auto;display:block;}}
 
+.agent-status{{font-family:var(--font-mono);font-size:12px;padding:8px 10px;
+  border-radius:6px;margin-bottom:12px;line-height:1.5;}}
+.agent-ok{{background:rgba(52,211,153,.12);color:var(--bull);}}
+.agent-warn{{background:rgba(230,180,80,.12);color:var(--amber);}}
+.agent-metrics{{display:grid;grid-template-columns:1fr 1fr;gap:10px;
+  font-family:var(--font-mono);font-size:14px;}}
+.agent-metrics div{{background:var(--panel-2);border-radius:7px;padding:8px 10px;}}
+.agent-balanced{{font-family:var(--font-mono);font-size:15px;font-weight:700;color:var(--text);}}
+
 .weight-row{{display:grid;grid-template-columns:80px 1fr 54px;align-items:center;
   gap:10px;margin-bottom:10px;font-size:12px;}}
 .weight-label{{text-transform:uppercase;letter-spacing:.06em;color:var(--text-dim);}}
@@ -525,6 +599,11 @@ footer{{margin-top:26px;color:var(--text-dim);font-size:11px;line-height:1.6;}}
       </div>
 
       <div class="card">
+        <h2>Agent AI &middot; invatare online</h2>
+        {agent_html}
+      </div>
+
+      <div class="card">
         <h2>Learning curve &middot; progresul agentului</h2>
         {learning_curve_html}
       </div>
@@ -555,6 +634,7 @@ def main():
     chart = load_json(CHART_FILE, None)
     token_metadata = load_json(TOKEN_METADATA_FILE, {})
     weights_history = load_json(WEIGHTS_HISTORY_FILE, [])
+    agent_state = load_json(AGENT_MODEL_FILE, {})
 
     scan = history[-1] if history else {"scan_time": "-", "universe_size": 0, "top_long": [], "top_short": []}
     best = scan.get("best_candidate")
@@ -570,7 +650,7 @@ def main():
             narrative = None  # narativul e vechi, pt alt candidat - nu-l arat ca fiind curent
 
     os.makedirs(DOCS_DIR, exist_ok=True)
-    html = build_html(scan, best, deep, chart, health, weights, session, token_meta, narrative, history, weights_history)
+    html = build_html(scan, best, deep, chart, health, weights, session, token_meta, narrative, history, weights_history, agent_state)
     with open(OUTPUT_FILE, "w") as f:
         f.write(html)
     print(f"Dashboard generat: {OUTPUT_FILE}")
