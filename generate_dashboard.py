@@ -29,6 +29,7 @@ HISTORY_FILE = os.path.join(DATA_DIR, "scan_history.json")
 WEIGHTS_FILE = os.path.join(DATA_DIR, "weights.json")
 WEIGHTS_HISTORY_FILE = os.path.join(DATA_DIR, "weights_history.json")
 AGENT_MODEL_FILE = os.path.join(DATA_DIR, "agent_model.json")
+PLANS_FILE = os.path.join(DATA_DIR, "plans.json")
 CHART_FILE = os.path.join(DATA_DIR, "latest_chart.json")
 OUTPUT_FILE = os.path.join(DOCS_DIR, "index.html")
 
@@ -300,6 +301,64 @@ def render_line_chart_svg(series_dict, width=640, height=150, pad=12, y_min=None
     return "\n".join(parts)
 
 
+STATE_STYLE = {
+    "OPEN": ("open", "OPEN &middot; WAITING"),
+    "TP1_HIT": ("tp1", "TP1 HIT &middot; RUNNING"),
+    "TP2_HIT": ("tp2", "TP2 HIT &middot; CLOSED"),
+    "SL_HIT": ("sl", "SL &middot; INVALIDATED"),
+    "EXPIRED": ("exp", "EXPIRED"),
+}
+
+
+def render_plan_memory(store):
+    """Memoria de planuri: fiecare plan numerotat, cu starea lui si R realizat."""
+    plans = (store or {}).get("plans") or []
+    if not plans:
+        return '<p class="dim">Niciun plan inca &mdash; apar la prima scanare cu semnale.</p>'
+
+    summary = store.get("summary") or {}
+    head = ""
+    if summary.get("closed"):
+        pf = summary.get("profit_factor")
+        head = f'''<div class="plan-summary">
+      <div><span class="dim">R TOTAL</span><br>{summary["total_r"]:+.2f}R</div>
+      <div><span class="dim">RATA</span><br>{summary["win_rate"]}%</div>
+      <div><span class="dim">R MEDIU</span><br>{summary["avg_r"]:+.3f}R</div>
+      <div><span class="dim">PROFIT FACTOR</span><br>{pf if pf is not None else "&mdash;"}</div>
+    </div>'''
+
+    cards = []
+    for p in sorted(plans, key=lambda x: x["id"], reverse=True)[:12]:
+        cls, label = STATE_STYLE.get(p["state"], ("open", p["state"]))
+        r = p.get("realized_r")
+        r_txt = f'<span class="plan-r r-{"pos" if r and r > 0 else "neg"}">{r:+.2f}R</span>' if r is not None else ""
+        mode = (p.get("decision") or {}).get("mode", "")
+        cards.append(f'''<div class="plan-card plan-{cls}">
+      <div class="plan-head-row"><strong>PLAN #{p["id"]} &middot; {p["symbol"]}</strong>{r_txt}</div>
+      <div class="plan-state">{p["direction"]} &middot; {label}</div>
+      <div class="plan-lv">entry {fmt_price(p["entry"])} &middot; SL {fmt_price(p["sl"])} &middot; TP1 {fmt_price(p["tp1"])}</div>
+      <div class="dim" style="margin-top:4px;">{p["created_time"]} &middot; {mode}</div>
+    </div>''')
+    return head + '<div class="plan-grid-cards">' + "".join(cards) + "</div>"
+
+
+def render_calibration(store):
+    """Probabilitatea MASURATA pe intervale de scor, nu formula."""
+    cal = (store or {}).get("calibration") or {}
+    if not cal:
+        return '<p class="dim">Se calibreaza dupa primele planuri inchise.</p>'
+    rows = []
+    for b in sorted(cal, key=int):
+        e = cal[b]
+        badge = "reliable" if e["reliable"] else "thin"
+        txt = (f'{e["win_rate"]}% <span class="dim">(IC {e["ci_low"]}-{e["ci_high"]}%)</span>'
+               if e["reliable"] else f'<span class="dim">n={e["total"]}, prea putine date</span>')
+        rows.append(f'''<div class="cal-row cal-{badge}">
+      <span>scor {b}-{int(b)+19}</span><span>{txt}</span>
+      <span class="dim">{e["avg_r"]:+.2f}R</span></div>''')
+    return '<div class="cal-list">' + "".join(rows) + "</div>"
+
+
 def render_agent_card(agent_state):
     if not agent_state or not agent_state.get("agent", {}).get("total"):
         return ('<p class="dim">Agentul nu s-a antrenat inca &mdash; ruleaza ai_agent.py '
@@ -391,13 +450,15 @@ def render_learning_curve(history, weights_history, health, agent_state=None):
     '''
 
 
-def build_html(scan, best, deep, chart, health, weights, session, token_meta, narrative, history, weights_history, agent_state):
+def build_html(scan, best, deep, chart, health, weights, session, token_meta, narrative, history, weights_history, agent_state, plans_store):
     plan_html = render_plan(best, deep)
     levels_html = render_levels(deep)
     liquidity_html = render_liquidity(deep)
     similar_html = render_similar_projects(token_meta, narrative)
     learning_curve_html = render_learning_curve(history, weights_history, health, agent_state)
     agent_html = render_agent_card(agent_state)
+    plans_html = render_plan_memory(plans_store)
+    calibration_html = render_calibration(plans_store)
     chart_svg = render_svg_chart(chart)
     weight_bars = render_weight_bars(weights)
     long_rows = render_opportunity_rows(scan.get("top_long", []))
@@ -505,6 +566,30 @@ header{{display:flex;justify-content:space-between;align-items:baseline;
 .agent-metrics{{display:grid;grid-template-columns:1fr 1fr;gap:10px;
   font-family:var(--font-mono);font-size:14px;}}
 .agent-metrics div{{background:var(--panel-2);border-radius:7px;padding:8px 10px;}}
+.plan-summary{{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;
+  font-family:var(--font-mono);font-size:14px;}}
+.plan-summary div{{background:var(--panel-2);border-radius:7px;padding:8px 10px;}}
+.plan-grid-cards{{display:grid;gap:8px;}}
+@media(min-width:600px){{.plan-grid-cards{{grid-template-columns:1fr 1fr;}}}}
+.plan-card{{background:var(--panel-2);border-radius:7px;padding:10px 12px;
+  border-left:3px solid var(--text-dim);font-size:12px;}}
+.plan-open{{border-left-color:var(--ema20);}}
+.plan-tp1{{border-left-color:var(--amber);}}
+.plan-tp2{{border-left-color:var(--bull);}}
+.plan-sl{{border-left-color:var(--bear);}}
+.plan-exp{{border-left-color:var(--text-dim);}}
+.plan-head-row{{display:flex;justify-content:space-between;align-items:baseline;
+  font-family:var(--font-mono);margin-bottom:3px;}}
+.plan-r{{font-weight:700;}}
+.r-pos{{color:var(--bull);}}
+.r-neg{{color:var(--bear);}}
+.plan-state{{font-family:var(--font-mono);font-size:11px;color:var(--text-dim);}}
+.plan-lv{{font-family:var(--font-mono);font-size:11px;margin-top:4px;}}
+.cal-list{{display:flex;flex-direction:column;gap:5px;font-family:var(--font-mono);font-size:12px;}}
+.cal-row{{display:grid;grid-template-columns:100px 1fr 60px;background:var(--panel-2);
+  border-radius:6px;padding:6px 9px;align-items:center;}}
+.cal-reliable{{border-left:2px solid var(--bull);}}
+.cal-thin{{border-left:2px solid var(--text-dim);}}
 .agent-balanced{{font-family:var(--font-mono);font-size:15px;font-weight:700;color:var(--text);}}
 
 .weight-row{{display:grid;grid-template-columns:80px 1fr 54px;align-items:center;
@@ -599,6 +684,16 @@ footer{{margin-top:26px;color:var(--text-dim);font-size:11px;line-height:1.6;}}
       </div>
 
       <div class="card">
+        <h2>Autonomous plan memory</h2>
+        {plans_html}
+      </div>
+
+      <div class="card">
+        <h2>Calibrare &middot; probabilitate masurata</h2>
+        {calibration_html}
+      </div>
+
+      <div class="card">
         <h2>Agent AI &middot; invatare online</h2>
         {agent_html}
       </div>
@@ -635,6 +730,7 @@ def main():
     token_metadata = load_json(TOKEN_METADATA_FILE, {})
     weights_history = load_json(WEIGHTS_HISTORY_FILE, [])
     agent_state = load_json(AGENT_MODEL_FILE, {})
+    plans_store = load_json(PLANS_FILE, {})
 
     scan = history[-1] if history else {"scan_time": "-", "universe_size": 0, "top_long": [], "top_short": []}
     best = scan.get("best_candidate")
@@ -650,7 +746,7 @@ def main():
             narrative = None  # narativul e vechi, pt alt candidat - nu-l arat ca fiind curent
 
     os.makedirs(DOCS_DIR, exist_ok=True)
-    html = build_html(scan, best, deep, chart, health, weights, session, token_meta, narrative, history, weights_history, agent_state)
+    html = build_html(scan, best, deep, chart, health, weights, session, token_meta, narrative, history, weights_history, agent_state, plans_store)
     with open(OUTPUT_FILE, "w") as f:
         f.write(html)
     print(f"Dashboard generat: {OUTPUT_FILE}")
