@@ -165,7 +165,15 @@ def main():
     print(f"Actualizez metadata pentru {len(universe)} simboluri "
           f"(delay {delay}s intre apeluri, {'cu' if COINGECKO_API_KEY else 'fara'} cheie Demo)...")
 
-    coins_list = http_get_json(f"{COINGECKO_BASE}/coins/list", coingecko_headers())
+    try:
+        coins_list = http_get_json(f"{COINGECKO_BASE}/coins/list", coingecko_headers())
+    except Exception as e:
+        # NU las asta sa omoare workflow-ul: daca pasul iese cu cod != 0,
+        # GitHub Actions opreste job-ul si nu mai ajunge la pasul de commit,
+        # deci s-ar pierde toata scanarea. Metadata e optionala; scanarea nu.
+        print(f"[!] CoinGecko indisponibil ({e}) - sar peste actualizarea metadata "
+              f"in aceasta rulare. Se reincearca la urmatoarea.")
+        return
 
     tokens = {}
     for sym in universe:
