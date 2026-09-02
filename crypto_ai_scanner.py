@@ -30,6 +30,7 @@ scoreaza si notifica. Nu este sfat financiar.
 
 import ccxt
 import plan_tracker
+import indicators
 import json
 import os
 import time
@@ -546,7 +547,10 @@ def main():
         fib = compute_fibonacci(highs, lows)
         plan = compute_trade_plan(best["direction"], best["price"], best["atr"], structure, fib)
         liquidity = fetch_liquidity_levels(exchange, best["symbol"])
-        deep_analysis = {"structure": structure, "fibonacci": fib, "plan": plan, "liquidity": liquidity}
+        # indicatorii din poze - calculati din OHLCV deja descarcat, zero apeluri API in plus
+        inds = indicators.compute_all(best_ohlcv)
+        deep_analysis = {"structure": structure, "fibonacci": fib, "plan": plan,
+                         "liquidity": liquidity, "indicators": inds}
 
         n = CONFIG["chart_candles"]
         save_json(CHART_FILE, {
@@ -558,9 +562,9 @@ def main():
         })
 
     # ---- PLANURI: creez pentru toate semnalele din top, nu doar pentru cel
-    # mai bun. Reutilizez ohlcv_cache, deci nu costa niciun apel API in plus.
+    # mai bun. Reutilizez ohlcv_cache, deci in mod normal nu costa apeluri
+    # API in plus.
     plan_store = plan_tracker.load_plans()
-    calibration = plan_tracker.build_calibration(plan_store)
 
     # 1) evaluez planurile deschise pe lumanarile proaspete
     closed_now = []
@@ -569,11 +573,25 @@ def main():
             continue
         candles = ohlcv_cache.get(p["symbol"])
         if not candles:
-            continue  # simbolul nu a mai intrat in scanare acum; reincerc data viitoare
+            # Planul e "orfan": simbolul a iesit din top-200 sau din universul
+            # scanat. Fara asta ar ramane OPEN la nesfarsit si nu s-ar invata
+            # niciodata din el. Descarc explicit - sunt putine cazuri.
+            try:
+                candles = exchange.fetch_ohlcv(
+                    p["symbol"], timeframe=CONFIG["timeframe"], limit=CONFIG["candles"])
+                ohlcv_cache[p["symbol"]] = candles
+                print(f"  (plan orfan #{p['id']} {p['symbol']}: descarcat separat)")
+            except Exception as e:
+                print(f"  [!] plan orfan #{p['id']} {p['symbol']}: {e}")
+                continue
         if plan_tracker.evaluate_plan(p, candles) and p["state"] in plan_tracker.CLOSED_STATES:
             closed_now.append(p)
 
-    # 2) decid daca deschid planuri noi
+    # 2) recalibrez ACUM, dupa evaluare - deciziile de mai jos trebuie sa
+    # foloseasca si rezultatele inchise chiar in aceasta rulare, nu date vechi
+    calibration = plan_tracker.build_calibration(plan_store)
+
+    # 3) decid daca deschid planuri noi
     issued, skipped = [], []
     for sig in (longs[: CONFIG["top_n_per_direction"]] + shorts[: CONFIG["top_n_per_direction"]]):
         if plan_tracker.has_open_plan(plan_store, sig["symbol"], sig["direction"]):
@@ -595,7 +613,7 @@ def main():
         if new_plan:
             issued.append(new_plan)
 
-    # 3) recalibrez cu rezultatele proaspete si salvez
+    # 4) salvez calibrarea finala si rezumatul
     plan_store["calibration"] = plan_tracker.build_calibration(plan_store)
     plan_store["summary"] = plan_tracker.summarize(plan_store)
     plan_tracker.save_plans(plan_store)
