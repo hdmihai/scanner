@@ -161,16 +161,24 @@ def evaluate_plan(plan, candles):
     if not relevant:
         return False
 
-    tp1_hit = plan["state"] == STATE_TP1
+    # BUG FIX (idempotenta): retin MOMENTUL cand s-a atins TP1, nu doar un
+    # boolean. Fara asta, la reevaluarea planului - se intampla la FIECARE
+    # scanare, pe aceleasi lumanari - SL-ul mutat la breakeven se aplica
+    # RETROACTIV si barelor de dinainte de TP1. Cum entry-ul e langa pretul
+    # curent, aproape orice plan coboara sub entry la un moment dat inainte de
+    # TP1, deci toti castigatorii s-ar fi inchis fals la +0.5R in loc sa ruleze
+    # spre TP2 - si toate datele de invatare ar fi fost falsificate in jos.
+    tp1_ts = plan.get("tp1_hit_ts")
     changed = False
     bars = 0
 
     for c in relevant:
         bars += 1
-        high, low, close = c[2], c[3], c[4]
+        bar_ts, high, low, close = c[0] / 1000.0, c[2], c[3], c[4]
 
-        # SL-ul curent: dupa TP1 se muta la breakeven (regula 2 din header)
-        active_sl = entry if tp1_hit else sl
+        # breakeven-ul se aplica DOAR barelor de dupa cea in care s-a atins TP1
+        after_tp1 = tp1_ts is not None and bar_ts > tp1_ts
+        active_sl = entry if after_tp1 else sl
 
         if is_long:
             sl_touched = low <= active_sl
@@ -183,7 +191,7 @@ def evaluate_plan(plan, candles):
 
         # REGULA 1: ambiguitate in aceeasi bara -> presupun SL primul
         if sl_touched:
-            if tp1_hit:
+            if after_tp1:
                 # jumatate luata la TP1, restul iesit la breakeven
                 r = TP1_FRACTION * _r_at(tp1, entry, sl, direction)
                 plan["state_detail"] = "TP1 HIT · SL LA BREAKEVEN"
@@ -192,35 +200,37 @@ def evaluate_plan(plan, candles):
                 plan["state_detail"] = "SL HIT · INVALIDATED"
             plan["state"] = STATE_SL
             plan["realized_r"] = round(r, 3)
-            plan["closed_ts"] = c[0] / 1000.0
+            plan["closed_ts"] = bar_ts
             changed = True
             break
 
         if tp2_touched:
             r_tp1 = _r_at(tp1, entry, sl, direction)
             r_tp2 = _r_at(tp2, entry, sl, direction)
-            r = TP1_FRACTION * r_tp1 + (1 - TP1_FRACTION) * r_tp2 if tp1_hit else r_tp2
+            r = (TP1_FRACTION * r_tp1 + (1 - TP1_FRACTION) * r_tp2
+                 if tp1_ts is not None else r_tp2)
             plan["state"] = STATE_TP2
             plan["state_detail"] = "TP2 HIT · CLOSED"
             plan["realized_r"] = round(r, 3)
-            plan["closed_ts"] = c[0] / 1000.0
+            plan["closed_ts"] = bar_ts
             changed = True
             break
 
-        if tp1_touched and not tp1_hit:
-            tp1_hit = True
+        if tp1_touched and tp1_ts is None:
+            tp1_ts = bar_ts
+            plan["tp1_hit_ts"] = bar_ts
             plan["state"] = STATE_TP1
             plan["state_detail"] = "TP1 HIT · RULEAZA SPRE TP2"
             changed = True
 
         if bars >= MAX_BARS:
             r = _r_at(close, entry, sl, direction)
-            if tp1_hit:
+            if tp1_ts is not None:
                 r = TP1_FRACTION * _r_at(tp1, entry, sl, direction) + (1 - TP1_FRACTION) * r
             plan["state"] = STATE_EXPIRED
             plan["state_detail"] = f"EXPIRAT dupa {bars} bare"
             plan["realized_r"] = round(r, 3)
-            plan["closed_ts"] = c[0] / 1000.0
+            plan["closed_ts"] = bar_ts
             changed = True
             break
 
