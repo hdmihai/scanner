@@ -36,6 +36,9 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python crypto_ai_scanner.py
 
+      - name: Antreneaza agentul AI pe semnalele nou evaluate
+        run: python ai_agent.py
+
       - name: Actualizeaza metadata proiecte (CoinGecko + optional Gemini)
         env:
           COINGECKO_API_KEY: ${{ secrets.COINGECKO_API_KEY }}
@@ -54,6 +57,11 @@ jobs:
         run: python send_email_digest.py
 
       - name: Salveaza memoria (data/) si pagina (docs/) inapoi in repo
+        # if: always() - ruleaza chiar daca un pas anterior a esuat. Altfel, o
+        # eroare in metadata/email (ex: rate limit CoinGecko) ar omori job-ul
+        # inainte de salvare si s-ar pierde toata scanarea. Daca nu s-a
+        # schimbat nimic, `git diff --staged --quiet` face pasul un no-op.
+        if: always()
         run: |
           git config user.name "crypto-ai-scanner-bot"
           git config user.email "actions@users.noreply.github.com"
