@@ -37,13 +37,17 @@ from datetime import datetime, timezone
 
 # ============================== CONFIG ==============================
 CONFIG = {
-    "exchange_fallback": ["kraken", "okx", "kucoin", "gateio", "mexc"],
+    "exchange_fallback": ["okx", "kucoin", "gateio", "mexc", "kraken"],
     # Incearca pe rand, primul care raspunde e folosit - vezi connect_exchange().
     # Kraken primul (serveste SUA, nu are motiv sa geo-blocheze); restul sunt
     # rezerve. NU mai modifica sursa fisierului la runtime (spre deosebire de
     # run_scanner_with_exchange_fallback.py, care trebuie sters - vezi nota
     # din raspuns).
-    "quote": "USDT",
+    "quotes": ["USDT", "USDC", "USD"],
+    # Mai multe monede de cotare, nu doar USDT: pe Kraken aproape totul e cotat
+    # in USD (doar 44 perechi USDT din 1440 de piete), motiv pentru care prima
+    # rulare reala a gasit doar 34 de simboluri. Deduplicate pe simbolul de baza.
+    "min_universe": 120,       # sub atat, incerc urmatorul exchange din lista
     "universe_size": 200,      # cate simboluri intra efectiv in scanare (scor + persistenta)
     "coingecko_scope": 200,    # doar proiectele din top N CoinGecko dupa market cap sunt eligibile
     "timeframe": "1h",
@@ -254,17 +258,30 @@ def score_symbol(ohlcv, weights):
 # reactioneze pretul, pentru ca acolo sta volumul mare de ordine.
 
 def fetch_liquidity_levels(exchange, symbol, depth=50, top_n=3):
+    """BUG FIX: nu despachetez cu `for p, a in bids`. Standardul ccxt e
+    [pret, cantitate], dar unele exchange-uri adauga un al treilea camp -
+    Kraken pune si timestamp-ul nivelului, ceea ce arunca
+    "ValueError: too many values to unpack (expected 2)". Iau explicit
+    primele doua elemente si ignor restul, indiferent de exchange."""
     try:
         ob = exchange.fetch_order_book(symbol, limit=depth)
     except Exception as e:
         print(f"[!] order book {symbol}: {e}")
         return None
-    bids = sorted(ob.get("bids", []), key=lambda x: x[1], reverse=True)[:top_n]
-    asks = sorted(ob.get("asks", []), key=lambda x: x[1], reverse=True)[:top_n]
-    return {
-        "bids": [{"price": round(p, 6), "amount": round(a, 4)} for p, a in bids],
-        "asks": [{"price": round(p, 6), "amount": round(a, 4)} for p, a in asks],
-    }
+
+    def normalize(levels):
+        out = []
+        for lvl in levels or []:
+            if not lvl or len(lvl) < 2:
+                continue
+            try:
+                price, amount = float(lvl[0]), float(lvl[1])
+            except (TypeError, ValueError):
+                continue
+            out.append({"price": round(price, 6), "amount": round(amount, 4)})
+        return sorted(out, key=lambda d: d["amount"], reverse=True)[:top_n]
+
+    return {"bids": normalize(ob.get("bids")), "asks": normalize(ob.get("asks"))}
 
 
 def fetch_coingecko_top_symbols(top_n=200):
@@ -397,13 +414,48 @@ def format_message(scan):
 
 # ================================ MAIN ===================================
 
-def connect_exchange():
-    """Incearca exchange-urile din CONFIG['exchange_fallback'] in ordine, la
-    runtime, fara sa modifice fisierul sursa (spre deosebire de
-    run_scanner_with_exchange_fallback.py). Necesar pentru ca Binance (451)
-    SI Bybit (403 CloudFront) s-au dovedit blocate din runner-ul GitHub
-    Actions - motive diferite, acelasi rezultat."""
+def build_eligible_pairs(markets, tickers, scope):
+    """Construieste lista de perechi eligibile, cu doua imbunatatiri fata de
+    varianta initiala:
+
+    1. MAI MULTE MONEDE DE COTARE. Prima rulare reala a gasit doar 34 de
+       simboluri pe Kraken, pentru ca acolo aproape totul e cotat in USD, nu
+       USDT (44 perechi USDT din 1440 de piete). Accept acum USDT/USDC/USD.
+    2. DEDUPLICARE PE SIMBOL DE BAZA. BTC/USDT si BTC/USD sunt acelasi
+       proiect - pastrez varianta cu volum mai mare, ca sa nu apara de doua
+       ori in universul scanat si sa umfle artificial numararea."""
+    by_base = {}
+    for symbol, m in markets.items():
+        if not m.get("active", True):
+            continue
+        parts = symbol.split("/")
+        if len(parts) != 2:
+            continue
+        base, quote = parts[0].upper(), parts[1].upper()
+        if quote not in CONFIG["quotes"]:
+            continue
+        if scope and base not in scope:
+            continue
+        vol = tickers.get(symbol, {}).get("quoteVolume", 0) or 0
+        prev = by_base.get(base)
+        if prev is None or vol > prev[1]:
+            by_base[base] = (symbol, vol)
+
+    pairs = sorted(by_base.values(), key=lambda t: t[1], reverse=True)
+    return [symbol for symbol, _ in pairs]
+
+
+def connect_exchange(scope):
+    """Alege exchange-ul dupa ACOPERIRE, nu doar dupa conectivitate.
+
+    Varianta veche lua primul exchange care raspundea - a nimerit Kraken, care
+    a mers, dar acopera putin din top-200. Acum, pentru fiecare exchange care
+    raspunde, calculez cate simboluri din scope gaseste efectiv si ma opresc la
+    primul care trece pragul; daca niciunul nu-l trece, folosesc cel mai bun
+    gasit (tot mai bine decat sa pic)."""
+    best = None
     last_error = None
+
     for exchange_id in CONFIG["exchange_fallback"]:
         exchange_class = getattr(ccxt, exchange_id, None)
         if exchange_class is None:
@@ -413,44 +465,42 @@ def connect_exchange():
         try:
             markets = exchange.load_markets()
             tickers = exchange.fetch_tickers()
-            print(f"[OK] Conectat la {exchange_id} ({len(markets)} piete).")
-            return exchange, markets, tickers, exchange_id
         except Exception as e:
             print(f"[!] {exchange_id} indisponibil din acest runner: {e}")
             last_error = e
             continue
 
-    raise SystemExit(
-        f"[EROARE FATALA] Niciun exchange din {CONFIG['exchange_fallback']} nu "
-        f"a raspuns din acest runner. Ultima eroare: {last_error}\n"
-        "Adauga alt exchange in CONFIG['exchange_fallback'], sau ruleaza "
-        "scriptul de pe un server/PC/telefon cu IP rezidential (nu de cloud)."
-    )
+        pairs = build_eligible_pairs(markets, tickers, scope)
+        print(f"[OK] {exchange_id}: {len(markets)} piete -> {len(pairs)} simboluri eligibile din scope.")
+
+        if best is None or len(pairs) > len(best[3]):
+            best = (exchange, markets, tickers, pairs, exchange_id)
+
+        if len(pairs) >= CONFIG["min_universe"]:
+            print(f"=> Folosesc {exchange_id} (acoperire suficienta).")
+            return best
+
+    if best is None:
+        raise SystemExit(
+            f"[EROARE FATALA] Niciun exchange din {CONFIG['exchange_fallback']} nu "
+            f"a raspuns din acest runner. Ultima eroare: {last_error}\n"
+            "Adauga alt exchange in CONFIG['exchange_fallback'], sau ruleaza "
+            "scriptul de pe un server/PC/telefon cu IP rezidential (nu de cloud)."
+        )
+
+    print(f"[!] Niciun exchange nu atinge pragul de {CONFIG['min_universe']} simboluri. "
+          f"Folosesc cel mai bun gasit: {best[4]} cu {len(best[3])} simboluri.")
+    return best
 
 
 def main():
-    exchange, markets, all_tickers, exchange_id = connect_exchange()
-
-    usdt_pairs = [
-        s for s, m in markets.items()
-        if s.endswith("/" + CONFIG["quote"]) and m.get("active", True)
-    ]
-
     coingecko_scope = fetch_coingecko_top_symbols(CONFIG["coingecko_scope"])
-    if coingecko_scope:
-        before = len(usdt_pairs)
-        usdt_pairs = [s for s in usdt_pairs if s.split("/")[0].upper() in coingecko_scope]
-        print(f"Scope CoinGecko top-{CONFIG['coingecko_scope']}: {before} -> {len(usdt_pairs)} "
-              f"perechi eligibile pe {exchange_id}.")
-    else:
+    if not coingecko_scope:
         print("[!] Nu am putut lua lista CoinGecko - continui fara filtrul de scope.")
 
-    ranked = sorted(
-        usdt_pairs,
-        key=lambda s: all_tickers.get(s, {}).get("quoteVolume", 0) or 0,
-        reverse=True,
-    )
-    universe = ranked[: CONFIG["universe_size"]]
+    exchange, markets, all_tickers, eligible, exchange_id = connect_exchange(coingecko_scope)
+    universe = eligible[: CONFIG["universe_size"]]
+    print(f"Universe final: {len(universe)} simboluri pe {exchange_id}.")
 
     weights = load_json(WEIGHTS_FILE, dict(DEFAULT_WEIGHTS))
     history = load_json(HISTORY_FILE, [])
