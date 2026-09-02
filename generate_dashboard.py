@@ -27,6 +27,7 @@ DATA_DIR = "data"
 DOCS_DIR = "docs"
 HISTORY_FILE = os.path.join(DATA_DIR, "scan_history.json")
 WEIGHTS_FILE = os.path.join(DATA_DIR, "weights.json")
+WEIGHTS_HISTORY_FILE = os.path.join(DATA_DIR, "weights_history.json")
 CHART_FILE = os.path.join(DATA_DIR, "latest_chart.json")
 OUTPUT_FILE = os.path.join(DOCS_DIR, "index.html")
 
@@ -251,11 +252,87 @@ def render_plan(best, deep):
 
 # --------------------------------- PAGINA -----------------------------------
 
-def build_html(scan, best, deep, chart, health, weights, session, token_meta, narrative):
+def compute_hit_rate_curve(history):
+    """Hit-rate cumulativ, un punct per scanare - arata cum evolueaza
+    precizia semnalelor pe masura ce se acumuleaza date evaluate."""
+    points, hits, total = [], 0, 0
+    for scan in history:
+        for r in scan.get("results", []):
+            if r.get("outcome") == "hit":
+                hits += 1; total += 1
+            elif r.get("outcome") == "miss":
+                total += 1
+        points.append(round(100 * hits / total, 2) if total else None)
+    return points
+
+
+def render_line_chart_svg(series_dict, width=640, height=150, pad=12, y_min=None, y_max=None):
+    """Mini-grafic de linii generic (fara lumanari) - reutilizat pentru
+    hit-rate si pentru evolutia ponderilor."""
+    all_vals = [v for s in series_dict.values() for v in s if v is not None]
+    if len(all_vals) < 2:
+        return '<div class="chart-empty">Inca nu sunt destule date acumulate.</div>'
+    vmax = y_max if y_max is not None else max(all_vals)
+    vmin = y_min if y_min is not None else min(all_vals)
+    vrange = (vmax - vmin) or 1
+    n = max(len(s) for s in series_dict.values())
+    plot_w, plot_h = width - 2 * pad, height - 2 * pad
+
+    def x(i):
+        return pad + (i / max(n - 1, 1)) * plot_w
+
+    def y(v):
+        return pad + (vmax - v) / vrange * plot_h
+
+    colors = ["var(--ema20)", "var(--bull)", "var(--amber)", "var(--bear)"]
+    parts = [f'<svg viewBox="0 0 {width} {height}" class="chart-svg-sm">']
+    for frac in (0, 0.5, 1.0):
+        gy = pad + frac * plot_h
+        parts.append(f'<line x1="{pad}" y1="{gy:.1f}" x2="{width - pad}" y2="{gy:.1f}" class="grid-line"/>')
+    for idx, series in enumerate(series_dict.values()):
+        pts = [(x(i), y(v)) for i, v in enumerate(series) if v is not None]
+        if len(pts) < 2:
+            continue
+        path = " ".join(f"{px:.1f},{py:.1f}" for px, py in pts)
+        parts.append(f'<polyline points="{path}" fill="none" stroke="{colors[idx % len(colors)]}" stroke-width="1.6" opacity="0.9"/>')
+    parts.append("</svg>")
+    return "\n".join(parts)
+
+
+def render_learning_curve(history, weights_history, health):
+    hit_curve = compute_hit_rate_curve(history)
+    hit_svg = render_line_chart_svg({"hit_rate": hit_curve}, y_min=0, y_max=100)
+
+    comps = ["trend", "momentum", "volatility", "volume"]
+    w_series = {c: [w.get(c) for w in weights_history] for c in comps}
+    w_svg = render_line_chart_svg(w_series, y_min=0.3, y_max=2.0) if len(weights_history) >= 2 else (
+        '<div class="chart-empty">Se acumuleaza de-abia de acum - revino peste cateva zile.</div>'
+    )
+
+    legend = "".join(
+        f'<span><i class="dot" style="background:{c}"></i>{n}</span>'
+        for n, c in zip(comps, ["var(--ema20)", "var(--bull)", "var(--amber)", "var(--bear)"])
+    )
+
+    return f'''
+    <div class="lc-block">
+      <h3>Hit-rate cumulativ <span class="dim">({health["evaluated"]} semnale evaluate)</span></h3>
+      {hit_svg}
+    </div>
+    <div class="lc-block">
+      <h3>Evolutia ponderilor adaptive</h3>
+      {w_svg}
+      <div class="legend">{legend}</div>
+    </div>
+    '''
+
+
+def build_html(scan, best, deep, chart, health, weights, session, token_meta, narrative, history, weights_history):
     plan_html = render_plan(best, deep)
     levels_html = render_levels(deep)
     liquidity_html = render_liquidity(deep)
     similar_html = render_similar_projects(token_meta, narrative)
+    learning_curve_html = render_learning_curve(history, weights_history, health)
     chart_svg = render_svg_chart(chart)
     weight_bars = render_weight_bars(weights)
     long_rows = render_opportunity_rows(scan.get("top_long", []))
@@ -351,6 +428,11 @@ header{{display:flex;justify-content:space-between;align-items:baseline;
 .narrative{{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);
   font-size:13px;line-height:1.6;color:var(--text);}}
 
+.lc-block + .lc-block{{margin-top:16px;padding-top:16px;border-top:1px solid var(--border);}}
+.lc-block h3{{font-size:11px;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--text-dim);font-weight:500;margin:0 0 8px;}}
+.chart-svg-sm{{width:100%;height:auto;display:block;}}
+
 .weight-row{{display:grid;grid-template-columns:80px 1fr 54px;align-items:center;
   gap:10px;margin-bottom:10px;font-size:12px;}}
 .weight-label{{text-transform:uppercase;letter-spacing:.06em;color:var(--text-dim);}}
@@ -443,6 +525,11 @@ footer{{margin-top:26px;color:var(--text-dim);font-size:11px;line-height:1.6;}}
       </div>
 
       <div class="card">
+        <h2>Learning curve &middot; progresul agentului</h2>
+        {learning_curve_html}
+      </div>
+
+      <div class="card">
         <h2>Sessions</h2>
         <div class="sessions">
           <div><span class="dim">UTC now</span>{session["utc_time"]}</div>
@@ -467,6 +554,7 @@ def main():
     weights = load_json(WEIGHTS_FILE, {"trend": 1.0, "momentum": 1.0, "volatility": 1.0, "volume": 1.0})
     chart = load_json(CHART_FILE, None)
     token_metadata = load_json(TOKEN_METADATA_FILE, {})
+    weights_history = load_json(WEIGHTS_HISTORY_FILE, [])
 
     scan = history[-1] if history else {"scan_time": "-", "universe_size": 0, "top_long": [], "top_short": []}
     best = scan.get("best_candidate")
@@ -482,7 +570,7 @@ def main():
             narrative = None  # narativul e vechi, pt alt candidat - nu-l arat ca fiind curent
 
     os.makedirs(DOCS_DIR, exist_ok=True)
-    html = build_html(scan, best, deep, chart, health, weights, session, token_meta, narrative)
+    html = build_html(scan, best, deep, chart, health, weights, session, token_meta, narrative, history, weights_history)
     with open(OUTPUT_FILE, "w") as f:
         f.write(html)
     print(f"Dashboard generat: {OUTPUT_FILE}")
