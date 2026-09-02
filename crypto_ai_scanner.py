@@ -29,6 +29,7 @@ scoreaza si notifica. Nu este sfat financiar.
 """
 
 import ccxt
+import plan_tracker
 import json
 import os
 import time
@@ -555,6 +556,58 @@ def main():
             "ema20": ema_series_full(closes, 20)[-n:],
             "ema50": ema_series_full(closes, 50)[-n:],
         })
+
+    # ---- PLANURI: creez pentru toate semnalele din top, nu doar pentru cel
+    # mai bun. Reutilizez ohlcv_cache, deci nu costa niciun apel API in plus.
+    plan_store = plan_tracker.load_plans()
+    calibration = plan_tracker.build_calibration(plan_store)
+
+    # 1) evaluez planurile deschise pe lumanarile proaspete
+    closed_now = []
+    for p in plan_store["plans"]:
+        if p["state"] in plan_tracker.CLOSED_STATES:
+            continue
+        candles = ohlcv_cache.get(p["symbol"])
+        if not candles:
+            continue  # simbolul nu a mai intrat in scanare acum; reincerc data viitoare
+        if plan_tracker.evaluate_plan(p, candles) and p["state"] in plan_tracker.CLOSED_STATES:
+            closed_now.append(p)
+
+    # 2) decid daca deschid planuri noi
+    issued, skipped = [], []
+    for sig in (longs[: CONFIG["top_n_per_direction"]] + shorts[: CONFIG["top_n_per_direction"]]):
+        if plan_tracker.has_open_plan(plan_store, sig["symbol"], sig["direction"]):
+            continue
+        candles = ohlcv_cache.get(sig["symbol"])
+        if not candles:
+            continue
+        highs_s = [c[2] for c in candles]
+        lows_s = [c[3] for c in candles]
+        struct_s = compute_structure_levels(highs_s, lows_s)
+        fib_s = compute_fibonacci(highs_s, lows_s)
+        levels = compute_trade_plan(sig["direction"], sig["price"], sig["atr"], struct_s, fib_s)
+
+        decision = plan_tracker.decide(calibration, sig)
+        if decision["action"] == "SKIP":
+            skipped.append((sig["symbol"], decision["reason"]))
+            continue
+        new_plan = plan_tracker.create_plan(plan_store, sig, levels, decision)
+        if new_plan:
+            issued.append(new_plan)
+
+    # 3) recalibrez cu rezultatele proaspete si salvez
+    plan_store["calibration"] = plan_tracker.build_calibration(plan_store)
+    plan_store["summary"] = plan_tracker.summarize(plan_store)
+    plan_tracker.save_plans(plan_store)
+
+    print(f"\nPlanuri: {len(issued)} deschise, {len(skipped)} refuzate, "
+          f"{len(closed_now)} inchise in aceasta rulare")
+    for p in closed_now:
+        print(f"  PLAN #{p['id']} {p['symbol']} {p['direction']}: "
+              f"{p['state_detail']} -> {p['realized_r']:+.2f}R")
+    for sym, reason in skipped:
+        print(f"  REFUZAT {sym}: {reason}")
+    plan_tracker.print_summary(plan_store)
 
     scan_record = {
         "scan_id_ts": now_ts,
