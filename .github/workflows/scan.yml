@@ -1,11 +1,12 @@
 name: Crypto AI Scanner
 
-# Ruleaza automat la fiecare ora (minutul 7, ca sa evite varful de trafic
-# de la minutul 0 de pe serverele GitHub) + poti da click manual pe
-# "Run workflow" din tab-ul Actions oricand vrei un test imediat.
+# Ruleaza automat la fiecare 4 ore (minutul 7, ca sa evite varful de trafic
+# de la minutul 0 de pe serverele GitHub) - calculat sa ramana sub cele
+# 2000 min/luna gratuite pe repo privat, la universe_size=200. Poti da
+# click manual pe "Run workflow" din tab-ul Actions oricand vrei un test.
 on:
   schedule:
-    - cron: '7 * * * *'
+    - cron: '7 */4 * * *'
   workflow_dispatch: {}
 
 # Necesar ca job-ul sa poata face "git push" cu rezultatele scanarii
@@ -29,14 +30,11 @@ jobs:
       - name: Instaleaza dependinte
         run: pip install ccxt requests
 
-      - name: Ruleaza scannerul cu fallback automat de exchange
+      - name: Ruleaza scannerul (fallback de exchange e acum intern, in cod)
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          # Optional: change the fallback order without editing code.
-          # Example:
-          # CRI_EXCHANGE_ORDER: okx,kucoin,gateio,bitget,mexc,kraken,coinbase
-        run: python run_scanner_with_exchange_fallback.py
+        run: python crypto_ai_scanner.py
 
       - name: Actualizeaza metadata proiecte (CoinGecko + optional Gemini)
         env:
@@ -46,6 +44,14 @@ jobs:
 
       - name: Genereaza pagina dashboard (docs/index.html)
         run: python generate_dashboard.py
+
+      - name: Trimite digest pe email (doar la fiecare 4 ore)
+        env:
+          EMAIL_ADDRESS: ${{ secrets.EMAIL_ADDRESS }}
+          EMAIL_APP_PASSWORD: ${{ secrets.EMAIL_APP_PASSWORD }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+          GITHUB_PAGES_URL: https://hdmihai.github.io/scanner/
+        run: python send_email_digest.py
 
       - name: Salveaza memoria (data/) si pagina (docs/) inapoi in repo
         run: |
