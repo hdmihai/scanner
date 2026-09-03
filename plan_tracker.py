@@ -305,7 +305,7 @@ def calibrated_probability(calibration, score, bucket_size=20):
 
 # ========================= POARTA DE DECIZIE ================================
 
-def decide(calibration, signal, agent_proba=None, bucket_size=20):
+def decide(calibration, signal, agent_pred=None, bucket_size=20):
     """Agentul decide singur daca merita deschis un plan, pe baza istoricului
     lui de rezultate - nu pe baza unei formule fixe.
 
@@ -315,32 +315,52 @@ def decide(calibration, signal, agent_proba=None, bucket_size=20):
         invete niciodata nimic)
       - cu date -> calculeaza valoarea asteptata in R si deschide doar daca
         e pozitiva
+
+    ROLUL AGENTULUI (`agent_pred` din ai_agent.predict_for_signal):
+    Calibrarea stie doar in ce interval de scor cade semnalul. Agentul vede
+    toate caracteristicile (trend, momentum, volatilitate, volum, directie,
+    persistenta), deci e mai fin. Cand agentul e ACTIVE - adica a demonstrat
+    pe date ca bate baseline-ul - probabilitatea lui inlocuieste rata bruta
+    de bucket in calculul valorii asteptate. Marimile de castig/pierdere in R
+    raman cele MASURATE din planuri inchise; agentul estimeaza doar sansa,
+    nu inventeaza si magnitudini.
+    Cand agentul e in SHADOW, predictia lui e doar inregistrata pe plan, ca
+    sa se poata verifica ulterior daca ar fi ajutat.
     """
     score = signal.get("risk_adjusted", 0)
     cal = calibrated_probability(calibration, score, bucket_size)
+    agent_p = (agent_pred or {}).get("probability")
+    agent_active = bool((agent_pred or {}).get("active"))
 
     if cal is None:
         return {"action": "ISSUE", "mode": "EXPLORARE",
                 "reason": f"inca nu am destule planuri inchise la scor ~{score} "
                           f"(prag {MIN_BUCKET_SAMPLES}) - deschid ca sa invat",
-                "expected_value_r": None, "calibrated_prob": None}
+                "expected_value_r": None, "calibrated_prob": None,
+                "agent_prob": agent_p, "agent_used": False}
 
-    p = cal["win_rate"] / 100.0
     avg_win = cal["avg_win_r"] if cal["avg_win_r"] is not None else 1.0
     avg_loss = cal["avg_loss_r"] if cal["avg_loss_r"] is not None else 1.0
+
+    if agent_active and agent_p is not None:
+        p, source = agent_p, f"agent AI ({100*agent_p:.0f}%)"
+        agent_used = True
+    else:
+        p, source = cal["win_rate"] / 100.0, f"calibrare ({cal['win_rate']}%, n={cal['total']})"
+        agent_used = False
+
     ev = p * avg_win - (1 - p) * avg_loss
+    base = {"expected_value_r": round(ev, 3), "calibrated_prob": cal["win_rate"],
+            "agent_prob": agent_p, "agent_used": agent_used}
 
     if ev <= 0:
         return {"action": "SKIP", "mode": "EXPLOATARE",
-                "reason": f"valoare asteptata negativa ({ev:+.2f}R) la scor ~{score}: "
-                          f"rata reala {cal['win_rate']}% din {cal['total']} planuri inchise",
-                "expected_value_r": round(ev, 3), "calibrated_prob": cal["win_rate"]}
+                "reason": f"valoare asteptata negativa ({ev:+.2f}R) la scor ~{score}, "
+                          f"sansa din {source}", **base}
 
     return {"action": "ISSUE", "mode": "EXPLOATARE",
-            "reason": f"valoare asteptata {ev:+.2f}R la scor ~{score} "
-                      f"(rata reala {cal['win_rate']}%, IC {cal['ci_low']}-{cal['ci_high']}%, "
-                      f"n={cal['total']})",
-            "expected_value_r": round(ev, 3), "calibrated_prob": cal["win_rate"]}
+            "reason": f"valoare asteptata {ev:+.2f}R la scor ~{score}, sansa din {source} "
+                      f"(IC calibrare {cal['ci_low']}-{cal['ci_high']}%)", **base}
 
 
 # ============================== RAPORTARE ===================================
