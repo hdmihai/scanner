@@ -167,24 +167,50 @@ def compute_fibonacci(highs, lows, lookback=100):
     return {"swing_high": swing_high, "swing_low": swing_low, "retracement": retracement, "extension": extension}
 
 
-def compute_trade_plan(direction, price, atr_val, structure, fib):
-    """Plan de tranzactionare: SL pe baza de ATR, TP1 la prima structura relevanta, TP2 la extensia Fibonacci 1.618 (echivalentul casetei
-    AI PLAN: entry/SL/TP1/TP2 din poza ta)."""
-    ext_1618 = fib["extension"]["1.618"]
-    if direction == "LONG":
-        sl = price - atr_val * 1.5
-        above = [r for r in structure["resistance"] if r > price]
-        tp1 = min(above) if above else price + atr_val * 2
-        tp2 = ext_1618 if ext_1618 > tp1 else price + atr_val * 4
-    else:
-        sl = price + atr_val * 1.5
-        below = [s for s in structure["support"] if s < price]
-        tp1 = max(below) if below else price - atr_val * 2
-        tp2 = ext_1618 if ext_1618 < tp1 else price - atr_val * 4
+MIN_TP1_R = 1.0   # TP1 nu are voie mai aproape de 1R
+MIN_TP2_R = 2.5   # TP2 trebuie sa justifice riscul
 
-    risk = abs(price - sl)
-    reward = abs(tp2 - price)
-    expected_r = round(reward / risk, 2) if risk > 0 else None
+
+def compute_trade_plan(direction, price, atr_val, structure, fib):
+    """Plan de tranzactionare: SL pe baza de ATR, TP1 la prima structura
+    relevanta, TP2 la extensia Fibonacci 1.618.
+
+    PRAGURI MINIME IN R (adaugate dupa analiza a 47 de planuri reale):
+    Varianta initiala lua TP1 direct de la prima structura, fara sa verifice
+    cat de departe e. Cand cea mai apropiata rezistenta era la 0.1% iar SL-ul
+    la 1.5 ATR, iesea un TP1 la 0.05R - un plan care nu poate castiga. In
+    datele reale, 11 din 47 de planuri aveau TP1 sub 0.35R, unul chiar la 0.00R.
+
+    Efectul combinat cu regula "50% la TP1, apoi SL la breakeven": downside
+    ramanea -1R intreg, dar upside era taiat la ~0.45R. Castigul mediu masurat
+    a iesit 0.506R fata de pierdere medie 1.0R, deci ar fi fost nevoie de
+    66.4% rata de succes doar pentru break-even. Observat: 34.8%.
+
+    Acum structura e folosita doar daca ofera macar 1R; altfel TP1 se plaseaza
+    la exact 1R. Nu inventez o tinta mai buna decat da piata - doar refuz sa
+    generez planuri cu asteptare negativa prin constructie.
+    """
+    ext_1618 = fib["extension"]["1.618"]
+    risk = atr_val * 1.5
+    if risk <= 0:
+        return None
+
+    if direction == "LONG":
+        sl = price - risk
+        above = [r for r in structure["resistance"] if r >= price + risk * MIN_TP1_R]
+        tp1 = min(above) if above else price + risk * MIN_TP1_R
+        tp2_candidates = [c for c in (ext_1618, price + risk * 4)
+                          if c >= max(tp1, price + risk * MIN_TP2_R)]
+        tp2 = min(tp2_candidates) if tp2_candidates else price + risk * MIN_TP2_R
+    else:
+        sl = price + risk
+        below = [s for s in structure["support"] if s <= price - risk * MIN_TP1_R]
+        tp1 = max(below) if below else price - risk * MIN_TP1_R
+        tp2_candidates = [c for c in (ext_1618, price - risk * 4)
+                          if c <= min(tp1, price - risk * MIN_TP2_R)]
+        tp2 = max(tp2_candidates) if tp2_candidates else price - risk * MIN_TP2_R
+
+    expected_r = round(abs(tp2 - price) / risk, 2)
     return {
         "entry": round(price, 6), "sl": round(sl, 6),
         "tp1": round(tp1, 6), "tp2": round(tp2, 6),
@@ -566,6 +592,17 @@ def main():
     # mai bun. Reutilizez ohlcv_cache, deci in mod normal nu costa apeluri
     # API in plus.
     plan_store = plan_tracker.load_plans()
+
+    # 0) migrare automata: inchide planurile ramase din geometrii vechi, ca sa
+    # nu blocheze combinatiile simbol+directie. Ruleaza o singura data efectiv.
+    migrated = plan_tracker.auto_migrate_geometry(plan_store)
+    if migrated:
+        print(f"\nMigrare geometrie: am inchis {len(migrated)} planuri vechi "
+              f"(deblocheaza simbolurile pentru planuri noi):")
+        for pid, sym, direction, prev in migrated[:8]:
+            print(f"  PLAN #{pid} {sym} {direction} (era {prev})")
+        if len(migrated) > 8:
+            print(f"  ... si inca {len(migrated) - 8}")
 
     # 1) evaluez planurile deschise pe lumanarile proaspete
     closed_now = []
