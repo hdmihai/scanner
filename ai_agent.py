@@ -51,7 +51,7 @@ import os
 DATA_DIR = "data"
 HISTORY_FILE = os.path.join(DATA_DIR, "scan_history.json")
 PLANS_FILE = os.path.join(DATA_DIR, "plans.json")
-STATE_SOURCE = "plans"  # versiune de semnal: vezi nota din train_from_plans
+STATE_SOURCE = "plans-v2"  # versiune de semnal + geometrie: vezi train_from_plans
 MODEL_FILE = os.path.join(DATA_DIR, "agent_model.json")
 
 FEATURES = ["trend", "momentum", "volatility", "volume", "is_long", "persistence_n"]
@@ -259,7 +259,8 @@ def train_from_plans(plans, model, state):
     Fiecare plan e invatat exact o data (marcat cu `agent_trained`).
     """
     closed = [p for p in plans
-              if p.get("realized_r") is not None and not p.get("agent_trained")]
+              if p.get("realized_r") is not None and not p.get("agent_trained")
+              and p.get("geometry", "v1") == "v2"]
     closed.sort(key=lambda p: p.get("closed_ts") or 0)
 
     new_samples = 0
