@@ -30,6 +30,7 @@ WEIGHTS_FILE = os.path.join(DATA_DIR, "weights.json")
 WEIGHTS_HISTORY_FILE = os.path.join(DATA_DIR, "weights_history.json")
 AGENT_MODEL_FILE = os.path.join(DATA_DIR, "agent_model.json")
 PLANS_FILE = os.path.join(DATA_DIR, "plans.json")
+BRIEFING_FILE = os.path.join(DATA_DIR, "briefing.json")
 CHART_FILE = os.path.join(DATA_DIR, "latest_chart.json")
 OUTPUT_FILE = os.path.join(DOCS_DIR, "index.html")
 
@@ -59,6 +60,11 @@ def fmt_price(v):
 def compute_model_health(history, min_samples=MIN_SAMPLES_FOR_VALIDATION):
     hits = misses = 0
     for scan in history:
+        summ = scan.get("outcome_summary")
+        if summ:
+            hits += summ.get("hits", 0)
+            misses += summ.get("misses", 0)
+            continue
         for r in scan.get("results", []):
             outcome = r.get("outcome")
             if outcome == "hit":
@@ -211,6 +217,42 @@ def render_similar_projects(token_meta, narrative):
     {narrative_html}'''
 
 
+def render_indicators(deep):
+    """VWAP, POC/VAH/VAL, SuperTrend, MACD, EMA - etichetele din poze."""
+    ind = (deep or {}).get("indicators")
+    if not ind:
+        return '<p class="dim">Indicatorii apar dupa prima scanare cu semnal.</p>'
+
+    rows = []
+    st = ind.get("supertrend")
+    if st:
+        cls = "bull" if st["direction"] == "BULLISH" else "bear"
+        rows.append(f'<div class="ind-row"><span class="tag tag-{cls}">SuperTrend {st["direction"]}</span>'
+                    f'<span>{fmt_price(st["level"])}</span></div>')
+    if ind.get("vwap"):
+        rows.append(f'<div class="ind-row"><span class="tag tag-info">VWAP</span>'
+                    f'<span>{fmt_price(ind["vwap"])}</span></div>')
+    vp = ind.get("volume_profile")
+    if vp:
+        for label, key, cls in (("VAH","vah","warn"), ("POC","poc","warn"), ("VAL","val","info")):
+            rows.append(f'<div class="ind-row"><span class="tag tag-{cls}">{label}</span>'
+                        f'<span>{fmt_price(vp[key])}</span></div>')
+    m = ind.get("macd")
+    if m:
+        cls = "bull" if m["bullish"] else "bear"
+        rows.append(f'<div class="ind-row"><span class="tag tag-{cls}">MACD</span>'
+                    f'<span>hist {m["histogram"]:+.4f}</span></div>')
+
+    emas = ind.get("emas") or {}
+    ema_txt = " &middot; ".join(
+        f'{k.replace("ema","EMA ")} {fmt_price(v)}' for k, v in emas.items() if v is not None)
+    pos = ind.get("price_vs_value_area")
+    pos_html = f'<div class="ind-pos">Pretul e <strong>{pos}</strong></div>' if pos else ""
+
+    return ("".join(rows) + pos_html +
+            (f'<div class="ema-line dim">{ema_txt}</div>' if ema_txt else ""))
+
+
 def render_levels(deep):
     if not deep:
         return '<p class="dim">Fara analiza detaliata inca &mdash; apare dupa prima scanare cu semnal.</p>'
@@ -259,11 +301,18 @@ def compute_hit_rate_curve(history):
     precizia semnalelor pe masura ce se acumuleaza date evaluate."""
     points, hits, total = [], 0, 0
     for scan in history:
-        for r in scan.get("results", []):
-            if r.get("outcome") == "hit":
-                hits += 1; total += 1
-            elif r.get("outcome") == "miss":
-                total += 1
+        # scanarile compactate nu mai au `results`, dar pastreaza rezumatul -
+        # altfel curba s-ar rupe retroactiv dupa compactare
+        summ = scan.get("outcome_summary")
+        if summ:
+            hits += summ.get("hits", 0)
+            total += summ.get("hits", 0) + summ.get("misses", 0)
+        else:
+            for r in scan.get("results", []):
+                if r.get("outcome") == "hit":
+                    hits += 1; total += 1
+                elif r.get("outcome") == "miss":
+                    total += 1
         points.append(round(100 * hits / total, 2) if total else None)
     return points
 
@@ -308,6 +357,17 @@ STATE_STYLE = {
     "SL_HIT": ("sl", "SL &middot; INVALIDATED"),
     "EXPIRED": ("exp", "EXPIRED"),
 }
+
+
+def render_briefing(brief):
+    if not brief or not brief.get("text"):
+        return ""
+    src = brief.get("source", "determinist")
+    tag = "Gemini" if src == "gemini" else "generat din statistici"
+    return f'''<div class="card briefing-card">
+    <h2>Briefing &middot; <span class="dim">{tag}</span></h2>
+    <p class="briefing-text">{brief["text"]}</p>
+  </div>'''
 
 
 def render_plan_memory(store):
@@ -450,7 +510,7 @@ def render_learning_curve(history, weights_history, health, agent_state=None):
     '''
 
 
-def build_html(scan, best, deep, chart, health, weights, session, token_meta, narrative, history, weights_history, agent_state, plans_store):
+def build_html(scan, best, deep, chart, health, weights, session, token_meta, narrative, history, weights_history, agent_state, plans_store, briefing):
     plan_html = render_plan(best, deep)
     levels_html = render_levels(deep)
     liquidity_html = render_liquidity(deep)
@@ -459,6 +519,8 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
     agent_html = render_agent_card(agent_state)
     plans_html = render_plan_memory(plans_store)
     calibration_html = render_calibration(plans_store)
+    indicators_html = render_indicators(deep)
+    briefing_html = render_briefing(briefing)
     chart_svg = render_svg_chart(chart)
     weight_bars = render_weight_bars(weights)
     long_rows = render_opportunity_rows(scan.get("top_long", []))
@@ -566,6 +628,8 @@ header{{display:flex;justify-content:space-between;align-items:baseline;
 .agent-metrics{{display:grid;grid-template-columns:1fr 1fr;gap:10px;
   font-family:var(--font-mono);font-size:14px;}}
 .agent-metrics div{{background:var(--panel-2);border-radius:7px;padding:8px 10px;}}
+.briefing-card{{margin-bottom:14px;border-left:3px solid var(--amber);}}
+.briefing-text{{font-size:14px;line-height:1.7;margin:0;}}
 .plan-summary{{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;
   font-family:var(--font-mono);font-size:14px;}}
 .plan-summary div{{background:var(--panel-2);border-radius:7px;padding:8px 10px;}}
@@ -585,6 +649,15 @@ header{{display:flex;justify-content:space-between;align-items:baseline;
 .r-neg{{color:var(--bear);}}
 .plan-state{{font-family:var(--font-mono);font-size:11px;color:var(--text-dim);}}
 .plan-lv{{font-family:var(--font-mono);font-size:11px;margin-top:4px;}}
+.ind-row{{display:flex;justify-content:space-between;align-items:center;
+  padding:5px 0;font-family:var(--font-mono);font-size:12px;border-bottom:1px solid var(--border);}}
+.tag{{font-size:10px;padding:2px 7px;border-radius:4px;font-weight:700;letter-spacing:.04em;}}
+.tag-bull{{background:rgba(52,211,153,.15);color:var(--bull);}}
+.tag-bear{{background:rgba(251,122,108,.15);color:var(--bear);}}
+.tag-warn{{background:rgba(230,180,80,.15);color:var(--amber);}}
+.tag-info{{background:rgba(111,183,255,.15);color:var(--ema20);}}
+.ind-pos{{margin-top:10px;font-size:12px;color:var(--text-dim);}}
+.ema-line{{margin-top:8px;font-family:var(--font-mono);font-size:11px;line-height:1.6;}}
 .cal-list{{display:flex;flex-direction:column;gap:5px;font-family:var(--font-mono);font-size:12px;}}
 .cal-row{{display:grid;grid-template-columns:100px 1fr 60px;background:var(--panel-2);
   border-radius:6px;padding:6px 9px;align-items:center;}}
@@ -632,6 +705,8 @@ footer{{margin-top:26px;color:var(--text-dim);font-size:11px;line-height:1.6;}}
     <div class="meta">{scan_time}<br>universe {universe}</div>
   </header>
 
+  {briefing_html}
+
   <div class="grid">
     <div>
       <div class="card">
@@ -641,6 +716,11 @@ footer{{margin-top:26px;color:var(--text-dim);font-size:11px;line-height:1.6;}}
           <span><i class="dot" style="background:var(--ema20)"></i>EMA 20</span>
           <span><i class="dot" style="background:var(--ema50)"></i>EMA 50</span>
         </div>
+      </div>
+
+      <div class="card">
+        <h2>Indicatori &middot; VWAP, Volume Profile, SuperTrend, MACD</h2>
+        {indicators_html}
       </div>
 
       <div class="card">
@@ -731,6 +811,7 @@ def main():
     weights_history = load_json(WEIGHTS_HISTORY_FILE, [])
     agent_state = load_json(AGENT_MODEL_FILE, {})
     plans_store = load_json(PLANS_FILE, {})
+    briefing = load_json(BRIEFING_FILE, {})
 
     scan = history[-1] if history else {"scan_time": "-", "universe_size": 0, "top_long": [], "top_short": []}
     best = scan.get("best_candidate")
@@ -746,7 +827,7 @@ def main():
             narrative = None  # narativul e vechi, pt alt candidat - nu-l arat ca fiind curent
 
     os.makedirs(DOCS_DIR, exist_ok=True)
-    html = build_html(scan, best, deep, chart, health, weights, session, token_meta, narrative, history, weights_history, agent_state, plans_store)
+    html = build_html(scan, best, deep, chart, health, weights, session, token_meta, narrative, history, weights_history, agent_state, plans_store, briefing)
     with open(OUTPUT_FILE, "w") as f:
         f.write(html)
     print(f"Dashboard generat: {OUTPUT_FILE}")
