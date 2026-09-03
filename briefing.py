@@ -59,8 +59,17 @@ def gather_facts():
     plans = plans_store.get("plans", [])
     summary = plans_store.get("summary") or {}
     calibration = plans_store.get("calibration") or {}
-    closed = [p for p in plans if p.get("realized_r") is not None]
-    open_plans = [p for p in plans if p.get("realized_r") is None]
+    current_geo = summary.get("geometry", "v2")
+
+    # Numar la fel ca plan_tracker.summarize: doar geometria curenta.
+    # Fara asta apare o inconsistenta - `plans_closed` ar include planuri vechi
+    # in timp ce `avg_r` (din summary) le exclude, si briefing-ul ar raporta
+    # cifre care nu se potrivesc intre ele.
+    all_closed = [p for p in plans if p.get("realized_r") is not None]
+    closed = [p for p in all_closed if p.get("geometry", "v1") == current_geo]
+    open_plans = [p for p in plans if p.get("realized_r") is None
+                  and not p.get("migrated")]
+    legacy_closed = [p for p in all_closed if p.get("geometry", "v1") != current_geo]
 
     # ce s-a inchis recent (ultimele 5, dupa momentul inchiderii)
     recent_closed = sorted(closed, key=lambda p: p.get("closed_ts") or 0, reverse=True)[:5]
@@ -78,6 +87,8 @@ def gather_facts():
         "plans_total": len(plans),
         "plans_open": len(open_plans),
         "plans_closed": len(closed),
+        "legacy_closed": len(legacy_closed),
+        "legacy_total_r": round(sum(p["realized_r"] for p in legacy_closed), 2) if legacy_closed else None,
         "win_rate": summary.get("win_rate"),
         "total_r": summary.get("total_r"),
         "avg_r": summary.get("avg_r"),
@@ -121,11 +132,20 @@ def deterministic_briefing(f):
             f"Pana la primele inchideri nu pot spune nimic despre performanta - "
             f"orice cifra ar fi speculatie.")
     else:
-        pf = f"{f['profit_factor']}" if f["profit_factor"] is not None else "inca nedefinit"
+        pf = f"{f['profit_factor']}" if f.get("profit_factor") is not None else "inca nedefinit"
+        wr = f"{f['win_rate']}%" if f.get("win_rate") is not None else "necalculata"
+        tr = f"{f['total_r']:+.2f}R" if f.get("total_r") is not None else "necalculat"
+        ar = f"{f['avg_r']:+.3f}R" if f.get("avg_r") is not None else "necalculat"
         parts.append(
-            f"Din {f['plans_closed']} planuri inchise, rata de succes e {f['win_rate']}%, "
-            f"cu {f['total_r']:+.2f}R cumulat ({f['avg_r']:+.3f}R in medie pe plan) "
+            f"Din {f['plans_closed']} planuri inchise, rata de succes e {wr}, "
+            f"cu {tr} cumulat ({ar} in medie pe plan) "
             f"si profit factor {pf}. {f['plans_open']} planuri sunt inca deschise.")
+
+    if f.get("legacy_closed"):
+        parts.append(
+            f"Separat, {f['legacy_closed']} planuri inchise ({f['legacy_total_r']:+.2f}R) provin "
+            f"dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a "
+            f"tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile.")
 
     if f["recent_closed"]:
         items = ", ".join(f"#{p['id']} {p['symbol']} {p['r']:+.2f}R" for p in f["recent_closed"][:3])
@@ -187,14 +207,19 @@ def gemini_briefing(f):
 
 
 def main():
-    facts = gather_facts()
-    text = gemini_briefing(facts)
-    source = "gemini" if text else "determinist"
-    if not text:
-        text = deterministic_briefing(facts)
-
-    save_json(BRIEFING_FILE, {"text": text, "source": source, "facts": facts})
-    print(f"Briefing ({source}):\n{text}")
+    """Briefing-ul e informativ, nu critic. Daca ceva crapa aici, NU are voie
+    sa opreasca workflow-ul: pasii de dupa (dashboard, email, salvare) sunt mai
+    importanti decat un paragraf de text."""
+    try:
+        facts = gather_facts()
+        text = gemini_briefing(facts)
+        source = "gemini" if text else "determinist"
+        if not text:
+            text = deterministic_briefing(facts)
+        save_json(BRIEFING_FILE, {"text": text, "source": source, "facts": facts})
+        print(f"Briefing ({source}):\n{text}")
+    except Exception as e:
+        print(f"[!] Briefing esuat ({type(e).__name__}: {e}) - continui fara el.")
 
 
 if __name__ == "__main__":
