@@ -135,8 +135,17 @@ def has_open_plan(store, symbol, direction):
 
 
 def create_plan(store, signal, plan_levels, decision):
-    """Inregistreaza un plan nou, numerotat (PLAN #N, ca in poze)."""
-    entry, sl = plan_levels["entry"], plan_levels["sl"]
+    """Inregistreaza un plan nou, numerotat (PLAN #N, ca in poze).
+
+    Returneaza None daca nivelurile lipsesc sau sunt degenerate - nu arunc
+    exceptie, pentru ca un singur simbol problematic nu are voie sa opreasca
+    intreaga scanare.
+    """
+    if not plan_levels:
+        return None
+    entry, sl = plan_levels.get("entry"), plan_levels.get("sl")
+    if entry is None or sl is None:
+        return None
     risk = abs(entry - sl)
     if risk <= 0:
         return None
