@@ -36,6 +36,7 @@ import json
 import os
 import time
 import requests
+import math
 from datetime import datetime, timezone
 
 # ============================== CONFIG ==============================
@@ -75,6 +76,26 @@ DEFAULT_WEIGHTS = {"trend": 1.0, "momentum": 1.0, "volatility": 1.0, "volume": 1
 # ============================ INDICATORI =============================
 # Implementati simplu, in Python pur, fara pandas/numpy - ca sa mearga
 # usor si pe un VPS minimal sau pe telefon (Termux).
+
+def round_price(value, sig=8):
+    """Rotunjeste la cifre SEMNIFICATIVE, nu la un numar fix de zecimale.
+
+    BUG FIX: peste tot se folosea `round(x, 6)`. Pentru o moneda la 0.0000234,
+    ATR-ul tipic (~2%) e 0.00000047, care rotunjit la 6 zecimale devine 0.0.
+    De aici `compute_trade_plan` returna None si scannerul crapa cu
+    "TypeError: 'NoneType' object is not subscriptable".
+
+    Chiar si cand nu crapa, era gresit: la un pret de 0.00000089, entry, SL,
+    TP1 si TP2 deveneau toate 0.000001 - planul aratand valid, dar complet
+    inutil. Universul top-200 contine multe monede sub 0.0001, deci problema
+    afecta o parte reala din scanari, tacut.
+    """
+    if value is None or value == 0:
+        return value
+    exponent = math.floor(math.log10(abs(value)))
+    decimals = max(0, min(sig - 1 - exponent, 18))
+    return round(value, decimals)
+
 
 def ema(values, period):
     if len(values) < period:
@@ -152,8 +173,8 @@ def find_swing_points(highs, lows, lookback=5):
 def compute_structure_levels(highs, lows, n_levels=3):
     """Niveluri simple de suport/rezistenta, din cele mai recente puncte de swing (echivalentul S1-S3 / R1-R3 din poza ta)."""
     swing_highs, swing_lows = find_swing_points(highs, lows)
-    resistance = sorted(set(round(h, 6) for h in swing_highs[-12:]), reverse=True)[:n_levels]
-    support = sorted(set(round(l, 6) for l in swing_lows[-12:]), reverse=True)[-n_levels:]
+    resistance = sorted(set(round_price(h) for h in swing_highs[-12:]), reverse=True)[:n_levels]
+    support = sorted(set(round_price(l) for l in swing_lows[-12:]), reverse=True)[-n_levels:]
     return {"resistance": resistance, "support": support}
 
 
@@ -162,8 +183,8 @@ def compute_fibonacci(highs, lows, lookback=100):
     swing_high = max(highs[-lookback:])
     swing_low = min(lows[-lookback:])
     diff = swing_high - swing_low
-    retracement = {str(r): round(swing_high - diff * r, 6) for r in (0.236, 0.382, 0.5, 0.618, 0.786)}
-    extension = {str(r): round(swing_high + diff * (r - 1), 6) for r in (1.272, 1.618, 2.0)}
+    retracement = {str(r): round_price(swing_high - diff * r) for r in (0.236, 0.382, 0.5, 0.618, 0.786)}
+    extension = {str(r): round_price(swing_high + diff * (r - 1)) for r in (1.272, 1.618, 2.0)}
     return {"swing_high": swing_high, "swing_low": swing_low, "retracement": retracement, "extension": extension}
 
 
@@ -212,8 +233,8 @@ def compute_trade_plan(direction, price, atr_val, structure, fib):
 
     expected_r = round(abs(tp2 - price) / risk, 2)
     return {
-        "entry": round(price, 6), "sl": round(sl, 6),
-        "tp1": round(tp1, 6), "tp2": round(tp2, 6),
+        "entry": round_price(price), "sl": round_price(sl),
+        "tp1": round_price(tp1), "tp2": round_price(tp2),
         "expected_r": expected_r,
     }
 
@@ -277,7 +298,7 @@ def score_symbol(ohlcv, weights):
         "expected_r": expected_r,
         "components": components,
         "price": price,
-        "atr": round(a, 6),
+        "atr": round_price(a),
     }
 
 
@@ -286,16 +307,24 @@ def score_symbol(ohlcv, weights):
 # sunt un concept central in Smart Money Concepts: zone unde e probabil sa
 # reactioneze pretul, pentru ca acolo sta volumul mare de ordine.
 
-def fetch_liquidity_levels(exchange, symbol, depth=50, top_n=3):
+def fetch_liquidity_levels(exchange, symbol, depth=100, top_n=3):
     """BUG FIX: nu despachetez cu `for p, a in bids`. Standardul ccxt e
     [pret, cantitate], dar unele exchange-uri adauga un al treilea camp -
     Kraken pune si timestamp-ul nivelului, ceea ce arunca
     "ValueError: too many values to unpack (expected 2)". Iau explicit
     primele doua elemente si ignor restul, indiferent de exchange."""
-    try:
-        ob = exchange.fetch_order_book(symbol, limit=depth)
-    except Exception as e:
-        print(f"[!] order book {symbol}: {e}")
+    # KuCoin accepta doar limit=20 sau 100; alte valori sunt respinse. Incerc
+    # valoarea ceruta, apoi variantele acceptate, apoi fara limit deloc.
+    ob = None
+    for attempt in (depth, 20, None):
+        try:
+            ob = (exchange.fetch_order_book(symbol, limit=attempt) if attempt
+                  else exchange.fetch_order_book(symbol))
+            break
+        except Exception as e:
+            last_err = e
+    if ob is None:
+        print(f"[!] order book {symbol}: {last_err}")
         return None
 
     def normalize(levels):
@@ -307,7 +336,7 @@ def fetch_liquidity_levels(exchange, symbol, depth=50, top_n=3):
                 price, amount = float(lvl[0]), float(lvl[1])
             except (TypeError, ValueError):
                 continue
-            out.append({"price": round(price, 6), "amount": round(amount, 4)})
+            out.append({"price": round_price(price), "amount": round_price(amount, 6)})
         return sorted(out, key=lambda d: d["amount"], reverse=True)[:top_n]
 
     return {"bids": normalize(ob.get("bids")), "asks": normalize(ob.get("asks"))}
@@ -643,6 +672,11 @@ def main():
         struct_s = compute_structure_levels(highs_s, lows_s)
         fib_s = compute_fibonacci(highs_s, lows_s)
         levels = compute_trade_plan(sig["direction"], sig["price"], sig["atr"], struct_s, fib_s)
+        if not levels:
+            # geometrie degenerata (ex. ATR efectiv zero) - sar peste simbol,
+            # nu opresc scanarea din cauza unuia singur
+            print(f"  [!] {sig['symbol']}: niveluri invalide, sar peste")
+            continue
 
         agent_pred = ai_agent.predict_for_signal(agent_model, agent_state, sig)
         decision = plan_tracker.decide(calibration, sig, agent_pred)
