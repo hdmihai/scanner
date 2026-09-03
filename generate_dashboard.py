@@ -391,6 +391,11 @@ def render_plan_memory(store):
     for p in sorted(plans, key=lambda x: x["id"], reverse=True)[:12]:
         cls, label = STATE_STYLE.get(p["state"], ("open", p["state"]))
         r = p.get("realized_r")
+        # Un plan care a atins TP1 si a iesit la breakeven are starea SL_HIT dar
+        # R POZITIV. Colorarea dupa stare il arata rosu desi a facut bani - deci
+        # culoarea urmeaza semnul lui R, care e adevarul economic.
+        if r is not None:
+            cls = "tp2" if r > 0 else "sl"
         r_txt = f'<span class="plan-r r-{"pos" if r and r > 0 else "neg"}">{r:+.2f}R</span>' if r is not None else ""
         mode = (p.get("decision") or {}).get("mode", "")
         cards.append(f'''<div class="plan-card plan-{cls}">
