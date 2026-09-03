@@ -1,35 +1,35 @@
 {
   "model": {
     "weights": {
-      "trend": -0.011138,
-      "momentum": -0.068758,
-      "volatility": -0.062349,
-      "volume": -0.06261,
-      "is_long": 0.070566,
-      "persistence_n": -0.070713
+      "trend": -0.092031,
+      "momentum": -0.142322,
+      "volatility": -0.220355,
+      "volume": -0.172391,
+      "is_long": 0.048435,
+      "persistence_n": -0.218822
     },
-    "bias": -0.087696
+    "bias": -0.30463
   },
-  "samples_trained": 23,
+  "samples_trained": 37,
   "last_trained_scan_ts": 0.0,
   "agent": {
-    "correct": 14,
-    "total": 23
+    "correct": 27,
+    "total": 37
   },
   "baseline": {
-    "correct": 8,
-    "total": 23
+    "correct": 9,
+    "total": 37
   },
   "by_direction": {
     "LONG": {
-      "agent": 4,
-      "baseline": 6,
-      "total": 11
+      "agent": 7,
+      "baseline": 7,
+      "total": 15
     },
     "SHORT": {
-      "agent": 10,
+      "agent": 20,
       "baseline": 2,
-      "total": 12
+      "total": 22
     }
   },
   "first_scan_ts": 1788382138.6609972,
@@ -54,6 +54,20 @@
     0,
     0,
     0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
     1,
     1,
     1
@@ -81,14 +95,35 @@
     1,
     0,
     0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
     0
   ],
-  "curve": [],
+  "curve": [
+    {
+      "n": 25,
+      "agent": 64.0,
+      "baseline": 32.0,
+      "agent_recent": 64.0
+    }
+  ],
   "status": "SHADOW",
   "source": "plans",
-  "last_event_ts": 1788433200.0,
-  "status_reason": "are nevoie de 300 exemple (are 23)",
-  "days_covered": 0.59,
+  "last_event_ts": 1788451200.0,
+  "status_reason": "are nevoie de 300 exemple (are 37)",
+  "days_covered": 0.8,
   "balanced_agent": null,
   "balanced_baseline": null
 }

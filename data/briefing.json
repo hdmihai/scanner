@@ -1,99 +1,99 @@
 {
-  "text": "Din 23 planuri inchise, rata de succes e 34.8%, cu -10.95R cumulat (-0.476R in medie pe plan) si profit factor 0.27. 24 planuri sunt inca deschise. Ultimele inchise: #24 DASH/USDT -1.00R, #29 DCR/USDT -1.00R, #31 SPX/USDT -1.00R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 23)).",
+  "text": "Din 37 planuri inchise, rata de succes e 24.3%, cu -23.95R cumulat (-0.647R in medie pe plan) si profit factor 0.14. 19 planuri sunt inca deschise. Ultimele inchise: #32 CARDS/USDT -1.00R, #43 PYTH/USDT -1.00R, #27 ARB/USDT -1.00R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 37)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-03 12:45 UTC",
-    "universe_size": 167,
-    "plans_total": 47,
-    "plans_open": 24,
-    "plans_closed": 23,
-    "win_rate": 34.8,
-    "total_r": -10.95,
-    "avg_r": -0.476,
-    "profit_factor": 0.27,
+    "scan_time": "2026-09-03 16:20 UTC",
+    "universe_size": 166,
+    "plans_total": 56,
+    "plans_open": 19,
+    "plans_closed": 37,
+    "win_rate": 24.3,
+    "total_r": -23.95,
+    "avg_r": -0.647,
+    "profit_factor": 0.14,
     "recent_closed": [
       {
-        "id": 24,
-        "symbol": "DASH/USDT",
+        "id": 32,
+        "symbol": "CARDS/USDT",
         "direction": "SHORT",
         "state": "SL HIT \u00b7 INVALIDATED",
         "r": -1.0
-      },
-      {
-        "id": 29,
-        "symbol": "DCR/USDT",
-        "direction": "SHORT",
-        "state": "SL HIT \u00b7 INVALIDATED",
-        "r": -1.0
-      },
-      {
-        "id": 31,
-        "symbol": "SPX/USDT",
-        "direction": "SHORT",
-        "state": "SL HIT \u00b7 INVALIDATED",
-        "r": -1.0
-      },
-      {
-        "id": 13,
-        "symbol": "EGLD/USDT",
-        "direction": "LONG",
-        "state": "TP1 HIT \u00b7 SL LA BREAKEVEN",
-        "r": 0.667
-      },
-      {
-        "id": 18,
-        "symbol": "APT/USDT",
-        "direction": "LONG",
-        "state": "TP1 HIT \u00b7 SL LA BREAKEVEN",
-        "r": 0.667
-      }
-    ],
-    "open_now": [
-      {
-        "id": 47,
-        "symbol": "CC/USDT",
-        "direction": "SHORT",
-        "state": "OPEN \u00b7 WAITING"
-      },
-      {
-        "id": 46,
-        "symbol": "DCR/USDT",
-        "direction": "SHORT",
-        "state": "OPEN \u00b7 WAITING"
-      },
-      {
-        "id": 45,
-        "symbol": "LIT/USDT",
-        "direction": "LONG",
-        "state": "OPEN \u00b7 WAITING"
-      },
-      {
-        "id": 44,
-        "symbol": "LDO/USDT",
-        "direction": "LONG",
-        "state": "OPEN \u00b7 WAITING"
       },
       {
         "id": 43,
         "symbol": "PYTH/USDT",
         "direction": "LONG",
+        "state": "SL HIT \u00b7 INVALIDATED",
+        "r": -1.0
+      },
+      {
+        "id": 27,
+        "symbol": "ARB/USDT",
+        "direction": "LONG",
+        "state": "SL HIT \u00b7 INVALIDATED",
+        "r": -1.0
+      },
+      {
+        "id": 38,
+        "symbol": "MORPHO/USDT",
+        "direction": "SHORT",
+        "state": "SL HIT \u00b7 INVALIDATED",
+        "r": -1.0
+      },
+      {
+        "id": 5,
+        "symbol": "KITE/USDT",
+        "direction": "LONG",
+        "state": "SL HIT \u00b7 INVALIDATED",
+        "r": -1.0
+      }
+    ],
+    "open_now": [
+      {
+        "id": 56,
+        "symbol": "USDE/USDT",
+        "direction": "SHORT",
+        "state": "OPEN \u00b7 WAITING"
+      },
+      {
+        "id": 55,
+        "symbol": "SKY/USDT",
+        "direction": "SHORT",
+        "state": "OPEN \u00b7 WAITING"
+      },
+      {
+        "id": 54,
+        "symbol": "CVX/USDT",
+        "direction": "SHORT",
+        "state": "OPEN \u00b7 WAITING"
+      },
+      {
+        "id": 53,
+        "symbol": "MORPHO/USDT",
+        "direction": "SHORT",
+        "state": "OPEN \u00b7 WAITING"
+      },
+      {
+        "id": 52,
+        "symbol": "SKR/USDT",
+        "direction": "SHORT",
         "state": "OPEN \u00b7 WAITING"
       }
     ],
     "best_bucket": null,
     "worst_bucket": null,
     "agent_status": "SHADOW",
-    "agent_reason": "are nevoie de 300 exemple (are 23)",
-    "agent_samples": 23,
+    "agent_reason": "are nevoie de 300 exemple (are 37)",
+    "agent_samples": 37,
     "agent_balanced": null,
     "baseline_balanced": null,
     "agent_weights": {
-      "trend": -0.011138,
-      "momentum": -0.068758,
-      "volatility": -0.062349,
-      "volume": -0.06261,
-      "is_long": 0.070566,
-      "persistence_n": -0.070713
+      "trend": -0.092031,
+      "momentum": -0.142322,
+      "volatility": -0.220355,
+      "volume": -0.172391,
+      "is_long": 0.048435,
+      "persistence_n": -0.218822
     }
   }
 }
