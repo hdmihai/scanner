@@ -50,6 +50,8 @@ import os
 
 DATA_DIR = "data"
 HISTORY_FILE = os.path.join(DATA_DIR, "scan_history.json")
+PLANS_FILE = os.path.join(DATA_DIR, "plans.json")
+STATE_SOURCE = "plans"  # versiune de semnal: vezi nota din train_from_plans
 MODEL_FILE = os.path.join(DATA_DIR, "agent_model.json")
 
 FEATURES = ["trend", "momentum", "volatility", "volume", "is_long", "persistence_n"]
@@ -125,6 +127,8 @@ class OnlineLogisticRegression:
 # ============================ CARACTERISTICI ==============================
 
 def extract_features(result):
+    """Accepta atat un rezultat de scanare cat si un plan - planurile pastreaza
+    contextul de la momentul deschiderii sub alte nume de campuri."""
     """Transforma un rezultat de scanare in vectorul de intrare al modelului.
     Componentele sunt deja 0-1; persistenta o normalizez si o plafonez, ca sa
     nu domine restul doar pentru ca e un numar mai mare."""
@@ -135,7 +139,8 @@ def extract_features(result):
         "volatility": float(comp.get("volatility", 0.0)),
         "volume": float(comp.get("volume", 0.0)),
         "is_long": 1.0 if result.get("direction") == "LONG" else 0.0,
-        "persistence_n": min(float(result.get("persistence", 0)) / 10.0, 1.0),
+        "persistence_n": min(float(
+            result.get("persistence", result.get("persistence_at_entry", 0)) or 0) / 10.0, 1.0),
     }
 
 
@@ -192,10 +197,13 @@ def balanced_accuracy(by_direction, which):
     return 100 * sum(accs) / len(accs) if accs else None
 
 
-def days_covered(state, history):
-    first = state.get("first_scan_ts") or (min((s.get("scan_id_ts", 0) for s in history), default=0))
-    last = max((s.get("scan_id_ts", 0) for s in history), default=0)
-    return (last - first) / 86400 if first and last else 0.0
+def days_covered(state, plans=None):
+    first = state.get("first_scan_ts") or 0
+    last = state.get("last_event_ts") or 0
+    if plans:
+        first = first or min((p.get("created_ts") or 0) for p in plans)
+        last = max([last] + [(p.get("closed_ts") or 0) for p in plans])
+    return (last - first) / 86400 if first and last and last > first else 0.0
 
 
 def load_agent():
@@ -205,7 +213,7 @@ def load_agent():
     return model, state
 
 
-def agent_is_active(state, history=None):
+def agent_is_active(state, plans=None):
     """Agentul influenteaza deciziile doar daca trece TOATE conditiile:
       1. a vazut destule exemple
       2. acopera destule zile (mai multe regimuri de piata, nu doar unul)
@@ -215,7 +223,7 @@ def agent_is_active(state, history=None):
     if a.get("total", 0) < MIN_SAMPLES_TO_ACTIVATE:
         return False, f"are nevoie de {MIN_SAMPLES_TO_ACTIVATE} exemple (are {a.get('total', 0)})"
 
-    days = days_covered(state, history or [])
+    days = days_covered(state, plans or [])
     if days < MIN_DAYS_TO_ACTIVATE:
         return False, (f"acopera doar {days:.1f} zile din {MIN_DAYS_TO_ACTIVATE} necesare "
                        f"(prea putine regimuri de piata)")
@@ -232,6 +240,89 @@ def agent_is_active(state, history=None):
 
 
 # ============================== ANTRENARE =================================
+
+def train_from_plans(plans, model, state):
+    """Invata din PLANURI INCHISE, nu din campul `outcome` al scanarilor.
+
+    DE CE AM SCHIMBAT SEMNALUL DE INVATARE:
+    `outcome` (hit/miss) compara pretul de intrare cu pretul dintr-un singur
+    moment, la 24h. Nu spune daca tranzactia a functionat - un semnal care a
+    atins TP si apoi a revenit conta "miss", iar unul care a trecut prin SL si
+    si-a revenit conta "hit". Agentul e chemat sa decida daca merita deschis un
+    plan, deci trebuie sa invete exact din ce inseamna "planul a mers": R
+    realizat, masurat bara cu bara.
+
+    Consecinta onesta: contorul de exemple reporneste de la zero cand se
+    schimba sursa de semnal. Datele vechi masurau altceva; amestecarea lor ar
+    fi produs un model antrenat pe doua definitii diferite ale succesului.
+
+    Fiecare plan e invatat exact o data (marcat cu `agent_trained`).
+    """
+    closed = [p for p in plans
+              if p.get("realized_r") is not None and not p.get("agent_trained")]
+    closed.sort(key=lambda p: p.get("closed_ts") or 0)
+
+    new_samples = 0
+    for p in closed:
+        y = 1.0 if p["realized_r"] > 0 else 0.0
+        x = extract_features(p)
+
+        # 1) INTAI prezic (pe date nevazute) - acuratete onesta
+        p_agent = model.predict_proba(x)
+        # baseline: formula pe care o afisa sistemul inainte de calibrare
+        score = p.get("score_at_entry") or 0
+        p_base = min(50 + score * 0.35, 88) / 100.0
+
+        agent_ok = 1 if (p_agent >= 0.5) == (y == 1.0) else 0
+        base_ok = 1 if (p_base >= 0.5) == (y == 1.0) else 0
+
+        state["agent"]["correct"] += agent_ok
+        state["agent"]["total"] += 1
+        state["baseline"]["correct"] += base_ok
+        state["baseline"]["total"] += 1
+
+        d = p.get("direction")
+        if d in state["by_direction"]:
+            state["by_direction"][d]["agent"] += agent_ok
+            state["by_direction"][d]["baseline"] += base_ok
+            state["by_direction"][d]["total"] += 1
+
+        state["recent"] = (state.get("recent", []) + [agent_ok])[-RECENT_WINDOW:]
+        state["recent_baseline"] = (state.get("recent_baseline", []) + [base_ok])[-RECENT_WINDOW:]
+
+        # 2) ABIA APOI invat din el
+        model.learn_one(x, y)
+        p["agent_trained"] = True
+        new_samples += 1
+
+        total = state["agent"]["total"]
+        if total % CURVE_EVERY == 0:
+            state["curve"].append({
+                "n": total,
+                "agent": round(100 * state["agent"]["correct"] / total, 2),
+                "baseline": round(100 * state["baseline"]["correct"] / state["baseline"]["total"], 2),
+                "agent_recent": round(100 * sum(state["recent"]) / len(state["recent"]), 2),
+            })
+
+    if closed:
+        first = min((p.get("created_ts") or 0) for p in plans if p.get("created_ts"))
+        last = max((p.get("closed_ts") or 0) for p in plans if p.get("closed_ts"))
+        state["first_scan_ts"] = state.get("first_scan_ts") or first
+        state["last_event_ts"] = last
+
+    state["samples_trained"] = state.get("samples_trained", 0) + new_samples
+    return new_samples
+
+
+def predict_for_signal(model, state, signal):
+    """Probabilitatea agentului pentru un semnal nou, plus daca are voie sa
+    influenteze decizia (doar cand e ACTIVE)."""
+    x = extract_features(signal)
+    return {
+        "probability": round(model.predict_proba(x), 4),
+        "active": state.get("status") == "ACTIVE",
+    }
+
 
 def train_incremental(history, model, state):
     """Parcurge doar scanarile netreantrenate inca, in ordine cronologica.
@@ -302,40 +393,51 @@ def summarize(state):
 
 
 def main():
-    history = load_json(HISTORY_FILE, [])
-    if not history:
-        print("Nu exista inca nicio scanare - ruleaza intai crypto_ai_scanner.py.")
+    plans_store = load_json(PLANS_FILE, {"plans": []})
+    plans = plans_store.get("plans", [])
+
+    state = load_json(MODEL_FILE, None)
+    # Daca starea salvata provine din sursa veche de semnal (campul `outcome`),
+    # o resetez: etichetele masurau altceva. Vezi nota din train_from_plans.
+    if state is None or state.get("source") != STATE_SOURCE:
+        if state is not None:
+            print("[i] Resetez agentul: sursa de invatare s-a schimbat din "
+                  "'outcome' (miscare ATR) in 'planuri inchise' (R real).")
+        state = default_state()
+        state["source"] = STATE_SOURCE
+    model = OnlineLogisticRegression.from_dict(state.get("model", {}))
+
+    if not plans:
+        print("Niciun plan inca - agentul invata din planuri inchise. "
+              "Ruleaza intai crypto_ai_scanner.py.")
+        save_json(MODEL_FILE, state)
         return
 
-    model, state = load_agent()
-    if not state.get("first_scan_ts"):
-        state["first_scan_ts"] = min((s.get("scan_id_ts", 0) for s in history), default=0.0)
-
-    new_samples = train_incremental(history, model, state)
+    new_samples = train_from_plans(plans, model, state)
+    save_json(PLANS_FILE, plans_store)  # persist marcajele agent_trained
 
     state["model"] = model.to_dict()
-    active, reason = agent_is_active(state, history)
+    active, reason = agent_is_active(state, plans)
     state["status"] = "ACTIVE" if active else "SHADOW"
     state["status_reason"] = reason
-    state["days_covered"] = round(days_covered(state, history), 2)
+    state["days_covered"] = round(days_covered(state, plans), 2)
     state["balanced_agent"] = balanced_accuracy(state["by_direction"], "agent")
     state["balanced_baseline"] = balanced_accuracy(state["by_direction"], "baseline")
     save_json(MODEL_FILE, state)
 
     acc_agent, acc_base, acc_recent = summarize(state)
-    print(f"Exemple noi invatate acum: {new_samples}")
-    print(f"Total exemple vazute: {state['agent']['total']} pe {state['days_covered']} zile")
+    print(f"Planuri noi invatate acum: {new_samples}")
+    print(f"Total planuri invatate: {state['agent']['total']} pe {state['days_covered']} zile")
     if acc_agent is not None:
-        print(f"Acuratete BRUTA    - agent {acc_agent:.2f}% | euristica {acc_base:.2f}%")
+        print(f"Acuratete BRUTA       - agent {acc_agent:.2f}% | baseline {acc_base:.2f}%")
         ba, bb = state["balanced_agent"], state["balanced_baseline"]
         if ba is not None:
-            print(f"Acuratete ECHILIBRATA - agent {ba:.2f}% | euristica {bb:.2f}%  <- asta conteaza")
-        print("Defalcare pe directie:")
+            print(f"Acuratete ECHILIBRATA - agent {ba:.2f}% | baseline {bb:.2f}%  <- asta conteaza")
         for d in ("LONG", "SHORT"):
-            s = state["by_direction"][d]
-            if s["total"]:
-                print(f"  {d}: agent {100*s['agent']/s['total']:.1f}% "
-                      f"| euristica {100*s['baseline']/s['total']:.1f}% (din {s['total']})")
+            st = state["by_direction"][d]
+            if st["total"]:
+                print(f"  {d}: agent {100*st['agent']/st['total']:.1f}% "
+                      f"| baseline {100*st['baseline']/st['total']:.1f}% (din {st['total']})")
     print(f"Status: {state['status']} - {reason}")
     print("Greutati invatate:", json.dumps(state["model"]["weights"]))
 
