@@ -31,6 +31,7 @@ scoreaza si notifica. Nu este sfat financiar.
 import ccxt
 import plan_tracker
 import indicators
+import ai_agent
 import json
 import os
 import time
@@ -591,7 +592,8 @@ def main():
     # foloseasca si rezultatele inchise chiar in aceasta rulare, nu date vechi
     calibration = plan_tracker.build_calibration(plan_store)
 
-    # 3) decid daca deschid planuri noi
+    # 3) decid daca deschid planuri noi - cu contributia agentului daca e ACTIVE
+    agent_model, agent_state = ai_agent.load_agent()
     issued, skipped = [], []
     for sig in (longs[: CONFIG["top_n_per_direction"]] + shorts[: CONFIG["top_n_per_direction"]]):
         if plan_tracker.has_open_plan(plan_store, sig["symbol"], sig["direction"]):
@@ -605,7 +607,8 @@ def main():
         fib_s = compute_fibonacci(highs_s, lows_s)
         levels = compute_trade_plan(sig["direction"], sig["price"], sig["atr"], struct_s, fib_s)
 
-        decision = plan_tracker.decide(calibration, sig)
+        agent_pred = ai_agent.predict_for_signal(agent_model, agent_state, sig)
+        decision = plan_tracker.decide(calibration, sig, agent_pred)
         if decision["action"] == "SKIP":
             skipped.append((sig["symbol"], decision["reason"]))
             continue
