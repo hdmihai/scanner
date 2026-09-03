@@ -39,6 +39,14 @@ jobs:
       - name: Antreneaza agentul AI pe semnalele nou evaluate
         run: python ai_agent.py
 
+      - name: Genereaza briefing-ul narativ
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python briefing.py
+
+      - name: Compacteaza istoricul vechi (tine repo-ul mic)
+        run: python compact_history.py
+
       - name: Actualizeaza metadata proiecte (CoinGecko + optional Gemini)
         env:
           COINGECKO_API_KEY: ${{ secrets.COINGECKO_API_KEY }}
