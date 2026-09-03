@@ -50,6 +50,13 @@ PLANS_FILE = os.path.join(DATA_DIR, "plans.json")
 
 MAX_BARS = 48          # cate lumanari las un plan deschis (48 = 2 zile pe 1h)
 MIN_BUCKET_SAMPLES = 20  # sub atat, nu pronunt o probabilitate calibrata
+
+# Versiunea geometriei planului. Cand regulile de plasare a TP1/TP2 se schimba,
+# rezultatele vechi devin necomparabile: descriu o structura care nu mai exista.
+# Calibrarea foloseste doar planuri din versiunea curenta.
+# v1 -> v2: TP1 nu mai poate fi sub 1R (v1 producea planuri cu asteptare
+# negativa prin constructie: 21 din 47 aveau TP1 sub 1R, unul la 0.00R).
+GEOMETRY_VERSION = "v2"
 TP1_FRACTION = 0.5     # cat din pozitie se inchide la TP1
 
 STATE_OPEN = "OPEN"
@@ -73,6 +80,37 @@ def save_json(path, data):
     os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
     with open(path, "w") as f:
         json.dump(data, f, indent=2)
+
+
+def auto_migrate_geometry(store):
+    """Inchide automat planurile deschise generate cu o geometrie veche.
+
+    DE CE AUTOMAT SI NU CA PAS MANUAL:
+    `has_open_plan` refuza sa deschida un plan nou pentru o combinatie
+    simbol+directie care are deja unul activ. Planurile ramase din geometria
+    veche ar bloca astfel simbolurile respective pana s-ar inchide singure -
+    intarziind degeaba colectarea de date bune. Facand-o automat, nu depinde
+    de un pas manual pe care e usor sa-l uiti sau sa-l rulezi gresit.
+
+    Nu le atribui un R: geometria lor nu mai e comparabila, deci un rezultat
+    ar fi contorizat undeva unde nu-si are locul. Raman vizibile in istoric,
+    cu numerotarea intacta.
+
+    Idempotent: dupa o rulare nu mai gaseste nimic de migrat.
+    """
+    migrated = []
+    for p in store.get("plans", []):
+        if p.get("state") in CLOSED_STATES:
+            continue
+        if p.get("geometry", "v1") == GEOMETRY_VERSION:
+            continue
+        prev = p.get("state")
+        p["state"] = STATE_EXPIRED
+        p["state_detail"] = f"INCHIS AUTOMAT LA MIGRARE (geometrie {p.get('geometry', 'v1')})"
+        p["migrated"] = True
+        p["migrated_ts"] = time.time()
+        migrated.append((p["id"], p["symbol"], p["direction"], prev))
+    return migrated
 
 
 def load_plans():
@@ -125,6 +163,7 @@ def create_plan(store, signal, plan_levels, decision):
         "components": signal.get("components"),
         "persistence_at_entry": signal.get("persistence"),
         "decision": decision,
+        "geometry": GEOMETRY_VERSION,
     }
     store["plans"].append(plan)
     store["next_id"] += 1
@@ -260,6 +299,8 @@ def build_calibration(store, bucket_size=20):
     for p in store["plans"]:
         if p["state"] not in CLOSED_STATES or p.get("realized_r") is None:
             continue
+        if p.get("geometry", "v1") != GEOMETRY_VERSION:
+            continue  # geometrie veche: rezultatele nu sunt comparabile
         score = p.get("score_at_entry")
         if score is None:
             continue
@@ -367,7 +408,9 @@ def decide(calibration, signal, agent_pred=None, bucket_size=20):
 
 def summarize(store):
     plans = store["plans"]
-    closed = [p for p in plans if p["state"] in CLOSED_STATES and p.get("realized_r") is not None]
+    all_closed = [p for p in plans if p["state"] in CLOSED_STATES and p.get("realized_r") is not None]
+    closed = [p for p in all_closed if p.get("geometry", "v1") == GEOMETRY_VERSION]
+    legacy = [p for p in all_closed if p.get("geometry", "v1") != GEOMETRY_VERSION]
     open_plans = [p for p in plans if p["state"] not in CLOSED_STATES]
 
     total_r = sum(p["realized_r"] for p in closed)
@@ -385,6 +428,9 @@ def summarize(store):
         profit_factor = round(gross_win / gross_loss, 2) if gross_loss > 0 else None
 
     return {
+        "legacy_closed": len(legacy),
+        "legacy_total_r": round(sum(p["realized_r"] for p in legacy), 2) if legacy else None,
+        "geometry": GEOMETRY_VERSION,
         "total_plans": len(plans),
         "open": len(open_plans),
         "closed": len(closed),
