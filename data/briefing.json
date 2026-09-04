@@ -1,65 +1,101 @@
 {
-  "text": "10 planuri sunt deschise, niciunul inchis inca. Pana la primele inchideri nu pot spune nimic despre performanta - orice cifra ar fi speculatie. Separat, 37 planuri inchise (-23.95R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 0)).",
+  "text": "Din 5 planuri inchise, rata de succes e 40.0%, cu -2.00R cumulat (-0.400R in medie pe plan) si profit factor 0.33. 13 planuri sunt inca deschise. Separat, 37 planuri inchise (-23.95R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #65 CC/USDT -1.00R, #57 AR/USDT +0.50R, #58 LDO/USDT +0.50R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 5)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-03 20:21 UTC",
-    "universe_size": 169,
-    "plans_total": 66,
-    "plans_open": 10,
-    "plans_closed": 0,
+    "scan_time": "2026-09-04 00:27 UTC",
+    "universe_size": 168,
+    "plans_total": 74,
+    "plans_open": 13,
+    "plans_closed": 5,
     "legacy_closed": 37,
     "legacy_total_r": -23.95,
-    "win_rate": null,
-    "total_r": 0,
-    "avg_r": null,
-    "profit_factor": null,
-    "recent_closed": [],
-    "open_now": [
-      {
-        "id": 66,
-        "symbol": "CARDS/USDT",
-        "direction": "SHORT",
-        "state": "OPEN \u00b7 WAITING"
-      },
+    "win_rate": 40.0,
+    "total_r": -2.0,
+    "avg_r": -0.4,
+    "profit_factor": 0.33,
+    "recent_closed": [
       {
         "id": 65,
         "symbol": "CC/USDT",
         "direction": "SHORT",
-        "state": "OPEN \u00b7 WAITING"
+        "state": "SL HIT \u00b7 INVALIDATED",
+        "r": -1.0
       },
       {
-        "id": 64,
-        "symbol": "NFT/USDT",
-        "direction": "SHORT",
-        "state": "OPEN \u00b7 WAITING"
+        "id": 57,
+        "symbol": "AR/USDT",
+        "direction": "LONG",
+        "state": "TP1 HIT \u00b7 SL LA BREAKEVEN",
+        "r": 0.5
       },
       {
-        "id": 63,
-        "symbol": "USDS/USDT",
-        "direction": "SHORT",
-        "state": "OPEN \u00b7 WAITING"
+        "id": 58,
+        "symbol": "LDO/USDT",
+        "direction": "LONG",
+        "state": "TP1 HIT \u00b7 SL LA BREAKEVEN",
+        "r": 0.5
+      },
+      {
+        "id": 60,
+        "symbol": "XLM/USDT",
+        "direction": "LONG",
+        "state": "SL HIT \u00b7 INVALIDATED",
+        "r": -1.0
       },
       {
         "id": 62,
         "symbol": "SKR/USDT",
         "direction": "SHORT",
+        "state": "SL HIT \u00b7 INVALIDATED",
+        "r": -1.0
+      }
+    ],
+    "open_now": [
+      {
+        "id": 74,
+        "symbol": "SAND/USDT",
+        "direction": "SHORT",
+        "state": "OPEN \u00b7 WAITING"
+      },
+      {
+        "id": 73,
+        "symbol": "MORPHO/USDT",
+        "direction": "SHORT",
+        "state": "OPEN \u00b7 WAITING"
+      },
+      {
+        "id": 72,
+        "symbol": "SKR/USDT",
+        "direction": "SHORT",
+        "state": "OPEN \u00b7 WAITING"
+      },
+      {
+        "id": 71,
+        "symbol": "XTZ/USDT",
+        "direction": "LONG",
+        "state": "OPEN \u00b7 WAITING"
+      },
+      {
+        "id": 70,
+        "symbol": "ENS/USDT",
+        "direction": "LONG",
         "state": "OPEN \u00b7 WAITING"
       }
     ],
     "best_bucket": null,
     "worst_bucket": null,
     "agent_status": "SHADOW",
-    "agent_reason": "are nevoie de 300 exemple (are 0)",
-    "agent_samples": 0,
+    "agent_reason": "are nevoie de 300 exemple (are 5)",
+    "agent_samples": 5,
     "agent_balanced": null,
     "baseline_balanced": null,
     "agent_weights": {
-      "trend": 0.0,
-      "momentum": 0.0,
-      "volatility": 0.0,
-      "volume": 0.0,
-      "is_long": 0.0,
-      "persistence_n": 0.0
+      "trend": -0.001416,
+      "momentum": -0.004027,
+      "volatility": 0.008088,
+      "volume": -0.001032,
+      "is_long": 0.023347,
+      "persistence_n": 0.019487
     }
   }
 }
