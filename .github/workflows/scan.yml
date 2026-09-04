@@ -13,6 +13,7 @@ on:
 # (data/scan_history.json si data/weights.json) inapoi in repo.
 permissions:
   contents: write
+  actions: write   # necesar pentru stergerea run-urilor vechi (pasul de la final)
 
 jobs:
   scan:
@@ -76,3 +77,36 @@ jobs:
           git add data/ docs/
           git diff --staged --quiet || git commit -m "scan $(date -u +'%Y-%m-%d %H:%M UTC')"
           git push
+
+      - name: Pastreaza doar ultimele 30 de run-uri
+        # Sterge DOAR inregistrarile de executie din tab-ul Actions (loguri,
+        # status, durata). NU atinge datele agentului: plans.json,
+        # agent_model.json si scan_history.json sunt comise in git de pasul de
+        # mai sus, deci traiesc in istoricul repo-ului, nu in run-uri.
+        # Workflow-ul nu foloseste artifacts, deci nu se pierde nimic functional.
+        # Ce se pierde: logurile mai vechi de 30 de rulari, adica ~5 zile de
+        # diagnostic la cadenta de 4h. Suficient pentru depanare.
+        if: always()
+        continue-on-error: true   # curatenia nu are voie sa strice scanarea
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          KEEP: 30
+        run: |
+          # Exclud run-urile in curs sau in asteptare - altfel acest run s-ar
+          # sterge singur, iar API-ul ar returna eroare.
+          # Fara --paginate intentionat: `gh api --paginate` aplica filtrul --jq
+          # pe FIECARE pagina separat, deci ar pastra 30 de run-uri din fiecare
+          # pagina in loc de 30 in total. Cu per_page=100 acopar cazul normal;
+          # daca vreodata sunt mai multe, se curata progresiv la rulari succesive.
+          ids=$(gh api \
+            "repos/${GITHUB_REPOSITORY}/actions/workflows/scan.yml/runs?per_page=100" \
+            --jq '.workflow_runs
+                  | map(select(.status != "in_progress" and .status != "queued"))
+                  | sort_by(.created_at) | reverse
+                  | .['"${KEEP}"':] | .[].id')
+          count=$(echo "$ids" | grep -c . || true)
+          echo "Run-uri de sters (pastrez ultimele ${KEEP}): ${count}"
+          for id in $ids; do
+            gh api -X DELETE "repos/${GITHUB_REPOSITORY}/actions/runs/$id" \
+              && echo "  sters $id" || echo "  [!] nu am putut sterge $id"
+          done
