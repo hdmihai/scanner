@@ -33,7 +33,7 @@ import time
 DATA_DIR = "data"
 HISTORY_FILE = os.path.join(DATA_DIR, "scan_history.json")
 
-KEEP_DETAIL_DAYS = 3   # sub atat, pastrez semnalele individuale intacte
+KEEP_DETAIL_DAYS = 14   # sub atat, pastrez semnalele individuale intacte
 
 
 def load_json(path, default):
