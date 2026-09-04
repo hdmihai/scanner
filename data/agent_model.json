@@ -1,35 +1,35 @@
 {
   "model": {
     "weights": {
-      "trend": -0.001416,
-      "momentum": -0.004027,
-      "volatility": 0.008088,
-      "volume": -0.001032,
-      "is_long": 0.023347,
-      "persistence_n": 0.019487
+      "trend": -0.011772,
+      "momentum": -0.051101,
+      "volatility": -0.015926,
+      "volume": -0.043239,
+      "is_long": -0.001151,
+      "persistence_n": -0.004932
     },
-    "bias": -0.02734
+    "bias": -0.100174
   },
-  "samples_trained": 5,
+  "samples_trained": 8,
   "last_trained_scan_ts": 0.0,
   "agent": {
-    "correct": 1,
-    "total": 5
+    "correct": 4,
+    "total": 8
   },
   "baseline": {
     "correct": 2,
-    "total": 5
+    "total": 8
   },
   "by_direction": {
     "LONG": {
-      "agent": 1,
+      "agent": 2,
       "baseline": 2,
-      "total": 3
+      "total": 4
     },
     "SHORT": {
-      "agent": 0,
+      "agent": 2,
       "baseline": 0,
-      "total": 2
+      "total": 4
     }
   },
   "first_scan_ts": 1788382138.6609972,
@@ -38,21 +38,27 @@
     0,
     1,
     0,
-    0
+    0,
+    1,
+    1,
+    1
   ],
   "recent_baseline": [
     0,
     1,
     1,
     0,
+    0,
+    0,
+    0,
     0
   ],
   "curve": [],
   "status": "SHADOW",
   "source": "plans-v2",
-  "status_reason": "are nevoie de 300 exemple (are 5)",
-  "days_covered": 1.13,
+  "status_reason": "are nevoie de 300 exemple (are 8)",
+  "days_covered": 1.22,
   "balanced_agent": null,
   "balanced_baseline": null,
-  "last_event_ts": 1788480000.0
+  "last_event_ts": 1788487200.0
 }
