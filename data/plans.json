@@ -1,5 +1,5 @@
 {
-  "next_id": 81,
+  "next_id": 90,
   "plans": [
     {
       "id": 1,
@@ -2054,11 +2054,11 @@
       "tp2": 0.02974,
       "risk": 0.0006675,
       "planned_r_tp2": 4.0,
-      "state": "OPEN",
-      "state_detail": "OPEN \u00b7 WAITING",
-      "realized_r": null,
-      "closed_ts": null,
-      "bars_checked": 8,
+      "state": "SL_HIT",
+      "state_detail": "SL HIT \u00b7 INVALIDATED",
+      "realized_r": -1.0,
+      "closed_ts": 1788498000.0,
+      "bars_checked": 9,
       "score_at_entry": 72,
       "components": {
         "trend": 0.147,
@@ -2076,7 +2076,8 @@
         "agent_prob": 0.3212,
         "agent_used": false
       },
-      "geometry": "v2"
+      "geometry": "v2",
+      "agent_trained": true
     },
     {
       "id": 60,
@@ -2131,7 +2132,7 @@
       "state_detail": "OPEN \u00b7 WAITING",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 4,
+      "bars_checked": 12,
       "score_at_entry": 66,
       "components": {
         "trend": 0.713,
@@ -2311,11 +2312,11 @@
       "tp2": 0.1403,
       "risk": 0.009675,
       "planned_r_tp2": 4.0,
-      "state": "TP1_HIT",
-      "state_detail": "TP1 HIT \u00b7 RULEAZA SPRE TP2",
-      "realized_r": null,
-      "closed_ts": null,
-      "bars_checked": 8,
+      "state": "TP2_HIT",
+      "state_detail": "TP2 HIT \u00b7 CLOSED",
+      "realized_r": 2.641,
+      "closed_ts": 1788505200.0,
+      "bars_checked": 11,
       "score_at_entry": 16,
       "components": {
         "trend": 0.214,
@@ -2334,7 +2335,8 @@
         "agent_used": false
       },
       "geometry": "v2",
-      "tp1_hit_ts": 1788480000.0
+      "tp1_hit_ts": 1788480000.0,
+      "agent_trained": true
     },
     {
       "id": 67,
@@ -2352,7 +2354,7 @@
       "state_detail": "OPEN \u00b7 WAITING",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 4,
+      "bars_checked": 8,
       "score_at_entry": 82,
       "components": {
         "trend": 0.982,
@@ -2388,7 +2390,7 @@
       "state_detail": "OPEN \u00b7 WAITING",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 4,
+      "bars_checked": 8,
       "score_at_entry": 69,
       "components": {
         "trend": 0.889,
@@ -2420,11 +2422,11 @@
       "tp2": 0.031674286,
       "risk": 0.00043607,
       "planned_r_tp2": 4.0,
-      "state": "OPEN",
-      "state_detail": "OPEN \u00b7 WAITING",
-      "realized_r": null,
-      "closed_ts": null,
-      "bars_checked": 0,
+      "state": "SL_HIT",
+      "state_detail": "SL HIT \u00b7 INVALIDATED",
+      "realized_r": -1.0,
+      "closed_ts": 1788498000.0,
+      "bars_checked": 5,
       "score_at_entry": 69,
       "components": {
         "trend": 0.464,
@@ -2442,7 +2444,8 @@
         "agent_prob": 0.5,
         "agent_used": false
       },
-      "geometry": "v2"
+      "geometry": "v2",
+      "agent_trained": true
     },
     {
       "id": 70,
@@ -2456,11 +2459,11 @@
       "tp2": 6.429,
       "risk": 0.1575,
       "planned_r_tp2": 4.0,
-      "state": "OPEN",
-      "state_detail": "OPEN \u00b7 WAITING",
-      "realized_r": null,
-      "closed_ts": null,
-      "bars_checked": 4,
+      "state": "SL_HIT",
+      "state_detail": "SL HIT \u00b7 INVALIDATED",
+      "realized_r": -1.0,
+      "closed_ts": 1788501600.0,
+      "bars_checked": 6,
       "score_at_entry": 68,
       "components": {
         "trend": 0.203,
@@ -2478,7 +2481,8 @@
         "agent_prob": 0.5,
         "agent_used": false
       },
-      "geometry": "v2"
+      "geometry": "v2",
+      "agent_trained": true
     },
     {
       "id": 71,
@@ -2529,11 +2533,11 @@
       "tp2": 0.017255071,
       "risk": 0.00104357,
       "planned_r_tp2": 2.5,
-      "state": "OPEN",
-      "state_detail": "OPEN \u00b7 WAITING",
-      "realized_r": null,
-      "closed_ts": null,
-      "bars_checked": 0,
+      "state": "SL_HIT",
+      "state_detail": "SL HIT \u00b7 INVALIDATED",
+      "realized_r": -1.0,
+      "closed_ts": 1788490800.0,
+      "bars_checked": 3,
       "score_at_entry": 48,
       "components": {
         "trend": 1.0,
@@ -2551,7 +2555,8 @@
         "agent_prob": 0.5,
         "agent_used": false
       },
-      "geometry": "v2"
+      "geometry": "v2",
+      "agent_trained": true
     },
     {
       "id": 73,
@@ -2569,7 +2574,7 @@
       "state_detail": "OPEN \u00b7 WAITING",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 4,
+      "bars_checked": 8,
       "score_at_entry": 33,
       "components": {
         "trend": 0.106,
@@ -2605,7 +2610,7 @@
       "state_detail": "OPEN \u00b7 WAITING",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 4,
+      "bars_checked": 8,
       "score_at_entry": 22,
       "components": {
         "trend": 0.033,
@@ -2641,7 +2646,7 @@
       "state_detail": "OPEN \u00b7 WAITING",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 0,
+      "bars_checked": 4,
       "score_at_entry": 63,
       "components": {
         "trend": 0.74,
@@ -2677,7 +2682,7 @@
       "state_detail": "OPEN \u00b7 WAITING",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 0,
+      "bars_checked": 4,
       "score_at_entry": 59,
       "components": {
         "trend": 0.338,
@@ -2713,7 +2718,7 @@
       "state_detail": "OPEN \u00b7 WAITING",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 0,
+      "bars_checked": 4,
       "score_at_entry": 55,
       "components": {
         "trend": 0.243,
@@ -2749,7 +2754,7 @@
       "state_detail": "OPEN \u00b7 WAITING",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 0,
+      "bars_checked": 4,
       "score_at_entry": 28,
       "components": {
         "trend": 0.076,
@@ -2781,11 +2786,11 @@
       "tp2": 0.99861429,
       "risk": 0.00024643,
       "planned_r_tp2": 4.0,
-      "state": "OPEN",
-      "state_detail": "OPEN \u00b7 WAITING",
+      "state": "TP1_HIT",
+      "state_detail": "TP1 HIT \u00b7 RULEAZA SPRE TP2",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 0,
+      "bars_checked": 4,
       "score_at_entry": 25,
       "components": {
         "trend": 0.003,
@@ -2803,7 +2808,8 @@
         "agent_prob": 0.4935,
         "agent_used": false
       },
-      "geometry": "v2"
+      "geometry": "v2",
+      "tp1_hit_ts": 1788498000.0
     },
     {
       "id": 80,
@@ -2821,7 +2827,7 @@
       "state_detail": "OPEN \u00b7 WAITING",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 0,
+      "bars_checked": 4,
       "score_at_entry": 23,
       "components": {
         "trend": 0.076,
@@ -2840,24 +2846,348 @@
         "agent_used": false
       },
       "geometry": "v2"
+    },
+    {
+      "id": 81,
+      "symbol": "NPC/USDT",
+      "direction": "LONG",
+      "created_ts": 1788510061.0037713,
+      "created_time": "2026-09-04 08:21 UTC",
+      "entry": 0.0196,
+      "sl": 0.019032143,
+      "tp1": 0.020167857,
+      "tp2": 0.021871429,
+      "risk": 0.00056786,
+      "planned_r_tp2": 4.0,
+      "state": "OPEN",
+      "state_detail": "OPEN \u00b7 WAITING",
+      "realized_r": null,
+      "closed_ts": null,
+      "bars_checked": 0,
+      "score_at_entry": 88,
+      "components": {
+        "trend": 0.867,
+        "momentum": 0.672,
+        "volatility": 0.966,
+        "volume": 1.0
+      },
+      "persistence_at_entry": 0,
+      "decision": {
+        "action": "ISSUE",
+        "mode": "EXPLORARE",
+        "reason": "inca nu am destule planuri inchise la scor ~88 (prag 20) - deschid ca sa invat",
+        "expected_value_r": null,
+        "calibrated_prob": null,
+        "agent_prob": 0.4491,
+        "agent_used": false
+      },
+      "geometry": "v2"
+    },
+    {
+      "id": 82,
+      "symbol": "LIT/USDT",
+      "direction": "LONG",
+      "created_ts": 1788510061.0040352,
+      "created_time": "2026-09-04 08:21 UTC",
+      "entry": 4.475,
+      "sl": 4.3090357,
+      "tp1": 4.6409643,
+      "tp2": 5.1388572,
+      "risk": 0.1659643,
+      "planned_r_tp2": 4.0,
+      "state": "OPEN",
+      "state_detail": "OPEN \u00b7 WAITING",
+      "realized_r": null,
+      "closed_ts": null,
+      "bars_checked": 0,
+      "score_at_entry": 69,
+      "components": {
+        "trend": 1.0,
+        "momentum": 0.752,
+        "volatility": 0.764,
+        "volume": 0.29
+      },
+      "persistence_at_entry": 1,
+      "decision": {
+        "action": "ISSUE",
+        "mode": "EXPLORARE",
+        "reason": "inca nu am destule planuri inchise la scor ~69 (prag 20) - deschid ca sa invat",
+        "expected_value_r": null,
+        "calibrated_prob": null,
+        "agent_prob": 0.4559,
+        "agent_used": false
+      },
+      "geometry": "v2"
+    },
+    {
+      "id": 83,
+      "symbol": "SPX/USDT",
+      "direction": "LONG",
+      "created_ts": 1788510061.0042703,
+      "created_time": "2026-09-04 08:21 UTC",
+      "entry": 0.6059,
+      "sl": 0.58972143,
+      "tp1": 0.62207857,
+      "tp2": 0.67061428,
+      "risk": 0.01617857,
+      "planned_r_tp2": 4.0,
+      "state": "OPEN",
+      "state_detail": "OPEN \u00b7 WAITING",
+      "realized_r": null,
+      "closed_ts": null,
+      "bars_checked": 0,
+      "score_at_entry": 59,
+      "components": {
+        "trend": 0.578,
+        "momentum": 0.641,
+        "volatility": 0.89,
+        "volume": 0.296
+      },
+      "persistence_at_entry": 0,
+      "decision": {
+        "action": "ISSUE",
+        "mode": "EXPLORARE",
+        "reason": "inca nu am destule planuri inchise la scor ~59 (prag 20) - deschid ca sa invat",
+        "expected_value_r": null,
+        "calibrated_prob": null,
+        "agent_prob": 0.4581,
+        "agent_used": false
+      },
+      "geometry": "v2"
+    },
+    {
+      "id": 84,
+      "symbol": "HNT/USDT",
+      "direction": "LONG",
+      "created_ts": 1788510061.0045493,
+      "created_time": "2026-09-04 08:21 UTC",
+      "entry": 0.607,
+      "sl": 0.52192857,
+      "tp1": 0.755,
+      "tp2": 0.94728572,
+      "risk": 0.08507143,
+      "planned_r_tp2": 4.0,
+      "state": "OPEN",
+      "state_detail": "OPEN \u00b7 WAITING",
+      "realized_r": null,
+      "closed_ts": null,
+      "bars_checked": 0,
+      "score_at_entry": 57,
+      "components": {
+        "trend": 0.999,
+        "momentum": 0.204,
+        "volatility": 0.0,
+        "volume": 1.0
+      },
+      "persistence_at_entry": 0,
+      "decision": {
+        "action": "ISSUE",
+        "mode": "EXPLORARE",
+        "reason": "inca nu am destule planuri inchise la scor ~57 (prag 20) - deschid ca sa invat",
+        "expected_value_r": null,
+        "calibrated_prob": null,
+        "agent_prob": 0.4584,
+        "agent_used": false
+      },
+      "geometry": "v2"
+    },
+    {
+      "id": 85,
+      "symbol": "XMR/USDT",
+      "direction": "LONG",
+      "created_ts": 1788510061.0047913,
+      "created_time": "2026-09-04 08:21 UTC",
+      "entry": 543.3,
+      "sl": 525.22393,
+      "tp1": 561.37607,
+      "tp2": 591.69646,
+      "risk": 18.07607,
+      "planned_r_tp2": 2.68,
+      "state": "OPEN",
+      "state_detail": "OPEN \u00b7 WAITING",
+      "realized_r": null,
+      "closed_ts": null,
+      "bars_checked": 0,
+      "score_at_entry": 56,
+      "components": {
+        "trend": 0.146,
+        "momentum": 0.788,
+        "volatility": 0.891,
+        "volume": 0.43
+      },
+      "persistence_at_entry": 0,
+      "decision": {
+        "action": "ISSUE",
+        "mode": "EXPLORARE",
+        "reason": "inca nu am destule planuri inchise la scor ~56 (prag 20) - deschid ca sa invat",
+        "expected_value_r": null,
+        "calibrated_prob": null,
+        "agent_prob": 0.4561,
+        "agent_used": false
+      },
+      "geometry": "v2"
+    },
+    {
+      "id": 86,
+      "symbol": "JASMY/USDT",
+      "direction": "SHORT",
+      "created_ts": 1788510061.005021,
+      "created_time": "2026-09-04 08:21 UTC",
+      "entry": 0.004386,
+      "sl": 0.0045043929,
+      "tp1": 0.004246,
+      "tp2": 0.0039124286,
+      "risk": 0.00011839,
+      "planned_r_tp2": 4.0,
+      "state": "OPEN",
+      "state_detail": "OPEN \u00b7 WAITING",
+      "realized_r": null,
+      "closed_ts": null,
+      "bars_checked": 0,
+      "score_at_entry": 62,
+      "components": {
+        "trend": 0.321,
+        "momentum": 0.998,
+        "volatility": 0.9,
+        "volume": 0.306
+      },
+      "persistence_at_entry": 0,
+      "decision": {
+        "action": "ISSUE",
+        "mode": "EXPLORARE",
+        "reason": "inca nu am destule planuri inchise la scor ~62 (prag 20) - deschid ca sa invat",
+        "expected_value_r": null,
+        "calibrated_prob": null,
+        "agent_prob": 0.4545,
+        "agent_used": false
+      },
+      "geometry": "v2"
+    },
+    {
+      "id": 87,
+      "symbol": "2Z/USDT",
+      "direction": "SHORT",
+      "created_ts": 1788510061.0052617,
+      "created_time": "2026-09-04 08:21 UTC",
+      "entry": 0.05268,
+      "sl": 0.0532125,
+      "tp1": 0.05133,
+      "tp2": 0.05055,
+      "risk": 0.0005325,
+      "planned_r_tp2": 4.0,
+      "state": "OPEN",
+      "state_detail": "OPEN \u00b7 WAITING",
+      "realized_r": null,
+      "closed_ts": null,
+      "bars_checked": 0,
+      "score_at_entry": 37,
+      "components": {
+        "trend": 0.089,
+        "momentum": 0.74,
+        "volatility": 0.337,
+        "volume": 0.323
+      },
+      "persistence_at_entry": 0,
+      "decision": {
+        "action": "ISSUE",
+        "mode": "EXPLORARE",
+        "reason": "inca nu am destule planuri inchise la scor ~37 (prag 20) - deschid ca sa invat",
+        "expected_value_r": null,
+        "calibrated_prob": null,
+        "agent_prob": 0.4605,
+        "agent_used": false
+      },
+      "geometry": "v2"
+    },
+    {
+      "id": 88,
+      "symbol": "USDC/USDT",
+      "direction": "SHORT",
+      "created_ts": 1788510061.0055149,
+      "created_time": "2026-09-04 08:21 UTC",
+      "entry": 0.9998,
+      "sl": 0.99997143,
+      "tp1": 0.99962857,
+      "tp2": 0.99911429,
+      "risk": 0.00017143,
+      "planned_r_tp2": 4.0,
+      "state": "OPEN",
+      "state_detail": "OPEN \u00b7 WAITING",
+      "realized_r": null,
+      "closed_ts": null,
+      "bars_checked": 0,
+      "score_at_entry": 28,
+      "components": {
+        "trend": 0.002,
+        "momentum": 0.477,
+        "volatility": 0.006,
+        "volume": 0.612
+      },
+      "persistence_at_entry": 5,
+      "decision": {
+        "action": "ISSUE",
+        "mode": "EXPLORARE",
+        "reason": "inca nu am destule planuri inchise la scor ~28 (prag 20) - deschid ca sa invat",
+        "expected_value_r": null,
+        "calibrated_prob": null,
+        "agent_prob": 0.4617,
+        "agent_used": false
+      },
+      "geometry": "v2"
+    },
+    {
+      "id": 89,
+      "symbol": "USDD/USDT",
+      "direction": "SHORT",
+      "created_ts": 1788510061.0057445,
+      "created_time": "2026-09-04 08:21 UTC",
+      "entry": 0.997,
+      "sl": 0.99814643,
+      "tp1": 0.99585357,
+      "tp2": 0.99241429,
+      "risk": 0.00114643,
+      "planned_r_tp2": 4.0,
+      "state": "OPEN",
+      "state_detail": "OPEN \u00b7 WAITING",
+      "realized_r": null,
+      "closed_ts": null,
+      "bars_checked": 0,
+      "score_at_entry": 25,
+      "components": {
+        "trend": 0.007,
+        "momentum": 0.506,
+        "volatility": 0.038,
+        "volume": 0.448
+      },
+      "persistence_at_entry": 0,
+      "decision": {
+        "action": "ISSUE",
+        "mode": "EXPLORARE",
+        "reason": "inca nu am destule planuri inchise la scor ~25 (prag 20) - deschid ca sa invat",
+        "expected_value_r": null,
+        "calibrated_prob": null,
+        "agent_prob": 0.4635,
+        "agent_used": false
+      },
+      "geometry": "v2"
     }
   ],
   "calibration": {
     "60": {
-      "total": 4,
-      "win_rate": 50.0,
-      "ci_low": 15.0,
-      "ci_high": 85.0,
-      "avg_r": -0.25,
+      "total": 7,
+      "win_rate": 28.6,
+      "ci_low": 8.2,
+      "ci_high": 64.1,
+      "avg_r": -0.571,
       "avg_win_r": 0.5,
       "avg_loss_r": 1.0,
       "reliable": false
     },
     "40": {
-      "total": 1,
+      "total": 2,
       "win_rate": 0.0,
       "ci_low": 0.0,
-      "ci_high": 79.3,
+      "ci_high": 65.8,
       "avg_r": -1.0,
       "avg_win_r": null,
       "avg_loss_r": 1.0,
@@ -2872,27 +3202,37 @@
       "avg_win_r": null,
       "avg_loss_r": 1.0,
       "reliable": false
+    },
+    "0": {
+      "total": 1,
+      "win_rate": 100.0,
+      "ci_low": 20.7,
+      "ci_high": 100.0,
+      "avg_r": 2.641,
+      "avg_win_r": 2.641,
+      "avg_loss_r": null,
+      "reliable": false
     }
   },
   "summary": {
     "legacy_closed": 37,
     "legacy_total_r": -23.95,
     "geometry": "v2",
-    "total_plans": 80,
-    "open": 16,
-    "closed": 8,
+    "total_plans": 89,
+    "open": 20,
+    "closed": 13,
     "by_state": {
-      "SL_HIT": 44,
-      "TP2_HIT": 1,
+      "SL_HIT": 48,
+      "TP2_HIT": 2,
       "EXPIRED": 19,
-      "OPEN": 15,
+      "OPEN": 19,
       "TP1_HIT": 1
     },
-    "win_rate": 25.0,
-    "total_r": -5.0,
-    "avg_r": -0.625,
-    "profit_factor": 0.17,
-    "best": 0.5,
+    "win_rate": 23.1,
+    "total_r": -6.36,
+    "avg_r": -0.489,
+    "profit_factor": 0.36,
+    "best": 2.641,
     "worst": -1.0
   }
 }
