@@ -52,8 +52,16 @@ CONFIG = {
     # in USD (doar 44 perechi USDT din 1440 de piete), motiv pentru care prima
     # rulare reala a gasit doar 34 de simboluri. Deduplicate pe simbolul de baza.
     "min_universe": 120,       # sub atat, incerc urmatorul exchange din lista
+                               # (se ajusteaza automat la marimea watchlist-ului)
     "universe_size": 200,      # cate simboluri intra efectiv in scanare (scor + persistenta)
     "coingecko_scope": 200,    # doar proiectele din top N CoinGecko dupa market cap sunt eligibile
+
+    # WATCHLIST: daca e completata, scaneaza DOAR aceste simboluri si ignora
+    # complet top-200 CoinGecko. Lasa lista goala ca sa revii la scanarea larga.
+    # Aliasurile acopera redenumirile: GRAM e Toncoin redenumit (iunie 2026), dar
+    # unele burse pot inca lista perechea ca TON/USDT. Se ia primul alias gasit.
+    "watchlist": ["ADA", "AVAX", "POL", "LINK", "FET", "NEAR", "GRAM"],
+    "aliases": {"GRAM": ["GRAM", "TON"], "POL": ["POL", "MATIC"]},
     "timeframe": "1h",
     "candles": 200,
     "lookahead_hours": 24,     # dupa cate ore evaluam daca un semnal a "nimerit"
@@ -216,20 +224,26 @@ def compute_trade_plan(direction, price, atr_val, structure, fib):
     if risk <= 0:
         return None
 
+    # BUG FIX (gasit pe planul real #62 SKR/USDT): varianta anterioara avea un
+    # fallback pentru TP2 care nu verifica daca e dincolo de TP1. Cand structura
+    # dadea un TP1 foarte departe (8.91R), fallback-ul punea TP2 la 2.50R - deci
+    # MAI APROAPE decat TP1. Pretul ar fi atins TP2 primul, planul s-ar fi inchis
+    # inregistrand 2.5R desi tinta structurala era la 8.9R, iar etapa TP1 nu s-ar
+    # fi declansat niciodata. Acum TP2 e garantat dincolo de TP1, prin constructie.
     if direction == "LONG":
         sl = price - risk
         above = [r for r in structure["resistance"] if r >= price + risk * MIN_TP1_R]
         tp1 = min(above) if above else price + risk * MIN_TP1_R
-        tp2_candidates = [c for c in (ext_1618, price + risk * 4)
-                          if c >= max(tp1, price + risk * MIN_TP2_R)]
-        tp2 = min(tp2_candidates) if tp2_candidates else price + risk * MIN_TP2_R
+        tp2_floor = max(tp1 + risk * 0.5, price + risk * MIN_TP2_R)
+        tp2_candidates = [c for c in (ext_1618, price + risk * 4) if c >= tp2_floor]
+        tp2 = min(tp2_candidates) if tp2_candidates else tp2_floor
     else:
         sl = price + risk
         below = [s for s in structure["support"] if s <= price - risk * MIN_TP1_R]
         tp1 = max(below) if below else price - risk * MIN_TP1_R
-        tp2_candidates = [c for c in (ext_1618, price - risk * 4)
-                          if c <= min(tp1, price - risk * MIN_TP2_R)]
-        tp2 = max(tp2_candidates) if tp2_candidates else price - risk * MIN_TP2_R
+        tp2_ceiling = min(tp1 - risk * 0.5, price - risk * MIN_TP2_R)
+        tp2_candidates = [c for c in (ext_1618, price - risk * 4) if c <= tp2_ceiling]
+        tp2 = max(tp2_candidates) if tp2_candidates else tp2_ceiling
 
     expected_r = round(abs(tp2 - price) / risk, 2)
     return {
@@ -456,16 +470,19 @@ def format_message(scan):
         ]
         return "```\n" + "\n".join([header] + body) + "\n```" if rows else "_(niciun semnal)_"
 
-    parts = [f"ðŸ“Š *Scan {scan['scan_time']}* â€” universe {scan['universe_size']}"]
-    parts.append("\nðŸŸ¢ *TOP LONG*")
+    # ASCII pur intentionat: emoji-urile s-au corupt de trei ori la transferul
+    # fisierului (UTF-8 citit ca Latin-1), producand caractere ilizibile in mesajele Telegram.
+    # Textul simplu nu poate fi corupt de nicio conversie de encoding.
+    parts = [f"*SCAN {scan['scan_time']}* - universe {scan['universe_size']}"]
+    parts.append("\n*TOP LONG*")
     parts.append(table(scan["top_long"]))
-    parts.append("\nðŸ”´ *TOP SHORT*")
+    parts.append("\n*TOP SHORT*")
     parts.append(table(scan["top_short"]))
     if scan.get("best_candidate"):
         b = scan["best_candidate"]
         parts.append(
-            f"\nâ­ *Best candidate:* {b['symbol']} {b['direction']} Â· "
-            f"conf {b['probability']}% Â· exp {b['expected_r']}R"
+            f"\n*BEST CANDIDATE:* {b['symbol']} {b['direction']} - "
+            f"conf {b['probability']}% - exp {b['expected_r']}R"
         )
     return "\n".join(parts)
 
@@ -552,9 +569,21 @@ def connect_exchange(scope):
 
 
 def main():
-    coingecko_scope = fetch_coingecko_top_symbols(CONFIG["coingecko_scope"])
-    if not coingecko_scope:
-        print("[!] Nu am putut lua lista CoinGecko - continui fara filtrul de scope.")
+    watchlist = CONFIG.get("watchlist") or []
+    if watchlist:
+        # pragul de acoperire nu poate depasi cate simboluri exista in watchlist
+        CONFIG["min_universe"] = max(1, int(len(watchlist) * 0.7))
+        # Extind fiecare simbol cu aliasurile lui, ca sa nu ratez perechea din
+        # cauza unei redenumiri (ex. TON -> GRAM).
+        coingecko_scope = set()
+        for sym in watchlist:
+            coingecko_scope.update(CONFIG.get("aliases", {}).get(sym, [sym]))
+        print(f"Watchlist activa: {len(watchlist)} simboluri "
+              f"({len(coingecko_scope)} incluzand aliasuri) - ignor top-200 CoinGecko.")
+    else:
+        coingecko_scope = fetch_coingecko_top_symbols(CONFIG["coingecko_scope"])
+        if not coingecko_scope:
+            print("[!] Nu am putut lua lista CoinGecko - continui fara filtrul de scope.")
 
     exchange, markets, all_tickers, eligible, exchange_id = connect_exchange(coingecko_scope)
     universe = eligible[: CONFIG["universe_size"]]
