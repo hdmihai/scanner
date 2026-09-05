@@ -1,19 +1,33 @@
 {
-  "text": "Din 33 planuri inchise, rata de succes e 18.2%, cu -18.47R cumulat (-0.560R in medie pe plan) si profit factor 0.32. 23 planuri sunt inca deschise. Separat, 37 planuri inchise (-23.95R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #102 CC/USDT +0.50R, #103 MON/USDT -1.00R, #111 POL/USDT -1.00R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 33)).",
+  "text": "Din 35 planuri inchise, rata de succes e 22.9%, cu -16.44R cumulat (-0.470R in medie pe plan) si profit factor 0.39. 21 planuri sunt inca deschise. Separat, 37 planuri inchise (-23.95R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #87 2Z/USDT +1.27R, #97 VIRTUAL/USDT +0.77R, #102 CC/USDT +0.50R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 35)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-05 04:17 UTC",
+    "scan_time": "2026-09-05 08:18 UTC",
     "universe_size": 7,
     "plans_total": 112,
-    "plans_open": 23,
-    "plans_closed": 33,
+    "plans_open": 21,
+    "plans_closed": 35,
     "legacy_closed": 37,
     "legacy_total_r": -23.95,
-    "win_rate": 18.2,
-    "total_r": -18.47,
-    "avg_r": -0.56,
-    "profit_factor": 0.32,
+    "win_rate": 22.9,
+    "total_r": -16.44,
+    "avg_r": -0.47,
+    "profit_factor": 0.39,
     "recent_closed": [
+      {
+        "id": 87,
+        "symbol": "2Z/USDT",
+        "direction": "SHORT",
+        "state": "TP1 HIT \u00b7 SL LA BREAKEVEN",
+        "r": 1.268
+      },
+      {
+        "id": 97,
+        "symbol": "VIRTUAL/USDT",
+        "direction": "SHORT",
+        "state": "TP1 HIT \u00b7 SL LA BREAKEVEN",
+        "r": 0.765
+      },
       {
         "id": 102,
         "symbol": "CC/USDT",
@@ -34,20 +48,6 @@
         "direction": "SHORT",
         "state": "SL HIT \u00b7 INVALIDATED",
         "r": -1.0
-      },
-      {
-        "id": 104,
-        "symbol": "STRK/USDT",
-        "direction": "SHORT",
-        "state": "SL HIT \u00b7 INVALIDATED",
-        "r": -1.0
-      },
-      {
-        "id": 110,
-        "symbol": "FET/USDT",
-        "direction": "SHORT",
-        "state": "SL HIT \u00b7 INVALIDATED",
-        "r": -1.0
       }
     ],
     "open_now": [
@@ -55,13 +55,13 @@
         "id": 112,
         "symbol": "FET/USDT",
         "direction": "LONG",
-        "state": "OPEN \u00b7 WAITING"
+        "state": "TP1 HIT \u00b7 RULEAZA SPRE TP2"
       },
       {
         "id": 109,
         "symbol": "AVAX/USDT",
         "direction": "LONG",
-        "state": "OPEN \u00b7 WAITING"
+        "state": "TP1 HIT \u00b7 RULEAZA SPRE TP2"
       },
       {
         "id": 108,
@@ -85,17 +85,17 @@
     "best_bucket": null,
     "worst_bucket": null,
     "agent_status": "SHADOW",
-    "agent_reason": "are nevoie de 300 exemple (are 33)",
-    "agent_samples": 33,
+    "agent_reason": "are nevoie de 300 exemple (are 35)",
+    "agent_samples": 35,
     "agent_balanced": null,
     "baseline_balanced": null,
     "agent_weights": {
-      "trend": -0.059427,
-      "momentum": -0.187497,
-      "volatility": -0.208046,
-      "volume": -0.18962,
-      "is_long": -0.124423,
-      "persistence_n": -0.057361
+      "trend": -0.056047,
+      "momentum": -0.151092,
+      "volatility": -0.179015,
+      "volume": -0.169116,
+      "is_long": -0.124422,
+      "persistence_n": -0.05736
     }
   }
 }
