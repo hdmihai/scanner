@@ -1,19 +1,26 @@
 {
-  "text": "Din 27 planuri inchise, rata de succes e 14.8%, cu -16.86R cumulat (-0.624R in medie pe plan) si profit factor 0.27. 27 planuri sunt inca deschise. Separat, 37 planuri inchise (-23.95R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #78 NFT/USDT -1.00R, #93 PUMP/USDT -1.00R, #94 FIL/USDT +2.50R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 27)).",
+  "text": "Din 28 planuri inchise, rata de succes e 17.9%, cu -14.97R cumulat (-0.535R in medie pe plan) si profit factor 0.35. 27 planuri sunt inca deschise. Separat, 37 planuri inchise (-23.95R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #99 DASH/USDT +1.89R, #78 NFT/USDT -1.00R, #93 PUMP/USDT -1.00R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 28)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-04 20:18 UTC",
+    "scan_time": "2026-09-05 00:28 UTC",
     "universe_size": 7,
-    "plans_total": 110,
+    "plans_total": 111,
     "plans_open": 27,
-    "plans_closed": 27,
+    "plans_closed": 28,
     "legacy_closed": 37,
     "legacy_total_r": -23.95,
-    "win_rate": 14.8,
-    "total_r": -16.86,
-    "avg_r": -0.624,
-    "profit_factor": 0.27,
+    "win_rate": 17.9,
+    "total_r": -14.97,
+    "avg_r": -0.535,
+    "profit_factor": 0.35,
     "recent_closed": [
+      {
+        "id": 99,
+        "symbol": "DASH/USDT",
+        "direction": "LONG",
+        "state": "TP2 HIT \u00b7 CLOSED",
+        "r": 1.886
+      },
       {
         "id": 78,
         "symbol": "NFT/USDT",
@@ -41,16 +48,15 @@
         "direction": "SHORT",
         "state": "SL HIT \u00b7 INVALIDATED",
         "r": -1.0
-      },
-      {
-        "id": 90,
-        "symbol": "XPL/USDT",
-        "direction": "LONG",
-        "state": "SL HIT \u00b7 INVALIDATED",
-        "r": -1.0
       }
     ],
     "open_now": [
+      {
+        "id": 111,
+        "symbol": "POL/USDT",
+        "direction": "SHORT",
+        "state": "OPEN \u00b7 WAITING"
+      },
       {
         "id": 110,
         "symbol": "FET/USDT",
@@ -74,28 +80,22 @@
         "symbol": "GRAM/USDT",
         "direction": "LONG",
         "state": "OPEN \u00b7 WAITING"
-      },
-      {
-        "id": 106,
-        "symbol": "LINK/USDT",
-        "direction": "LONG",
-        "state": "OPEN \u00b7 WAITING"
       }
     ],
     "best_bucket": null,
     "worst_bucket": null,
     "agent_status": "SHADOW",
-    "agent_reason": "are nevoie de 300 exemple (are 27)",
-    "agent_samples": 27,
+    "agent_reason": "are nevoie de 300 exemple (are 28)",
+    "agent_samples": 28,
     "agent_balanced": null,
     "baseline_balanced": null,
     "agent_weights": {
-      "trend": -0.096296,
-      "momentum": -0.199546,
-      "volatility": -0.18357,
-      "volume": -0.206942,
-      "is_long": -0.159684,
-      "persistence_n": -0.074484
+      "trend": -0.061038,
+      "momentum": -0.174971,
+      "volatility": -0.183569,
+      "volume": -0.18963,
+      "is_long": -0.124426,
+      "persistence_n": -0.067432
     }
   }
 }
