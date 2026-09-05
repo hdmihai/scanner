@@ -1,5 +1,5 @@
 {
-  "next_id": 112,
+  "next_id": 113,
   "plans": [
     {
       "id": 1,
@@ -2354,7 +2354,7 @@
       "state_detail": "OPEN \u00b7 WAITING",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 24,
+      "bars_checked": 28,
       "score_at_entry": 82,
       "components": {
         "trend": 0.982,
@@ -2390,7 +2390,7 @@
       "state_detail": "TP1 HIT \u00b7 RULEAZA SPRE TP2",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 24,
+      "bars_checked": 28,
       "score_at_entry": 69,
       "components": {
         "trend": 0.889,
@@ -2612,7 +2612,7 @@
       "state_detail": "OPEN \u00b7 WAITING",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 24,
+      "bars_checked": 28,
       "score_at_entry": 22,
       "components": {
         "trend": 0.033,
@@ -2907,7 +2907,7 @@
       "state_detail": "TP1 HIT \u00b7 RULEAZA SPRE TP2",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 16,
+      "bars_checked": 20,
       "score_at_entry": 69,
       "components": {
         "trend": 1.0,
@@ -3088,7 +3088,7 @@
       "state_detail": "TP1 HIT \u00b7 RULEAZA SPRE TP2",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 16,
+      "bars_checked": 20,
       "score_at_entry": 37,
       "components": {
         "trend": 0.089,
@@ -3383,7 +3383,7 @@
       "state_detail": "OPEN \u00b7 WAITING",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 12,
+      "bars_checked": 16,
       "score_at_entry": 37,
       "components": {
         "trend": 0.045,
@@ -3456,7 +3456,7 @@
       "state_detail": "TP1 HIT \u00b7 RULEAZA SPRE TP2",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 12,
+      "bars_checked": 16,
       "score_at_entry": 32,
       "components": {
         "trend": 0.016,
@@ -3489,11 +3489,11 @@
       "tp2": 3.0012857,
       "risk": 0.0873214,
       "planned_r_tp2": 4.0,
-      "state": "OPEN",
-      "state_detail": "OPEN \u00b7 WAITING",
+      "state": "TP1_HIT",
+      "state_detail": "TP1 HIT \u00b7 RULEAZA SPRE TP2",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 8,
+      "bars_checked": 12,
       "score_at_entry": 58,
       "components": {
         "trend": 0.618,
@@ -3511,7 +3511,8 @@
         "agent_prob": 0.3469,
         "agent_used": false
       },
-      "geometry": "v2"
+      "geometry": "v2",
+      "tp1_hit_ts": 1788566400.0
     },
     {
       "id": 99,
@@ -3567,7 +3568,7 @@
       "state_detail": "OPEN \u00b7 WAITING",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 8,
+      "bars_checked": 12,
       "score_at_entry": 49,
       "components": {
         "trend": 0.375,
@@ -3603,7 +3604,7 @@
       "state_detail": "OPEN \u00b7 WAITING",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 8,
+      "bars_checked": 12,
       "score_at_entry": 53,
       "components": {
         "trend": 0.241,
@@ -3635,11 +3636,11 @@
       "tp2": 0.099445714,
       "risk": 0.00213857,
       "planned_r_tp2": 4.0,
-      "state": "TP1_HIT",
-      "state_detail": "TP1 HIT \u00b7 RULEAZA SPRE TP2",
-      "realized_r": null,
-      "closed_ts": null,
-      "bars_checked": 8,
+      "state": "SL_HIT",
+      "state_detail": "TP1 HIT \u00b7 SL LA BREAKEVEN",
+      "realized_r": 0.5,
+      "closed_ts": 1788577200.0,
+      "bars_checked": 11,
       "score_at_entry": 44,
       "components": {
         "trend": 0.176,
@@ -3658,7 +3659,8 @@
         "agent_used": false
       },
       "geometry": "v2",
-      "tp1_hit_ts": 1788555600.0
+      "tp1_hit_ts": 1788555600.0,
+      "agent_trained": true
     },
     {
       "id": 103,
@@ -3672,11 +3674,11 @@
       "tp2": 0.020132857,
       "risk": 0.00109179,
       "planned_r_tp2": 4.0,
-      "state": "OPEN",
-      "state_detail": "OPEN \u00b7 WAITING",
-      "realized_r": null,
-      "closed_ts": null,
-      "bars_checked": 8,
+      "state": "SL_HIT",
+      "state_detail": "SL HIT \u00b7 INVALIDATED",
+      "realized_r": -1.0,
+      "closed_ts": 1788577200.0,
+      "bars_checked": 11,
       "score_at_entry": 43,
       "components": {
         "trend": 0.1,
@@ -3694,7 +3696,8 @@
         "agent_prob": 0.3811,
         "agent_used": false
       },
-      "geometry": "v2"
+      "geometry": "v2",
+      "agent_trained": true
     },
     {
       "id": 104,
@@ -3708,11 +3711,11 @@
       "tp2": 0.02346,
       "risk": 0.000615,
       "planned_r_tp2": 4.0,
-      "state": "OPEN",
-      "state_detail": "OPEN \u00b7 WAITING",
-      "realized_r": null,
-      "closed_ts": null,
-      "bars_checked": 8,
+      "state": "SL_HIT",
+      "state_detail": "SL HIT \u00b7 INVALIDATED",
+      "realized_r": -1.0,
+      "closed_ts": 1788570000.0,
+      "bars_checked": 9,
       "score_at_entry": 42,
       "components": {
         "trend": 0.095,
@@ -3730,7 +3733,8 @@
         "agent_prob": 0.3839,
         "agent_used": false
       },
-      "geometry": "v2"
+      "geometry": "v2",
+      "agent_trained": true
     },
     {
       "id": 105,
@@ -3748,7 +3752,7 @@
       "state_detail": "TP1 HIT \u00b7 RULEAZA SPRE TP2",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 4,
+      "bars_checked": 8,
       "score_at_entry": 51,
       "components": {
         "trend": 0.404,
@@ -3785,7 +3789,7 @@
       "state_detail": "OPEN \u00b7 WAITING",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 4,
+      "bars_checked": 8,
       "score_at_entry": 30,
       "components": {
         "trend": 0.185,
@@ -3821,7 +3825,7 @@
       "state_detail": "OPEN \u00b7 WAITING",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 4,
+      "bars_checked": 8,
       "score_at_entry": 30,
       "components": {
         "trend": 0.147,
@@ -3857,7 +3861,7 @@
       "state_detail": "OPEN \u00b7 WAITING",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 4,
+      "bars_checked": 8,
       "score_at_entry": 23,
       "components": {
         "trend": 0.002,
@@ -3893,7 +3897,7 @@
       "state_detail": "OPEN \u00b7 WAITING",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 4,
+      "bars_checked": 8,
       "score_at_entry": 13,
       "components": {
         "trend": 0.075,
@@ -3925,11 +3929,11 @@
       "tp2": 0.1409,
       "risk": 0.003375,
       "planned_r_tp2": 4.0,
-      "state": "OPEN",
-      "state_detail": "OPEN \u00b7 WAITING",
-      "realized_r": null,
-      "closed_ts": null,
-      "bars_checked": 4,
+      "state": "SL_HIT",
+      "state_detail": "SL HIT \u00b7 INVALIDATED",
+      "realized_r": -1.0,
+      "closed_ts": 1788570000.0,
+      "bars_checked": 5,
       "score_at_entry": 25,
       "components": {
         "trend": 0.022,
@@ -3947,7 +3951,8 @@
         "agent_prob": 0.3782,
         "agent_used": false
       },
-      "geometry": "v2"
+      "geometry": "v2",
+      "agent_trained": true
     },
     {
       "id": 111,
@@ -3961,11 +3966,11 @@
       "tp2": 0.086722857,
       "risk": 0.00154929,
       "planned_r_tp2": 4.0,
-      "state": "OPEN",
-      "state_detail": "OPEN \u00b7 WAITING",
-      "realized_r": null,
-      "closed_ts": null,
-      "bars_checked": 0,
+      "state": "SL_HIT",
+      "state_detail": "SL HIT \u00b7 INVALIDATED",
+      "realized_r": -1.0,
+      "closed_ts": 1788577200.0,
+      "bars_checked": 3,
       "score_at_entry": 20,
       "components": {
         "trend": 0.026,
@@ -3983,6 +3988,43 @@
         "agent_prob": 0.3731,
         "agent_used": false
       },
+      "geometry": "v2",
+      "agent_trained": true
+    },
+    {
+      "id": 112,
+      "symbol": "FET/USDT",
+      "direction": "LONG",
+      "created_ts": 1788581879.3664649,
+      "created_time": "2026-09-05 04:17 UTC",
+      "entry": 0.1625,
+      "sl": 0.15941429,
+      "tp1": 0.16558571,
+      "tp2": 0.1709722,
+      "risk": 0.00308571,
+      "planned_r_tp2": 2.75,
+      "state": "OPEN",
+      "state_detail": "OPEN \u00b7 WAITING",
+      "realized_r": null,
+      "closed_ts": null,
+      "bars_checked": 0,
+      "score_at_entry": 55,
+      "components": {
+        "trend": 0.118,
+        "momentum": 0.681,
+        "volatility": 0.633,
+        "volume": 0.727
+      },
+      "persistence_at_entry": 0,
+      "decision": {
+        "action": "ISSUE",
+        "mode": "EXPLORARE",
+        "reason": "inca nu am destule planuri inchise la scor ~55 (prag 20) - deschid ca sa invat",
+        "expected_value_r": null,
+        "calibrated_prob": null,
+        "agent_prob": 0.3037,
+        "agent_used": false
+      },
       "geometry": "v2"
     }
   ],
@@ -3998,21 +4040,21 @@
       "reliable": false
     },
     "40": {
-      "total": 6,
-      "win_rate": 16.7,
-      "ci_low": 3.0,
-      "ci_high": 56.4,
-      "avg_r": -0.519,
-      "avg_win_r": 1.886,
+      "total": 9,
+      "win_rate": 22.2,
+      "ci_low": 6.3,
+      "ci_high": 54.7,
+      "avg_r": -0.513,
+      "avg_win_r": 1.193,
       "avg_loss_r": 1.0,
       "reliable": false
     },
     "20": {
-      "total": 10,
-      "win_rate": 10.0,
-      "ci_low": 1.8,
-      "ci_high": 40.4,
-      "avg_r": -0.65,
+      "total": 12,
+      "win_rate": 8.3,
+      "ci_low": 1.5,
+      "ci_high": 35.4,
+      "avg_r": -0.708,
       "avg_win_r": 2.5,
       "avg_loss_r": 1.0,
       "reliable": false
@@ -4032,20 +4074,20 @@
     "legacy_closed": 37,
     "legacy_total_r": -23.95,
     "geometry": "v2",
-    "total_plans": 111,
-    "open": 27,
-    "closed": 28,
+    "total_plans": 112,
+    "open": 23,
+    "closed": 33,
     "by_state": {
-      "SL_HIT": 61,
+      "SL_HIT": 66,
       "TP2_HIT": 4,
       "EXPIRED": 19,
-      "OPEN": 21,
+      "OPEN": 17,
       "TP1_HIT": 6
     },
-    "win_rate": 17.9,
-    "total_r": -14.97,
-    "avg_r": -0.535,
-    "profit_factor": 0.35,
+    "win_rate": 18.2,
+    "total_r": -18.47,
+    "avg_r": -0.56,
+    "profit_factor": 0.32,
     "best": 2.641,
     "worst": -1.0
   }
