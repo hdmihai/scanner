@@ -1,71 +1,65 @@
 {
-  "text": "Din 45 planuri inchise, rata de succes e 33.3%, cu -6.04R cumulat (-0.134R in medie pe plan) si profit factor 0.8. 15 planuri sunt inca deschise. Separat, 37 planuri inchise (-23.95R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #105 NEAR/USDT +2.13R, #112 FET/USDT +1.87R, #82 LIT/USDT +0.93R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 45)).",
+  "text": "Din 49 planuri inchise, rata de succes e 34.7%, cu -6.71R cumulat (-0.137R in medie pe plan) si profit factor 0.79. 13 planuri sunt inca deschise. Separat, 37 planuri inchise (-23.95R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #100 S/USDT +0.83R, #114 AVAX/USDT -1.00R, #115 NEAR/USDT +0.50R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 49)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-06 12:22 UTC",
+    "scan_time": "2026-09-06 16:18 UTC",
     "universe_size": 7,
-    "plans_total": 116,
-    "plans_open": 15,
-    "plans_closed": 45,
+    "plans_total": 118,
+    "plans_open": 13,
+    "plans_closed": 49,
     "legacy_closed": 37,
     "legacy_total_r": -23.95,
-    "win_rate": 33.3,
-    "total_r": -6.04,
-    "avg_r": -0.134,
-    "profit_factor": 0.8,
+    "win_rate": 34.7,
+    "total_r": -6.71,
+    "avg_r": -0.137,
+    "profit_factor": 0.79,
     "recent_closed": [
+      {
+        "id": 100,
+        "symbol": "S/USDT",
+        "direction": "LONG",
+        "state": "TP1 HIT \u00b7 SL LA BREAKEVEN",
+        "r": 0.827
+      },
+      {
+        "id": 114,
+        "symbol": "AVAX/USDT",
+        "direction": "LONG",
+        "state": "SL HIT \u00b7 INVALIDATED",
+        "r": -1.0
+      },
+      {
+        "id": 115,
+        "symbol": "NEAR/USDT",
+        "direction": "LONG",
+        "state": "TP1 HIT \u00b7 SL LA BREAKEVEN",
+        "r": 0.5
+      },
+      {
+        "id": 116,
+        "symbol": "FET/USDT",
+        "direction": "LONG",
+        "state": "SL HIT \u00b7 INVALIDATED",
+        "r": -1.0
+      },
       {
         "id": 105,
         "symbol": "NEAR/USDT",
         "direction": "LONG",
         "state": "TP2 HIT \u00b7 CLOSED",
         "r": 2.135
-      },
-      {
-        "id": 112,
-        "symbol": "FET/USDT",
-        "direction": "LONG",
-        "state": "TP2 HIT \u00b7 CLOSED",
-        "r": 1.873
-      },
-      {
-        "id": 82,
-        "symbol": "LIT/USDT",
-        "direction": "LONG",
-        "state": "EXPIRAT dupa 48 bare",
-        "r": 0.925
-      },
-      {
-        "id": 109,
-        "symbol": "AVAX/USDT",
-        "direction": "LONG",
-        "state": "TP2 HIT \u00b7 CLOSED",
-        "r": 2.509
-      },
-      {
-        "id": 67,
-        "symbol": "NIGHT/USDT",
-        "direction": "LONG",
-        "state": "EXPIRAT dupa 48 bare",
-        "r": 1.198
       }
     ],
     "open_now": [
       {
-        "id": 116,
+        "id": 118,
         "symbol": "FET/USDT",
         "direction": "LONG",
         "state": "OPEN \u00b7 WAITING"
       },
       {
-        "id": 115,
+        "id": 117,
         "symbol": "NEAR/USDT",
-        "direction": "LONG",
-        "state": "OPEN \u00b7 WAITING"
-      },
-      {
-        "id": 114,
-        "symbol": "AVAX/USDT",
         "direction": "LONG",
         "state": "OPEN \u00b7 WAITING"
       },
@@ -80,22 +74,28 @@
         "symbol": "POL/USDT",
         "direction": "LONG",
         "state": "OPEN \u00b7 WAITING"
+      },
+      {
+        "id": 107,
+        "symbol": "GRAM/USDT",
+        "direction": "LONG",
+        "state": "OPEN \u00b7 WAITING"
       }
     ],
     "best_bucket": null,
     "worst_bucket": null,
     "agent_status": "SHADOW",
-    "agent_reason": "are nevoie de 300 exemple (are 45)",
-    "agent_samples": 45,
+    "agent_reason": "are nevoie de 300 exemple (are 49)",
+    "agent_samples": 49,
     "agent_balanced": null,
     "baseline_balanced": null,
     "agent_weights": {
-      "trend": 0.069886,
-      "momentum": -0.057729,
-      "volatility": -0.061496,
-      "volume": -0.082519,
-      "is_long": 0.094093,
-      "persistence_n": 0.001181
+      "trend": 0.085003,
+      "momentum": -0.057247,
+      "volatility": -0.038297,
+      "volume": -0.075636,
+      "is_long": 0.097436,
+      "persistence_n": -0.011868
     }
   }
 }
