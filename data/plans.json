@@ -1,5 +1,5 @@
 {
-  "next_id": 115,
+  "next_id": 117,
   "plans": [
     {
       "id": 1,
@@ -3576,7 +3576,7 @@
       "state_detail": "TP1 HIT \u00b7 RULEAZA SPRE TP2",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 40,
+      "bars_checked": 44,
       "score_at_entry": 49,
       "components": {
         "trend": 0.375,
@@ -3758,11 +3758,11 @@
       "tp2": 2.41048,
       "risk": 0.0916071,
       "planned_r_tp2": 3.27,
-      "state": "TP1_HIT",
-      "state_detail": "TP1 HIT \u00b7 RULEAZA SPRE TP2",
-      "realized_r": null,
-      "closed_ts": null,
-      "bars_checked": 36,
+      "state": "TP2_HIT",
+      "state_detail": "TP2 HIT \u00b7 CLOSED",
+      "realized_r": 2.135,
+      "closed_ts": 1788688800.0,
+      "bars_checked": 38,
       "score_at_entry": 51,
       "components": {
         "trend": 0.404,
@@ -3781,7 +3781,8 @@
         "agent_used": false
       },
       "geometry": "v2",
-      "tp1_hit_ts": 1788566400.0
+      "tp1_hit_ts": 1788566400.0,
+      "agent_trained": true
     },
     {
       "id": 106,
@@ -3799,7 +3800,7 @@
       "state_detail": "TP1 HIT \u00b7 RULEAZA SPRE TP2",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 36,
+      "bars_checked": 40,
       "score_at_entry": 30,
       "components": {
         "trend": 0.185,
@@ -3836,7 +3837,7 @@
       "state_detail": "OPEN \u00b7 WAITING",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 36,
+      "bars_checked": 40,
       "score_at_entry": 30,
       "components": {
         "trend": 0.147,
@@ -3872,7 +3873,7 @@
       "state_detail": "OPEN \u00b7 WAITING",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 36,
+      "bars_checked": 40,
       "score_at_entry": 23,
       "components": {
         "trend": 0.002,
@@ -4016,11 +4017,11 @@
       "tp2": 0.1709722,
       "risk": 0.00308571,
       "planned_r_tp2": 2.75,
-      "state": "TP1_HIT",
-      "state_detail": "TP1 HIT \u00b7 RULEAZA SPRE TP2",
-      "realized_r": null,
-      "closed_ts": null,
-      "bars_checked": 28,
+      "state": "TP2_HIT",
+      "state_detail": "TP2 HIT \u00b7 CLOSED",
+      "realized_r": 1.873,
+      "closed_ts": 1788688800.0,
+      "bars_checked": 30,
       "score_at_entry": 55,
       "components": {
         "trend": 0.118,
@@ -4039,7 +4040,8 @@
         "agent_used": false
       },
       "geometry": "v2",
-      "tp1_hit_ts": 1788591600.0
+      "tp1_hit_ts": 1788591600.0,
+      "agent_trained": true
     },
     {
       "id": 113,
@@ -4057,7 +4059,7 @@
       "state_detail": "OPEN \u00b7 WAITING",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 16,
+      "bars_checked": 20,
       "score_at_entry": 30,
       "components": {
         "trend": 0.107,
@@ -4093,7 +4095,7 @@
       "state_detail": "OPEN \u00b7 WAITING",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 4,
+      "bars_checked": 8,
       "score_at_entry": 32,
       "components": {
         "trend": 0.228,
@@ -4112,6 +4114,78 @@
         "agent_used": false
       },
       "geometry": "v2"
+    },
+    {
+      "id": 115,
+      "symbol": "NEAR/USDT",
+      "direction": "LONG",
+      "created_ts": 1788697322.158662,
+      "created_time": "2026-09-06 12:22 UTC",
+      "entry": 2.378,
+      "sl": 2.3009643,
+      "tp1": 2.4550357,
+      "tp2": 2.6861429,
+      "risk": 0.0770357,
+      "planned_r_tp2": 4.0,
+      "state": "OPEN",
+      "state_detail": "OPEN \u00b7 WAITING",
+      "realized_r": null,
+      "closed_ts": null,
+      "bars_checked": 0,
+      "score_at_entry": 71,
+      "components": {
+        "trend": 0.781,
+        "momentum": 0.831,
+        "volatility": 0.92,
+        "volume": 0.348
+      },
+      "persistence_at_entry": 20,
+      "decision": {
+        "action": "ISSUE",
+        "mode": "EXPLORARE",
+        "reason": "inca nu am destule planuri inchise la scor ~71 (prag 20) - deschid ca sa invat",
+        "expected_value_r": null,
+        "calibrated_prob": null,
+        "agent_prob": 0.4139,
+        "agent_used": false
+      },
+      "geometry": "v2"
+    },
+    {
+      "id": 116,
+      "symbol": "FET/USDT",
+      "direction": "LONG",
+      "created_ts": 1788697322.1589272,
+      "created_time": "2026-09-06 12:22 UTC",
+      "entry": 0.1712,
+      "sl": 0.16825357,
+      "tp1": 0.17414643,
+      "tp2": 0.18298571,
+      "risk": 0.00294643,
+      "planned_r_tp2": 4.0,
+      "state": "OPEN",
+      "state_detail": "OPEN \u00b7 WAITING",
+      "realized_r": null,
+      "closed_ts": null,
+      "bars_checked": 0,
+      "score_at_entry": 50,
+      "components": {
+        "trend": 0.397,
+        "momentum": 0.744,
+        "volatility": 0.574,
+        "volume": 0.331
+      },
+      "persistence_at_entry": 8,
+      "decision": {
+        "action": "ISSUE",
+        "mode": "EXPLORARE",
+        "reason": "inca nu am destule planuri inchise la scor ~50 (prag 20) - deschid ca sa invat",
+        "expected_value_r": null,
+        "calibrated_prob": null,
+        "agent_prob": 0.4205,
+        "agent_used": false
+      },
+      "geometry": "v2"
     }
   ],
   "calibration": {
@@ -4126,12 +4200,12 @@
       "reliable": false
     },
     "40": {
-      "total": 11,
-      "win_rate": 27.3,
-      "ci_low": 9.7,
-      "ci_high": 56.6,
-      "avg_r": -0.283,
-      "avg_win_r": 1.629,
+      "total": 13,
+      "win_rate": 38.5,
+      "ci_low": 17.7,
+      "ci_high": 64.5,
+      "avg_r": 0.069,
+      "avg_win_r": 1.779,
       "avg_loss_r": 1.0,
       "reliable": false
     },
@@ -4170,20 +4244,20 @@
     "legacy_closed": 37,
     "legacy_total_r": -23.95,
     "geometry": "v2",
-    "total_plans": 114,
+    "total_plans": 116,
     "open": 15,
-    "closed": 43,
+    "closed": 45,
     "by_state": {
       "SL_HIT": 70,
-      "TP2_HIT": 6,
+      "TP2_HIT": 8,
       "EXPIRED": 23,
-      "OPEN": 11,
-      "TP1_HIT": 4
+      "OPEN": 13,
+      "TP1_HIT": 2
     },
-    "win_rate": 30.2,
-    "total_r": -10.04,
-    "avg_r": -0.234,
-    "profit_factor": 0.66,
+    "win_rate": 33.3,
+    "total_r": -6.04,
+    "avg_r": -0.134,
+    "profit_factor": 0.8,
     "best": 2.641,
     "worst": -1.0
   }
