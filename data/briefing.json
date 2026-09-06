@@ -1,19 +1,26 @@
 {
-  "text": "Din 42 planuri inchise, rata de succes e 28.6%, cu -10.97R cumulat (-0.261R in medie pe plan) si profit factor 0.63. 16 planuri sunt inca deschise. Separat, 37 planuri inchise (-23.95R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #109 AVAX/USDT +2.51R, #67 NIGHT/USDT +1.20R, #68 ZEC/USDT +1.86R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 42)).",
+  "text": "Din 43 planuri inchise, rata de succes e 30.2%, cu -10.04R cumulat (-0.234R in medie pe plan) si profit factor 0.66. 15 planuri sunt inca deschise. Separat, 37 planuri inchise (-23.95R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #82 LIT/USDT +0.93R, #109 AVAX/USDT +2.51R, #67 NIGHT/USDT +1.20R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 43)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-06 04:18 UTC",
+    "scan_time": "2026-09-06 08:19 UTC",
     "universe_size": 7,
     "plans_total": 114,
-    "plans_open": 16,
-    "plans_closed": 42,
+    "plans_open": 15,
+    "plans_closed": 43,
     "legacy_closed": 37,
     "legacy_total_r": -23.95,
-    "win_rate": 28.6,
-    "total_r": -10.97,
-    "avg_r": -0.261,
-    "profit_factor": 0.63,
+    "win_rate": 30.2,
+    "total_r": -10.04,
+    "avg_r": -0.234,
+    "profit_factor": 0.66,
     "recent_closed": [
+      {
+        "id": 82,
+        "symbol": "LIT/USDT",
+        "direction": "LONG",
+        "state": "EXPIRAT dupa 48 bare",
+        "r": 0.925
+      },
       {
         "id": 109,
         "symbol": "AVAX/USDT",
@@ -41,13 +48,6 @@
         "direction": "SHORT",
         "state": "EXPIRAT dupa 48 bare",
         "r": -0.601
-      },
-      {
-        "id": 95,
-        "symbol": "SKY/USDT",
-        "direction": "SHORT",
-        "state": "SL HIT \u00b7 INVALIDATED",
-        "r": -1.0
       }
     ],
     "open_now": [
@@ -85,17 +85,17 @@
     "best_bucket": null,
     "worst_bucket": null,
     "agent_status": "SHADOW",
-    "agent_reason": "are nevoie de 300 exemple (are 42)",
-    "agent_samples": 42,
+    "agent_reason": "are nevoie de 300 exemple (are 43)",
+    "agent_samples": 43,
     "agent_balanced": null,
     "baseline_balanced": null,
     "agent_weights": {
-      "trend": 0.024746,
-      "momentum": -0.118106,
-      "volatility": -0.118465,
-      "volume": -0.124707,
-      "is_long": 0.006656,
-      "persistence_n": -0.027933
+      "trend": 0.054822,
+      "momentum": -0.095488,
+      "volatility": -0.095486,
+      "volume": -0.115984,
+      "is_long": 0.036732,
+      "persistence_n": -0.024925
     }
   }
 }
