@@ -3797,11 +3797,11 @@
       "tp2": 12.666857,
       "risk": 0.243964,
       "planned_r_tp2": 4.0,
-      "state": "TP1_HIT",
-      "state_detail": "TP1 HIT \u00b7 RULEAZA SPRE TP2",
-      "realized_r": null,
-      "closed_ts": null,
-      "bars_checked": 44,
+      "state": "EXPIRED",
+      "state_detail": "EXPIRAT dupa 48 bare",
+      "realized_r": 1.914,
+      "closed_ts": 1788724800.0,
+      "bars_checked": 48,
       "score_at_entry": 30,
       "components": {
         "trend": 0.185,
@@ -3820,7 +3820,8 @@
         "agent_used": false
       },
       "geometry": "v2",
-      "tp1_hit_ts": 1788620400.0
+      "tp1_hit_ts": 1788620400.0,
+      "agent_trained": true
     },
     {
       "id": 107,
@@ -3834,11 +3835,11 @@
       "tp2": 1.4761429,
       "risk": 0.0230357,
       "planned_r_tp2": 4.0,
-      "state": "OPEN",
-      "state_detail": "OPEN \u00b7 WAITING",
-      "realized_r": null,
-      "closed_ts": null,
-      "bars_checked": 44,
+      "state": "EXPIRED",
+      "state_detail": "EXPIRAT dupa 48 bare",
+      "realized_r": 1.693,
+      "closed_ts": 1788724800.0,
+      "bars_checked": 48,
       "score_at_entry": 30,
       "components": {
         "trend": 0.147,
@@ -3856,7 +3857,8 @@
         "agent_prob": 0.3251,
         "agent_used": false
       },
-      "geometry": "v2"
+      "geometry": "v2",
+      "agent_trained": true
     },
     {
       "id": 108,
@@ -3870,11 +3872,11 @@
       "tp2": 0.10817232,
       "risk": 0.00194464,
       "planned_r_tp2": 7.63,
-      "state": "OPEN",
-      "state_detail": "OPEN \u00b7 WAITING",
-      "realized_r": null,
-      "closed_ts": null,
-      "bars_checked": 44,
+      "state": "EXPIRED",
+      "state_detail": "EXPIRAT dupa 48 bare",
+      "realized_r": 2.052,
+      "closed_ts": 1788724800.0,
+      "bars_checked": 48,
       "score_at_entry": 23,
       "components": {
         "trend": 0.002,
@@ -3892,7 +3894,8 @@
         "agent_prob": 0.3461,
         "agent_used": false
       },
-      "geometry": "v2"
+      "geometry": "v2",
+      "agent_trained": true
     },
     {
       "id": 109,
@@ -4060,7 +4063,7 @@
       "state_detail": "OPEN \u00b7 WAITING",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 24,
+      "bars_checked": 28,
       "score_at_entry": 30,
       "components": {
         "trend": 0.107,
@@ -4208,7 +4211,7 @@
       "state_detail": "OPEN \u00b7 WAITING",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 0,
+      "bars_checked": 4,
       "score_at_entry": 54,
       "components": {
         "trend": 0.868,
@@ -4240,11 +4243,11 @@
       "tp2": 0.18545714,
       "risk": 0.00373929,
       "planned_r_tp2": 4.0,
-      "state": "OPEN",
-      "state_detail": "OPEN \u00b7 WAITING",
+      "state": "TP1_HIT",
+      "state_detail": "TP1 HIT \u00b7 RULEAZA SPRE TP2",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 0,
+      "bars_checked": 4,
       "score_at_entry": 52,
       "components": {
         "trend": 0.405,
@@ -4262,7 +4265,8 @@
         "agent_prob": 0.4684,
         "agent_used": false
       },
-      "geometry": "v2"
+      "geometry": "v2",
+      "tp1_hit_ts": 1788721200.0
     }
   ],
   "calibration": {
@@ -4287,14 +4291,14 @@
       "reliable": false
     },
     "20": {
-      "total": 17,
-      "win_rate": 17.6,
-      "ci_low": 6.2,
-      "ci_high": 41.0,
-      "avg_r": -0.533,
-      "avg_win_r": 1.511,
+      "total": 20,
+      "win_rate": 30.0,
+      "ci_low": 14.5,
+      "ci_high": 51.9,
+      "avg_r": -0.17,
+      "avg_win_r": 1.699,
       "avg_loss_r": 0.971,
-      "reliable": false
+      "reliable": true
     },
     "0": {
       "total": 2,
@@ -4322,19 +4326,19 @@
     "legacy_total_r": -23.95,
     "geometry": "v2",
     "total_plans": 118,
-    "open": 13,
-    "closed": 49,
+    "open": 10,
+    "closed": 52,
     "by_state": {
       "SL_HIT": 74,
       "TP2_HIT": 8,
-      "EXPIRED": 23,
-      "OPEN": 12,
+      "EXPIRED": 26,
+      "OPEN": 9,
       "TP1_HIT": 1
     },
-    "win_rate": 34.7,
-    "total_r": -6.71,
-    "avg_r": -0.137,
-    "profit_factor": 0.79,
+    "win_rate": 38.5,
+    "total_r": -1.05,
+    "avg_r": -0.02,
+    "profit_factor": 0.97,
     "best": 2.641,
     "worst": -1.0
   }
