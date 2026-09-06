@@ -1,53 +1,53 @@
 {
-  "text": "Din 37 planuri inchise, rata de succes e 24.3%, cu -14.94R cumulat (-0.404R in medie pe plan) si profit factor 0.47. 20 planuri sunt inca deschise. Separat, 37 planuri inchise (-23.95R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #98 AR/USDT +2.50R, #101 JTO/USDT -1.00R, #87 2Z/USDT +1.27R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 37)).",
+  "text": "Din 41 planuri inchise, rata de succes e 26.8%, cu -13.48R cumulat (-0.329R in medie pe plan) si profit factor 0.54. 16 planuri sunt inca deschise. Separat, 37 planuri inchise (-23.95R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #67 NIGHT/USDT +1.20R, #68 ZEC/USDT +1.86R, #74 SAND/USDT -0.60R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 41)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-05 20:17 UTC",
+    "scan_time": "2026-09-06 00:30 UTC",
     "universe_size": 7,
     "plans_total": 113,
-    "plans_open": 20,
-    "plans_closed": 37,
+    "plans_open": 16,
+    "plans_closed": 41,
     "legacy_closed": 37,
     "legacy_total_r": -23.95,
-    "win_rate": 24.3,
-    "total_r": -14.94,
-    "avg_r": -0.404,
-    "profit_factor": 0.47,
+    "win_rate": 26.8,
+    "total_r": -13.48,
+    "avg_r": -0.329,
+    "profit_factor": 0.54,
     "recent_closed": [
+      {
+        "id": 67,
+        "symbol": "NIGHT/USDT",
+        "direction": "LONG",
+        "state": "EXPIRAT dupa 48 bare",
+        "r": 1.198
+      },
+      {
+        "id": 68,
+        "symbol": "ZEC/USDT",
+        "direction": "LONG",
+        "state": "EXPIRAT dupa 48 bare",
+        "r": 1.865
+      },
+      {
+        "id": 74,
+        "symbol": "SAND/USDT",
+        "direction": "SHORT",
+        "state": "EXPIRAT dupa 48 bare",
+        "r": -0.601
+      },
+      {
+        "id": 95,
+        "symbol": "SKY/USDT",
+        "direction": "SHORT",
+        "state": "SL HIT \u00b7 INVALIDATED",
+        "r": -1.0
+      },
       {
         "id": 98,
         "symbol": "AR/USDT",
         "direction": "LONG",
         "state": "TP2 HIT \u00b7 CLOSED",
         "r": 2.5
-      },
-      {
-        "id": 101,
-        "symbol": "JTO/USDT",
-        "direction": "SHORT",
-        "state": "SL HIT \u00b7 INVALIDATED",
-        "r": -1.0
-      },
-      {
-        "id": 87,
-        "symbol": "2Z/USDT",
-        "direction": "SHORT",
-        "state": "TP1 HIT \u00b7 SL LA BREAKEVEN",
-        "r": 1.268
-      },
-      {
-        "id": 97,
-        "symbol": "VIRTUAL/USDT",
-        "direction": "SHORT",
-        "state": "TP1 HIT \u00b7 SL LA BREAKEVEN",
-        "r": 0.765
-      },
-      {
-        "id": 102,
-        "symbol": "CC/USDT",
-        "direction": "SHORT",
-        "state": "TP1 HIT \u00b7 SL LA BREAKEVEN",
-        "r": 0.5
       }
     ],
     "open_now": [
@@ -85,17 +85,17 @@
     "best_bucket": null,
     "worst_bucket": null,
     "agent_status": "SHADOW",
-    "agent_reason": "are nevoie de 300 exemple (are 37)",
-    "agent_samples": 37,
+    "agent_reason": "are nevoie de 300 exemple (are 41)",
+    "agent_samples": 41,
     "agent_balanced": null,
     "baseline_balanced": null,
     "agent_weights": {
-      "trend": -0.038549,
-      "momentum": -0.152487,
-      "volatility": -0.163556,
-      "volume": -0.155733,
-      "is_long": -0.089355,
-      "persistence_n": -0.022294
+      "trend": 0.022559,
+      "momentum": -0.119302,
+      "volatility": -0.13022,
+      "volume": -0.125699,
+      "is_long": -0.022512,
+      "persistence_n": -0.027933
     }
   }
 }
