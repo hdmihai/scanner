@@ -4362,7 +4362,7 @@
       "state_detail": "OPEN \u00b7 WAITING",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 4,
+      "bars_checked": 8,
       "score_at_entry": 57,
       "components": {
         "trend": 0.669,
@@ -4394,11 +4394,11 @@
       "tp2": 0.1952096,
       "risk": 0.00531429,
       "planned_r_tp2": 3.69,
-      "state": "OPEN",
-      "state_detail": "OPEN \u00b7 WAITING",
+      "state": "TP1_HIT",
+      "state_detail": "TP1 HIT \u00b7 RULEAZA SPRE TP2",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 4,
+      "bars_checked": 8,
       "score_at_entry": 51,
       "components": {
         "trend": 0.44,
@@ -4416,7 +4416,8 @@
         "agent_prob": 0.515,
         "agent_used": false
       },
-      "geometry": "v2"
+      "geometry": "v2",
+      "tp1_hit_ts": 1788782400.0
     },
     {
       "id": 123,
@@ -4434,7 +4435,7 @@
       "state_detail": "OPEN \u00b7 WAITING",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 4,
+      "bars_checked": 8,
       "score_at_entry": 45,
       "components": {
         "trend": 0.613,
@@ -4466,11 +4467,11 @@
       "tp2": 0.10198,
       "risk": 0.0012525,
       "planned_r_tp2": 4.0,
-      "state": "OPEN",
-      "state_detail": "OPEN \u00b7 WAITING",
-      "realized_r": null,
-      "closed_ts": null,
-      "bars_checked": 4,
+      "state": "SL_HIT",
+      "state_detail": "SL HIT \u00b7 INVALIDATED",
+      "realized_r": -1.0,
+      "closed_ts": 1788793200.0,
+      "bars_checked": 7,
       "score_at_entry": 19,
       "components": {
         "trend": 0.117,
@@ -4488,7 +4489,8 @@
         "agent_prob": 0.5126,
         "agent_used": false
       },
-      "geometry": "v2"
+      "geometry": "v2",
+      "agent_trained": true
     },
     {
       "id": 125,
@@ -4506,7 +4508,7 @@
       "state_detail": "OPEN \u00b7 WAITING",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 0,
+      "bars_checked": 4,
       "score_at_entry": 42,
       "components": {
         "trend": 0.079,
@@ -4538,11 +4540,11 @@
       "tp2": 8.434174,
       "risk": 0.1534286,
       "planned_r_tp2": 3.62,
-      "state": "OPEN",
-      "state_detail": "OPEN \u00b7 WAITING",
+      "state": "TP1_HIT",
+      "state_detail": "TP1 HIT \u00b7 RULEAZA SPRE TP2",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 0,
+      "bars_checked": 4,
       "score_at_entry": 41,
       "components": {
         "trend": 0.269,
@@ -4560,7 +4562,8 @@
         "agent_prob": 0.514,
         "agent_used": false
       },
-      "geometry": "v2"
+      "geometry": "v2",
+      "tp1_hit_ts": 1788786000.0
     }
   ],
   "calibration": {
@@ -4595,13 +4598,13 @@
       "reliable": true
     },
     "0": {
-      "total": 2,
-      "win_rate": 100.0,
-      "ci_low": 34.2,
-      "ci_high": 100.0,
-      "avg_r": 2.575,
+      "total": 3,
+      "win_rate": 66.7,
+      "ci_low": 20.8,
+      "ci_high": 93.9,
+      "avg_r": 1.383,
       "avg_win_r": 2.575,
-      "avg_loss_r": null,
+      "avg_loss_r": 1.0,
       "reliable": false
     },
     "80": {
@@ -4620,18 +4623,19 @@
     "legacy_total_r": -23.95,
     "geometry": "v2",
     "total_plans": 126,
-    "open": 13,
-    "closed": 57,
+    "open": 12,
+    "closed": 58,
     "by_state": {
-      "SL_HIT": 79,
+      "SL_HIT": 80,
       "TP2_HIT": 8,
       "EXPIRED": 26,
-      "OPEN": 13
+      "OPEN": 10,
+      "TP1_HIT": 2
     },
-    "win_rate": 38.6,
-    "total_r": -3.05,
-    "avg_r": -0.054,
-    "profit_factor": 0.91,
+    "win_rate": 37.9,
+    "total_r": -4.05,
+    "avg_r": -0.07,
+    "profit_factor": 0.89,
     "best": 2.641,
     "worst": -1.0
   }
