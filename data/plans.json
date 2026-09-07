@@ -1,5 +1,5 @@
 {
-  "next_id": 125,
+  "next_id": 127,
   "plans": [
     {
       "id": 1,
@@ -4362,7 +4362,7 @@
       "state_detail": "OPEN \u00b7 WAITING",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 0,
+      "bars_checked": 4,
       "score_at_entry": 57,
       "components": {
         "trend": 0.669,
@@ -4398,7 +4398,7 @@
       "state_detail": "OPEN \u00b7 WAITING",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 0,
+      "bars_checked": 4,
       "score_at_entry": 51,
       "components": {
         "trend": 0.44,
@@ -4434,7 +4434,7 @@
       "state_detail": "OPEN \u00b7 WAITING",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 0,
+      "bars_checked": 4,
       "score_at_entry": 45,
       "components": {
         "trend": 0.613,
@@ -4470,7 +4470,7 @@
       "state_detail": "OPEN \u00b7 WAITING",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 0,
+      "bars_checked": 4,
       "score_at_entry": 19,
       "components": {
         "trend": 0.117,
@@ -4486,6 +4486,78 @@
         "expected_value_r": null,
         "calibrated_prob": null,
         "agent_prob": 0.5126,
+        "agent_used": false
+      },
+      "geometry": "v2"
+    },
+    {
+      "id": 125,
+      "symbol": "ADA/USDT",
+      "direction": "LONG",
+      "created_ts": 1788783921.6215384,
+      "created_time": "2026-09-07 12:25 UTC",
+      "entry": 0.221,
+      "sl": 0.21628571,
+      "tp1": 0.2265,
+      "tp2": 0.23985714,
+      "risk": 0.00471429,
+      "planned_r_tp2": 4.0,
+      "state": "OPEN",
+      "state_detail": "OPEN \u00b7 WAITING",
+      "realized_r": null,
+      "closed_ts": null,
+      "bars_checked": 0,
+      "score_at_entry": 42,
+      "components": {
+        "trend": 0.079,
+        "momentum": 0.325,
+        "volatility": 0.711,
+        "volume": 0.614
+      },
+      "persistence_at_entry": 0,
+      "decision": {
+        "action": "ISSUE",
+        "mode": "EXPLORARE",
+        "reason": "inca nu am destule planuri inchise la scor ~42 (prag 20) - deschid ca sa invat",
+        "expected_value_r": null,
+        "calibrated_prob": null,
+        "agent_prob": 0.5062,
+        "agent_used": false
+      },
+      "geometry": "v2"
+    },
+    {
+      "id": 126,
+      "symbol": "AVAX/USDT",
+      "direction": "LONG",
+      "created_ts": 1788783921.6218169,
+      "created_time": "2026-09-07 12:25 UTC",
+      "entry": 7.878,
+      "sl": 7.7245714,
+      "tp1": 8.0314286,
+      "tp2": 8.434174,
+      "risk": 0.1534286,
+      "planned_r_tp2": 3.62,
+      "state": "OPEN",
+      "state_detail": "OPEN \u00b7 WAITING",
+      "realized_r": null,
+      "closed_ts": null,
+      "bars_checked": 0,
+      "score_at_entry": 41,
+      "components": {
+        "trend": 0.269,
+        "momentum": 0.451,
+        "volatility": 0.649,
+        "volume": 0.287
+      },
+      "persistence_at_entry": 2,
+      "decision": {
+        "action": "ISSUE",
+        "mode": "EXPLORARE",
+        "reason": "inca nu am destule planuri inchise la scor ~41 (prag 20) - deschid ca sa invat",
+        "expected_value_r": null,
+        "calibrated_prob": null,
+        "agent_prob": 0.514,
         "agent_used": false
       },
       "geometry": "v2"
@@ -4547,14 +4619,14 @@
     "legacy_closed": 37,
     "legacy_total_r": -23.95,
     "geometry": "v2",
-    "total_plans": 124,
-    "open": 11,
+    "total_plans": 126,
+    "open": 13,
     "closed": 57,
     "by_state": {
       "SL_HIT": 79,
       "TP2_HIT": 8,
       "EXPIRED": 26,
-      "OPEN": 11
+      "OPEN": 13
     },
     "win_rate": 38.6,
     "total_r": -3.05,
