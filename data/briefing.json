@@ -1,109 +1,53 @@
 {
-  "text": "Din 58 planuri inchise, rata de succes e 37.9%, cu -4.05R cumulat (-0.070R in medie pe plan) si profit factor 0.89. 12 planuri sunt inca deschise. Separat, 37 planuri inchise (-23.95R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #124 POL/USDT -1.00R, #113 ADA/USDT -1.00R, #117 NEAR/USDT -1.00R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 58)).",
+  "text": "6 planuri sunt deschise, niciunul inchis inca. Pana la primele inchideri nu pot spune nimic despre performanta - orice cifra ar fi speculatie. Separat, 95 planuri inchise (-28.00R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 58)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-07 16:19 UTC",
+    "scan_time": "2026-09-07 17:19 UTC",
     "universe_size": 7,
-    "plans_total": 126,
-    "plans_open": 12,
-    "plans_closed": 58,
-    "legacy_closed": 37,
-    "legacy_total_r": -23.95,
-    "win_rate": 37.9,
-    "total_r": -4.05,
-    "avg_r": -0.07,
-    "profit_factor": 0.89,
-    "recent_closed": [
-      {
-        "id": 124,
-        "symbol": "POL/USDT",
-        "direction": "LONG",
-        "state": "SL HIT \u00b7 INVALIDATED",
-        "r": -1.0
-      },
-      {
-        "id": 113,
-        "symbol": "ADA/USDT",
-        "direction": "LONG",
-        "state": "SL HIT \u00b7 INVALIDATED",
-        "r": -1.0
-      },
-      {
-        "id": 117,
-        "symbol": "NEAR/USDT",
-        "direction": "LONG",
-        "state": "SL HIT \u00b7 INVALIDATED",
-        "r": -1.0
-      },
-      {
-        "id": 118,
-        "symbol": "FET/USDT",
-        "direction": "LONG",
-        "state": "TP1 HIT \u00b7 SL LA BREAKEVEN",
-        "r": 0.5
-      },
-      {
-        "id": 120,
-        "symbol": "LINK/USDT",
-        "direction": "LONG",
-        "state": "TP1 HIT \u00b7 SL LA BREAKEVEN",
-        "r": 0.5
-      }
-    ],
+    "plans_total": 132,
+    "plans_open": 6,
+    "plans_closed": 0,
+    "legacy_closed": 95,
+    "legacy_total_r": -28.0,
+    "win_rate": null,
+    "total_r": 0,
+    "avg_r": null,
+    "profit_factor": null,
+    "recent_closed": [],
     "open_now": [
       {
-        "id": 126,
-        "symbol": "AVAX/USDT",
-        "direction": "LONG",
-        "state": "TP1 HIT \u00b7 RULEAZA SPRE TP2"
+        "id": 132,
+        "symbol": "GRAM/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
       },
       {
-        "id": 125,
+        "id": 131,
         "symbol": "ADA/USDT",
         "direction": "LONG",
-        "state": "OPEN \u00b7 WAITING"
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
       },
       {
-        "id": 123,
+        "id": 130,
         "symbol": "NEAR/USDT",
         "direction": "LONG",
-        "state": "OPEN \u00b7 WAITING"
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
       },
       {
-        "id": 122,
-        "symbol": "FET/USDT",
-        "direction": "LONG",
-        "state": "TP1 HIT \u00b7 RULEAZA SPRE TP2"
-      },
-      {
-        "id": 121,
+        "id": 129,
         "symbol": "LINK/USDT",
         "direction": "LONG",
-        "state": "OPEN \u00b7 WAITING"
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 128,
+        "symbol": "AVAX/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
       }
     ],
-    "best_bucket": {
-      "range": "20-39",
-      "total": 21,
-      "win_rate": 28.6,
-      "ci_low": 13.8,
-      "ci_high": 50.0,
-      "avg_r": -0.21,
-      "avg_win_r": 1.699,
-      "avg_loss_r": 0.973,
-      "reliable": true
-    },
-    "worst_bucket": {
-      "range": "20-39",
-      "total": 21,
-      "win_rate": 28.6,
-      "ci_low": 13.8,
-      "ci_high": 50.0,
-      "avg_r": -0.21,
-      "avg_win_r": 1.699,
-      "avg_loss_r": 0.973,
-      "reliable": true
-    },
+    "best_bucket": null,
+    "worst_bucket": null,
     "agent_status": "SHADOW",
     "agent_reason": "are nevoie de 300 exemple (are 58)",
     "agent_samples": 58,
