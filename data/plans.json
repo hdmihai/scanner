@@ -1,5 +1,5 @@
 {
-  "next_id": 119,
+  "next_id": 120,
   "plans": [
     {
       "id": 1,
@@ -4063,7 +4063,7 @@
       "state_detail": "OPEN \u00b7 WAITING",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 28,
+      "bars_checked": 32,
       "score_at_entry": 30,
       "components": {
         "trend": 0.107,
@@ -4211,7 +4211,7 @@
       "state_detail": "OPEN \u00b7 WAITING",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 4,
+      "bars_checked": 8,
       "score_at_entry": 54,
       "components": {
         "trend": 0.868,
@@ -4247,7 +4247,7 @@
       "state_detail": "TP1 HIT \u00b7 RULEAZA SPRE TP2",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 4,
+      "bars_checked": 8,
       "score_at_entry": 52,
       "components": {
         "trend": 0.405,
@@ -4267,6 +4267,42 @@
       },
       "geometry": "v2",
       "tp1_hit_ts": 1788721200.0
+    },
+    {
+      "id": 119,
+      "symbol": "GRAM/USDT",
+      "direction": "LONG",
+      "created_ts": 1788741041.3216825,
+      "created_time": "2026-09-07 00:30 UTC",
+      "entry": 1.433,
+      "sl": 1.4200357,
+      "tp1": 1.449,
+      "tp2": 1.4848571,
+      "risk": 0.0129643,
+      "planned_r_tp2": 4.0,
+      "state": "OPEN",
+      "state_detail": "OPEN \u00b7 WAITING",
+      "realized_r": null,
+      "closed_ts": null,
+      "bars_checked": 0,
+      "score_at_entry": 43,
+      "components": {
+        "trend": 0.133,
+        "momentum": 0.525,
+        "volatility": 0.302,
+        "volume": 0.78
+      },
+      "persistence_at_entry": 21,
+      "decision": {
+        "action": "ISSUE",
+        "mode": "EXPLORARE",
+        "reason": "inca nu am destule planuri inchise la scor ~43 (prag 20) - deschid ca sa invat",
+        "expected_value_r": null,
+        "calibrated_prob": null,
+        "agent_prob": 0.5193,
+        "agent_used": false
+      },
+      "geometry": "v2"
     }
   ],
   "calibration": {
@@ -4325,14 +4361,14 @@
     "legacy_closed": 37,
     "legacy_total_r": -23.95,
     "geometry": "v2",
-    "total_plans": 118,
-    "open": 10,
+    "total_plans": 119,
+    "open": 11,
     "closed": 52,
     "by_state": {
       "SL_HIT": 74,
       "TP2_HIT": 8,
       "EXPIRED": 26,
-      "OPEN": 9,
+      "OPEN": 10,
       "TP1_HIT": 1
     },
     "win_rate": 38.5,
