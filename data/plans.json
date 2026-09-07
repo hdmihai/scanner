@@ -1,5 +1,5 @@
 {
-  "next_id": 134,
+  "next_id": 135,
   "plans": [
     {
       "id": 1,
@@ -4601,10 +4601,10 @@
       "tp2": 0.19598571,
       "risk": 0.00347143,
       "planned_r_tp2": 4.5,
-      "state": "TP1_HIT",
-      "state_detail": "TP1 HIT \u00b7 RULEAZA SPRE TP2",
-      "realized_r": null,
-      "closed_ts": null,
+      "state": "SL_HIT",
+      "state_detail": "TP1 HIT \u00b7 SL LA BREAKEVEN",
+      "realized_r": 0.5,
+      "closed_ts": 1788818400.0,
       "bars_checked": 5,
       "score_at_entry": 54,
       "components": {
@@ -4643,7 +4643,7 @@
       "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 5,
+      "bars_checked": 6,
       "score_at_entry": 43,
       "components": {
         "trend": 0.369,
@@ -4679,7 +4679,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 5,
+      "bars_checked": 6,
       "score_at_entry": 40,
       "components": {
         "trend": 0.52,
@@ -4716,7 +4716,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 5,
+      "bars_checked": 6,
       "score_at_entry": 34,
       "components": {
         "trend": 0.318,
@@ -4753,7 +4753,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 5,
+      "bars_checked": 6,
       "score_at_entry": 30,
       "components": {
         "trend": 0.096,
@@ -4790,7 +4790,7 @@
       "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 5,
+      "bars_checked": 6,
       "score_at_entry": 26,
       "components": {
         "trend": 0.007,
@@ -4827,7 +4827,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 3,
+      "bars_checked": 4,
       "score_at_entry": 22,
       "components": {
         "trend": 0.004,
@@ -4847,29 +4847,76 @@
       },
       "geometry": "v3",
       "entered_ts": 1788811200.0
+    },
+    {
+      "id": 134,
+      "symbol": "FET/USDT",
+      "direction": "LONG",
+      "created_ts": 1788823169.2874556,
+      "created_time": "2026-09-07 23:19 UTC",
+      "entry": 0.18026786,
+      "signal_price": 0.1822,
+      "sl": 0.17640357,
+      "tp1": 0.1845,
+      "tp2": 0.19765714,
+      "risk": 0.00386429,
+      "planned_r_tp2": 4.5,
+      "state": "PENDING",
+      "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
+      "realized_r": null,
+      "closed_ts": null,
+      "bars_checked": 0,
+      "score_at_entry": 55,
+      "components": {
+        "trend": 0.602,
+        "momentum": 0.443,
+        "volatility": 0.94,
+        "volume": 0.219
+      },
+      "persistence_at_entry": 22,
+      "decision": {
+        "action": "ISSUE",
+        "mode": "EXPLORARE",
+        "reason": "inca nu am destule planuri inchise la scor ~55 (prag 20) - deschid ca sa invat",
+        "expected_value_r": null,
+        "calibrated_prob": null,
+        "agent_prob": 0.4991,
+        "agent_used": false
+      },
+      "geometry": "v3"
     }
   ],
-  "calibration": {},
+  "calibration": {
+    "40": {
+      "total": 1,
+      "win_rate": 100.0,
+      "ci_low": 20.7,
+      "ci_high": 100.0,
+      "avg_r": 0.5,
+      "avg_win_r": 0.5,
+      "avg_loss_r": null,
+      "reliable": false
+    }
+  },
   "summary": {
     "legacy_closed": 95,
     "legacy_total_r": -28.0,
     "geometry": "v3",
-    "total_plans": 133,
+    "total_plans": 134,
     "open": 7,
-    "closed": 0,
+    "closed": 1,
     "by_state": {
-      "SL_HIT": 80,
+      "SL_HIT": 81,
       "TP2_HIT": 8,
       "EXPIRED": 38,
-      "TP1_HIT": 1,
-      "PENDING": 2,
+      "PENDING": 3,
       "OPEN": 4
     },
-    "win_rate": null,
-    "total_r": 0,
-    "avg_r": null,
+    "win_rate": 100.0,
+    "total_r": 0.5,
+    "avg_r": 0.5,
     "profit_factor": null,
-    "best": null,
-    "worst": null
+    "best": 0.5,
+    "worst": 0.5
   }
 }
