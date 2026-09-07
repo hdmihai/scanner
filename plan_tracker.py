@@ -169,6 +169,9 @@ def create_plan(store, signal, plan_levels, decision):
         "created_ts": time.time(),
         "created_time": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
         "entry": entry,
+        "signal_price": plan_levels.get("signal_price"),  # BUG FIX: se calcula
+        # in compute_trade_plan dar nu era copiat aici, deci se pierdea. E
+        # necesar ca sa pot diagnostica cat de des se atinge zona de pullback.
         "sl": sl,
         "tp1": plan_levels["tp1"],
         "tp2": plan_levels["tp2"],
