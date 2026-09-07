@@ -198,6 +198,11 @@ def compute_fibonacci(highs, lows, lookback=100):
 
 MIN_TP1_R = 1.0   # TP1 nu are voie mai aproape de 1R
 MIN_TP2_R = 2.5   # TP2 trebuie sa justifice riscul
+PULLBACK_ATR = 0.5  # cat de mult astept sa revina pretul inainte de intrare
+SL_ATR = 1.5        # distanta stopului, in ATR
+RSI_LONG = (45, 75)   # banda RSI pentru LONG
+RSI_SHORT = (25, 55)  # banda RSI pentru SHORT
+REVERSE_SIGNAL = False  # diagnostic: inverseaza directia semnalului
 
 
 def compute_trade_plan(direction, price, atr_val, structure, fib):
@@ -230,24 +235,36 @@ def compute_trade_plan(direction, price, atr_val, structure, fib):
     # MAI APROAPE decat TP1. Pretul ar fi atins TP2 primul, planul s-ar fi inchis
     # inregistrand 2.5R desi tinta structurala era la 8.9R, iar etapa TP1 nu s-ar
     # fi declansat niciodata. Acum TP2 e garantat dincolo de TP1, prin constructie.
+    # INTRARE PE PULLBACK (v3): nu intru la pretul de semnal, ci astept o
+    # revenire de PULLBACK_ATR. SL-ul ramane la nivelul structural (calculat din
+    # pretul de semnal), deci riscul se micsoreaza si TP1 devine mult mai
+    # aproape in termeni absoluti - 0.5 ATR fata de 1.69 ATR masurat pe planurile
+    # v2. Daca pretul nu revine, planul expira fara pierdere.
+    pullback = atr_val * PULLBACK_ATR
+    entry = price - pullback if direction == "LONG" else price + pullback
+    risk = abs(entry - (price - atr_val * SL_ATR if direction == "LONG" else price + atr_val * SL_ATR))
+    if risk <= 0:
+        return None
+
     if direction == "LONG":
-        sl = price - risk
-        above = [r for r in structure["resistance"] if r >= price + risk * MIN_TP1_R]
-        tp1 = min(above) if above else price + risk * MIN_TP1_R
-        tp2_floor = max(tp1 + risk * 0.5, price + risk * MIN_TP2_R)
+        sl = price - atr_val * SL_ATR
+        above = [r for r in structure["resistance"] if r >= entry + risk * MIN_TP1_R]
+        tp1 = min(above) if above else entry + risk * MIN_TP1_R
+        tp2_floor = max(tp1 + risk * 0.5, entry + risk * MIN_TP2_R)
         tp2_candidates = [c for c in (ext_1618, price + risk * 4) if c >= tp2_floor]
         tp2 = min(tp2_candidates) if tp2_candidates else tp2_floor
     else:
-        sl = price + risk
-        below = [s for s in structure["support"] if s <= price - risk * MIN_TP1_R]
-        tp1 = max(below) if below else price - risk * MIN_TP1_R
-        tp2_ceiling = min(tp1 - risk * 0.5, price - risk * MIN_TP2_R)
+        sl = price + atr_val * SL_ATR
+        below = [s for s in structure["support"] if s <= entry - risk * MIN_TP1_R]
+        tp1 = max(below) if below else entry - risk * MIN_TP1_R
+        tp2_ceiling = min(tp1 - risk * 0.5, entry - risk * MIN_TP2_R)
         tp2_candidates = [c for c in (ext_1618, price - risk * 4) if c <= tp2_ceiling]
         tp2 = max(tp2_candidates) if tp2_candidates else tp2_ceiling
 
-    expected_r = round(abs(tp2 - price) / risk, 2)
+    expected_r = round(abs(tp2 - entry) / risk, 2)
     return {
-        "entry": round_price(price), "sl": round_price(sl),
+        "entry": round_price(entry), "sl": round_price(sl),
+        "signal_price": round_price(price),
         "tp1": round_price(tp1), "tp2": round_price(tp2),
         "expected_r": expected_r,
     }
@@ -279,14 +296,19 @@ def score_symbol(ohlcv, weights):
     trend_up = ema20 > ema50
     trend_strength = min(abs(ema20 - ema50) / ema50 * 20, 1.0)
 
-    if trend_up and 45 <= r <= 75:
+    lo_l, hi_l = RSI_LONG
+    lo_s, hi_s = RSI_SHORT
+    if trend_up and lo_l <= r <= hi_l:
         direction = "LONG"
-        momentum_strength = min((r - 45) / 30, 1.0)
-    elif (not trend_up) and 25 <= r <= 55:
+        momentum_strength = min((r - lo_l) / max(hi_l - lo_l, 1), 1.0)
+    elif (not trend_up) and lo_s <= r <= hi_s:
         direction = "SHORT"
-        momentum_strength = min((55 - r) / 30, 1.0)
+        momentum_strength = min((hi_s - r) / max(hi_s - lo_s, 1), 1.0)
     else:
         return None  # fara semnal clar in acest moment
+
+    if REVERSE_SIGNAL:
+        direction = "SHORT" if direction == "LONG" else "LONG"
 
     atr_pct = a / price
     volatility_score = max(1.0 - abs(atr_pct - 0.02) / 0.02, 0.0)  # favorizeaza ~2% ATR
