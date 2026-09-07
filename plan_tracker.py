@@ -56,15 +56,27 @@ MIN_BUCKET_SAMPLES = 20  # sub atat, nu pronunt o probabilitate calibrata
 # Calibrarea foloseste doar planuri din versiunea curenta.
 # v1 -> v2: TP1 nu mai poate fi sub 1R (v1 producea planuri cu asteptare
 # negativa prin constructie: 21 din 47 aveau TP1 sub 1R, unul la 0.00R).
-GEOMETRY_VERSION = "v2"
+GEOMETRY_VERSION = "v3"
+# v2 -> v3: INTRARE PE PULLBACK, nu la piata.
+# Diagnostic pe 27 de planuri v2 inchise: LONG castiga 15.4%, SHORT 14.3% -
+# ambele directii pierdeau la fel, deci nu era regim de piata, ci moment de
+# intrare. Logica de semnal (RSI 45-75 + trend ascendent pentru LONG) intra
+# DUPA miscare, la un maxim local; simetric pentru SHORT. SL-ul se atingea in
+# 3.6h median, 6 din 22 in prima ora.
+# Acum planul asteapta revenirea pretului la zona de intrare. Daca nu revine in
+# MAX_WAIT_BARS, expira FARA pierdere - exact tranzactiile care fugeau.
 TP1_FRACTION = 0.5     # cat din pozitie se inchide la TP1
 
+STATE_PENDING = "PENDING"     # asteapta revenirea pretului la zona de intrare
+STATE_NO_ENTRY = "NO_ENTRY"   # pretul nu a revenit - plan anulat, FARA pierdere
 STATE_OPEN = "OPEN"
 STATE_TP1 = "TP1_HIT"
 STATE_TP2 = "TP2_HIT"
 STATE_SL = "SL_HIT"
 STATE_EXPIRED = "EXPIRED"
-CLOSED_STATES = (STATE_TP2, STATE_SL, STATE_EXPIRED)
+CLOSED_STATES = (STATE_TP2, STATE_SL, STATE_EXPIRED, STATE_NO_ENTRY)
+
+MAX_WAIT_BARS = 8   # cate bare astept revenirea la zona de intrare
 
 
 # ============================== PERSISTENTA ================================
@@ -162,8 +174,8 @@ def create_plan(store, signal, plan_levels, decision):
         "tp2": plan_levels["tp2"],
         "risk": round(risk, 8),
         "planned_r_tp2": round(abs(plan_levels["tp2"] - entry) / risk, 2),
-        "state": STATE_OPEN,
-        "state_detail": "OPEN · WAITING",
+        "state": STATE_PENDING,
+        "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
         "realized_r": None,
         "closed_ts": None,
         "bars_checked": 0,
@@ -208,6 +220,32 @@ def evaluate_plan(plan, candles):
     relevant = [c for c in candles if c[0] / 1000.0 >= plan["created_ts"]]
     if not relevant:
         return False
+
+    # FAZA 1: planul asteapta ca pretul sa revina la zona de intrare
+    if plan["state"] == STATE_PENDING:
+        waited = 0
+        for c in relevant:
+            waited += 1
+            bar_ts, high, low = c[0] / 1000.0, c[2], c[3]
+            touched = (low <= entry) if is_long else (high >= entry)
+            if touched:
+                plan["state"] = STATE_OPEN
+                plan["state_detail"] = "INTRARE ATINSA - pozitie activa"
+                plan["entered_ts"] = bar_ts
+                break
+            if waited >= MAX_WAIT_BARS:
+                plan["state"] = STATE_NO_ENTRY
+                plan["state_detail"] = f"PRETUL NU A REVENIT in {MAX_WAIT_BARS} bare - anulat"
+                plan["realized_r"] = 0.0   # niciun trade, deci nicio pierdere
+                plan["closed_ts"] = bar_ts
+                return True
+        if plan["state"] == STATE_PENDING:
+            plan["bars_checked"] = waited
+            return False
+        # de aici incolo evaluez doar barele de DUPA intrare
+        relevant = [c for c in relevant if c[0] / 1000.0 >= plan["entered_ts"]]
+        if not relevant:
+            return True
 
     # BUG FIX (idempotenta): retin MOMENTUL cand s-a atins TP1, nu doar un
     # boolean. Fara asta, la reevaluarea planului - se intampla la FIECARE
