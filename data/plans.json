@@ -1,5 +1,5 @@
 {
-  "next_id": 133,
+  "next_id": 134,
   "plans": [
     {
       "id": 1,
@@ -4601,11 +4601,11 @@
       "tp2": 0.19598571,
       "risk": 0.00347143,
       "planned_r_tp2": 4.5,
-      "state": "OPEN",
-      "state_detail": "INTRARE ATINSA - pozitie activa",
+      "state": "TP1_HIT",
+      "state_detail": "TP1 HIT \u00b7 RULEAZA SPRE TP2",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 1,
+      "bars_checked": 2,
       "score_at_entry": 54,
       "components": {
         "trend": 0.565,
@@ -4624,7 +4624,8 @@
         "agent_used": false
       },
       "geometry": "v3",
-      "entered_ts": 1788804000.0
+      "entered_ts": 1788804000.0,
+      "tp1_hit_ts": 1788807600.0
     },
     {
       "id": 128,
@@ -4642,7 +4643,7 @@
       "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 1,
+      "bars_checked": 2,
       "score_at_entry": 43,
       "components": {
         "trend": 0.369,
@@ -4678,7 +4679,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 1,
+      "bars_checked": 2,
       "score_at_entry": 40,
       "components": {
         "trend": 0.52,
@@ -4715,7 +4716,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 1,
+      "bars_checked": 2,
       "score_at_entry": 34,
       "components": {
         "trend": 0.318,
@@ -4752,7 +4753,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 1,
+      "bars_checked": 2,
       "score_at_entry": 30,
       "components": {
         "trend": 0.096,
@@ -4789,7 +4790,7 @@
       "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 1,
+      "bars_checked": 2,
       "score_at_entry": 26,
       "components": {
         "trend": 0.007,
@@ -4808,6 +4809,43 @@
         "agent_used": false
       },
       "geometry": "v3"
+    },
+    {
+      "id": 133,
+      "symbol": "POL/USDT",
+      "direction": "SHORT",
+      "created_ts": 1788808765.260825,
+      "created_time": "2026-09-07 19:19 UTC",
+      "entry": 0.096011071,
+      "signal_price": 0.09559,
+      "sl": 0.096853214,
+      "tp1": 0.08972,
+      "tp2": 0.089298929,
+      "risk": 0.00084214,
+      "planned_r_tp2": 7.97,
+      "state": "PENDING",
+      "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
+      "realized_r": null,
+      "closed_ts": null,
+      "bars_checked": 0,
+      "score_at_entry": 22,
+      "components": {
+        "trend": 0.004,
+        "momentum": 0.471,
+        "volatility": 0.44,
+        "volume": 0.01
+      },
+      "persistence_at_entry": 0,
+      "decision": {
+        "action": "ISSUE",
+        "mode": "EXPLORARE",
+        "reason": "inca nu am destule planuri inchise la scor ~22 (prag 20) - deschid ca sa invat",
+        "expected_value_r": null,
+        "calibrated_prob": null,
+        "agent_prob": 0.4675,
+        "agent_used": false
+      },
+      "geometry": "v3"
     }
   ],
   "calibration": {},
@@ -4815,15 +4853,16 @@
     "legacy_closed": 95,
     "legacy_total_r": -28.0,
     "geometry": "v3",
-    "total_plans": 132,
-    "open": 6,
+    "total_plans": 133,
+    "open": 7,
     "closed": 0,
     "by_state": {
       "SL_HIT": 80,
       "TP2_HIT": 8,
       "EXPIRED": 38,
-      "OPEN": 4,
-      "PENDING": 2
+      "TP1_HIT": 1,
+      "PENDING": 3,
+      "OPEN": 3
     },
     "win_rate": null,
     "total_r": 0,
