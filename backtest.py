@@ -41,6 +41,7 @@ RULARE
 ------
     python3 backtest.py                  # 180 de zile, watchlist-ul din CONFIG
     python3 backtest.py --days 90
+    python3 backtest.py --sweep          # compara variante de intrare pe aceleasi date
     python3 backtest.py --merge          # adauga rezultatele in data/plans.json
                                          # ca agentul sa invete din ele
 """
@@ -202,11 +203,116 @@ def replay_symbol(symbol, candles, weights, start_id):
     return plans, next_id
 
 
+# ============================ VARIANTE DE INTRARE ===========================
+# Diagnostic pe planurile reale: LONG castiga 15.4%, SHORT 14.3% - ambele
+# directii pierdeau simetric, deci problema nu e regimul de piata ci intrarea.
+# Simularea a aratat ca managementul pozitiei (50% la TP1 vs 100% la TP2)
+# schimba rezultatul cu 0.003R - neglijabil. Semnalul de intrare e tot.
+# Variantele de mai jos se testeaza pe date REALE, ca sa decida evidenta.
+
+VARIANTS = {
+    "actual": {},
+    "rsi_strans": {"rsi_long": (50, 65), "rsi_short": (35, 50)},
+    "rsi_larg": {"rsi_long": (40, 80), "rsi_short": (20, 60)},
+    "contra_trend": {"reverse": True},          # diagnostic: are semnalul avantaj invers?
+    "sl_larg": {"sl_atr": 2.5},
+    "sl_strans": {"sl_atr": 1.0},
+    "fara_pullback": {"pullback": 0.0},
+    "pullback_mare": {"pullback": 1.0},
+}
+
+
+# Cost pe tranzactie, exprimat ca procent din pret (dus-intors: taxe + spread).
+# ESENTIAL pentru o comparatie corecta: fara el, sweep-ul favorizeaza mereu
+# stopurile minuscule, pentru ca R se calculeaza impartind la risc - un risc mai
+# mic umfla R fara niciun avantaj real. Costul in R = cost_pct / risc_pct, deci
+# penalizeaza exact configuratiile care par bune doar prin micsorarea numitorului.
+ROUNDTRIP_COST_PCT = 0.001   # 0.1% dus-intors, tipic pe spot
+
+
+def cost_in_r(plan):
+    risk_pct = abs(plan["entry"] - plan["sl"]) / plan["entry"] if plan.get("entry") else 0
+    return ROUNDTRIP_COST_PCT / risk_pct if risk_pct > 0 else 0
+
+
+def apply_variant(cfg):
+    """Aplica temporar o varianta peste parametrii globali."""
+    saved = {
+        "pullback": scanner.PULLBACK_ATR, "sl_atr": scanner.SL_ATR,
+        "rsi_long": scanner.RSI_LONG, "rsi_short": scanner.RSI_SHORT,
+        "reverse": scanner.REVERSE_SIGNAL, "tp1_frac": plan_tracker.TP1_FRACTION,
+    }
+    scanner.PULLBACK_ATR = cfg.get("pullback", saved["pullback"])
+    scanner.SL_ATR = cfg.get("sl_atr", saved["sl_atr"])
+    scanner.RSI_LONG = cfg.get("rsi_long", saved["rsi_long"])
+    scanner.RSI_SHORT = cfg.get("rsi_short", saved["rsi_short"])
+    scanner.REVERSE_SIGNAL = cfg.get("reverse", saved["reverse"])
+    plan_tracker.TP1_FRACTION = cfg.get("tp1_frac", saved["tp1_frac"])
+    return saved
+
+
+def restore_variant(saved):
+    scanner.PULLBACK_ATR = saved["pullback"]
+    scanner.SL_ATR = saved["sl_atr"]
+    scanner.RSI_LONG = saved["rsi_long"]
+    scanner.RSI_SHORT = saved["rsi_short"]
+    scanner.REVERSE_SIGNAL = saved["reverse"]
+    plan_tracker.TP1_FRACTION = saved["tp1_frac"]
+
+
+def run_sweep(symbols, histories, weights):
+    """Ruleaza fiecare varianta pe aceleasi date si compara. Aceleasi lumanari
+    pentru toate variantele, deci diferentele vin doar din configuratie."""
+    print("\n" + "=" * 74)
+    print("SWEEP DE VARIANTE - aceleasi date, configuratii diferite")
+    print("=" * 74)
+    print(f"{'varianta':18s} {'inchise':>8s} {'castig%':>9s} {'R brut':>9s} {'R net':>9s} {'PF net':>7s}")
+    print("-" * 74)
+
+    rows = []
+    for name, cfg in VARIANTS.items():
+        saved = apply_variant(cfg)
+        allp, nid = [], 1
+        for sym, candles in histories.items():
+            pl, nid = replay_symbol(sym, candles, weights, nid)
+            allp.extend(pl)
+        restore_variant(saved)
+
+        closed = [x for x in allp if x.get("realized_r") is not None]
+        if not closed:
+            print(f"{name:18s} {'0':>8s} {'-':>9s} {'-':>9s} {'-':>9s} {'-':>6s}")
+            continue
+        gross = [x["realized_r"] for x in closed]
+        # planurile NO_ENTRY nu au costat nimic - nu s-a intrat in piata
+        net = [g - (cost_in_r(x) if x.get("state") != plan_tracker.STATE_NO_ENTRY else 0)
+               for g, x in zip(gross, closed)]
+        wins = [r for r in net if r > 0]
+        losses = [abs(r) for r in net if r < 0]
+        pf = (sum(wins) / sum(losses)) if losses else float("inf")
+        rows.append((name, len(closed), 100 * len(wins) / len(closed),
+                     sum(gross) / len(gross), sum(net) / len(net), pf))
+        print(f"{name:18s} {len(closed):8d} {100*len(wins)/len(closed):8.1f}% "
+              f"{sum(gross)/len(gross):+9.3f} {sum(net)/len(net):+9.3f} {pf:7.2f}")
+
+    if rows:
+        best = max(rows, key=lambda r: r[4])
+        print("-" * 74)
+        print(f"R net = R brut minus {100*ROUNDTRIP_COST_PCT:.2f}% cost dus-intors, "
+              f"convertit in R. Compara dupa R NET.")
+        print(f"Cea mai buna: {best[0]} ({best[4]:+.3f}R net pe plan, {best[1]} planuri)")
+        if best[4] <= 0:
+            print("\nATENTIE: nicio varianta nu e profitabila pe aceste date.")
+            print("Asta inseamna ca logica de semnal actuala nu are avantaj pe "
+                  "aceste simboluri/perioada - nu ca trebuie reglati parametrii.")
+    return rows
+
+
 def main():
     days = DEFAULT_DAYS
     if "--days" in sys.argv:
         days = int(sys.argv[sys.argv.index("--days") + 1])
     merge = "--merge" in sys.argv
+    sweep = "--sweep" in sys.argv
 
     exchange, markets, tickers, _, exchange_id = scanner.connect_exchange(scope=None)
     symbols = resolve_symbols(exchange, markets, tickers)
@@ -221,6 +327,7 @@ def main():
     weights = load_json(os.path.join(DATA_DIR, "weights.json"),
                         dict(scanner.DEFAULT_WEIGHTS))
 
+    histories = {}
     all_plans = []
     next_id = 1
     for base, sym in symbols.items():
@@ -231,11 +338,16 @@ def main():
             continue
         span = (candles[-1][0] - candles[0][0]) / 86400000
         print(f"{len(candles)} bare ({span:.0f} zile). Rulez replay...", end=" ", flush=True)
+        histories[sym] = candles
         plans, next_id = replay_symbol(sym, candles, weights, next_id)
         closed = [p for p in plans if p.get("realized_r") is not None]
         total_r = sum(p["realized_r"] for p in closed)
         print(f"{len(closed)} planuri inchise, {total_r:+.1f}R")
         all_plans.extend(plans)
+
+    if sweep:
+        run_sweep(symbols, histories, weights)
+        return
 
     closed = [p for p in all_plans if p.get("realized_r") is not None]
     if not closed:
