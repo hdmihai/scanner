@@ -446,13 +446,22 @@ def render_token_details(details, plans_store):
         if hist:
             tot = sum(p["realized_r"] for p in closed)
             wins = [p for p in closed if p["realized_r"] > 0]
-            rows_h = "".join(
-                f'<div class="liq-row"><span>#{p["id"]}</span>'
-                f'<span>{p["direction"]}</span>'
-                f'<span class="dim">{p.get("state_detail", p["state"])[:26]}</span>'
-                f'<span class="{"r-pos" if (p.get("realized_r") or 0) > 0 else "r-neg"}">'
-                f'{f"{p[chr(34)+chr(34)] if False else p["realized_r"]:+.2f}R" if p.get("realized_r") is not None else "-"}</span></div>'
-                for p in sorted(hist, key=lambda x: -x["id"])[:6])
+            # Valorile se calculeaza INAINTE, in variabile simple. F-string-uri
+            # imbricate cu aceleasi ghilimele sunt valide doar din Python 3.12
+            # (PEP 701); workflow-ul ruleaza pe 3.11, unde sunt eroare de sintaxa.
+            row_parts = []
+            for pl_ in sorted(hist, key=lambda x: -x["id"])[:6]:
+                r_val = pl_.get("realized_r")
+                r_txt = "-" if r_val is None else "{:+.2f}R".format(r_val)
+                r_cls = "r-pos" if (r_val or 0) > 0 else "r-neg"
+                state_txt = pl_.get("state_detail") or pl_.get("state", "")
+                row_parts.append(
+                    '<div class="liq-row">'
+                    '<span>#{}</span><span>{}</span>'
+                    '<span class="dim">{}</span>'
+                    '<span class="{}">{}</span></div>'.format(
+                        pl_["id"], pl_["direction"], state_txt[:26], r_cls, r_txt))
+            rows_h = "".join(row_parts)
             summary_h = (f'{len(closed)} inchise &middot; {100*len(wins)/len(closed):.0f}% castig '
                          f'&middot; {tot:+.2f}R') if closed else f'{len(hist)} deschise'
             hist_html = f'<div class="dim" style="margin-bottom:6px;">{summary_h}</div>' \
