@@ -1,19 +1,26 @@
 {
-  "text": "Din 29 planuri inchise, rata de succes e 8.0%, cu -21.90R cumulat (-0.876R in medie pe plan) si profit factor 0.05. 19 planuri sunt inca deschise. Separat, 95 planuri inchise (-28.00R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #153 BTC/USDT -1.00R, #139 GRAM/USDT -1.00R, #142 ADA/USDT -1.00R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 25)).",
+  "text": "Din 30 planuri inchise, rata de succes e 7.7%, cu -22.90R cumulat (-0.881R in medie pe plan) si profit factor 0.05. 18 planuri sunt inca deschise. Separat, 95 planuri inchise (-28.00R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #165 OP/USDT -1.00R, #153 BTC/USDT -1.00R, #139 GRAM/USDT -1.00R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 26)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-08 17:21 UTC",
+    "scan_time": "2026-09-08 18:25 UTC",
     "universe_size": 20,
     "plans_total": 174,
-    "plans_open": 19,
-    "plans_closed": 29,
+    "plans_open": 18,
+    "plans_closed": 30,
     "legacy_closed": 95,
     "legacy_total_r": -28.0,
-    "win_rate": 8.0,
-    "total_r": -21.9,
-    "avg_r": -0.876,
+    "win_rate": 7.7,
+    "total_r": -22.9,
+    "avg_r": -0.881,
     "profit_factor": 0.05,
     "recent_closed": [
+      {
+        "id": 165,
+        "symbol": "OP/USDT",
+        "direction": "LONG",
+        "state": "SL HIT \u00b7 INVALIDATED",
+        "r": -1.0
+      },
       {
         "id": 153,
         "symbol": "BTC/USDT",
@@ -41,13 +48,6 @@
         "direction": "SHORT",
         "state": "TP1 HIT \u00b7 SL LA BREAKEVEN",
         "r": 0.602
-      },
-      {
-        "id": 152,
-        "symbol": "ETH/USDT",
-        "direction": "SHORT",
-        "state": "SL HIT \u00b7 INVALIDATED",
-        "r": -1.0
       }
     ],
     "open_now": [
@@ -55,7 +55,7 @@
         "id": 174,
         "symbol": "BTC/USDT",
         "direction": "SHORT",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
+        "state": "INTRARE ATINSA - pozitie activa"
       },
       {
         "id": 173,
@@ -85,16 +85,16 @@
     "best_bucket": null,
     "worst_bucket": null,
     "agent_status": "SHADOW",
-    "agent_reason": "are nevoie de 300 exemple (are 25)",
-    "agent_samples": 25,
+    "agent_reason": "are nevoie de 300 exemple (are 26)",
+    "agent_samples": 26,
     "agent_balanced": null,
     "baseline_balanced": null,
     "agent_weights": {
-      "trend": -0.057936,
-      "momentum": -0.113331,
-      "volatility": -0.23989,
-      "volume": -0.131278,
-      "is_long": -0.221423,
+      "trend": -0.058526,
+      "momentum": -0.114569,
+      "volatility": -0.251638,
+      "volume": -0.13839,
+      "is_long": -0.23582,
       "persistence_n": -0.059322
     }
   }
