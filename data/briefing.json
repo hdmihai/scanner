@@ -1,11 +1,11 @@
 {
-  "text": "Din 6 planuri inchise, rata de succes e 16.7%, cu -1.50R cumulat (-0.250R in medie pe plan) si profit factor 0.25. 5 planuri sunt inca deschise. Separat, 95 planuri inchise (-28.00R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #134 FET/USDT +0.00R, #131 ADA/USDT -1.00R, #129 LINK/USDT -1.00R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 58)).",
+  "text": "Din 6 planuri inchise, rata de succes e 16.7%, cu -1.50R cumulat (-0.250R in medie pe plan) si profit factor 0.25. 6 planuri sunt inca deschise. Separat, 95 planuri inchise (-28.00R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #134 FET/USDT +0.00R, #131 ADA/USDT -1.00R, #129 LINK/USDT -1.00R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 58)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-08 07:22 UTC",
+    "scan_time": "2026-09-08 08:24 UTC",
     "universe_size": 7,
-    "plans_total": 137,
-    "plans_open": 5,
+    "plans_total": 138,
+    "plans_open": 6,
     "plans_closed": 6,
     "legacy_closed": 95,
     "legacy_total_r": -28.0,
@@ -52,10 +52,16 @@
     ],
     "open_now": [
       {
+        "id": 138,
+        "symbol": "ADA/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
         "id": 137,
         "symbol": "FET/USDT",
         "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
+        "state": "INTRARE ATINSA - pozitie activa"
       },
       {
         "id": 136,
@@ -73,12 +79,6 @@
         "id": 133,
         "symbol": "POL/USDT",
         "direction": "SHORT",
-        "state": "INTRARE ATINSA - pozitie activa"
-      },
-      {
-        "id": 130,
-        "symbol": "NEAR/USDT",
-        "direction": "LONG",
         "state": "INTRARE ATINSA - pozitie activa"
       }
     ],
