@@ -1,19 +1,33 @@
 {
-  "text": "Din 10 planuri inchise, rata de succes e 10.0%, cu -4.50R cumulat (-0.450R in medie pe plan) si profit factor 0.1. 6 planuri sunt inca deschise. Separat, 95 planuri inchise (-28.00R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #141 LINK/USDT -1.00R, #133 POL/USDT -1.00R, #136 GRAM/USDT +0.00R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 58)).",
+  "text": "Din 12 planuri inchise, rata de succes e 8.3%, cu -6.50R cumulat (-0.542R in medie pe plan) si profit factor 0.07. 7 planuri sunt inca deschise. Separat, 95 planuri inchise (-28.00R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #137 FET/USDT -1.00R, #140 ADA/USDT -1.00R, #141 LINK/USDT -1.00R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 58)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-08 11:21 UTC",
+    "scan_time": "2026-09-08 12:12 UTC",
     "universe_size": 7,
-    "plans_total": 142,
-    "plans_open": 6,
-    "plans_closed": 10,
+    "plans_total": 145,
+    "plans_open": 7,
+    "plans_closed": 12,
     "legacy_closed": 95,
     "legacy_total_r": -28.0,
-    "win_rate": 10.0,
-    "total_r": -4.5,
-    "avg_r": -0.45,
-    "profit_factor": 0.1,
+    "win_rate": 8.3,
+    "total_r": -6.5,
+    "avg_r": -0.542,
+    "profit_factor": 0.07,
     "recent_closed": [
+      {
+        "id": 137,
+        "symbol": "FET/USDT",
+        "direction": "LONG",
+        "state": "SL HIT \u00b7 INVALIDATED",
+        "r": -1.0
+      },
+      {
+        "id": 140,
+        "symbol": "ADA/USDT",
+        "direction": "LONG",
+        "state": "SL HIT \u00b7 INVALIDATED",
+        "r": -1.0
+      },
       {
         "id": 141,
         "symbol": "LINK/USDT",
@@ -34,23 +48,27 @@
         "direction": "SHORT",
         "state": "PRETUL NU A REVENIT in 8 bare - anulat",
         "r": 0.0
-      },
-      {
-        "id": 138,
-        "symbol": "ADA/USDT",
-        "direction": "SHORT",
-        "state": "SL HIT \u00b7 INVALIDATED",
-        "r": -1.0
-      },
-      {
-        "id": 134,
-        "symbol": "FET/USDT",
-        "direction": "LONG",
-        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
-        "r": 0.0
       }
     ],
     "open_now": [
+      {
+        "id": 145,
+        "symbol": "POL/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 144,
+        "symbol": "NEAR/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 143,
+        "symbol": "FET/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
       {
         "id": 142,
         "symbol": "ADA/USDT",
@@ -58,27 +76,9 @@
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       },
       {
-        "id": 140,
-        "symbol": "ADA/USDT",
-        "direction": "LONG",
-        "state": "INTRARE ATINSA - pozitie activa"
-      },
-      {
         "id": 139,
         "symbol": "GRAM/USDT",
         "direction": "SHORT",
-        "state": "INTRARE ATINSA - pozitie activa"
-      },
-      {
-        "id": 137,
-        "symbol": "FET/USDT",
-        "direction": "LONG",
-        "state": "INTRARE ATINSA - pozitie activa"
-      },
-      {
-        "id": 135,
-        "symbol": "AVAX/USDT",
-        "direction": "LONG",
         "state": "INTRARE ATINSA - pozitie activa"
       }
     ],
