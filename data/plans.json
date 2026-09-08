@@ -1,5 +1,5 @@
 {
-  "next_id": 179,
+  "next_id": 180,
   "plans": [
     {
       "id": 1,
@@ -6141,11 +6141,11 @@
       "tp2": 1.4807571,
       "risk": 0.0131643,
       "planned_r_tp2": 4.5,
-      "state": "PENDING",
-      "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
+      "state": "OPEN",
+      "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 3,
+      "bars_checked": 1,
       "score_at_entry": 55,
       "components": {
         "trend": 0.01,
@@ -6163,7 +6163,8 @@
         "agent_prob": 0.3064,
         "agent_used": false
       },
-      "geometry": "v3"
+      "geometry": "v3",
+      "entered_ts": 1788894000.0
     },
     {
       "id": 168,
@@ -6577,6 +6578,43 @@
         "agent_used": false
       },
       "geometry": "v3"
+    },
+    {
+      "id": 179,
+      "symbol": "BNB/USDT",
+      "direction": "LONG",
+      "created_ts": 1788896924.6347148,
+      "created_time": "2026-09-08 19:48 UTC",
+      "entry": 744.96429,
+      "signal_price": 748.1,
+      "sl": 738.69286,
+      "tp1": 756.4,
+      "tp2": 773.18571,
+      "risk": 6.27143,
+      "planned_r_tp2": 4.5,
+      "state": "PENDING",
+      "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
+      "realized_r": null,
+      "closed_ts": null,
+      "bars_checked": 0,
+      "score_at_entry": 21,
+      "components": {
+        "trend": 0.052,
+        "momentum": 0.117,
+        "volatility": 0.419,
+        "volume": 0.211
+      },
+      "persistence_at_entry": 10,
+      "decision": {
+        "action": "ISSUE",
+        "mode": "EXPLORARE",
+        "reason": "inca nu am destule planuri inchise la scor ~21 (prag 20) - deschid ca sa invat",
+        "expected_value_r": null,
+        "calibrated_prob": null,
+        "agent_prob": 0.3227,
+        "agent_used": false
+      },
+      "geometry": "v3"
     }
   ],
   "calibration": {
@@ -6627,15 +6665,15 @@
     "legacy_closed": 95,
     "legacy_total_r": -28.0,
     "geometry": "v3",
-    "total_plans": 178,
-    "open": 18,
+    "total_plans": 179,
+    "open": 19,
     "closed": 30,
     "by_state": {
       "SL_HIT": 110,
       "TP2_HIT": 8,
       "EXPIRED": 38,
       "NO_ENTRY": 4,
-      "OPEN": 5,
+      "OPEN": 6,
       "TP1_HIT": 1,
       "PENDING": 12
     },
