@@ -1,19 +1,26 @@
 {
-  "text": "Din 4 planuri inchise, rata de succes e 25.0%, cu -0.50R cumulat (-0.125R in medie pe plan) si profit factor 0.5. 6 planuri sunt inca deschise. Separat, 95 planuri inchise (-28.00R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #129 LINK/USDT -1.00R, #128 AVAX/USDT +0.00R, #132 GRAM/USDT +0.00R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 58)).",
+  "text": "Din 5 planuri inchise, rata de succes e 20.0%, cu -1.50R cumulat (-0.300R in medie pe plan) si profit factor 0.25. 5 planuri sunt inca deschise. Separat, 95 planuri inchise (-28.00R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #131 ADA/USDT -1.00R, #129 LINK/USDT -1.00R, #128 AVAX/USDT +0.00R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 58)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-08 05:21 UTC",
+    "scan_time": "2026-09-08 06:26 UTC",
     "universe_size": 7,
     "plans_total": 136,
-    "plans_open": 6,
-    "plans_closed": 4,
+    "plans_open": 5,
+    "plans_closed": 5,
     "legacy_closed": 95,
     "legacy_total_r": -28.0,
-    "win_rate": 25.0,
-    "total_r": -0.5,
-    "avg_r": -0.125,
-    "profit_factor": 0.5,
+    "win_rate": 20.0,
+    "total_r": -1.5,
+    "avg_r": -0.3,
+    "profit_factor": 0.25,
     "recent_closed": [
+      {
+        "id": 131,
+        "symbol": "ADA/USDT",
+        "direction": "LONG",
+        "state": "SL HIT \u00b7 INVALIDATED",
+        "r": -1.0
+      },
       {
         "id": 129,
         "symbol": "LINK/USDT",
@@ -69,8 +76,8 @@
         "state": "INTRARE ATINSA - pozitie activa"
       },
       {
-        "id": 131,
-        "symbol": "ADA/USDT",
+        "id": 130,
+        "symbol": "NEAR/USDT",
         "direction": "LONG",
         "state": "INTRARE ATINSA - pozitie activa"
       }
