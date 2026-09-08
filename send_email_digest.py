@@ -179,8 +179,8 @@ def main():
 
     scan = history[-1]
     best = scan.get("best_candidate")
-    subject = (f"SCANLINE · {best['symbol']} {best['direction']} · {scan['scan_time']}"
-               if best else f"SCANLINE · fara semnal · {scan['scan_time']}")
+    subject = (f"SCANLINE - {best['symbol']} {best['direction']} - {scan['scan_time']}"
+               if best else f"SCANLINE - fara semnal - {scan['scan_time']}")
 
     html_body = build_summary_html(scan)
     send_email(subject, html_body, attachment_path=DASHBOARD_FILE)
