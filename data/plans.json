@@ -4675,11 +4675,11 @@
       "tp2": 13.840143,
       "risk": 0.226786,
       "planned_r_tp2": 4.5,
-      "state": "OPEN",
-      "state_detail": "INTRARE ATINSA - pozitie activa",
-      "realized_r": null,
-      "closed_ts": null,
-      "bars_checked": 9,
+      "state": "SL_HIT",
+      "state_detail": "SL HIT \u00b7 INVALIDATED",
+      "realized_r": -1.0,
+      "closed_ts": 1788836400.0,
+      "bars_checked": 10,
       "score_at_entry": 40,
       "components": {
         "trend": 0.52,
@@ -4716,7 +4716,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 9,
+      "bars_checked": 10,
       "score_at_entry": 34,
       "components": {
         "trend": 0.318,
@@ -4753,7 +4753,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 9,
+      "bars_checked": 10,
       "score_at_entry": 30,
       "components": {
         "trend": 0.096,
@@ -4827,7 +4827,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 7,
+      "bars_checked": 8,
       "score_at_entry": 22,
       "components": {
         "trend": 0.004,
@@ -4865,7 +4865,7 @@
       "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 3,
+      "bars_checked": 4,
       "score_at_entry": 55,
       "components": {
         "trend": 0.602,
@@ -4902,7 +4902,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 1,
+      "bars_checked": 2,
       "score_at_entry": 53,
       "components": {
         "trend": 0.398,
@@ -4940,7 +4940,7 @@
       "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 1,
+      "bars_checked": 2,
       "score_at_entry": 29,
       "components": {
         "trend": 0.079,
@@ -4963,13 +4963,13 @@
   ],
   "calibration": {
     "40": {
-      "total": 2,
-      "win_rate": 50.0,
-      "ci_low": 9.5,
-      "ci_high": 90.5,
-      "avg_r": 0.25,
+      "total": 3,
+      "win_rate": 33.3,
+      "ci_low": 6.1,
+      "ci_high": 79.2,
+      "avg_r": -0.167,
       "avg_win_r": 0.5,
-      "avg_loss_r": 0.0,
+      "avg_loss_r": 0.5,
       "reliable": false
     },
     "20": {
@@ -4988,21 +4988,21 @@
     "legacy_total_r": -28.0,
     "geometry": "v3",
     "total_plans": 136,
-    "open": 7,
-    "closed": 3,
+    "open": 6,
+    "closed": 4,
     "by_state": {
-      "SL_HIT": 81,
+      "SL_HIT": 82,
       "TP2_HIT": 8,
       "EXPIRED": 38,
       "NO_ENTRY": 2,
-      "OPEN": 5,
+      "OPEN": 4,
       "PENDING": 2
     },
-    "win_rate": 33.3,
-    "total_r": 0.5,
-    "avg_r": 0.167,
-    "profit_factor": null,
+    "win_rate": 25.0,
+    "total_r": -0.5,
+    "avg_r": -0.125,
+    "profit_factor": 0.5,
     "best": 0.5,
-    "worst": 0.0
+    "worst": -1.0
   }
 }
