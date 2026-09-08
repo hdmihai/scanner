@@ -1,5 +1,5 @@
 {
-  "next_id": 178,
+  "next_id": 179,
   "plans": [
     {
       "id": 1,
@@ -6540,6 +6540,43 @@
         "agent_used": false
       },
       "geometry": "v3"
+    },
+    {
+      "id": 178,
+      "symbol": "POL/USDT",
+      "direction": "LONG",
+      "created_ts": 1788895211.554517,
+      "created_time": "2026-09-08 19:20 UTC",
+      "entry": 0.095586429,
+      "signal_price": 0.09616,
+      "sl": 0.094439286,
+      "tp1": 0.0982,
+      "tp2": 0.10074857,
+      "risk": 0.00114714,
+      "planned_r_tp2": 4.5,
+      "state": "PENDING",
+      "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
+      "realized_r": null,
+      "closed_ts": null,
+      "bars_checked": 0,
+      "score_at_entry": 21,
+      "components": {
+        "trend": 0.02,
+        "momentum": 0.098,
+        "volatility": 0.596,
+        "volume": 0.06
+      },
+      "persistence_at_entry": 4,
+      "decision": {
+        "action": "ISSUE",
+        "mode": "EXPLORARE",
+        "reason": "inca nu am destule planuri inchise la scor ~21 (prag 20) - deschid ca sa invat",
+        "expected_value_r": null,
+        "calibrated_prob": null,
+        "agent_prob": 0.3223,
+        "agent_used": false
+      },
+      "geometry": "v3"
     }
   ],
   "calibration": {
@@ -6590,8 +6627,8 @@
     "legacy_closed": 95,
     "legacy_total_r": -28.0,
     "geometry": "v3",
-    "total_plans": 177,
-    "open": 17,
+    "total_plans": 178,
+    "open": 18,
     "closed": 30,
     "by_state": {
       "SL_HIT": 110,
@@ -6600,7 +6637,7 @@
       "NO_ENTRY": 4,
       "OPEN": 5,
       "TP1_HIT": 1,
-      "PENDING": 11
+      "PENDING": 12
     },
     "win_rate": 13.3,
     "total_r": -23.33,
