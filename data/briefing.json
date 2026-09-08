@@ -1,17 +1,17 @@
 {
-  "text": "Din 12 planuri inchise, rata de succes e 8.3%, cu -6.50R cumulat (-0.542R in medie pe plan) si profit factor 0.07. 7 planuri sunt inca deschise. Separat, 95 planuri inchise (-28.00R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #137 FET/USDT -1.00R, #140 ADA/USDT -1.00R, #141 LINK/USDT -1.00R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 58)).",
+  "text": "Din 12 planuri inchise, rata de succes e 12.5%, cu -6.50R cumulat (-0.812R in medie pe plan) si profit factor 0.07. 17 planuri sunt inca deschise. Separat, 95 planuri inchise (-28.00R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #137 FET/USDT -1.00R, #140 ADA/USDT -1.00R, #141 LINK/USDT -1.00R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 8)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-08 12:27 UTC",
-    "universe_size": 7,
-    "plans_total": 145,
-    "plans_open": 7,
+    "scan_time": "2026-09-08 12:56 UTC",
+    "universe_size": 20,
+    "plans_total": 155,
+    "plans_open": 17,
     "plans_closed": 12,
     "legacy_closed": 95,
     "legacy_total_r": -28.0,
-    "win_rate": 8.3,
+    "win_rate": 12.5,
     "total_r": -6.5,
-    "avg_r": -0.542,
+    "avg_r": -0.812,
     "profit_factor": 0.07,
     "recent_closed": [
       {
@@ -52,50 +52,50 @@
     ],
     "open_now": [
       {
-        "id": 145,
-        "symbol": "POL/USDT",
+        "id": 155,
+        "symbol": "XRP/USDT",
         "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       },
       {
-        "id": 144,
-        "symbol": "NEAR/USDT",
+        "id": 154,
+        "symbol": "SOL/USDT",
         "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       },
       {
-        "id": 143,
-        "symbol": "FET/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 142,
-        "symbol": "ADA/USDT",
+        "id": 153,
+        "symbol": "BTC/USDT",
         "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       },
       {
-        "id": 139,
-        "symbol": "GRAM/USDT",
+        "id": 152,
+        "symbol": "ETH/USDT",
         "direction": "SHORT",
-        "state": "INTRARE ATINSA - pozitie activa"
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 151,
+        "symbol": "AAVE/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
       }
     ],
     "best_bucket": null,
     "worst_bucket": null,
     "agent_status": "SHADOW",
-    "agent_reason": "are nevoie de 300 exemple (are 58)",
-    "agent_samples": 58,
-    "agent_balanced": 41.17647058823529,
-    "baseline_balanced": 50.0,
+    "agent_reason": "are nevoie de 300 exemple (are 8)",
+    "agent_samples": 8,
+    "agent_balanced": null,
+    "baseline_balanced": null,
     "agent_weights": {
-      "trend": 0.088436,
-      "momentum": -0.053203,
-      "volatility": 0.01034,
-      "volume": -0.078772,
-      "is_long": 0.122537,
-      "persistence_n": -0.039119
+      "trend": -0.017889,
+      "momentum": -0.039099,
+      "volatility": -0.087024,
+      "volume": -0.035863,
+      "is_long": -0.093831,
+      "persistence_n": -0.012118
     }
   }
 }
