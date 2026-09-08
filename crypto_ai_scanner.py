@@ -88,6 +88,8 @@ HISTORY_FILE = os.path.join(CONFIG["data_dir"], "scan_history.json")
 WEIGHTS_FILE = os.path.join(CONFIG["data_dir"], "weights.json")
 WEIGHTS_HISTORY_FILE = os.path.join(CONFIG["data_dir"], "weights_history.json")
 CHART_FILE = os.path.join(CONFIG["data_dir"], "latest_chart.json")
+DETAILS_FILE = os.path.join(CONFIG["data_dir"], "latest_details.json")
+SPARKLINE_BARS = 40   # cate preturi de inchidere pastrez pentru graficul mic
 
 DEFAULT_WEIGHTS = {"trend": 1.0, "momentum": 1.0, "volatility": 1.0, "volume": 1.0}
 
@@ -678,6 +680,41 @@ def main():
             "ema20": ema_series_full(closes, 20)[-n:],
             "ema50": ema_series_full(closes, 50)[-n:],
         })
+
+    # ---- DETALII PER SIMBOL, pentru dashboard.
+    # Se calculeaza din ohlcv_cache, deci ZERO apeluri API in plus - doar CPU.
+    # Fisierul se SUPRASCRIE la fiecare rulare, nu se acumuleaza: un instantaneu
+    # al starii curente. Daca as fi salvat lumanarile complete pentru toate
+    # simbolurile ar fi insemnat ~326 KB pe scanare, comise orar - peste 200 MB
+    # pe luna in git. Pastrez in schimb doar indicatorii (cateva numere) si o
+    # linie de pret scurta pentru graficul mic.
+    details = {}
+    for r in results:
+        candles = ohlcv_cache.get(r["symbol"])
+        if not candles:
+            continue
+        d_highs = [c[2] for c in candles]
+        d_lows = [c[3] for c in candles]
+        d_closes = [c[4] for c in candles]
+        d_struct = compute_structure_levels(d_highs, d_lows)
+        d_fib = compute_fibonacci(d_highs, d_lows)
+        details[r["symbol"]] = {
+            "direction": r["direction"],
+            "score": r["risk_adjusted"],
+            "probability": r["probability"],
+            "components": r["components"],
+            "price": r["price"],
+            "atr": r["atr"],
+            "persistence": r["persistence"],
+            "age_minutes": r["age_minutes"],
+            "indicators": indicators.compute_all(candles),
+            "structure": d_struct,
+            "fibonacci": d_fib,
+            "plan": compute_trade_plan(r["direction"], r["price"], r["atr"], d_struct, d_fib),
+            "sparkline": [round_price(c) for c in d_closes[-SPARKLINE_BARS:]],
+        }
+    save_json(DETAILS_FILE, {"scan_time": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
+                             "exchange": exchange_id, "symbols": details})
 
     # ---- PLANURI: creez pentru toate semnalele din top, nu doar pentru cel
     # mai bun. Reutilizez ohlcv_cache, deci in mod normal nu costa apeluri
