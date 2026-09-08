@@ -48,10 +48,17 @@ import json
 import math
 import os
 
+import plan_tracker
+
 DATA_DIR = "data"
 HISTORY_FILE = os.path.join(DATA_DIR, "scan_history.json")
 PLANS_FILE = os.path.join(DATA_DIR, "plans.json")
-STATE_SOURCE = "plans-v2"  # versiune de semnal + geometrie: vezi train_from_plans
+# Legata de geometria planurilor: v2 intra la piata, v3 intra pe pullback.
+# Acelasi vector de caracteristici duce la rezultate diferite sub cele doua
+# sisteme, deci antrenarea pe amandoua ar invata media a doua functii diferite.
+# La schimbarea geometriei, agentul reporneste - costa exemplele acumulate, dar
+# oricum ramane in SHADOW pana la 300, deci pierderea e doar contabila.
+STATE_SOURCE = "plans-v3"
 MODEL_FILE = os.path.join(DATA_DIR, "agent_model.json")
 
 FEATURES = ["trend", "momentum", "volatility", "volume", "is_long", "persistence_n"]
@@ -185,16 +192,24 @@ def default_state():
     }
 
 
-def balanced_accuracy(by_direction, which):
+def balanced_accuracy(by_direction, which, min_per_direction=30):
     """Media acuratetii pe LONG si pe SHORT, nu acuratetea bruta.
     Un model care prezice mereu SHORT intr-o piata in scadere are acuratete
-    bruta mare, dar acuratete echilibrata ~50% - exact ce vreau sa expun."""
-    accs = []
+    bruta mare, dar acuratete echilibrata ~50% - exact ce vreau sa expun.
+
+    Returneaza (valoare, directii_incluse). Daca o directie nu are destule
+    exemple e exclusa - dar atunci rezultatul NU mai e echilibrat, si apelantul
+    trebuie sa stie asta. Inainte se raporta valoarea unei singure directii sub
+    eticheta "echilibrat", ceea ce era inselator."""
+    accs, used = [], []
     for d in ("LONG", "SHORT"):
         stats = by_direction.get(d, {})
-        if stats.get("total", 0) >= 30:   # prea putine exemple = nu numar directia
+        if stats.get("total", 0) >= min_per_direction:
             accs.append(stats[which] / stats["total"])
-    return 100 * sum(accs) / len(accs) if accs else None
+            used.append(d)
+    if not accs:
+        return None, []
+    return 100 * sum(accs) / len(accs), used
 
 
 def days_covered(state, plans=None):
@@ -229,10 +244,11 @@ def agent_is_active(state, plans=None):
                        f"(prea putine regimuri de piata)")
 
     bd = state.get("by_direction", {})
-    bal_agent = balanced_accuracy(bd, "agent")
-    bal_base = balanced_accuracy(bd, "baseline")
-    if bal_agent is None or bal_base is None:
-        return False, "inca nu am destule exemple pe ambele directii"
+    bal_agent, used_a = balanced_accuracy(bd, "agent")
+    bal_base, used_b = balanced_accuracy(bd, "baseline")
+    if bal_agent is None or bal_base is None or len(used_a) < 2:
+        return False, ("inca nu am destule exemple pe AMBELE directii "
+                       f"(am: {', '.join(used_a) if used_a else 'niciuna'})")
     if bal_agent <= bal_base:
         return False, (f"acuratete echilibrata {bal_agent:.1f}% nu bate inca "
                        f"euristica ({bal_base:.1f}%)")
@@ -257,10 +273,20 @@ def train_from_plans(plans, model, state):
     fi produs un model antrenat pe doua definitii diferite ale succesului.
 
     Fiecare plan e invatat exact o data (marcat cu `agent_trained`).
+
+    BUG FIX 1: filtrul era scris hardcodat "v2". Cand geometria a trecut la v3,
+    agentul a continuat sa invete din planurile VECHI si sa le ignore pe cele
+    curente - exact pe dos. Acum se leaga de plan_tracker.GEOMETRY_VERSION.
+
+    BUG FIX 2: planurile NO_ENTRY (pretul nu a revenit la zona de intrare) sunt
+    excluse complet. Au realized_r = 0.0, iar regula `y = 1 daca r > 0` le
+    transforma in exemple NEGATIVE - agentul invata ca acele configuratii esueaza,
+    cand de fapt nicio tranzactie nu a avut loc. E o eticheta falsa, nu un rezultat.
     """
     closed = [p for p in plans
               if p.get("realized_r") is not None and not p.get("agent_trained")
-              and p.get("geometry", "v1") == "v2"]
+              and p.get("geometry", "v1") == plan_tracker.GEOMETRY_VERSION
+              and p.get("state") != plan_tracker.STATE_NO_ENTRY]
     closed.sort(key=lambda p: p.get("closed_ts") or 0)
 
     new_samples = 0
@@ -398,12 +424,24 @@ def main():
     plans = plans_store.get("plans", [])
 
     state = load_json(MODEL_FILE, None)
-    # Daca starea salvata provine din sursa veche de semnal (campul `outcome`),
+    # Daca starea salvata provine din alta sursa/geometrie de semnal (campul `outcome`),
     # o resetez: etichetele masurau altceva. Vezi nota din train_from_plans.
     if state is None or state.get("source") != STATE_SOURCE:
         if state is not None:
-            print("[i] Resetez agentul: sursa de invatare s-a schimbat din "
-                  "'outcome' (miscare ATR) in 'planuri inchise' (R real).")
+            print(f"[i] Resetez agentul: sursa de invatare s-a schimbat "
+                  f"({state.get('source')} -> {STATE_SOURCE}).")
+            # BUG FIX: la reset trebuie sterse si marcajele `agent_trained` de pe
+            # planurile geometriei CURENTE. Fara asta, planurile deja marcate erau
+            # sarite dupa reset, iar agentul repornea la zero si ramanea acolo -
+            # nu mai avea din ce sa invete pana la urmatoarele planuri noi.
+            cleared = 0
+            for p in plans:
+                if (p.get("geometry", "v1") == plan_tracker.GEOMETRY_VERSION
+                        and p.pop("agent_trained", None)):
+                    cleared += 1
+            if cleared:
+                print(f"[i] Am eliberat {cleared} planuri {plan_tracker.GEOMETRY_VERSION} "
+                      f"pentru reinvatare.")
         state = default_state()
         state["source"] = STATE_SOURCE
     model = OnlineLogisticRegression.from_dict(state.get("model", {}))
@@ -422,8 +460,10 @@ def main():
     state["status"] = "ACTIVE" if active else "SHADOW"
     state["status_reason"] = reason
     state["days_covered"] = round(days_covered(state, plans), 2)
-    state["balanced_agent"] = balanced_accuracy(state["by_direction"], "agent")
-    state["balanced_baseline"] = balanced_accuracy(state["by_direction"], "baseline")
+    ba, used = balanced_accuracy(state["by_direction"], "agent")
+    bb, _ = balanced_accuracy(state["by_direction"], "baseline")
+    state["balanced_agent"], state["balanced_baseline"] = ba, bb
+    state["balanced_directions"] = used
     save_json(MODEL_FILE, state)
 
     acc_agent, acc_base, acc_recent = summarize(state)
@@ -433,7 +473,9 @@ def main():
         print(f"Acuratete BRUTA       - agent {acc_agent:.2f}% | baseline {acc_base:.2f}%")
         ba, bb = state["balanced_agent"], state["balanced_baseline"]
         if ba is not None:
-            print(f"Acuratete ECHILIBRATA - agent {ba:.2f}% | baseline {bb:.2f}%  <- asta conteaza")
+            lbl = ("ECHILIBRATA" if len(used) == 2
+                   else f"doar {used[0]} (cealalta directie sub prag)")
+            print(f"Acuratete {lbl} - agent {ba:.2f}% | baseline {bb:.2f}%")
         for d in ("LONG", "SHORT"):
             st = state["by_direction"][d]
             if st["total"]:
