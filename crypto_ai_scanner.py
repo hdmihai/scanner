@@ -60,13 +60,24 @@ CONFIG = {
     # complet top-200 CoinGecko. Lasa lista goala ca sa revii la scanarea larga.
     # Aliasurile acopera redenumirile: GRAM e Toncoin redenumit (iunie 2026), dar
     # unele burse pot inca lista perechea ca TON/USDT. Se ia primul alias gasit.
-    "watchlist": ["ADA", "AVAX", "POL", "LINK", "FET", "NEAR", "GRAM"],
+    # WATCHLIST in trepte. Cele 7 initiale erau toate mid-cap alts cu profil
+    # asemanator - date omogene. Treapta 1 adauga capete diferite de spectru:
+    # BTC/ETH au volatilitate mult mai mica, DOGE mult mai mare. Diversitatea
+    # de ATR conteaza mai mult decat numarul brut de simboluri, pentru ca da
+    # regimuri diferite in ACEEASI perioada calendaristica.
+    "watchlist": [
+        "ADA", "AVAX", "POL", "LINK", "FET", "NEAR", "GRAM",
+        "BTC", "ETH", "SOL", "XRP", "DOGE",
+        "BNB", "LTC", "DOT", "ATOM", "UNI", "AAVE", "ARB", "OP",
+    ],
     "aliases": {"GRAM": ["GRAM", "TON"], "POL": ["POL", "MATIC"]},
     "timeframe": "1h",
     "candles": 200,
     "lookahead_hours": 24,     # dupa cate ore evaluam daca un semnal a "nimerit"
     "hit_threshold_atr": 0.5,  # miscare minima (in ATR-uri) ca sa conteze "hit"
-    "top_n_per_direction": 5,
+    # Plafonul REAL de volum: se deschid planuri doar pentru top N pe directie,
+    # deci un univers de 200 ar da tot 10 planuri/scanare cu N=5.
+    "top_n_per_direction": 8,
     "chart_candles": 80,       # cate lumanari pastram pentru graficul din dashboard
     "telegram_bot_token": os.environ.get("TELEGRAM_BOT_TOKEN", "PUNE_AICI_TOKEN_DE_LA_BOTFATHER"),
     "telegram_chat_id": os.environ.get("TELEGRAM_CHAT_ID", "PUNE_AICI_CHAT_ID_UL_TAU"),
