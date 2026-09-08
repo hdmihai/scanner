@@ -1,5 +1,5 @@
 {
-  "next_id": 135,
+  "next_id": 137,
   "plans": [
     {
       "id": 1,
@@ -4639,10 +4639,10 @@
       "tp2": 8.4482857,
       "risk": 0.0970714,
       "planned_r_tp2": 4.5,
-      "state": "PENDING",
-      "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
-      "realized_r": null,
-      "closed_ts": null,
+      "state": "NO_ENTRY",
+      "state_detail": "PRETUL NU A REVENIT in 8 bare - anulat",
+      "realized_r": 0.0,
+      "closed_ts": 1788829200.0,
       "bars_checked": 7,
       "score_at_entry": 43,
       "components": {
@@ -4679,7 +4679,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 7,
+      "bars_checked": 8,
       "score_at_entry": 40,
       "components": {
         "trend": 0.52,
@@ -4716,7 +4716,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 7,
+      "bars_checked": 8,
       "score_at_entry": 34,
       "components": {
         "trend": 0.318,
@@ -4753,7 +4753,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 7,
+      "bars_checked": 8,
       "score_at_entry": 30,
       "components": {
         "trend": 0.096,
@@ -4786,10 +4786,10 @@
       "tp2": 1.3066071,
       "risk": 0.0107857,
       "planned_r_tp2": 9.53,
-      "state": "PENDING",
-      "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
-      "realized_r": null,
-      "closed_ts": null,
+      "state": "NO_ENTRY",
+      "state_detail": "PRETUL NU A REVENIT in 8 bare - anulat",
+      "realized_r": 0.0,
+      "closed_ts": 1788829200.0,
       "bars_checked": 7,
       "score_at_entry": 26,
       "components": {
@@ -4827,7 +4827,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 5,
+      "bars_checked": 6,
       "score_at_entry": 22,
       "components": {
         "trend": 0.004,
@@ -4865,7 +4865,7 @@
       "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 1,
+      "bars_checked": 2,
       "score_at_entry": 55,
       "components": {
         "trend": 0.602,
@@ -4884,17 +4884,101 @@
         "agent_used": false
       },
       "geometry": "v3"
+    },
+    {
+      "id": 135,
+      "symbol": "AVAX/USDT",
+      "direction": "LONG",
+      "created_ts": 1788830443.2201989,
+      "created_time": "2026-09-08 01:20 UTC",
+      "entry": 8.0957857,
+      "signal_price": 8.142,
+      "sl": 8.0033571,
+      "tp1": 8.2,
+      "tp2": 8.5117143,
+      "risk": 0.0924286,
+      "planned_r_tp2": 4.5,
+      "state": "PENDING",
+      "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
+      "realized_r": null,
+      "closed_ts": null,
+      "bars_checked": 0,
+      "score_at_entry": 53,
+      "components": {
+        "trend": 0.398,
+        "momentum": 0.761,
+        "volatility": 0.568,
+        "volume": 0.406
+      },
+      "persistence_at_entry": 12,
+      "decision": {
+        "action": "ISSUE",
+        "mode": "EXPLORARE",
+        "reason": "inca nu am destule planuri inchise la scor ~53 (prag 20) - deschid ca sa invat",
+        "expected_value_r": null,
+        "calibrated_prob": null,
+        "agent_prob": 0.4857,
+        "agent_used": false
+      },
+      "geometry": "v3"
+    },
+    {
+      "id": 136,
+      "symbol": "GRAM/USDT",
+      "direction": "SHORT",
+      "created_ts": 1788830443.2204814,
+      "created_time": "2026-09-08 01:20 UTC",
+      "entry": 1.3971786,
+      "signal_price": 1.392,
+      "sl": 1.4075357,
+      "tp1": 1.323,
+      "tp2": 1.3178214,
+      "risk": 0.0103571,
+      "planned_r_tp2": 7.66,
+      "state": "PENDING",
+      "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
+      "realized_r": null,
+      "closed_ts": null,
+      "bars_checked": 0,
+      "score_at_entry": 29,
+      "components": {
+        "trend": 0.079,
+        "momentum": 0.63,
+        "volatility": 0.372,
+        "volume": 0.078
+      },
+      "persistence_at_entry": 9,
+      "decision": {
+        "action": "ISSUE",
+        "mode": "EXPLORARE",
+        "reason": "inca nu am destule planuri inchise la scor ~29 (prag 20) - deschid ca sa invat",
+        "expected_value_r": null,
+        "calibrated_prob": null,
+        "agent_prob": 0.4568,
+        "agent_used": false
+      },
+      "geometry": "v3"
     }
   ],
   "calibration": {
     "40": {
-      "total": 1,
-      "win_rate": 100.0,
-      "ci_low": 20.7,
-      "ci_high": 100.0,
-      "avg_r": 0.5,
+      "total": 2,
+      "win_rate": 50.0,
+      "ci_low": 9.5,
+      "ci_high": 90.5,
+      "avg_r": 0.25,
       "avg_win_r": 0.5,
-      "avg_loss_r": null,
+      "avg_loss_r": 0.0,
+      "reliable": false
+    },
+    "20": {
+      "total": 1,
+      "win_rate": 0.0,
+      "ci_low": 0.0,
+      "ci_high": 79.3,
+      "avg_r": 0.0,
+      "avg_win_r": null,
+      "avg_loss_r": 0.0,
       "reliable": false
     }
   },
@@ -4902,21 +4986,22 @@
     "legacy_closed": 95,
     "legacy_total_r": -28.0,
     "geometry": "v3",
-    "total_plans": 134,
+    "total_plans": 136,
     "open": 7,
-    "closed": 1,
+    "closed": 3,
     "by_state": {
       "SL_HIT": 81,
       "TP2_HIT": 8,
       "EXPIRED": 38,
-      "PENDING": 3,
-      "OPEN": 4
+      "NO_ENTRY": 2,
+      "OPEN": 4,
+      "PENDING": 3
     },
-    "win_rate": 100.0,
+    "win_rate": 33.3,
     "total_r": 0.5,
-    "avg_r": 0.5,
+    "avg_r": 0.167,
     "profit_factor": null,
     "best": 0.5,
-    "worst": 0.5
+    "worst": 0.0
   }
 }
