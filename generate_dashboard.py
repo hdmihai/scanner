@@ -31,6 +31,7 @@ WEIGHTS_HISTORY_FILE = os.path.join(DATA_DIR, "weights_history.json")
 AGENT_MODEL_FILE = os.path.join(DATA_DIR, "agent_model.json")
 PLANS_FILE = os.path.join(DATA_DIR, "plans.json")
 BRIEFING_FILE = os.path.join(DATA_DIR, "briefing.json")
+DETAILS_FILE = os.path.join(DATA_DIR, "latest_details.json")
 CHART_FILE = os.path.join(DATA_DIR, "latest_chart.json")
 OUTPUT_FILE = os.path.join(DOCS_DIR, "index.html")
 
@@ -359,6 +360,129 @@ STATE_STYLE = {
 }
 
 
+def render_sparkline(values, width=200, height=36):
+    """Linie de pret minimala, desenata ca SVG. Fara librarie, fara CDN."""
+    vals = [v for v in (values or []) if v is not None]
+    if len(vals) < 2:
+        return ""
+    vmax, vmin = max(vals), min(vals)
+    rng = (vmax - vmin) or (vmax or 1)
+    n = len(vals)
+    pts = " ".join(
+        f"{(i / (n - 1)) * width:.1f},{height - ((v - vmin) / rng) * height:.1f}"
+        for i, v in enumerate(vals))
+    up = vals[-1] >= vals[0]
+    color = "var(--bull)" if up else "var(--bear)"
+    return (f'<svg viewBox="0 0 {width} {height}" class="spark" preserveAspectRatio="none">'
+            f'<polyline points="{pts}" fill="none" stroke="{color}" stroke-width="1.5"/></svg>')
+
+
+def render_token_details(details, plans_store):
+    """Un panou pliabil per simbol scanat. Foloseste <details>/<summary> nativ:
+    zero JavaScript, merge in orice browser, se deschide cu un tap pe telefon,
+    si ramane inchis implicit ca pagina sa nu devina grea."""
+    symbols = (details or {}).get("symbols") or {}
+    if not symbols:
+        return '<p class="dim">Detaliile apar dupa prima scanare cu semnale.</p>'
+
+    # istoricul de planuri pe simbol, ca sa vezi ce a facut agentul pe fiecare
+    by_symbol = {}
+    for p in (plans_store or {}).get("plans", []):
+        by_symbol.setdefault(p["symbol"], []).append(p)
+
+    blocks = []
+    for sym, d in sorted(symbols.items(), key=lambda kv: -(kv[1].get("score") or 0)):
+        direction = d.get("direction", "")
+        dcls = "bull" if direction == "LONG" else "bear"
+        ind = d.get("indicators") or {}
+        st = ind.get("supertrend") or {}
+        vp = ind.get("volume_profile") or {}
+        macd = ind.get("macd") or {}
+        plan = d.get("plan") or {}
+
+        rows = []
+        if st:
+            rows.append(("SuperTrend", f'{st["direction"]} @ {fmt_price(st["level"])}',
+                         "bull" if st["direction"] == "BULLISH" else "bear"))
+        if ind.get("vwap"):
+            rows.append(("VWAP", fmt_price(ind["vwap"]), "info"))
+        if vp:
+            rows.append(("POC / VAH / VAL",
+                         f'{fmt_price(vp["poc"])} / {fmt_price(vp["vah"])} / {fmt_price(vp["val"])}', "warn"))
+        if macd:
+            rows.append(("MACD hist", f'{macd["histogram"]:+.6f}',
+                         "bull" if macd.get("bullish") else "bear"))
+        if ind.get("price_vs_value_area"):
+            rows.append(("Pozitie", ind["price_vs_value_area"], "info"))
+        ind_html = "".join(
+            f'<div class="ind-row"><span class="tag tag-{c}">{k}</span><span>{v}</span></div>'
+            for k, v, c in rows)
+
+        emas = ind.get("emas") or {}
+        ema_html = " &middot; ".join(f'{k.replace("ema", "EMA ")} {fmt_price(v)}'
+                                     for k, v in emas.items() if v is not None)
+
+        comp_html = "".join(
+            f'<div class="fib-row"><span>{k}</span><span>{v:.2f}</span></div>'
+            for k, v in (d.get("components") or {}).items())
+
+        plan_html = ""
+        if plan:
+            risk = abs(plan["entry"] - plan["sl"]) or 1
+            plan_html = f'''<div class="plan-grid" style="margin-top:8px;">
+          <div><span class="dim">ENTRY</span><br>{fmt_price(plan["entry"])}</div>
+          <div><span class="dim">SL</span><br>{fmt_price(plan["sl"])}</div>
+          <div><span class="dim">TP1</span><br>{fmt_price(plan["tp1"])}</div>
+          <div><span class="dim">TP2</span><br>{fmt_price(plan["tp2"])}</div>
+        </div>
+        <div class="dim" style="margin-top:6px;">
+          TP1 la {abs(plan["tp1"]-plan["entry"])/risk:.2f}R &middot;
+          TP2 la {abs(plan["tp2"]-plan["entry"])/risk:.2f}R
+        </div>'''
+
+        hist = by_symbol.get(sym, [])
+        closed = [p for p in hist if p.get("realized_r") is not None]
+        hist_html = '<p class="dim">Niciun plan inca pe acest simbol.</p>'
+        if hist:
+            tot = sum(p["realized_r"] for p in closed)
+            wins = [p for p in closed if p["realized_r"] > 0]
+            rows_h = "".join(
+                f'<div class="liq-row"><span>#{p["id"]}</span>'
+                f'<span>{p["direction"]}</span>'
+                f'<span class="dim">{p.get("state_detail", p["state"])[:26]}</span>'
+                f'<span class="{"r-pos" if (p.get("realized_r") or 0) > 0 else "r-neg"}">'
+                f'{f"{p[chr(34)+chr(34)] if False else p["realized_r"]:+.2f}R" if p.get("realized_r") is not None else "-"}</span></div>'
+                for p in sorted(hist, key=lambda x: -x["id"])[:6])
+            summary_h = (f'{len(closed)} inchise &middot; {100*len(wins)/len(closed):.0f}% castig '
+                         f'&middot; {tot:+.2f}R') if closed else f'{len(hist)} deschise'
+            hist_html = f'<div class="dim" style="margin-bottom:6px;">{summary_h}</div>' \
+                        f'<div class="liq-list">{rows_h}</div>'
+
+        blocks.append(f'''<details class="tok">
+      <summary>
+        <span class="tok-sym">{sym}</span>
+        <span class="badge badge-{dcls}">{direction}</span>
+        <span class="tok-score">{d.get("score")}/100</span>
+        <span class="tok-spark">{render_sparkline(d.get("sparkline"))}</span>
+      </summary>
+      <div class="tok-body">
+        <div class="tok-meta">
+          <div><span class="dim">PRET</span><br>{fmt_price(d.get("price"))}</div>
+          <div><span class="dim">ATR</span><br>{fmt_price(d.get("atr"))}</div>
+          <div><span class="dim">PERSISTENTA</span><br>{d.get("persistence")}</div>
+          <div><span class="dim">PROBABILITATE</span><br>{d.get("probability")}%</div>
+        </div>
+        <h4>Plan propus</h4>{plan_html}
+        <h4>Indicatori</h4>{ind_html}
+        <div class="ema-line dim">{ema_html}</div>
+        <h4>Componentele scorului</h4><div class="fib-list">{comp_html}</div>
+        <h4>Istoricul planurilor pe acest simbol</h4>{hist_html}
+      </div>
+    </details>''')
+
+    return "".join(blocks)
+
+
 def render_briefing(brief):
     if not brief or not brief.get("text"):
         return ""
@@ -515,7 +639,7 @@ def render_learning_curve(history, weights_history, health, agent_state=None):
     '''
 
 
-def build_html(scan, best, deep, chart, health, weights, session, token_meta, narrative, history, weights_history, agent_state, plans_store, briefing):
+def build_html(scan, best, deep, chart, health, weights, session, token_meta, narrative, history, weights_history, agent_state, plans_store, briefing, details):
     plan_html = render_plan(best, deep)
     levels_html = render_levels(deep)
     liquidity_html = render_liquidity(deep)
@@ -526,6 +650,7 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
     calibration_html = render_calibration(plans_store)
     indicators_html = render_indicators(deep)
     briefing_html = render_briefing(briefing)
+    tokens_html = render_token_details(details, plans_store)
     chart_svg = render_svg_chart(chart)
     weight_bars = render_weight_bars(weights)
     long_rows = render_opportunity_rows(scan.get("top_long", []))
@@ -633,6 +758,25 @@ header{{display:flex;justify-content:space-between;align-items:baseline;
 .agent-metrics{{display:grid;grid-template-columns:1fr 1fr;gap:10px;
   font-family:var(--font-mono);font-size:14px;}}
 .agent-metrics div{{background:var(--panel-2);border-radius:7px;padding:8px 10px;}}
+.tok{{background:var(--panel-2);border-radius:8px;margin-bottom:8px;
+  border-left:3px solid var(--border);overflow:hidden;}}
+.tok[open]{{border-left-color:var(--amber);}}
+.tok summary{{display:flex;align-items:center;gap:10px;padding:11px 13px;cursor:pointer;
+  list-style:none;font-family:var(--font-mono);font-size:13px;}}
+.tok summary::-webkit-details-marker{{display:none;}}
+.tok summary::before{{content:"+";color:var(--text-dim);font-weight:700;width:10px;flex:none;}}
+.tok[open] summary::before{{content:"-";}}
+.tok-sym{{font-weight:700;flex:none;}}
+.tok-score{{color:var(--text-dim);margin-left:auto;flex:none;}}
+.tok-spark{{width:70px;height:24px;flex:none;display:block;}}
+.spark{{width:100%;height:100%;display:block;}}
+.tok-body{{padding:0 13px 14px;border-top:1px solid var(--border);}}
+.tok-body h4{{font-size:10px;text-transform:uppercase;letter-spacing:.07em;
+  color:var(--text-dim);margin:14px 0 6px;font-weight:600;}}
+.tok-meta{{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:12px;
+  font-family:var(--font-mono);font-size:13px;}}
+@media(min-width:520px){{.tok-meta{{grid-template-columns:repeat(4,1fr);}}}}
+.tok-meta div{{background:var(--panel);border-radius:6px;padding:7px 9px;}}
 .briefing-card{{margin-bottom:14px;border-left:3px solid var(--amber);}}
 .briefing-text{{font-size:14px;line-height:1.7;margin:0;}}
 .plan-summary{{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;
@@ -739,6 +883,11 @@ footer{{margin-top:26px;color:var(--text-dim);font-size:11px;line-height:1.6;}}
       </div>
 
       <div class="card">
+        <h2>Detalii per token &middot; <span class="dim">apasa pentru a deschide</span></h2>
+        {tokens_html}
+      </div>
+
+      <div class="card">
         <h2>Top long</h2>
         <table><tr><th>Symbol</th><th>Score</th><th>Prob</th><th>Pers</th></tr>{long_rows}</table>
       </div>
@@ -817,6 +966,7 @@ def main():
     agent_state = load_json(AGENT_MODEL_FILE, {})
     plans_store = load_json(PLANS_FILE, {})
     briefing = load_json(BRIEFING_FILE, {})
+    details = load_json(DETAILS_FILE, {})
 
     scan = history[-1] if history else {"scan_time": "-", "universe_size": 0, "top_long": [], "top_short": []}
     best = scan.get("best_candidate")
@@ -832,7 +982,7 @@ def main():
             narrative = None  # narativul e vechi, pt alt candidat - nu-l arat ca fiind curent
 
     os.makedirs(DOCS_DIR, exist_ok=True)
-    html = build_html(scan, best, deep, chart, health, weights, session, token_meta, narrative, history, weights_history, agent_state, plans_store, briefing)
+    html = build_html(scan, best, deep, chart, health, weights, session, token_meta, narrative, history, weights_history, agent_state, plans_store, briefing, details)
     with open(OUTPUT_FILE, "w") as f:
         f.write(html)
     print(f"Dashboard generat: {OUTPUT_FILE}")
