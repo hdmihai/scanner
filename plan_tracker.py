@@ -351,6 +351,11 @@ def build_calibration(store, bucket_size=20):
             continue
         if p.get("geometry", "v1") != GEOMETRY_VERSION:
             continue  # geometrie veche: rezultatele nu sunt comparabile
+        if p.get("state") == STATE_NO_ENTRY:
+            continue  # pretul nu a revenit la intrare: nicio tranzactie, deci
+            # niciun rezultat de calibrat. Le lasam inauntru ar fi insemnat sa le
+            # numaram ca pierderi (realized_r = 0.0 nu e > 0), coborand artificial
+            # rata de succes si invatand agentul ca acele configuratii esueaza.
         score = p.get("score_at_entry")
         if score is None:
             continue
@@ -459,7 +464,9 @@ def decide(calibration, signal, agent_pred=None, bucket_size=20):
 def summarize(store):
     plans = store["plans"]
     all_closed = [p for p in plans if p["state"] in CLOSED_STATES and p.get("realized_r") is not None]
-    closed = [p for p in all_closed if p.get("geometry", "v1") == GEOMETRY_VERSION]
+    current_geo = [p for p in all_closed if p.get("geometry", "v1") == GEOMETRY_VERSION]
+    no_entry = [p for p in current_geo if p.get("state") == STATE_NO_ENTRY]
+    closed = [p for p in current_geo if p.get("state") != STATE_NO_ENTRY]
     legacy = [p for p in all_closed if p.get("geometry", "v1") != GEOMETRY_VERSION]
     open_plans = [p for p in plans if p["state"] not in CLOSED_STATES]
 
@@ -478,6 +485,8 @@ def summarize(store):
         profit_factor = round(gross_win / gross_loss, 2) if gross_loss > 0 else None
 
     return {
+        "no_entry": len(no_entry),
+        "no_entry_pct": round(100 * len(no_entry) / len(current_geo), 1) if current_geo else None,
         "legacy_closed": len(legacy),
         "legacy_total_r": round(sum(p["realized_r"] for p in legacy), 2) if legacy else None,
         "geometry": GEOMETRY_VERSION,
