@@ -32,7 +32,7 @@ REGULI EXPLICITE (ca sa nu-mi umflu rezultatele)
 
 CE FACE IN PLUS FATA DE POZE
 ----------------------------
-Pozele arata stari de plan ("TP1 HIT · CLOSED", "SL / INVALIDATED"), dar
+Pozele arata stari de plan ("TP1 HIT - CLOSED", "SL / INVALIDATED"), dar
 afiseaza si procente de tip "86% confirmed" care nu par sa fie masurate din
 rezultate. Aici probabilitatea afisata e CALIBRATA din planurile inchise
 efectiv, cu interval de incredere Wilson, si spun explicit cand nu am destule
@@ -245,10 +245,18 @@ def evaluate_plan(plan, candles):
         if plan["state"] == STATE_PENDING:
             plan["bars_checked"] = waited
             return False
-        # de aici incolo evaluez doar barele de DUPA intrare
+
+    # BUG FIX (idempotenta, gasit la testul de 2000 de variante):
+    # faza de tranzactie incepe de la INTRARE, nu de la creare. Filtrul asta
+    # trebuie sa se aplice SI cand planul e deja OPEN dintr-o evaluare
+    # anterioara - atunci blocul PENDING de mai sus e sarit complet. Fara el,
+    # reevaluarea verifica SL si TP pe barele de DINAINTE de intrare: la un
+    # LONG care mai intai a urcat la TP1 si abia apoi a coborat la zona de
+    # intrare, a doua trecere inregistra fals TP1, apoi iesirea la breakeven.
+    if plan.get("entered_ts"):
         relevant = [c for c in relevant if c[0] / 1000.0 >= plan["entered_ts"]]
-        if not relevant:
-            return True
+    if not relevant:
+        return plan["state"] != STATE_PENDING
 
     # BUG FIX (idempotenta): retin MOMENTUL cand s-a atins TP1, nu doar un
     # boolean. Fara asta, la reevaluarea planului - se intampla la FIECARE
@@ -283,10 +291,10 @@ def evaluate_plan(plan, candles):
             if after_tp1:
                 # jumatate luata la TP1, restul iesit la breakeven
                 r = TP1_FRACTION * _r_at(tp1, entry, sl, direction)
-                plan["state_detail"] = "TP1 HIT · SL LA BREAKEVEN"
+                plan["state_detail"] = "TP1 HIT - SL LA BREAKEVEN"
             else:
                 r = -1.0
-                plan["state_detail"] = "SL HIT · INVALIDATED"
+                plan["state_detail"] = "SL HIT - INVALIDATED"
             plan["state"] = STATE_SL
             plan["realized_r"] = round(r, 3)
             plan["closed_ts"] = bar_ts
@@ -299,7 +307,7 @@ def evaluate_plan(plan, candles):
             r = (TP1_FRACTION * r_tp1 + (1 - TP1_FRACTION) * r_tp2
                  if tp1_ts is not None else r_tp2)
             plan["state"] = STATE_TP2
-            plan["state_detail"] = "TP2 HIT · CLOSED"
+            plan["state_detail"] = "TP2 HIT - CLOSED"
             plan["realized_r"] = round(r, 3)
             plan["closed_ts"] = bar_ts
             changed = True
@@ -309,7 +317,7 @@ def evaluate_plan(plan, candles):
             tp1_ts = bar_ts
             plan["tp1_hit_ts"] = bar_ts
             plan["state"] = STATE_TP1
-            plan["state_detail"] = "TP1 HIT · RULEAZA SPRE TP2"
+            plan["state_detail"] = "TP1 HIT - RULEAZA SPRE TP2"
             changed = True
 
         if bars >= MAX_BARS:
@@ -332,8 +340,12 @@ def evaluate_plan(plan, candles):
 def wilson_interval(successes, total, z=1.96):
     """Interval de incredere Wilson - onest si la esantioane mici, spre
     deosebire de intervalul normal care da rezultate absurde acolo."""
-    if total == 0:
+    if total <= 0:
         return (0.0, 1.0)
+    # Aparare: un `successes` peste `total` (date corupte, contor desincronizat)
+    # ar da p > 1, iar p*(1-p) negativ sub radical - math domain error, care ar
+    # opri intreg workflow-ul. Marginile se limiteaza in loc sa crape.
+    successes = max(0, min(successes, total))
     p = successes / total
     denom = 1 + z * z / total
     center = (p + z * z / (2 * total)) / denom
