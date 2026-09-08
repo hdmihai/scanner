@@ -1,19 +1,33 @@
 {
-  "text": "Din 34 planuri inchise, rata de succes e 13.3%, cu -23.33R cumulat (-0.778R in medie pe plan) si profit factor 0.1. 22 planuri sunt inca deschise. Separat, 95 planuri inchise (-28.00R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #143 FET/USDT +0.83R, #157 BNB/USDT +0.73R, #166 LTC/USDT -1.00R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 30)).",
+  "text": "Din 36 planuri inchise, rata de succes e 15.6%, cu -21.58R cumulat (-0.675R in medie pe plan) si profit factor 0.2. 21 planuri sunt inca deschise. Separat, 95 planuri inchise (-28.00R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #147 UNI/USDT -1.00R, #156 ATOM/USDT +2.75R, #143 FET/USDT +0.83R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 32)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-08 20:22 UTC",
+    "scan_time": "2026-09-08 21:19 UTC",
     "universe_size": 20,
-    "plans_total": 182,
-    "plans_open": 22,
-    "plans_closed": 34,
+    "plans_total": 183,
+    "plans_open": 21,
+    "plans_closed": 36,
     "legacy_closed": 95,
     "legacy_total_r": -28.0,
-    "win_rate": 13.3,
-    "total_r": -23.33,
-    "avg_r": -0.778,
-    "profit_factor": 0.1,
+    "win_rate": 15.6,
+    "total_r": -21.58,
+    "avg_r": -0.675,
+    "profit_factor": 0.2,
     "recent_closed": [
+      {
+        "id": 147,
+        "symbol": "UNI/USDT",
+        "direction": "LONG",
+        "state": "SL HIT - INVALIDATED",
+        "r": -1.0
+      },
+      {
+        "id": 156,
+        "symbol": "ATOM/USDT",
+        "direction": "LONG",
+        "state": "TP2 HIT - CLOSED",
+        "r": 2.75
+      },
       {
         "id": 143,
         "symbol": "FET/USDT",
@@ -34,23 +48,15 @@
         "direction": "LONG",
         "state": "SL HIT \u00b7 INVALIDATED",
         "r": -1.0
-      },
-      {
-        "id": 168,
-        "symbol": "POL/USDT",
-        "direction": "LONG",
-        "state": "SL HIT \u00b7 INVALIDATED",
-        "r": -1.0
-      },
-      {
-        "id": 165,
-        "symbol": "OP/USDT",
-        "direction": "LONG",
-        "state": "SL HIT \u00b7 INVALIDATED",
-        "r": -1.0
       }
     ],
     "open_now": [
+      {
+        "id": 183,
+        "symbol": "ATOM/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
       {
         "id": 182,
         "symbol": "LINK/USDT",
@@ -74,27 +80,21 @@
         "symbol": "BNB/USDT",
         "direction": "LONG",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 178,
-        "symbol": "POL/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
       }
     ],
     "best_bucket": null,
     "worst_bucket": null,
     "agent_status": "SHADOW",
-    "agent_reason": "are nevoie de 300 exemple (are 30)",
-    "agent_samples": 30,
+    "agent_reason": "are nevoie de 300 exemple (are 32)",
+    "agent_samples": 32,
     "agent_balanced": null,
     "baseline_balanced": null,
     "agent_weights": {
-      "trend": -0.040869,
-      "momentum": -0.112052,
-      "volatility": -0.220556,
-      "volume": -0.14907,
-      "is_long": -0.196741,
+      "trend": -0.027207,
+      "momentum": -0.082195,
+      "volatility": -0.211221,
+      "volume": -0.129147,
+      "is_long": -0.17393,
       "persistence_n": -0.019283
     }
   }
