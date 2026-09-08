@@ -83,30 +83,49 @@ jobs:
         # status, durata). NU atinge datele agentului: plans.json,
         # agent_model.json si scan_history.json sunt comise in git de pasul de
         # mai sus, deci traiesc in istoricul repo-ului, nu in run-uri.
-        # Workflow-ul nu foloseste artifacts, deci nu se pierde nimic functional.
-        # Ce se pierde: logurile mai vechi de 30 de rulari, adica ~5 zile de
-        # diagnostic la cadenta de 4h. Suficient pentru depanare.
+        #
+        # BUG FIX: varianta anterioara folosea felierea in jq cu variabila
+        # interpolata din shell: .['"${KEEP}"':]. Dupa expandare rezulta
+        # .["30":] - felie pe STRING - in loc de .[30:] - felie pe numar. jq
+        # dadea eroare, lista de id-uri ramanea goala, iar continue-on-error
+        # inghitea esecul in tacere. Rezultat: 128 de rulari acumulate in loc de 30.
+        # Acum jq scoate TOATE id-urile sortate, iar decuparea o face `tail` in
+        # shell - fara interpolare in interiorul filtrului, deci fara ambiguitate.
         if: always()
         continue-on-error: true   # curatenia nu are voie sa strice scanarea
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           KEEP: 30
         run: |
+          set -o pipefail
           # Exclud run-urile in curs sau in asteptare - altfel acest run s-ar
           # sterge singur, iar API-ul ar returna eroare.
-          # Fara --paginate intentionat: `gh api --paginate` aplica filtrul --jq
-          # pe FIECARE pagina separat, deci ar pastra 30 de run-uri din fiecare
-          # pagina in loc de 30 in total. Cu per_page=100 acopar cazul normal;
-          # daca vreodata sunt mai multe, se curata progresiv la rulari succesive.
-          ids=$(gh api \
-            "repos/${GITHUB_REPOSITORY}/actions/workflows/scan.yml/runs?per_page=100" \
-            --jq '.workflow_runs
-                  | map(select(.status != "in_progress" and .status != "queued"))
-                  | sort_by(.created_at) | reverse
-                  | .['"${KEEP}"':] | .[].id')
-          count=$(echo "$ids" | grep -c . || true)
-          echo "Run-uri de sters (pastrez ultimele ${KEEP}): ${count}"
+          if ! all_ids=$(gh api \
+              "repos/${GITHUB_REPOSITORY}/actions/workflows/scan.yml/runs?per_page=100" \
+              --jq '.workflow_runs
+                    | map(select(.status != "in_progress" and .status != "queued"))
+                    | sort_by(.created_at) | reverse
+                    | .[].id'); then
+            echo "[!] Nu am putut lista run-urile (API sau permisiuni). Sar peste curatare."
+            exit 0
+          fi
+
+          total=$(printf '%s\n' "$all_ids" | grep -c . || true)
+          ids=$(printf '%s\n' "$all_ids" | tail -n +$((KEEP + 1)))
+          count=$(printf '%s\n' "$ids" | grep -c . || true)
+          echo "Run-uri finalizate: ${total}. Pastrez ${KEEP}, sterg ${count}."
+
+          deleted=0; failed=0
           for id in $ids; do
-            gh api -X DELETE "repos/${GITHUB_REPOSITORY}/actions/runs/$id" \
-              && echo "  sters $id" || echo "  [!] nu am putut sterge $id"
+            if gh api -X DELETE "repos/${GITHUB_REPOSITORY}/actions/runs/$id" >/dev/null 2>&1; then
+              deleted=$((deleted + 1))
+            else
+              failed=$((failed + 1))
+              echo "  [!] nu am putut sterge run-ul $id"
+            fi
           done
+          echo "Sterse: ${deleted}. Esuate: ${failed}."
+          if [ "$count" -gt 0 ] && [ "$deleted" -eq 0 ]; then
+            echo "[!] ATENTIE: aveam ${count} de sters si niciunul nu a mers."
+            echo "    Verifica permisiunea 'actions: write' din workflow."
+          fi
