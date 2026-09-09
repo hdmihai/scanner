@@ -92,7 +92,8 @@ STATE_SL = "SL_HIT"
 STATE_EXPIRED = "EXPIRED"
 CLOSED_STATES = (STATE_TP2, STATE_SL, STATE_EXPIRED, STATE_NO_ENTRY)
 
-MAX_WAIT_BARS = 8   # cate bare astept revenirea la zona de intrare
+MAX_WAIT_BARS = 8      # cate bare astept revenirea la zona de intrare
+DEFAULT_BAR_SECONDS = 3600   # 1h; se salveaza pe fiecare plan la creare
 
 
 # ============================== PERSISTENTA ================================
@@ -204,6 +205,7 @@ def create_plan(store, signal, plan_levels, decision):
         "persistence_at_entry": signal.get("persistence"),
         "decision": decision,
         "geometry": GEOMETRY_VERSION,
+        "bar_seconds": signal.get("bar_seconds", DEFAULT_BAR_SECONDS),
     }
     store["plans"].append(plan)
     store["next_id"] += 1
@@ -250,6 +252,14 @@ def evaluate_plan(plan, candles):
 
     # FAZA 1: planul asteapta ca pretul sa revina la zona de intrare
     if plan["state"] == STATE_PENDING:
+        # BUG FIX: asteptarea se masoara in TIMP, nu numarand barele primite in
+        # apelul curent. Scanarea live trimite toate lumanarile de la creare, deci
+        # numaratoarea iesea corecta; backtest-ul trimite cate UNA, deci contorul
+        # ramanea mereu 1 si NO_ENTRY nu se declansa niciodata - backtest-ul nu
+        # modela deloc expirarea pullback-ului. Criteriul de timp e identic in
+        # ambele moduri si e si idempotent la reevaluari suprapuse.
+        bar_seconds = plan.get("bar_seconds") or DEFAULT_BAR_SECONDS
+        deadline = plan["created_ts"] + MAX_WAIT_BARS * bar_seconds
         waited = 0
         for c in relevant:
             waited += 1
@@ -260,7 +270,7 @@ def evaluate_plan(plan, candles):
                 plan["state_detail"] = "INTRARE ATINSA - pozitie activa"
                 plan["entered_ts"] = bar_ts
                 break
-            if waited >= MAX_WAIT_BARS:
+            if bar_ts >= deadline:
                 plan["state"] = STATE_NO_ENTRY
                 plan["state_detail"] = f"PRETUL NU A REVENIT in {MAX_WAIT_BARS} bare - anulat"
                 plan["realized_r"] = 0.0   # niciun trade: nicio pierdere si niciun cost
