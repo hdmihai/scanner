@@ -58,7 +58,7 @@ PLANS_FILE = os.path.join(DATA_DIR, "plans.json")
 # sisteme, deci antrenarea pe amandoua ar invata media a doua functii diferite.
 # La schimbarea geometriei, agentul reporneste - costa exemplele acumulate, dar
 # oricum ramane in SHADOW pana la 300, deci pierderea e doar contabila.
-STATE_SOURCE = "plans-v3-auc"
+STATE_SOURCE = "plans-v4"
 # Versiunea urcata odata cu adaugarea metricilor pentru date dezechilibrate
 # (AUC, prag de clasa majoritara, rata de predictii pozitive). Perechile
 # (predictie, rezultat) pe care se calculeaza se acumuleaza doar la invatare,
