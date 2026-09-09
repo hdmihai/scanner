@@ -31,6 +31,12 @@ jobs:
       - name: Instaleaza dependinte
         run: pip install ccxt requests
 
+      - name: Verifica compatibilitatea cu Python 3.11
+        # Ruleaza INAINTE de orice altceva: daca un fisier are sintaxa valida
+        # doar pe 3.12 (f-string-uri imbricate, PEP 701), pica aici cu mesaj
+        # clar, in loc sa opreasca workflow-ul la jumatate cu SyntaxError.
+        run: python check_py311.py
+
       - name: Ruleaza scannerul (fallback de exchange e acum intern, in cod)
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
