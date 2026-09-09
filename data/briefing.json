@@ -1,12 +1,12 @@
 {
-  "text": "Din 45 planuri inchise, rata de succes e 14.7%, cu -23.58R cumulat (-0.694R in medie pe plan) si profit factor 0.19. 20 planuri sunt inca deschise. Separat, 95 planuri inchise (-28.00R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #160 NEAR/USDT -1.00R, #175 UNI/USDT +0.00R, #177 GRAM/USDT +0.00R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 34)).",
+  "text": "Din 47 planuri inchise, rata de succes e 14.7%, cu -23.58R cumulat (-0.694R in medie pe plan) si profit factor 0.19. 21 planuri sunt inca deschise. Separat, 95 planuri inchise (-28.00R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #181 LTC/USDT +0.00R, #182 LINK/USDT +0.00R, #160 NEAR/USDT -1.00R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 34)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-09 03:21 UTC",
+    "scan_time": "2026-09-09 04:21 UTC",
     "universe_size": 20,
-    "plans_total": 191,
-    "plans_open": 20,
-    "plans_closed": 45,
+    "plans_total": 194,
+    "plans_open": 21,
+    "plans_closed": 47,
     "legacy_closed": 95,
     "legacy_total_r": -28.0,
     "win_rate": 14.7,
@@ -14,6 +14,20 @@
     "avg_r": -0.694,
     "profit_factor": 0.19,
     "recent_closed": [
+      {
+        "id": 181,
+        "symbol": "LTC/USDT",
+        "direction": "SHORT",
+        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
+        "r": 0.0
+      },
+      {
+        "id": 182,
+        "symbol": "LINK/USDT",
+        "direction": "SHORT",
+        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
+        "r": 0.0
+      },
       {
         "id": 160,
         "symbol": "NEAR/USDT",
@@ -34,23 +48,27 @@
         "direction": "SHORT",
         "state": "PRETUL NU A REVENIT in 8 bare - anulat",
         "r": 0.0
-      },
-      {
-        "id": 179,
-        "symbol": "BNB/USDT",
-        "direction": "LONG",
-        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
-        "r": 0.0
-      },
-      {
-        "id": 173,
-        "symbol": "OP/USDT",
-        "direction": "SHORT",
-        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
-        "r": 0.0
       }
     ],
     "open_now": [
+      {
+        "id": 194,
+        "symbol": "LTC/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 193,
+        "symbol": "LINK/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 192,
+        "symbol": "NEAR/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
       {
         "id": 191,
         "symbol": "UNI/USDT",
@@ -62,24 +80,6 @@
         "symbol": "BNB/USDT",
         "direction": "LONG",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 189,
-        "symbol": "ETH/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 188,
-        "symbol": "OP/USDT",
-        "direction": "SHORT",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 187,
-        "symbol": "AAVE/USDT",
-        "direction": "SHORT",
-        "state": "INTRARE ATINSA - pozitie activa"
       }
     ],
     "best_bucket": null,
