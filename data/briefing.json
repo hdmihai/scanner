@@ -1,12 +1,12 @@
 {
-  "text": "Din 40 planuri inchise, rata de succes e 15.2%, cu -22.58R cumulat (-0.684R in medie pe plan) si profit factor 0.19. 21 planuri sunt inca deschise. Separat, 95 planuri inchise (-28.00R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #169 AAVE/USDT +0.00R, #159 DOT/USDT +0.00R, #161 DOGE/USDT +0.00R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 33)).",
+  "text": "Din 41 planuri inchise, rata de succes e 15.2%, cu -22.58R cumulat (-0.684R in medie pe plan) si profit factor 0.19. 21 planuri sunt inca deschise. Separat, 95 planuri inchise (-28.00R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #173 OP/USDT +0.00R, #169 AAVE/USDT +0.00R, #159 DOT/USDT +0.00R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 33)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-09 00:31 UTC",
+    "scan_time": "2026-09-09 01:20 UTC",
     "universe_size": 20,
-    "plans_total": 187,
+    "plans_total": 188,
     "plans_open": 21,
-    "plans_closed": 40,
+    "plans_closed": 41,
     "legacy_closed": 95,
     "legacy_total_r": -28.0,
     "win_rate": 15.2,
@@ -14,6 +14,13 @@
     "avg_r": -0.684,
     "profit_factor": 0.19,
     "recent_closed": [
+      {
+        "id": 173,
+        "symbol": "OP/USDT",
+        "direction": "SHORT",
+        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
+        "r": 0.0
+      },
       {
         "id": 169,
         "symbol": "AAVE/USDT",
@@ -41,21 +48,20 @@
         "direction": "LONG",
         "state": "SL HIT - INVALIDATED",
         "r": -1.0
-      },
-      {
-        "id": 156,
-        "symbol": "ATOM/USDT",
-        "direction": "LONG",
-        "state": "TP2 HIT - CLOSED",
-        "r": 2.75
       }
     ],
     "open_now": [
       {
+        "id": 188,
+        "symbol": "OP/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
         "id": 187,
         "symbol": "AAVE/USDT",
         "direction": "SHORT",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
+        "state": "INTRARE ATINSA - pozitie activa"
       },
       {
         "id": 186,
@@ -72,12 +78,6 @@
       {
         "id": 184,
         "symbol": "DOGE/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 183,
-        "symbol": "ATOM/USDT",
         "direction": "LONG",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       }
