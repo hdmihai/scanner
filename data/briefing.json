@@ -1,121 +1,65 @@
 {
-  "text": "Din 79 planuri inchise, rata de succes e 13.3%, cu -42.20R cumulat (-0.703R in medie pe plan) si profit factor 0.19. 15 planuri sunt inca deschise. Separat, 95 planuri inchise (-28.00R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #206 GRAM/USDT +0.00R, #205 ETH/USDT -1.00R, #217 XRP/USDT -1.00R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 60)).",
+  "text": "11 planuri sunt deschise, niciunul inchis inca. Pana la primele inchideri nu pot spune nimic despre performanta - orice cifra ar fi speculatie. Separat, 174 planuri inchise (-70.20R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 0)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-09 20:21 UTC",
+    "scan_time": "2026-09-09 20:41 UTC",
     "universe_size": 20,
-    "plans_total": 220,
-    "plans_open": 15,
-    "plans_closed": 79,
-    "legacy_closed": 95,
-    "legacy_total_r": -28.0,
-    "win_rate": 13.3,
-    "total_r": -42.2,
-    "avg_r": -0.703,
-    "profit_factor": 0.19,
-    "recent_closed": [
-      {
-        "id": 206,
-        "symbol": "GRAM/USDT",
-        "direction": "SHORT",
-        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
-        "r": 0.0
-      },
-      {
-        "id": 205,
-        "symbol": "ETH/USDT",
-        "direction": "LONG",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.0
-      },
-      {
-        "id": 217,
-        "symbol": "XRP/USDT",
-        "direction": "LONG",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.0
-      },
-      {
-        "id": 199,
-        "symbol": "ARB/USDT",
-        "direction": "SHORT",
-        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
-        "r": 0.0
-      },
-      {
-        "id": 162,
-        "symbol": "ADA/USDT",
-        "direction": "LONG",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.0
-      }
-    ],
+    "plans_total": 231,
+    "plans_open": 11,
+    "plans_closed": 0,
+    "legacy_closed": 174,
+    "legacy_total_r": -70.2,
+    "win_rate": null,
+    "total_r": 0,
+    "avg_r": null,
+    "profit_factor": null,
+    "recent_closed": [],
     "open_now": [
       {
-        "id": 220,
-        "symbol": "DOGE/USDT",
+        "id": 231,
+        "symbol": "OP/USDT",
         "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       },
       {
-        "id": 219,
+        "id": 230,
+        "symbol": "LTC/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 229,
+        "symbol": "UNI/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 228,
+        "symbol": "AAVE/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 227,
         "symbol": "ARB/USDT",
         "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 218,
-        "symbol": "AVAX/USDT",
-        "direction": "LONG",
-        "state": "INTRARE ATINSA - pozitie activa"
-      },
-      {
-        "id": 216,
-        "symbol": "POL/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 215,
-        "symbol": "NEAR/USDT",
-        "direction": "LONG",
-        "state": "INTRARE ATINSA - pozitie activa"
       }
     ],
-    "best_bucket": {
-      "range": "20-39",
-      "total": 33,
-      "win_rate": 6.1,
-      "ci_low": 1.7,
-      "ci_high": 19.6,
-      "avg_r": -0.883,
-      "avg_win_r": 0.935,
-      "avg_loss_r": 1.0,
-      "reliable": true
-    },
-    "worst_bucket": {
-      "range": "20-39",
-      "total": 33,
-      "win_rate": 6.1,
-      "ci_low": 1.7,
-      "ci_high": 19.6,
-      "avg_r": -0.883,
-      "avg_win_r": 0.935,
-      "avg_loss_r": 1.0,
-      "reliable": true
-    },
+    "best_bucket": null,
+    "worst_bucket": null,
     "agent_status": "SHADOW",
-    "agent_reason": "are nevoie de 300 exemple (are 60)",
-    "agent_samples": 60,
-    "agent_balanced": 77.14285714285715,
-    "baseline_balanced": 20.0,
+    "agent_reason": "are nevoie de 300 exemple (are 0)",
+    "agent_samples": 0,
+    "agent_balanced": null,
+    "baseline_balanced": null,
     "agent_weights": {
-      "trend": -0.017055,
-      "momentum": -0.137689,
-      "volatility": -0.327093,
-      "volume": -0.221497,
-      "is_long": -0.221569,
-      "persistence_n": -0.156504
+      "trend": 0.0,
+      "momentum": 0.0,
+      "volatility": 0.0,
+      "volume": 0.0,
+      "is_long": 0.0,
+      "persistence_n": 0.0
     }
   }
 }
