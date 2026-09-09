@@ -6032,10 +6032,10 @@
       "tp2": 8.2818571,
       "risk": 0.0747143,
       "planned_r_tp2": 4.5,
-      "state": "OPEN",
-      "state_detail": "INTRARE ATINSA - pozitie activa",
-      "realized_r": null,
-      "closed_ts": null,
+      "state": "SL_HIT",
+      "state_detail": "SL HIT - INVALIDATED",
+      "realized_r": -1.0,
+      "closed_ts": 1788966000.0,
       "bars_checked": 19,
       "score_at_entry": 32,
       "components": {
@@ -6055,7 +6055,8 @@
         "agent_used": false
       },
       "geometry": "v3",
-      "entered_ts": 1788901200.0
+      "entered_ts": 1788901200.0,
+      "agent_trained": true
     },
     {
       "id": 165,
@@ -7979,11 +7980,11 @@
       "reliable": false
     },
     "20": {
-      "total": 31,
-      "win_rate": 6.5,
-      "ci_low": 1.8,
-      "ci_high": 20.7,
-      "avg_r": -0.875,
+      "total": 32,
+      "win_rate": 6.2,
+      "ci_low": 1.7,
+      "ci_high": 20.1,
+      "avg_r": -0.879,
       "avg_win_r": 0.935,
       "avg_loss_r": 1.0,
       "reliable": true
@@ -8011,24 +8012,24 @@
   },
   "summary": {
     "no_entry": 17,
-    "no_entry_pct": 23.9,
+    "no_entry_pct": 23.6,
     "legacy_closed": 95,
     "legacy_total_r": -28.0,
     "geometry": "v3",
     "total_plans": 214,
-    "open": 17,
-    "closed": 54,
+    "open": 16,
+    "closed": 55,
     "by_state": {
-      "SL_HIT": 132,
+      "SL_HIT": 133,
       "TP2_HIT": 10,
       "EXPIRED": 38,
       "NO_ENTRY": 17,
-      "OPEN": 11,
+      "OPEN": 10,
       "PENDING": 6
     },
-    "win_rate": 14.8,
-    "total_r": -36.2,
-    "avg_r": -0.67,
+    "win_rate": 14.5,
+    "total_r": -37.2,
+    "avg_r": -0.676,
     "profit_factor": 0.21,
     "best": 2.75,
     "worst": -1.0
