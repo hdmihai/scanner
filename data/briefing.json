@@ -1,19 +1,33 @@
 {
-  "text": "Din 64 planuri inchise, rata de succes e 12.5%, cu -33.83R cumulat (-0.705R in medie pe plan) si profit factor 0.19. 16 planuri sunt inca deschise. Separat, 95 planuri inchise (-28.00R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #197 LINK/USDT -1.00R, #198 UNI/USDT -1.00R, #186 DOT/USDT -1.00R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 48)).",
+  "text": "Din 66 planuri inchise, rata de succes e 12.2%, cu -34.83R cumulat (-0.711R in medie pe plan) si profit factor 0.19. 17 planuri sunt inca deschise. Separat, 95 planuri inchise (-28.00R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #195 NEAR/USDT +0.00R, #200 AAVE/USDT -1.00R, #197 LINK/USDT -1.00R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 49)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-09 13:23 UTC",
+    "scan_time": "2026-09-09 14:21 UTC",
     "universe_size": 20,
-    "plans_total": 206,
-    "plans_open": 16,
-    "plans_closed": 64,
+    "plans_total": 209,
+    "plans_open": 17,
+    "plans_closed": 66,
     "legacy_closed": 95,
     "legacy_total_r": -28.0,
-    "win_rate": 12.5,
-    "total_r": -33.83,
-    "avg_r": -0.705,
+    "win_rate": 12.2,
+    "total_r": -34.83,
+    "avg_r": -0.711,
     "profit_factor": 0.19,
     "recent_closed": [
+      {
+        "id": 195,
+        "symbol": "NEAR/USDT",
+        "direction": "LONG",
+        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
+        "r": 0.0
+      },
+      {
+        "id": 200,
+        "symbol": "AAVE/USDT",
+        "direction": "SHORT",
+        "state": "SL HIT - INVALIDATED",
+        "r": -1.0
+      },
       {
         "id": 197,
         "symbol": "LINK/USDT",
@@ -34,23 +48,27 @@
         "direction": "LONG",
         "state": "SL HIT - INVALIDATED",
         "r": -1.0
-      },
-      {
-        "id": 190,
-        "symbol": "BNB/USDT",
-        "direction": "LONG",
-        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
-        "r": 0.0
-      },
-      {
-        "id": 189,
-        "symbol": "ETH/USDT",
-        "direction": "LONG",
-        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
-        "r": 0.0
       }
     ],
     "open_now": [
+      {
+        "id": 209,
+        "symbol": "LINK/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 208,
+        "symbol": "UNI/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 207,
+        "symbol": "NEAR/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
       {
         "id": 206,
         "symbol": "GRAM/USDT",
@@ -62,24 +80,6 @@
         "symbol": "ETH/USDT",
         "direction": "LONG",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 204,
-        "symbol": "DOGE/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 203,
-        "symbol": "DOT/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 202,
-        "symbol": "ATOM/USDT",
-        "direction": "LONG",
-        "state": "TP1 HIT - RULEAZA SPRE TP2"
       }
     ],
     "best_bucket": {
@@ -105,17 +105,17 @@
       "reliable": true
     },
     "agent_status": "SHADOW",
-    "agent_reason": "are nevoie de 300 exemple (are 48)",
-    "agent_samples": 48,
+    "agent_reason": "are nevoie de 300 exemple (are 49)",
+    "agent_samples": 49,
     "agent_balanced": null,
     "baseline_balanced": null,
     "agent_weights": {
-      "trend": -0.027963,
-      "momentum": -0.133106,
-      "volatility": -0.304975,
-      "volume": -0.18833,
-      "is_long": -0.17947,
-      "persistence_n": -0.094637
+      "trend": -0.03007,
+      "momentum": -0.137563,
+      "volatility": -0.311269,
+      "volume": -0.198961,
+      "is_long": -0.179469,
+      "persistence_n": -0.108146
     }
   }
 }
