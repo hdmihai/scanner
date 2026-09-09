@@ -360,6 +360,27 @@ STATE_STYLE = {
 }
 
 
+def honest_probability(score, plans_store):
+    """Probabilitatea de afisat: cea MASURATA daca exista destule date, altfel
+    un semn ca nu stim inca.
+
+    Campul `probability` din scanare e formula `50 + scor * 0.35` - scorul
+    rescalat, nu o masuratoare. Afisat ca procent langa cardul de calibrare
+    reala, sugera o precizie care nu exista. Acum se afiseaza cifra masurata
+    din planurile inchise, cu intervalul ei de incredere, sau "-" cand nu am
+    inca destule date pe acel interval de scor.
+    """
+    cal = (plans_store or {}).get("calibration") or {}
+    if score is None:
+        return "-", "necunoscut"
+    b = str(int(score // 20) * 20)
+    e = cal.get(b)
+    if not e or not e.get("reliable"):
+        n = e.get("total", 0) if e else 0
+        return "-", f"necalibrat inca (n={n})"
+    return f'{e["win_rate"]}%', f'masurat, IC {e["ci_low"]}-{e["ci_high"]}%, n={e["total"]}'
+
+
 def render_sparkline(values, width=200, height=36):
     """Linie de pret minimala, desenata ca SVG. Fara librarie, fara CDN."""
     vals = [v for v in (values or []) if v is not None]
@@ -399,6 +420,7 @@ def render_token_details(details, plans_store):
         vp = ind.get("volume_profile") or {}
         macd = ind.get("macd") or {}
         plan = d.get("plan") or {}
+        prob_txt, prob_note = honest_probability(d.get("score"), plans_store)
 
         rows = []
         if st:
@@ -479,7 +501,7 @@ def render_token_details(details, plans_store):
           <div><span class="dim">PRET</span><br>{fmt_price(d.get("price"))}</div>
           <div><span class="dim">ATR</span><br>{fmt_price(d.get("atr"))}</div>
           <div><span class="dim">PERSISTENTA</span><br>{d.get("persistence")}</div>
-          <div><span class="dim">PROBABILITATE</span><br>{d.get("probability")}%</div>
+          <div><span class="dim">PROBABILITATE</span><br>{prob_txt}<br><span class="dim" style="font-size:10px;">{prob_note}</span></div>
         </div>
         <h4>Plan propus</h4>{plan_html}
         <h4>Indicatori</h4>{ind_html}
@@ -897,12 +919,12 @@ footer{{margin-top:26px;color:var(--text-dim);font-size:11px;line-height:1.6;}}
       </div>
 
       <div class="card">
-        <h2>Top long</h2>
-        <table><tr><th>Symbol</th><th>Score</th><th>Prob</th><th>Pers</th></tr>{long_rows}</table>
+        <h2>Top long <span class="dim">* Prob = formula din scor, nu masuratoare - vezi cardul de calibrare</span></h2>
+        <table><tr><th>Symbol</th><th>Score</th><th title="formula, nu masuratoare">Prob*</th><th>Pers</th></tr>{long_rows}</table>
       </div>
       <div class="card">
-        <h2>Top short</h2>
-        <table><tr><th>Symbol</th><th>Score</th><th>Prob</th><th>Pers</th></tr>{short_rows}</table>
+        <h2>Top short <span class="dim">* idem</span></h2>
+        <table><tr><th>Symbol</th><th>Score</th><th title="formula, nu masuratoare">Prob*</th><th>Pers</th></tr>{short_rows}</table>
       </div>
     </div>
 
