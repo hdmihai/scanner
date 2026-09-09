@@ -1,5 +1,5 @@
 {
-  "next_id": 210,
+  "next_id": 211,
   "plans": [
     {
       "id": 1,
@@ -7484,10 +7484,10 @@
       "tp2": 2.118,
       "risk": 0.0455,
       "planned_r_tp2": 4.5,
-      "state": "TP1_HIT",
-      "state_detail": "TP1 HIT - RULEAZA SPRE TP2",
-      "realized_r": null,
-      "closed_ts": null,
+      "state": "SL_HIT",
+      "state_detail": "TP1 HIT - SL LA BREAKEVEN",
+      "realized_r": 0.5,
+      "closed_ts": 1788962400.0,
       "bars_checked": 3,
       "score_at_entry": 66,
       "components": {
@@ -7508,7 +7508,8 @@
       },
       "geometry": "v3",
       "entered_ts": 1788955200.0,
-      "tp1_hit_ts": 1788955200.0
+      "tp1_hit_ts": 1788955200.0,
+      "agent_trained": true
     },
     {
       "id": 203,
@@ -7523,10 +7524,10 @@
       "tp2": 1.5223244,
       "risk": 0.0228929,
       "planned_r_tp2": 16.1,
-      "state": "OPEN",
-      "state_detail": "INTRARE ATINSA - pozitie activa",
-      "realized_r": null,
-      "closed_ts": null,
+      "state": "SL_HIT",
+      "state_detail": "SL HIT - INVALIDATED",
+      "realized_r": -1.0,
+      "closed_ts": 1788962400.0,
       "bars_checked": 2,
       "score_at_entry": 50,
       "components": {
@@ -7546,7 +7547,8 @@
         "agent_used": false
       },
       "geometry": "v3",
-      "entered_ts": 1788958800.0
+      "entered_ts": 1788958800.0,
+      "agent_trained": true
     },
     {
       "id": 204,
@@ -7770,15 +7772,52 @@
         "agent_used": false
       },
       "geometry": "v3"
+    },
+    {
+      "id": 210,
+      "symbol": "ATOM/USDT",
+      "direction": "LONG",
+      "created_ts": 1788964770.865377,
+      "created_time": "2026-09-09 14:39 UTC",
+      "entry": 1.8964643,
+      "signal_price": 1.922,
+      "sl": 1.8453929,
+      "tp1": 1.9475357,
+      "tp2": 2.1262857,
+      "risk": 0.0510714,
+      "planned_r_tp2": 4.5,
+      "state": "PENDING",
+      "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
+      "realized_r": null,
+      "closed_ts": null,
+      "bars_checked": 0,
+      "score_at_entry": 62,
+      "components": {
+        "trend": 1.0,
+        "momentum": 0.488,
+        "volatility": 0.671,
+        "volume": 0.396
+      },
+      "persistence_at_entry": 4,
+      "decision": {
+        "action": "ISSUE",
+        "mode": "EXPLORARE",
+        "reason": "inca nu am destule planuri inchise la scor ~62 (prag 20) - deschid ca sa invat",
+        "expected_value_r": null,
+        "calibrated_prob": null,
+        "agent_prob": 0.2348,
+        "agent_used": false
+      },
+      "geometry": "v3"
     }
   ],
   "calibration": {
     "40": {
-      "total": 13,
-      "win_rate": 23.1,
-      "ci_low": 8.2,
-      "ci_high": 50.3,
-      "avg_r": -0.62,
+      "total": 14,
+      "win_rate": 21.4,
+      "ci_low": 7.6,
+      "ci_high": 47.6,
+      "avg_r": -0.648,
       "avg_win_r": 0.645,
       "avg_loss_r": 1.0,
       "reliable": false
@@ -7804,38 +7843,38 @@
       "reliable": false
     },
     "60": {
-      "total": 6,
-      "win_rate": 33.3,
-      "ci_low": 9.7,
-      "ci_high": 70.0,
-      "avg_r": 0.25,
-      "avg_win_r": 2.75,
+      "total": 7,
+      "win_rate": 42.9,
+      "ci_low": 15.8,
+      "ci_high": 75.0,
+      "avg_r": 0.286,
+      "avg_win_r": 2.0,
       "avg_loss_r": 1.0,
       "reliable": false
     }
   },
   "summary": {
     "no_entry": 17,
-    "no_entry_pct": 25.8,
+    "no_entry_pct": 25.0,
     "legacy_closed": 95,
     "legacy_total_r": -28.0,
     "geometry": "v3",
-    "total_plans": 209,
-    "open": 17,
-    "closed": 49,
+    "total_plans": 210,
+    "open": 16,
+    "closed": 51,
     "by_state": {
-      "SL_HIT": 127,
+      "SL_HIT": 129,
       "TP2_HIT": 10,
       "EXPIRED": 38,
       "NO_ENTRY": 17,
-      "OPEN": 9,
-      "TP1_HIT": 2,
-      "PENDING": 6
+      "OPEN": 8,
+      "TP1_HIT": 1,
+      "PENDING": 7
     },
-    "win_rate": 12.2,
-    "total_r": -34.83,
-    "avg_r": -0.711,
-    "profit_factor": 0.19,
+    "win_rate": 13.7,
+    "total_r": -35.33,
+    "avg_r": -0.693,
+    "profit_factor": 0.2,
     "best": 2.75,
     "worst": -1.0
   }
