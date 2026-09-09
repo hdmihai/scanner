@@ -58,7 +58,12 @@ PLANS_FILE = os.path.join(DATA_DIR, "plans.json")
 # sisteme, deci antrenarea pe amandoua ar invata media a doua functii diferite.
 # La schimbarea geometriei, agentul reporneste - costa exemplele acumulate, dar
 # oricum ramane in SHADOW pana la 300, deci pierderea e doar contabila.
-STATE_SOURCE = "plans-v3"
+STATE_SOURCE = "plans-v3-auc"
+# Versiunea urcata odata cu adaugarea metricilor pentru date dezechilibrate
+# (AUC, prag de clasa majoritara, rata de predictii pozitive). Perechile
+# (predictie, rezultat) pe care se calculeaza se acumuleaza doar la invatare,
+# deci fara reset noile praguri n-ar avea pe ce lucra. Reinvatarea nu costa
+# nimic: agentul e oricum in SHADOW pana la 300 de exemple.
 MODEL_FILE = os.path.join(DATA_DIR, "agent_model.json")
 
 FEATURES = ["trend", "momentum", "volatility", "volume", "is_long", "persistence_n"]
@@ -67,6 +72,8 @@ LEARNING_RATE = 0.05
 L2 = 1e-4
 MIN_SAMPLES_TO_ACTIVATE = 300   # sub atat, agentul ramane in mod shadow
 MIN_DAYS_TO_ACTIVATE = 21       # ...si trebuie sa acopere si destul timp calendaristic
+MIN_AUC = 0.55                  # sub atat, modelul nu ordoneaza mai bine decat hazardul
+AUC_WINDOW = 500                # cate perechi (predictie, rezultat) pastrez pentru AUC
 RECENT_WINDOW = 200             # fereastra pentru acuratetea "recenta"
 CURVE_EVERY = 25                # la cate exemple salvez un punct pe curba
 
@@ -185,11 +192,48 @@ def default_state():
             "SHORT": {"agent": 0, "baseline": 0, "total": 0},
         },
         "first_scan_ts": 0.0,
+        "pairs": [],           # (probabilitate, rezultat) - pentru AUC si clasa majoritara
         "recent": [],          # 1/0 pentru ultimele predictii ale agentului
         "recent_baseline": [],
         "curve": [],           # puncte pentru graficul learning curve
         "status": "SHADOW",
     }
+
+
+def auc_score(pairs):
+    """Aria sub curba ROC, calculata prin numararea perechilor concordante.
+
+    DE CE E NECESARA: pe date dezechilibrate, acuratetea insala. Cu 13.3% rata de
+    castig, un model care spune MEREU "pierde" obtine 86.7% acuratete fara sa fi
+    invatat nimic. Exact asta s-a intamplat: agentul nu prezicea castig in niciun
+    caz, iar acuratetea lui (83.3%) era chiar SUB regula triviala. AUC masoara
+    altceva - daca modelul ORDONEAZA corect: 0.5 = hazard, 1.0 = separare perfecta.
+    """
+    pos = [p for p, y in pairs if y == 1.0]
+    neg = [p for p, y in pairs if y == 0.0]
+    if not pos or not neg:
+        return None
+    concordant = 0.0
+    for a_ in pos:
+        for b_ in neg:
+            concordant += 1.0 if a_ > b_ else (0.5 if a_ == b_ else 0.0)
+    return concordant / (len(pos) * len(neg))
+
+
+def majority_class_accuracy(pairs):
+    """Acuratetea pe care o obtii prezicand mereu clasa majoritara. E pragul REAL
+    pe care un model trebuie sa-l depaseasca; formula veche nu era suficienta."""
+    if not pairs:
+        return None
+    ones = sum(1 for _, y in pairs if y == 1.0)
+    return 100 * max(ones, len(pairs) - ones) / len(pairs)
+
+
+def predicted_positive_rate(pairs):
+    """Cat de des prezice modelul 'castig'. Aproape de 0 sau 1 = model degenerat."""
+    if not pairs:
+        return None
+    return 100 * sum(1 for p, _ in pairs if p >= 0.5) / len(pairs)
 
 
 def balanced_accuracy(by_direction, which, min_per_direction=30):
@@ -249,6 +293,28 @@ def agent_is_active(state, plans=None):
     if bal_agent is None or bal_base is None or len(used_a) < 2:
         return False, ("inca nu am destule exemple pe AMBELE directii "
                        f"(am: {', '.join(used_a) if used_a else 'niciuna'})")
+
+    # PRAGURI PENTRU DATE DEZECHILIBRATE. Fara ele, un model care spune mereu
+    # "pierde" pare excelent: la 13.3% rata de castig obtine 86.7% acuratete.
+    # Exact asta se intampla - agentul nu prezicea castig in niciun caz.
+    pairs = state.get("pairs") or []
+    maj = majority_class_accuracy(pairs)
+    acc = 100 * a["correct"] / a["total"]
+    if maj is not None and acc <= maj:
+        return False, (f"acuratetea {acc:.1f}% nu bate regula triviala "
+                       f"'prezice mereu clasa majoritara' ({maj:.1f}%)")
+
+    ppr = predicted_positive_rate(pairs)
+    if ppr is not None and (ppr < 5 or ppr > 95):
+        return False, (f"model degenerat: prezice 'castig' in {ppr:.0f}% din cazuri "
+                       f"- nu discrimineaza, doar reproduce clasa dominanta")
+
+    auc = auc_score(pairs)
+    if auc is None:
+        return False, "inca nu am ambele clase (castig si pierdere) in fereastra"
+    if auc < MIN_AUC:
+        return False, (f"AUC {auc:.3f} sub pragul {MIN_AUC} - modelul nu ordoneaza "
+                       f"semnalele mai bine decat hazardul (0.5)")
     if bal_agent <= bal_base:
         return False, (f"acuratete echilibrata {bal_agent:.1f}% nu bate inca "
                        f"euristica ({bal_base:.1f}%)")
@@ -314,6 +380,7 @@ def train_from_plans(plans, model, state):
             state["by_direction"][d]["baseline"] += base_ok
             state["by_direction"][d]["total"] += 1
 
+        state["pairs"] = (state.get("pairs", []) + [[round(p_agent, 5), y]])[-AUC_WINDOW:]
         state["recent"] = (state.get("recent", []) + [agent_ok])[-RECENT_WINDOW:]
         state["recent_baseline"] = (state.get("recent_baseline", []) + [base_ok])[-RECENT_WINDOW:]
 
@@ -387,6 +454,7 @@ def train_incremental(history, model, state):
                 state["by_direction"][d]["baseline"] += base_ok
                 state["by_direction"][d]["total"] += 1
 
+            state["pairs"] = (state.get("pairs", []) + [[round(p_agent, 5), y]])[-AUC_WINDOW:]
             state["recent"] = (state.get("recent", []) + [agent_ok])[-RECENT_WINDOW:]
             state["recent_baseline"] = (state.get("recent_baseline", []) + [base_ok])[-RECENT_WINDOW:]
 
@@ -464,6 +532,10 @@ def main():
     bb, _ = balanced_accuracy(state["by_direction"], "baseline")
     state["balanced_agent"], state["balanced_baseline"] = ba, bb
     state["balanced_directions"] = used
+    pairs = state.get("pairs") or []
+    state["auc"] = auc_score(pairs)
+    state["majority_baseline"] = majority_class_accuracy(pairs)
+    state["predicted_positive_rate"] = predicted_positive_rate(pairs)
     save_json(MODEL_FILE, state)
 
     acc_agent, acc_base, acc_recent = summarize(state)
@@ -481,6 +553,16 @@ def main():
             if st["total"]:
                 print(f"  {d}: agent {100*st['agent']/st['total']:.1f}% "
                       f"| baseline {100*st['baseline']/st['total']:.1f}% (din {st['total']})")
+    auc = state.get("auc")
+    maj = state.get("majority_baseline")
+    ppr = state.get("predicted_positive_rate")
+    if maj is not None:
+        print(f"Prag trivial (clasa majoritara): {maj:.2f}%  <- de batut, nu doar baseline-ul vechi")
+    if ppr is not None:
+        print(f"Prezice 'castig' in {ppr:.0f}% din cazuri" +
+              ("  [!] model degenerat" if ppr < 5 or ppr > 95 else ""))
+    if auc is not None:
+        print(f"AUC: {auc:.3f} (0.5 = hazard, prag {MIN_AUC})")
     print(f"Status: {state['status']} - {reason}")
     print("Greutati invatate:", json.dumps(state["model"]["weights"]))
 
