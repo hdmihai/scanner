@@ -1,12 +1,12 @@
 {
-  "text": "Din 59 planuri inchise, rata de succes e 13.3%, cu -30.83R cumulat (-0.685R in medie pe plan) si profit factor 0.21. 11 planuri sunt inca deschise. Separat, 95 planuri inchise (-28.00R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #183 ATOM/USDT +2.75R, #187 AAVE/USDT -1.00R, #170 SOL/USDT -1.00R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 45)).",
+  "text": "Din 60 planuri inchise, rata de succes e 13.3%, cu -30.83R cumulat (-0.685R in medie pe plan) si profit factor 0.21. 15 planuri sunt inca deschise. Separat, 95 planuri inchise (-28.00R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #189 ETH/USDT +0.00R, #183 ATOM/USDT +2.75R, #187 AAVE/USDT -1.00R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 45)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-09 09:22 UTC",
+    "scan_time": "2026-09-09 10:22 UTC",
     "universe_size": 20,
-    "plans_total": 196,
-    "plans_open": 11,
-    "plans_closed": 59,
+    "plans_total": 201,
+    "plans_open": 15,
+    "plans_closed": 60,
     "legacy_closed": 95,
     "legacy_total_r": -28.0,
     "win_rate": 13.3,
@@ -14,6 +14,13 @@
     "avg_r": -0.685,
     "profit_factor": 0.21,
     "recent_closed": [
+      {
+        "id": 189,
+        "symbol": "ETH/USDT",
+        "direction": "LONG",
+        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
+        "r": 0.0
+      },
       {
         "id": 183,
         "symbol": "ATOM/USDT",
@@ -41,45 +48,38 @@
         "direction": "SHORT",
         "state": "SL HIT - INVALIDATED",
         "r": -1.0
-      },
-      {
-        "id": 193,
-        "symbol": "LINK/USDT",
-        "direction": "SHORT",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.0
       }
     ],
     "open_now": [
       {
-        "id": 196,
-        "symbol": "LTC/USDT",
+        "id": 201,
+        "symbol": "SOL/USDT",
         "direction": "SHORT",
-        "state": "INTRARE ATINSA - pozitie activa"
-      },
-      {
-        "id": 195,
-        "symbol": "NEAR/USDT",
-        "direction": "LONG",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       },
       {
-        "id": 190,
-        "symbol": "BNB/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 189,
-        "symbol": "ETH/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 188,
-        "symbol": "OP/USDT",
+        "id": 200,
+        "symbol": "AAVE/USDT",
         "direction": "SHORT",
-        "state": "INTRARE ATINSA - pozitie activa"
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 199,
+        "symbol": "ARB/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 198,
+        "symbol": "UNI/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 197,
+        "symbol": "LINK/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
       }
     ],
     "best_bucket": {
