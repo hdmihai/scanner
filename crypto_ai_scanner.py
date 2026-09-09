@@ -41,7 +41,10 @@ from datetime import datetime, timezone
 
 # ============================== CONFIG ==============================
 CONFIG = {
-    "exchange_fallback": ["okx", "kucoin", "gateio", "mexc", "kraken"],
+    # "gateio" a fost redenumit "gate" in ccxt - verificat contra ccxt 4.5.78, unde
+    # `gateio` nu mai exista. connect_exchange sarea peste el gracios, deci nu
+    # crapa, dar aveai practic 4 rezerve in loc de 5, tacut.
+    "exchange_fallback": ["okx", "kucoin", "gate", "mexc", "kraken"],
     # Incearca pe rand, primul care raspunde e folosit - vezi connect_exchange().
     # Kraken primul (serveste SUA, nu are motiv sa geo-blocheze); restul sunt
     # rezerve. NU mai modifica sursa fisierului la runtime (spre deosebire de
@@ -97,6 +100,18 @@ DEFAULT_WEIGHTS = {"trend": 1.0, "momentum": 1.0, "volatility": 1.0, "volume": 1
 # ============================ INDICATORI =============================
 # Implementati simplu, in Python pur, fara pandas/numpy - ca sa mearga
 # usor si pe un VPS minimal sau pe telefon (Termux).
+
+def timeframe_seconds():
+    """Durata unei lumanari, in secunde, derivata din CONFIG['timeframe'].
+    Necesara ca expirarea pullback-ului sa fie masurata in timp, nu in numarul
+    de bare primite intr-un apel - vezi nota din plan_tracker.evaluate_plan."""
+    tf = CONFIG.get("timeframe", "1h")
+    units = {"m": 60, "h": 3600, "d": 86400, "w": 604800}
+    try:
+        return int(tf[:-1]) * units[tf[-1]]
+    except (ValueError, KeyError):
+        return 3600
+
 
 def round_price(value, sig=8):
     """Rotunjeste la cifre SEMNIFICATIVE, nu la un numar fix de zecimale.
@@ -788,6 +803,7 @@ def main():
             continue
 
         agent_pred = ai_agent.predict_for_signal(agent_model, agent_state, sig)
+        sig = {**sig, "bar_seconds": timeframe_seconds()}
         decision = plan_tracker.decide(calibration, sig, agent_pred)
         if decision["action"] == "SKIP":
             skipped.append((sig["symbol"], decision["reason"]))
