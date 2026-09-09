@@ -88,31 +88,37 @@ jobs:
         # Sterge DOAR inregistrarile de executie din tab-ul Actions (loguri,
         # status, durata). NU atinge datele agentului: plans.json,
         # agent_model.json si scan_history.json sunt comise in git de pasul de
-        # mai sus, deci traiesc in istoricul repo-ului, nu in run-uri.
+        # mai sus, deci traiesc in istoricul repo-ului.
         #
-        # BUG FIX: varianta anterioara folosea felierea in jq cu variabila
-        # interpolata din shell: .['"${KEEP}"':]. Dupa expandare rezulta
-        # .["30":] - felie pe STRING - in loc de .[30:] - felie pe numar. jq
-        # dadea eroare, lista de id-uri ramanea goala, iar continue-on-error
-        # inghitea esecul in tacere. Rezultat: 128 de rulari acumulate in loc de 30.
-        # Acum jq scoate TOATE id-urile sortate, iar decuparea o face `tail` in
-        # shell - fara interpolare in interiorul filtrului, deci fara ambiguitate.
+        # Rezultatul se scrie SI in rezumatul rularii ($GITHUB_STEP_SUMMARY),
+        # vizibil direct pe pagina run-ului. Motiv: `continue-on-error` face ca
+        # un esec sa nu opreasca scanarea - corect - dar il face si invizibil,
+        # jobul aparand verde. Asa s-a intamplat ca rularile sa se acumuleze
+        # fara ca nimic sa semnaleze.
         if: always()
-        continue-on-error: true   # curatenia nu are voie sa strice scanarea
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           KEEP: 30
         run: |
           set -o pipefail
-          # Exclud run-urile in curs sau in asteptare - altfel acest run s-ar
-          # sterge singur, iar API-ul ar returna eroare.
+          echo "### Curatare run-uri" >> "$GITHUB_STEP_SUMMARY"
+
           if ! all_ids=$(gh api \
               "repos/${GITHUB_REPOSITORY}/actions/workflows/scan.yml/runs?per_page=100" \
               --jq '.workflow_runs
                     | map(select(.status != "in_progress" and .status != "queued"))
                     | sort_by(.created_at) | reverse
-                    | .[].id'); then
-            echo "[!] Nu am putut lista run-urile (API sau permisiuni). Sar peste curatare."
+                    | .[].id' 2>&1); then
+            echo "[!] Nu am putut lista run-urile. Raspuns: ${all_ids}"
+            {
+              echo "**ESUAT** - nu am putut lista run-urile."
+              echo ""
+              echo "Cauze uzuale: lipseste \`actions: write\` din \`permissions\`,"
+              echo "sau tokenul nu are drepturi pe Actions."
+              echo ""
+              echo "\`\`\`"; echo "${all_ids}"; echo "\`\`\`"
+            } >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
 
@@ -121,17 +127,29 @@ jobs:
           count=$(printf '%s\n' "$ids" | grep -c . || true)
           echo "Run-uri finalizate: ${total}. Pastrez ${KEEP}, sterg ${count}."
 
-          deleted=0; failed=0
+          deleted=0; failed=0; last_err=""
           for id in $ids; do
-            if gh api -X DELETE "repos/${GITHUB_REPOSITORY}/actions/runs/$id" >/dev/null 2>&1; then
+            if err=$(gh api -X DELETE "repos/${GITHUB_REPOSITORY}/actions/runs/$id" 2>&1); then
               deleted=$((deleted + 1))
             else
-              failed=$((failed + 1))
-              echo "  [!] nu am putut sterge run-ul $id"
+              failed=$((failed + 1)); last_err="$err"
+              echo "  [!] run $id: $err"
             fi
           done
+
           echo "Sterse: ${deleted}. Esuate: ${failed}."
+          {
+            echo "- Run-uri finalizate: **${total}**"
+            echo "- De sters (peste ${KEEP}): **${count}**"
+            echo "- Sterse: **${deleted}** | Esuate: **${failed}**"
+          } >> "$GITHUB_STEP_SUMMARY"
+
           if [ "$count" -gt 0 ] && [ "$deleted" -eq 0 ]; then
             echo "[!] ATENTIE: aveam ${count} de sters si niciunul nu a mers."
-            echo "    Verifica permisiunea 'actions: write' din workflow."
+            {
+              echo ""
+              echo "**ATENTIE:** aveam ${count} de sters si niciunul nu a reusit."
+              echo "Ultima eroare:"
+              echo "\`\`\`"; echo "${last_err}"; echo "\`\`\`"
+            } >> "$GITHUB_STEP_SUMMARY"
           fi
