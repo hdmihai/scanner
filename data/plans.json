@@ -1,5 +1,5 @@
 {
-  "next_id": 235,
+  "next_id": 236,
   "plans": [
     {
       "id": 1,
@@ -8247,7 +8247,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 1,
+      "bars_checked": 2,
       "score_at_entry": 53,
       "components": {
         "trend": 0.685,
@@ -8285,7 +8285,7 @@
       "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 1,
+      "bars_checked": 2,
       "score_at_entry": 42,
       "components": {
         "trend": 0.807,
@@ -8318,8 +8318,8 @@
       "tp2": 0.10135714,
       "risk": 0.00135929,
       "planned_r_tp2": 4.5,
-      "state": "PENDING",
-      "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
+      "state": "OPEN",
+      "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
       "bars_checked": 1,
@@ -8340,7 +8340,8 @@
         "agent_prob": 0.2329,
         "agent_used": false
       },
-      "geometry": "v4"
+      "geometry": "v4",
+      "entered_ts": 1788991200.0
     },
     {
       "id": 224,
@@ -8359,7 +8360,7 @@
       "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 1,
+      "bars_checked": 2,
       "score_at_entry": 66,
       "components": {
         "trend": 0.102,
@@ -8396,7 +8397,7 @@
       "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 1,
+      "bars_checked": 2,
       "score_at_entry": 62,
       "components": {
         "trend": 0.047,
@@ -8433,7 +8434,7 @@
       "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 1,
+      "bars_checked": 2,
       "score_at_entry": 59,
       "components": {
         "trend": 0.328,
@@ -8470,7 +8471,7 @@
       "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 1,
+      "bars_checked": 2,
       "score_at_entry": 56,
       "components": {
         "trend": 0.499,
@@ -8507,7 +8508,7 @@
       "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 1,
+      "bars_checked": 2,
       "score_at_entry": 56,
       "components": {
         "trend": 0.158,
@@ -8544,7 +8545,7 @@
       "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 1,
+      "bars_checked": 2,
       "score_at_entry": 54,
       "components": {
         "trend": 0.308,
@@ -8581,7 +8582,7 @@
       "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 1,
+      "bars_checked": 2,
       "score_at_entry": 54,
       "components": {
         "trend": 0.086,
@@ -8618,7 +8619,7 @@
       "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 1,
+      "bars_checked": 2,
       "score_at_entry": 54,
       "components": {
         "trend": 0.34,
@@ -8655,7 +8656,7 @@
       "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 0,
+      "bars_checked": 1,
       "score_at_entry": 58,
       "components": {
         "trend": 0.062,
@@ -8693,7 +8694,7 @@
       "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 0,
+      "bars_checked": 1,
       "score_at_entry": 57,
       "components": {
         "trend": 0.094,
@@ -8751,6 +8752,44 @@
       },
       "geometry": "v4",
       "bar_seconds": 3600
+    },
+    {
+      "id": 235,
+      "symbol": "AVAX/USDT",
+      "direction": "SHORT",
+      "created_ts": 1788995956.006176,
+      "created_time": "2026-09-09 23:19 UTC",
+      "entry": 7.7351786,
+      "signal_price": 7.693,
+      "sl": 7.8195357,
+      "tp1": 7.433,
+      "tp2": 7.3555714,
+      "risk": 0.0843571,
+      "planned_r_tp2": 4.5,
+      "state": "PENDING",
+      "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
+      "realized_r": null,
+      "closed_ts": null,
+      "bars_checked": 0,
+      "score_at_entry": 63,
+      "components": {
+        "trend": 0.069,
+        "momentum": 0.859,
+        "volatility": 0.548,
+        "volume": 1.0
+      },
+      "persistence_at_entry": 6,
+      "decision": {
+        "action": "ISSUE",
+        "mode": "EXPLORARE",
+        "reason": "inca nu am destule planuri inchise la scor ~63 (prag 20) - deschid ca sa invat",
+        "expected_value_r": null,
+        "calibrated_prob": null,
+        "agent_prob": 0.5,
+        "agent_used": false
+      },
+      "geometry": "v4",
+      "bar_seconds": 3600
     }
   ],
   "calibration": {},
@@ -8760,15 +8799,15 @@
     "legacy_closed": 174,
     "legacy_total_r": -70.2,
     "geometry": "v4",
-    "total_plans": 234,
-    "open": 14,
+    "total_plans": 235,
+    "open": 15,
     "closed": 0,
     "by_state": {
       "SL_HIT": 138,
       "TP2_HIT": 10,
       "EXPIRED": 53,
       "NO_ENTRY": 19,
-      "OPEN": 1,
+      "OPEN": 2,
       "PENDING": 13
     },
     "win_rate": null,
