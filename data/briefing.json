@@ -1,11 +1,11 @@
 {
-  "text": "Din 62 planuri inchise, rata de succes e 13.0%, cu -31.83R cumulat (-0.692R in medie pe plan) si profit factor 0.2. 17 planuri sunt inca deschise. Separat, 95 planuri inchise (-28.00R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #186 DOT/USDT -1.00R, #190 BNB/USDT +0.00R, #189 ETH/USDT +0.00R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 46)).",
+  "text": "Din 62 planuri inchise, rata de succes e 13.0%, cu -31.83R cumulat (-0.692R in medie pe plan) si profit factor 0.2. 18 planuri sunt inca deschise. Separat, 95 planuri inchise (-28.00R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #186 DOT/USDT -1.00R, #190 BNB/USDT +0.00R, #189 ETH/USDT +0.00R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 46)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-09 11:21 UTC",
+    "scan_time": "2026-09-09 12:27 UTC",
     "universe_size": 20,
-    "plans_total": 205,
-    "plans_open": 17,
+    "plans_total": 206,
+    "plans_open": 18,
     "plans_closed": 62,
     "legacy_closed": 95,
     "legacy_total_r": -28.0,
@@ -52,6 +52,12 @@
     ],
     "open_now": [
       {
+        "id": 206,
+        "symbol": "GRAM/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
         "id": 205,
         "symbol": "ETH/USDT",
         "direction": "LONG",
@@ -73,13 +79,7 @@
         "id": 202,
         "symbol": "ATOM/USDT",
         "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 201,
-        "symbol": "SOL/USDT",
-        "direction": "SHORT",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
+        "state": "INTRARE ATINSA - pozitie activa"
       }
     ],
     "best_bucket": {
