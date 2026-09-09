@@ -643,6 +643,16 @@ def main():
         except Exception as e:
             print(f"[!] {symbol}: {e}")
             continue
+        # Renunt la ULTIMA lumanare: e cea curenta, inca neinchisa.
+        # De ce conteaza: scanarea porneste la minute imprevizibile (cron e :07,
+        # dar am masurat rulari intre :09 si :59 din cauza intarzierilor GitHub),
+        # deci bara curenta e prinsa oriunde intre 8% si 92% formata. EMA, RSI si
+        # ATR calculate pe ea se schimba pana la inchidere - acelasi setup da
+        # scoruri diferite doar in functie de cat de tarziu a pornit jobul.
+        # In plus, backtest.py foloseste doar bare inchise; fara acest fix cele
+        # doua nu testeaza acelasi lucru si rezultatele nu sunt comparabile.
+        if len(ohlcv) > 1:
+            ohlcv = ohlcv[:-1]
         ohlcv_cache[symbol] = ohlcv
         scored = score_symbol(ohlcv, weights)
         if not scored:
