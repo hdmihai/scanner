@@ -6646,10 +6646,10 @@
       "tp2": 0.19327143,
       "risk": 0.00349286,
       "planned_r_tp2": 4.5,
-      "state": "OPEN",
-      "state_detail": "INTRARE ATINSA - pozitie activa",
-      "realized_r": null,
-      "closed_ts": null,
+      "state": "SL_HIT",
+      "state_detail": "SL HIT - INVALIDATED",
+      "realized_r": -1.0,
+      "closed_ts": 1788966000.0,
       "bars_checked": 19,
       "score_at_entry": 35,
       "components": {
@@ -6669,7 +6669,8 @@
         "agent_used": false
       },
       "geometry": "v3",
-      "entered_ts": 1788901200.0
+      "entered_ts": 1788901200.0,
+      "agent_trained": true
     },
     {
       "id": 181,
@@ -7905,8 +7906,8 @@
       "tp2": 124.36,
       "risk": 1.315,
       "planned_r_tp2": 4.5,
-      "state": "OPEN",
-      "state_detail": "INTRARE ATINSA - pozitie activa",
+      "state": "TP1_HIT",
+      "state_detail": "TP1 HIT - RULEAZA SPRE TP2",
       "realized_r": null,
       "closed_ts": null,
       "bars_checked": 1,
@@ -7928,7 +7929,8 @@
         "agent_used": false
       },
       "geometry": "v3",
-      "entered_ts": 1788966000.0
+      "entered_ts": 1788966000.0,
+      "tp1_hit_ts": 1788966000.0
     },
     {
       "id": 214,
@@ -7980,11 +7982,11 @@
       "reliable": false
     },
     "20": {
-      "total": 32,
-      "win_rate": 6.2,
+      "total": 33,
+      "win_rate": 6.1,
       "ci_low": 1.7,
-      "ci_high": 20.1,
-      "avg_r": -0.879,
+      "ci_high": 19.6,
+      "avg_r": -0.883,
       "avg_win_r": 0.935,
       "avg_loss_r": 1.0,
       "reliable": true
@@ -8012,25 +8014,26 @@
   },
   "summary": {
     "no_entry": 17,
-    "no_entry_pct": 23.6,
+    "no_entry_pct": 23.3,
     "legacy_closed": 95,
     "legacy_total_r": -28.0,
     "geometry": "v3",
     "total_plans": 214,
-    "open": 16,
-    "closed": 55,
+    "open": 15,
+    "closed": 56,
     "by_state": {
-      "SL_HIT": 133,
+      "SL_HIT": 134,
       "TP2_HIT": 10,
       "EXPIRED": 38,
       "NO_ENTRY": 17,
-      "OPEN": 10,
-      "PENDING": 6
+      "OPEN": 8,
+      "PENDING": 6,
+      "TP1_HIT": 1
     },
-    "win_rate": 14.5,
-    "total_r": -37.2,
-    "avg_r": -0.676,
-    "profit_factor": 0.21,
+    "win_rate": 14.3,
+    "total_r": -38.2,
+    "avg_r": -0.682,
+    "profit_factor": 0.2,
     "best": 2.75,
     "worst": -1.0
   }
