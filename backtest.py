@@ -187,7 +187,13 @@ def replay_symbol(symbol, candles, weights, start_id):
             "tp1": levels["tp1"], "tp2": levels["tp2"],
             "risk": risk,
             "planned_r_tp2": round(abs(levels["tp2"] - levels["entry"]) / risk, 2),
-            "state": plan_tracker.STATE_OPEN,
+            # BUG FIX: aici era STATE_OPEN, deci backtest-ul intra DIRECT la
+            # pretul de pullback, fara sa astepte ca pretul sa revina acolo.
+            # Scanarea live creeaza planurile ca PENDING si le intra doar daca
+            # pretul chiar se intoarce; altfel expira NO_ENTRY, fara pierdere.
+            # Cu STATE_OPEN, backtest-ul masura o strategie care nu exista -
+            # exact greseala pe care backtest-ul trebuia sa o previna.
+            "state": plan_tracker.STATE_PENDING,
             "state_detail": "OPEN",
             "realized_r": None, "closed_ts": None, "bars_checked": 0,
             "score_at_entry": scored["risk_adjusted"],
@@ -196,6 +202,7 @@ def replay_symbol(symbol, candles, weights, start_id):
             "decision": {"action": "ISSUE", "mode": "BACKTEST",
                          "reason": "replay istoric, fara poarta de decizie"},
             "geometry": plan_tracker.GEOMETRY_VERSION,
+            "bar_seconds": scanner.timeframe_seconds(),
             "source": "backtest",
         }
         next_id += 1
