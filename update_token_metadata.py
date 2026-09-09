@@ -40,7 +40,21 @@ import urllib.request
 DATA_DIR = "data"
 METADATA_FILE = os.path.join(DATA_DIR, "token_metadata.json")
 HISTORY_FILE = os.path.join(DATA_DIR, "scan_history.json")
-LABS_SEED_FILE = os.path.join(DATA_DIR, "binance_labs_seed.json")
+# BUG TACUT, gasit uitandu-ma direct in repo: fisierul e la RADACINA, dar codul
+# il cauta in data/. `load_json` cu implicit gol nu arunca eroare, deci flagul
+# Binance Labs nu s-a activat niciodata si nimic nu a semnalat-o. Caut acum in
+# ambele locuri si spun explicit daca nu il gasesc.
+LABS_SEED_CANDIDATES = [
+    os.path.join(DATA_DIR, "binance_labs_seed.json"),
+    "binance_labs_seed.json",
+]
+
+
+def find_labs_seed():
+    for path in LABS_SEED_CANDIDATES:
+        if os.path.exists(path):
+            return path
+    return None
 
 REFRESH_DAYS = 7
 COINGECKO_BASE = "https://api.coingecko.com/api/v3"
@@ -158,8 +172,15 @@ def main():
         print("Nu exista inca nicio scanare - ruleaza intai crypto_ai_scanner.py.")
         return
 
-    labs = load_json(LABS_SEED_FILE, {"tickers": []})
-    labs_tickers = set(labs.get("tickers", []))
+    seed_path = find_labs_seed()
+    if seed_path is None:
+        print(f"[!] binance_labs_seed.json negasit in {LABS_SEED_CANDIDATES} - "
+              f"flagul Binance Labs va fi False pentru toate proiectele.")
+        labs_tickers = set()
+    else:
+        labs = load_json(seed_path, {"tickers": []})
+        labs_tickers = set(labs.get("tickers", []))
+        print(f"Binance Labs: {len(labs_tickers)} tickere incarcate din {seed_path}")
 
     delay = 0.7 if COINGECKO_API_KEY else 12  # respecta limita gratuita CoinGecko
     print(f"Actualizez metadata pentru {len(universe)} simboluri "
