@@ -56,7 +56,16 @@ MIN_BUCKET_SAMPLES = 20  # sub atat, nu pronunt o probabilitate calibrata
 # Calibrarea foloseste doar planuri din versiunea curenta.
 # v1 -> v2: TP1 nu mai poate fi sub 1R (v1 producea planuri cu asteptare
 # negativa prin constructie: 21 din 47 aveau TP1 sub 1R, unul la 0.00R).
-GEOMETRY_VERSION = "v3"
+GEOMETRY_VERSION = "v4"
+# v3 -> v4: doua schimbari care fac rezultatele necomparabile cu cele anterioare.
+#   1. Scanarea nu mai foloseste lumanarea curenta, neinchisa. Cron-ul e :07 dar
+#      rulari reale au fost masurate intre :09 si :59, deci bara era prinsa intre
+#      8% si 92% formata - acelasi setup dadea scoruri diferite doar dupa cat de
+#      tarziu pornea jobul. In plus, backtest.py foloseste doar bare inchise, deci
+#      pana acum cele doua nu testau acelasi lucru.
+#   2. R-ul raportat include acum costul dus-intors (0.1%). Inainte era brut, deci
+#      supraestima performanta: pe cele 51 de planuri intrate, ~4.6R diferenta.
+#
 # v2 -> v3: INTRARE PE PULLBACK, nu la piata.
 # Diagnostic pe 27 de planuri v2 inchise: LONG castiga 15.4%, SHORT 14.3% -
 # ambele directii pierdeau la fel, deci nu era regim de piata, ci moment de
@@ -66,6 +75,13 @@ GEOMETRY_VERSION = "v3"
 # Acum planul asteapta revenirea pretului la zona de intrare. Daca nu revine in
 # MAX_WAIT_BARS, expira FARA pierdere - exact tranzactiile care fugeau.
 TP1_FRACTION = 0.5     # cat din pozitie se inchide la TP1
+
+# Cost dus-intors (taxe + spread) ca procent din pret. R-ul raportat era BRUT,
+# deci supraestima performanta reala. backtest.py il modela deja; aici lipsea,
+# ceea ce facea ca cele doua sa raporteze marimi diferite sub acelasi nume.
+# Costul in R depinde de marimea stopului: un stop strans e penalizat mai tare,
+# fiindcă R se imparte la un risc mai mic.
+ROUNDTRIP_COST_PCT = 0.001
 
 STATE_PENDING = "PENDING"     # asteapta revenirea pretului la zona de intrare
 STATE_NO_ENTRY = "NO_ENTRY"   # pretul nu a revenit - plan anulat, FARA pierdere
@@ -196,6 +212,14 @@ def create_plan(store, signal, plan_levels, decision):
 
 # ======================= EVALUARE BARA CU BARA ==============================
 
+def cost_in_r(entry, sl):
+    """Costul tranzactiei exprimat in R. Zero daca nu s-a intrat in piata."""
+    if not entry or entry <= 0:
+        return 0.0
+    risk_pct = abs(entry - sl) / entry
+    return ROUNDTRIP_COST_PCT / risk_pct if risk_pct > 0 else 0.0
+
+
 def _r_at(price, entry, sl, direction):
     """Cati R fata de intrare, cu semn (pozitiv = in favoare)."""
     risk = abs(entry - sl)
@@ -239,7 +263,8 @@ def evaluate_plan(plan, candles):
             if waited >= MAX_WAIT_BARS:
                 plan["state"] = STATE_NO_ENTRY
                 plan["state_detail"] = f"PRETUL NU A REVENIT in {MAX_WAIT_BARS} bare - anulat"
-                plan["realized_r"] = 0.0   # niciun trade, deci nicio pierdere
+                plan["realized_r"] = 0.0   # niciun trade: nicio pierdere si niciun cost
+                plan["gross_r"] = 0.0
                 plan["closed_ts"] = bar_ts
                 return True
         if plan["state"] == STATE_PENDING:
@@ -296,7 +321,8 @@ def evaluate_plan(plan, candles):
                 r = -1.0
                 plan["state_detail"] = "SL HIT - INVALIDATED"
             plan["state"] = STATE_SL
-            plan["realized_r"] = round(r, 3)
+            plan["gross_r"] = round(r, 3)
+            plan["realized_r"] = round(r - cost_in_r(entry, sl), 3)
             plan["closed_ts"] = bar_ts
             changed = True
             break
@@ -308,7 +334,8 @@ def evaluate_plan(plan, candles):
                  if tp1_ts is not None else r_tp2)
             plan["state"] = STATE_TP2
             plan["state_detail"] = "TP2 HIT - CLOSED"
-            plan["realized_r"] = round(r, 3)
+            plan["gross_r"] = round(r, 3)
+            plan["realized_r"] = round(r - cost_in_r(entry, sl), 3)
             plan["closed_ts"] = bar_ts
             changed = True
             break
@@ -326,7 +353,8 @@ def evaluate_plan(plan, candles):
                 r = TP1_FRACTION * _r_at(tp1, entry, sl, direction) + (1 - TP1_FRACTION) * r
             plan["state"] = STATE_EXPIRED
             plan["state_detail"] = f"EXPIRAT dupa {bars} bare"
-            plan["realized_r"] = round(r, 3)
+            plan["gross_r"] = round(r, 3)
+            plan["realized_r"] = round(r - cost_in_r(entry, sl), 3)
             plan["closed_ts"] = bar_ts
             changed = True
             break
