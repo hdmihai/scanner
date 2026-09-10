@@ -1,19 +1,26 @@
 {
-  "text": "Din 14 planuri inchise, rata de succes e 50.0%, cu -1.14R cumulat (-0.284R in medie pe plan) si profit factor 0.47. 13 planuri sunt inca deschise. Separat, 174 planuri inchise (-70.20R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #242 NEAR/USDT -1.04R, #222 ATOM/USDT +0.53R, #234 SOL/USDT +0.00R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 4)).",
+  "text": "Din 15 planuri inchise, rata de succes e 40.0%, cu -2.21R cumulat (-0.441R in medie pe plan) si profit factor 0.31. 13 planuri sunt inca deschise. Separat, 174 planuri inchise (-70.20R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #223 POL/USDT -1.07R, #242 NEAR/USDT -1.04R, #222 ATOM/USDT +0.53R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 5)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-10 10:22 UTC",
+    "scan_time": "2026-09-10 11:21 UTC",
     "universe_size": 20,
-    "plans_total": 247,
+    "plans_total": 248,
     "plans_open": 13,
-    "plans_closed": 14,
+    "plans_closed": 15,
     "legacy_closed": 174,
     "legacy_total_r": -70.2,
-    "win_rate": 50.0,
-    "total_r": -1.14,
-    "avg_r": -0.284,
-    "profit_factor": 0.47,
+    "win_rate": 40.0,
+    "total_r": -2.21,
+    "avg_r": -0.441,
+    "profit_factor": 0.31,
     "recent_closed": [
+      {
+        "id": 223,
+        "symbol": "POL/USDT",
+        "direction": "LONG",
+        "state": "SL HIT - INVALIDATED",
+        "r": -1.07
+      },
       {
         "id": 242,
         "symbol": "NEAR/USDT",
@@ -41,16 +48,15 @@
         "direction": "LONG",
         "state": "TP1 HIT - SL LA BREAKEVEN",
         "r": 0.467
-      },
-      {
-        "id": 232,
-        "symbol": "BNB/USDT",
-        "direction": "SHORT",
-        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
-        "r": 0.0
       }
     ],
     "open_now": [
+      {
+        "id": 248,
+        "symbol": "POL/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
       {
         "id": 247,
         "symbol": "GRAM/USDT",
@@ -74,28 +80,22 @@
         "symbol": "AVAX/USDT",
         "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 243,
-        "symbol": "BNB/USDT",
-        "direction": "SHORT",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
       }
     ],
     "best_bucket": null,
     "worst_bucket": null,
     "agent_status": "SHADOW",
-    "agent_reason": "are nevoie de 300 exemple (are 4)",
-    "agent_samples": 4,
+    "agent_reason": "are nevoie de 300 exemple (are 5)",
+    "agent_samples": 5,
     "agent_balanced": null,
     "baseline_balanced": null,
     "agent_weights": {
-      "trend": 0.024645,
-      "momentum": -0.015922,
-      "volatility": -0.011175,
-      "volume": -0.020876,
-      "is_long": 0.023644,
-      "persistence_n": 0.008644
+      "trend": 0.024016,
+      "momentum": -0.016098,
+      "volatility": -0.029013,
+      "volume": -0.027619,
+      "is_long": -0.001515,
+      "persistence_n": -0.00142
     }
   }
 }
