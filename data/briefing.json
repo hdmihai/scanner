@@ -1,26 +1,28 @@
 {
-  "text": "15 planuri sunt deschise, niciunul inchis inca. Pana la primele inchideri nu pot spune nimic despre performanta - orice cifra ar fi speculatie. Separat, 174 planuri inchise (-70.20R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 0)).",
+  "text": "Din 1 planuri inchise, rata de succes e 0.0%, cu -1.09R cumulat (-1.092R in medie pe plan) si profit factor 0.0. 14 planuri sunt inca deschise. Separat, 174 planuri inchise (-70.20R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #235 AVAX/USDT -1.09R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 1)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-10 01:20 UTC",
+    "scan_time": "2026-09-10 02:22 UTC",
     "universe_size": 20,
     "plans_total": 235,
-    "plans_open": 15,
-    "plans_closed": 0,
+    "plans_open": 14,
+    "plans_closed": 1,
     "legacy_closed": 174,
     "legacy_total_r": -70.2,
-    "win_rate": null,
-    "total_r": 0,
-    "avg_r": null,
-    "profit_factor": null,
-    "recent_closed": [],
-    "open_now": [
+    "win_rate": 0.0,
+    "total_r": -1.09,
+    "avg_r": -1.092,
+    "profit_factor": 0.0,
+    "recent_closed": [
       {
         "id": 235,
         "symbol": "AVAX/USDT",
         "direction": "SHORT",
-        "state": "INTRARE ATINSA - pozitie activa"
-      },
+        "state": "SL HIT - INVALIDATED",
+        "r": -1.092
+      }
+    ],
+    "open_now": [
       {
         "id": 234,
         "symbol": "SOL/USDT",
@@ -44,22 +46,28 @@
         "symbol": "OP/USDT",
         "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 230,
+        "symbol": "LTC/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
       }
     ],
     "best_bucket": null,
     "worst_bucket": null,
     "agent_status": "SHADOW",
-    "agent_reason": "are nevoie de 300 exemple (are 0)",
-    "agent_samples": 0,
+    "agent_reason": "are nevoie de 300 exemple (are 1)",
+    "agent_samples": 1,
     "agent_balanced": null,
     "baseline_balanced": null,
     "agent_weights": {
-      "trend": 0.0,
-      "momentum": 0.0,
-      "volatility": 0.0,
-      "volume": 0.0,
+      "trend": -0.001725,
+      "momentum": -0.021475,
+      "volatility": -0.0137,
+      "volume": -0.025,
       "is_long": 0.0,
-      "persistence_n": 0.0
+      "persistence_n": -0.015
     }
   }
 }
