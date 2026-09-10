@@ -1,24 +1,24 @@
 {
   "model": {
     "weights": {
-      "trend": 0.46114,
-      "momentum": 0.578298,
-      "volatility": -0.19001,
-      "volume": -0.189295,
+      "trend": 0.458734,
+      "momentum": 0.565316,
+      "volatility": -0.195869,
+      "volume": -0.202286,
       "is_long": 0.061663,
-      "persistence_n": -0.00139
+      "persistence_n": -0.014382
     },
-    "bias": -1.433433
+    "bias": -1.446425
   },
-  "samples_trained": 4225,
+  "samples_trained": 4226,
   "last_trained_scan_ts": 0.0,
   "agent": {
-    "correct": 3014,
-    "total": 4225
+    "correct": 3015,
+    "total": 4226
   },
   "baseline": {
     "correct": 1287,
-    "total": 4225
+    "total": 4226
   },
   "by_direction": {
     "LONG": {
@@ -27,17 +27,13 @@
       "total": 2032
     },
     "SHORT": {
-      "agent": 1550,
+      "agent": 1551,
       "baseline": 692,
-      "total": 2193
+      "total": 2194
     }
   },
   "first_scan_ts": 1788382138.6609972,
   "pairs": [
-    [
-      0.29545,
-      0.0
-    ],
     [
       0.20305,
       0.0
@@ -2033,10 +2029,13 @@
     [
       0.21099,
       0.0
+    ],
+    [
+      0.25984,
+      0.0
     ]
   ],
   "recent": [
-    1,
     0,
     0,
     0,
@@ -2235,10 +2234,10 @@
     1,
     0,
     0,
+    1,
     1
   ],
   "recent_baseline": [
-    0,
     1,
     1,
     1,
@@ -2437,6 +2436,7 @@
     0,
     1,
     1,
+    0,
     0
   ],
   "curve": [
@@ -3457,16 +3457,16 @@
   ],
   "status": "SHADOW",
   "source": "plans-v4",
-  "status_reason": "acopera doar 7.6 zile din 21 necesare (prea putine regimuri de piata)",
-  "days_covered": 7.63,
-  "balanced_agent": 71.36333932950583,
-  "balanced_baseline": 30.41822181170582,
+  "status_reason": "acopera doar 7.7 zile din 21 necesare (prea putine regimuri de piata)",
+  "days_covered": 7.72,
+  "balanced_agent": 71.37002131798246,
+  "balanced_baseline": 30.411030620374824,
   "balanced_directions": [
     "LONG",
     "SHORT"
   ],
-  "auc": 0.695108801329303,
+  "auc": 0.6955153700659349,
   "majority_baseline": 65.4,
   "predicted_positive_rate": 19.2,
-  "last_event_ts": 1789041600.0
+  "last_event_ts": 1789048800.0
 }
