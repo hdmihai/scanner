@@ -257,12 +257,24 @@ def balanced_accuracy(by_direction, which, min_per_direction=30):
 
 
 def days_covered(state, plans=None):
-    first = state.get("first_scan_ts") or 0
-    last = state.get("last_event_ts") or 0
+    """Acoperirea calendaristica reala a datelor din care a invatat agentul.
+
+    BUG FIX: `first` se lua din starea salvata si nu cobora niciodata. Dupa ce
+    au fost adaugate 5510 planuri de backtest, vechi de pana la 180 de zile,
+    acoperirea raportata a ramas 7.8 zile - valoarea fixata la prima rulare
+    live. Agentul era blocat pe nedrept sub pragul de 21 de zile, desi avea
+    172 de zile de date. Acum se ia MINIMUL peste tot ce exista, nu prima
+    valoare intalnita.
+    """
+    candidates_first = [t for t in [state.get("first_scan_ts")] if t]
+    candidates_last = [t for t in [state.get("last_event_ts")] if t]
     if plans:
-        first = first or min((p.get("created_ts") or 0) for p in plans)
-        last = max([last] + [(p.get("closed_ts") or 0) for p in plans])
-    return (last - first) / 86400 if first and last and last > first else 0.0
+        candidates_first += [p["created_ts"] for p in plans if p.get("created_ts")]
+        candidates_last += [p["closed_ts"] for p in plans if p.get("closed_ts")]
+    if not candidates_first or not candidates_last:
+        return 0.0
+    first, last = min(candidates_first), max(candidates_last)
+    return (last - first) / 86400 if last > first else 0.0
 
 
 def load_agent():
@@ -381,6 +393,11 @@ def train_from_plans(plans, model, state):
             state["by_direction"][d]["total"] += 1
 
         state["pairs"] = (state.get("pairs", []) + [[round(p_agent, 5), y]])[-AUC_WINDOW:]
+        # perechi paralele pentru SCORUL brut, ca sa pot compara ordonarea:
+        # nu e de-ajuns ca agentul sa bata hazardul, trebuie sa bata euristica
+        # pe care ar urma sa o inlocuiasca.
+        state["score_pairs"] = (state.get("score_pairs", []) +
+                                [[round((score or 0) / 100.0, 5), y]])[-AUC_WINDOW:]
         state["recent"] = (state.get("recent", []) + [agent_ok])[-RECENT_WINDOW:]
         state["recent_baseline"] = (state.get("recent_baseline", []) + [base_ok])[-RECENT_WINDOW:]
 
@@ -401,7 +418,8 @@ def train_from_plans(plans, model, state):
     if closed:
         first = min((p.get("created_ts") or 0) for p in plans if p.get("created_ts"))
         last = max((p.get("closed_ts") or 0) for p in plans if p.get("closed_ts"))
-        state["first_scan_ts"] = state.get("first_scan_ts") or first
+        prev_first = state.get("first_scan_ts")
+        state["first_scan_ts"] = min(prev_first, first) if prev_first else first
         state["last_event_ts"] = last
 
     state["samples_trained"] = state.get("samples_trained", 0) + new_samples
@@ -415,6 +433,8 @@ def predict_for_signal(model, state, signal):
     return {
         "probability": round(model.predict_proba(x), 4),
         "active": state.get("status") == "ACTIVE",
+        # Agentul influenteaza EV doar daca ordoneaza mai bine decat scorul brut.
+        "superior": bool(state.get("agent_superior")),
     }
 
 
@@ -534,6 +554,9 @@ def main():
     state["balanced_directions"] = used
     pairs = state.get("pairs") or []
     state["auc"] = auc_score(pairs)
+    state["auc_score_baseline"] = auc_score(state.get("score_pairs") or [])
+    sa, sb = state["auc"], state["auc_score_baseline"]
+    state["agent_superior"] = bool(sa is not None and sb is not None and sa > sb)
     state["majority_baseline"] = majority_class_accuracy(pairs)
     state["predicted_positive_rate"] = predicted_positive_rate(pairs)
     save_json(MODEL_FILE, state)
@@ -562,7 +585,11 @@ def main():
         print(f"Prezice 'castig' in {ppr:.0f}% din cazuri" +
               ("  [!] model degenerat" if ppr < 5 or ppr > 95 else ""))
     if auc is not None:
-        print(f"AUC: {auc:.3f} (0.5 = hazard, prag {MIN_AUC})")
+        sb = state.get("auc_score_baseline")
+        extra = f" | AUC scor brut: {sb:.3f}" if sb is not None else ""
+        verdict = ("agentul ordoneaza mai bine" if state.get("agent_superior")
+                   else "scorul brut ordoneaza cel putin la fel de bine")
+        print(f"AUC: {auc:.3f} (0.5 = hazard, prag {MIN_AUC}){extra} -> {verdict}")
     print(f"Status: {state['status']} - {reason}")
     print("Greutati invatate:", json.dumps(state["model"]["weights"]))
 
