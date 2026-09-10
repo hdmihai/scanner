@@ -1,0 +1,122 @@
+name: Backtest
+
+# Rulare MANUALA, din tab-ul Actions -> "Backtest" -> "Run workflow".
+# Nu are `schedule`: backtest-ul descarca luni de istoric si nu are de ce sa
+# ruleze automat. Parametrii se aleg din formular, fara sa editezi fisierul.
+on:
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "Cate zile de istoric (180 = ~6 luni)"
+        required: true
+        default: "180"
+      mode:
+        description: "sweep = compara variante de intrare | single = doar configuratia actuala"
+        required: true
+        default: "sweep"
+        type: choice
+        options: [sweep, single]
+      merge:
+        description: "Adauga rezultatele in data/plans.json ca agentul sa invete din ele"
+        required: true
+        default: "false"
+        type: choice
+        options: ["false", "true"]
+
+permissions:
+  contents: write
+
+# Serializeaza cu scanarea orara: amandoua scriu in data/ si ar intra in
+# conflict la push daca ar rula simultan.
+concurrency:
+  group: scanner-data
+  cancel-in-progress: false
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    # Descarcarea a ~100 de pagini de istoric cu rate limit poate dura.
+    # 30 de minute e amplu, dar impiedica un job blocat sa ruleze la nesfarsit.
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Instaleaza dependinte
+        run: pip install ccxt requests
+
+      - name: Verifica compatibilitatea cu Python 3.11
+        run: python check_py311.py
+
+      - name: Ruleaza backtest-ul
+        # Parametrii trec prin `env`, NU interpolati direct in shell cu ${{ }}.
+        # Interpolarea directa insereaza textul in script inainte ca shell-ul
+        # sa-l vada, deci o valoare construita anume ar putea executa comenzi.
+        # Prin env, valoarea ramane un simplu sir pentru shell.
+        env:
+          BT_DAYS: ${{ inputs.days }}
+          BT_MODE: ${{ inputs.mode }}
+          BT_MERGE: ${{ inputs.merge }}
+        run: |
+          set -o pipefail
+
+          # Validez ca `days` e chiar un numar, altfel opresc aici cu mesaj clar.
+          case "$BT_DAYS" in
+            ''|*[!0-9]*) echo "[EROARE] 'days' trebuie sa fie un numar intreg, am primit: $BT_DAYS"; exit 1 ;;
+          esac
+
+          ARGS="--days $BT_DAYS"
+          [ "$BT_MODE" = "sweep" ] && ARGS="$ARGS --sweep"
+          [ "$BT_MERGE" = "true" ] && ARGS="$ARGS --merge"
+
+          echo "Rulez: python backtest.py $ARGS"
+          # tee: iesirea ajunge si in log, si intr-un fisier pe care il pun in
+          # rezumatul rularii, ca sa fie vizibila fara sa sapi prin log.
+          python backtest.py $ARGS 2>&1 | tee /tmp/backtest.log
+
+      - name: Pune rezultatul in rezumatul rularii
+        if: always()
+        env:
+          BT_DAYS: ${{ inputs.days }}
+          BT_MODE: ${{ inputs.mode }}
+          BT_MERGE: ${{ inputs.merge }}
+        run: |
+          {
+            echo "## Backtest - ${BT_DAYS} zile, mod ${BT_MODE}"
+            echo ""
+            if [ "$BT_MERGE" = "true" ]; then
+              echo "Rezultatele au fost adaugate in \`data/plans.json\`."
+              echo "Ruleaza apoi workflow-ul principal ca agentul sa invete din ele."
+            else
+              echo "Doar raport - datele agentului nu au fost atinse."
+            fi
+            echo ""
+            echo '```'
+            # Doar coada: partea de descarcare per simbol e lunga si se vede in log.
+            tail -n 60 /tmp/backtest.log 2>/dev/null || echo "(fara iesire)"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Salveaza rezultatele in repo
+        # Doar la succes: daca backtest-ul a crapat la jumatate, nu vreau sa
+        # comit un fisier scris partial peste datele bune.
+        if: success()
+        run: |
+          git config user.name "crypto-ai-scanner-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/
+          if git diff --staged --quiet; then
+            echo "Nimic de comis (modul sweep nu scrie fisiere)."
+            exit 0
+          fi
+          git commit -m "backtest $(date -u +'%Y-%m-%d %H:%M UTC')"
+          # Scanarea orara poate fi comis intre timp; rebase inainte de push.
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push
