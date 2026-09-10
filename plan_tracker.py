@@ -488,12 +488,23 @@ def decide(calibration, signal, agent_pred=None, bucket_size=20):
     avg_win = cal["avg_win_r"] if cal["avg_win_r"] is not None else 1.0
     avg_loss = cal["avg_loss_r"] if cal["avg_loss_r"] is not None else 1.0
 
-    if agent_active and agent_p is not None:
-        p, source = agent_p, f"agent AI ({100*agent_p:.0f}%)"
+    # BUG FIX: agentul NU mai inlocuieste probabilitatea in calculul EV.
+    # Iesirea unei regresii logistice antrenate pe date dezechilibrate nu e o
+    # probabilitate calibrata: masurat pe 4226 de planuri, agentul dadea median
+    # 0.19-0.27 acolo unde ratele reale erau 23%-60%. Substituind-o, poarta
+    # refuza pana si intervalul de scor cu +0.406R - singurul profitabil.
+    # In plus, agentul s-a dovedit ca ordoneaza mai PROST decat scorul brut
+    # (AUC 0.594 vs 0.606), deci nu are ce imbunatati deocamdata.
+    # Probabilitatea vine acum mereu din calibrare, care e masurata direct din
+    # rezultate. Agentul e inregistrat pe plan si va conta abia cand va dovedi
+    # ordonare superioara - vezi `agent_superior` din ai_agent.
+    p = cal["win_rate"] / 100.0
+    source = f"calibrare ({cal['win_rate']}%, n={cal['total']})"
+    agent_used = False
+    if agent_active and agent_p is not None and (agent_pred or {}).get("superior"):
+        p = agent_p
+        source = f"agent AI ({100*agent_p:.0f}%, ordonare dovedita superioara)"
         agent_used = True
-    else:
-        p, source = cal["win_rate"] / 100.0, f"calibrare ({cal['win_rate']}%, n={cal['total']})"
-        agent_used = False
 
     ev = p * avg_win - (1 - p) * avg_loss
     base = {"expected_value_r": round(ev, 3), "calibrated_prob": cal["win_rate"],
