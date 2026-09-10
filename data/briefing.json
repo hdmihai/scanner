@@ -1,19 +1,40 @@
 {
-  "text": "Din 8 planuri inchise, rata de succes e 0.0%, cu -1.09R cumulat (-1.092R in medie pe plan) si profit factor 0.0. 13 planuri sunt inca deschise. Separat, 174 planuri inchise (-70.20R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #224 FET/USDT +0.00R, #225 DOGE/USDT +0.00R, #226 LINK/USDT +0.00R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 1)).",
+  "text": "Din 11 planuri inchise, rata de succes e 50.0%, cu -0.62R cumulat (-0.312R in medie pe plan) si profit factor 0.43. 13 planuri sunt inca deschise. Separat, 174 planuri inchise (-70.20R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #221 NEAR/USDT +0.47R, #232 BNB/USDT +0.00R, #233 ADA/USDT +0.00R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 2)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-10 06:27 UTC",
+    "scan_time": "2026-09-10 07:22 UTC",
     "universe_size": 20,
-    "plans_total": 241,
+    "plans_total": 244,
     "plans_open": 13,
-    "plans_closed": 8,
+    "plans_closed": 11,
     "legacy_closed": 174,
     "legacy_total_r": -70.2,
-    "win_rate": 0.0,
-    "total_r": -1.09,
-    "avg_r": -1.092,
-    "profit_factor": 0.0,
+    "win_rate": 50.0,
+    "total_r": -0.62,
+    "avg_r": -0.312,
+    "profit_factor": 0.43,
     "recent_closed": [
+      {
+        "id": 221,
+        "symbol": "NEAR/USDT",
+        "direction": "LONG",
+        "state": "TP1 HIT - SL LA BREAKEVEN",
+        "r": 0.467
+      },
+      {
+        "id": 232,
+        "symbol": "BNB/USDT",
+        "direction": "SHORT",
+        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
+        "r": 0.0
+      },
+      {
+        "id": 233,
+        "symbol": "ADA/USDT",
+        "direction": "SHORT",
+        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
+        "r": 0.0
+      },
       {
         "id": 224,
         "symbol": "FET/USDT",
@@ -27,30 +48,27 @@
         "direction": "SHORT",
         "state": "PRETUL NU A REVENIT in 8 bare - anulat",
         "r": 0.0
-      },
-      {
-        "id": 226,
-        "symbol": "LINK/USDT",
-        "direction": "SHORT",
-        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
-        "r": 0.0
-      },
-      {
-        "id": 228,
-        "symbol": "AAVE/USDT",
-        "direction": "SHORT",
-        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
-        "r": 0.0
-      },
-      {
-        "id": 229,
-        "symbol": "UNI/USDT",
-        "direction": "SHORT",
-        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
-        "r": 0.0
       }
     ],
     "open_now": [
+      {
+        "id": 244,
+        "symbol": "AVAX/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 243,
+        "symbol": "BNB/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 242,
+        "symbol": "NEAR/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
       {
         "id": 241,
         "symbol": "AAVE/USDT",
@@ -62,40 +80,22 @@
         "symbol": "LINK/USDT",
         "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 239,
-        "symbol": "DOGE/USDT",
-        "direction": "SHORT",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 238,
-        "symbol": "FET/USDT",
-        "direction": "SHORT",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 237,
-        "symbol": "OP/USDT",
-        "direction": "SHORT",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
       }
     ],
     "best_bucket": null,
     "worst_bucket": null,
     "agent_status": "SHADOW",
-    "agent_reason": "are nevoie de 300 exemple (are 1)",
-    "agent_samples": 1,
+    "agent_reason": "are nevoie de 300 exemple (are 2)",
+    "agent_samples": 2,
     "agent_balanced": null,
     "baseline_balanced": null,
     "agent_weights": {
-      "trend": -0.001725,
-      "momentum": -0.021475,
-      "volatility": -0.0137,
-      "volume": -0.025,
-      "is_long": 0.0,
-      "persistence_n": -0.015
+      "trend": 0.015994,
+      "momentum": -0.013379,
+      "volatility": -0.000948,
+      "volume": -0.009764,
+      "is_long": 0.025867,
+      "persistence_n": 0.010867
     }
   }
 }
