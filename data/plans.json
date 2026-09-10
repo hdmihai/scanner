@@ -8483,7 +8483,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 19,
+      "bars_checked": 20,
       "score_at_entry": 56,
       "components": {
         "trend": 0.499,
@@ -9219,10 +9219,10 @@
       "tp2": 0.20215714,
       "risk": 0.00263571,
       "planned_r_tp2": 4.5,
-      "state": "PENDING",
-      "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
-      "realized_r": null,
-      "closed_ts": null,
+      "state": "NO_ENTRY",
+      "state_detail": "PRETUL NU A REVENIT in 8 bare - anulat",
+      "realized_r": 0.0,
+      "closed_ts": 1789063200.0,
       "bars_checked": 8,
       "score_at_entry": 58,
       "components": {
@@ -9242,7 +9242,8 @@
         "agent_used": false
       },
       "geometry": "v4",
-      "bar_seconds": 3600
+      "bar_seconds": 3600,
+      "gross_r": 0.0
     },
     {
       "id": 247,
@@ -9261,7 +9262,7 @@
       "state_detail": "TP1 HIT - RULEAZA SPRE TP2",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 7,
+      "bars_checked": 8,
       "score_at_entry": 52,
       "components": {
         "trend": 0.132,
@@ -9301,7 +9302,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 2,
+      "bars_checked": 3,
       "score_at_entry": 71,
       "components": {
         "trend": 0.04,
@@ -211881,7 +211882,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 1,
+      "bars_checked": 2,
       "score_at_entry": 65,
       "components": {
         "trend": 0.113,
@@ -211920,7 +211921,7 @@
       "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 3,
+      "bars_checked": 4,
       "score_at_entry": 62,
       "components": {
         "trend": 0.183,
@@ -211958,7 +211959,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 1,
+      "bars_checked": 2,
       "score_at_entry": 70,
       "components": {
         "trend": 0.845,
@@ -211997,7 +211998,7 @@
       "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 1,
+      "bars_checked": 2,
       "score_at_entry": 70,
       "components": {
         "trend": 0.563,
@@ -212035,7 +212036,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 1,
+      "bars_checked": 2,
       "score_at_entry": 66,
       "components": {
         "trend": 0.4,
@@ -212070,11 +212071,11 @@
       "tp2": 0.15288571,
       "risk": 0.00247857,
       "planned_r_tp2": 4.5,
-      "state": "PENDING",
-      "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
+      "state": "OPEN",
+      "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 0,
+      "bars_checked": 1,
       "score_at_entry": 77,
       "components": {
         "trend": 0.491,
@@ -212093,7 +212094,8 @@
         "agent_used": false
       },
       "geometry": "v4",
-      "bar_seconds": 3600
+      "bar_seconds": 3600,
+      "entered_ts": 1789063200.0
     },
     {
       "id": 5766,
@@ -212108,11 +212110,11 @@
       "tp2": 117.16714,
       "risk": 1.24571,
       "planned_r_tp2": 4.5,
-      "state": "PENDING",
-      "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
+      "state": "OPEN",
+      "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 0,
+      "bars_checked": 1,
       "score_at_entry": 64,
       "components": {
         "trend": 0.378,
@@ -212131,7 +212133,8 @@
         "agent_used": false
       },
       "geometry": "v4",
-      "bar_seconds": 3600
+      "bar_seconds": 3600,
+      "entered_ts": 1789063200.0
     },
     {
       "id": 5767,
@@ -212146,11 +212149,11 @@
       "tp2": 0.080208571,
       "risk": 0.00083786,
       "planned_r_tp2": 4.5,
-      "state": "PENDING",
-      "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
+      "state": "OPEN",
+      "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 0,
+      "bars_checked": 1,
       "score_at_entry": 63,
       "components": {
         "trend": 0.403,
@@ -212169,7 +212172,8 @@
         "agent_used": false
       },
       "geometry": "v4",
-      "bar_seconds": 3600
+      "bar_seconds": 3600,
+      "entered_ts": 1789063200.0
     },
     {
       "id": 5768,
@@ -212263,22 +212267,22 @@
     }
   },
   "summary": {
-    "no_entry": 1309,
-    "no_entry_pct": 23.6,
+    "no_entry": 1310,
+    "no_entry_pct": 23.7,
     "legacy_closed": 174,
     "legacy_total_r": -70.2,
     "geometry": "v4",
     "total_plans": 5768,
-    "open": 13,
+    "open": 12,
     "closed": 4226,
     "by_state": {
       "SL_HIT": 3832,
       "TP2_HIT": 542,
       "EXPIRED": 53,
-      "NO_ENTRY": 1328,
-      "OPEN": 5,
-      "PENDING": 7,
-      "TP1_HIT": 1
+      "NO_ENTRY": 1329,
+      "OPEN": 8,
+      "TP1_HIT": 1,
+      "PENDING": 3
     },
     "win_rate": 30.5,
     "total_r": -724.06,
