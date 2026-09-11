@@ -7,15 +7,19 @@ on:
   workflow_dispatch:
     inputs:
       days:
-        description: "Cate zile de istoric (180 = ~6 luni)"
+        description: "Zile de istoric: 180=6 luni, 730=2 ani, 1825=5 ani"
         required: true
-        default: "180"
+        default: "1825"
       mode:
-        description: "sweep = compara variante de intrare | single = doar configuratia actuala"
+        description: "walk_forward = validare pe ferestre nevazute (recomandat) | sweep = compara variante | single = raport simplu"
         required: true
-        default: "sweep"
+        default: "walk_forward"
         type: choice
-        options: [sweep, single]
+        options: [walk_forward, sweep, single]
+      windows:
+        description: "Cate ferestre de validare (doar pentru walk_forward)"
+        required: false
+        default: "6"
       merge:
         description: "Adauga rezultatele in data/plans.json ca agentul sa invete din ele"
         required: true
@@ -37,7 +41,9 @@ jobs:
     runs-on: ubuntu-latest
     # Descarcarea a ~100 de pagini de istoric cu rate limit poate dura.
     # 30 de minute e amplu, dar impiedica un job blocat sa ruleze la nesfarsit.
-    timeout-minutes: 30
+    # 5 ani x 20 simboluri: ~6 min descarcare + ~3 min replay. 60 de minute
+    # lasa marja pentru rate limit mai strict sau burse mai lente.
+    timeout-minutes: 60
 
     steps:
       - name: Checkout repo
@@ -100,7 +106,7 @@ jobs:
             echo ""
             echo '```'
             # Doar coada: partea de descarcare per simbol e lunga si se vede in log.
-            tail -n 60 /tmp/backtest.log 2>/dev/null || echo "(fara iesire)"
+            tail -n 80 /tmp/backtest.log 2>/dev/null || echo "(fara iesire)"
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
