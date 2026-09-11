@@ -1,19 +1,26 @@
 {
-  "text": "Din 5544 planuri inchise, rata de succes e 30.5%, cu -724.87R cumulat (-0.171R in medie pe plan) si profit factor 0.78. 9 planuri sunt inca deschise. Separat, 174 planuri inchise (-70.20R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #5762 UNI/USDT +0.53R, #5766 AAVE/USDT +0.40R, #5767 DOGE/USDT +0.40R. Pe intervalele de scor cu destule date, cel mai bine merge 80-99 (60.0%, +0.41R mediu, n=65), iar cel mai slab 20-39 (23.5%, -0.25R, n=1389). Deciziile de a deschide sau refuza planuri se bazeaza pe aceste cifre masurate, nu pe scorul brut. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 71.3% fata de 30.4% baseline, pe 4231 planuri invatate.",
+  "text": "Din 5545 planuri inchise, rata de succes e 30.5%, cu -726.05R cumulat (-0.172R in medie pe plan) si profit factor 0.78. 8 planuri sunt inca deschise. Separat, 174 planuri inchise (-70.20R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #5770 BTC/USDT -1.18R, #5762 UNI/USDT +0.53R, #5766 AAVE/USDT +0.40R. Pe intervalele de scor cu destule date, cel mai bine merge 80-99 (60.0%, +0.41R mediu, n=65), iar cel mai slab 20-39 (23.5%, -0.25R, n=1389). Deciziile de a deschide sau refuza planuri se bazeaza pe aceste cifre masurate, nu pe scorul brut. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 71.3% fata de 30.4% baseline, pe 4232 planuri invatate.",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-11 05:20 UTC",
+    "scan_time": "2026-09-11 06:26 UTC",
     "universe_size": 20,
     "plans_total": 5773,
-    "plans_open": 9,
-    "plans_closed": 5544,
+    "plans_open": 8,
+    "plans_closed": 5545,
     "legacy_closed": 174,
     "legacy_total_r": -70.2,
     "win_rate": 30.5,
-    "total_r": -724.87,
-    "avg_r": -0.171,
+    "total_r": -726.05,
+    "avg_r": -0.172,
     "profit_factor": 0.78,
     "recent_closed": [
+      {
+        "id": 5770,
+        "symbol": "BTC/USDT",
+        "direction": "SHORT",
+        "state": "SL HIT - INVALIDATED",
+        "r": -1.181
+      },
       {
         "id": 5762,
         "symbol": "UNI/USDT",
@@ -41,13 +48,6 @@
         "direction": "SHORT",
         "state": "SL HIT - INVALIDATED",
         "r": -1.066
-      },
-      {
-        "id": 5768,
-        "symbol": "AVAX/USDT",
-        "direction": "SHORT",
-        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
-        "r": 0.0
       }
     ],
     "open_now": [
@@ -61,7 +61,7 @@
         "id": 5772,
         "symbol": "AVAX/USDT",
         "direction": "SHORT",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
+        "state": "INTRARE ATINSA - pozitie activa"
       },
       {
         "id": 5771,
@@ -70,16 +70,16 @@
         "state": "INTRARE ATINSA - pozitie activa"
       },
       {
-        "id": 5770,
-        "symbol": "BTC/USDT",
-        "direction": "SHORT",
-        "state": "INTRARE ATINSA - pozitie activa"
-      },
-      {
         "id": 5769,
         "symbol": "XRP/USDT",
         "direction": "SHORT",
         "state": "INTRARE ATINSA - pozitie activa"
+      },
+      {
+        "id": 5764,
+        "symbol": "LINK/USDT",
+        "direction": "SHORT",
+        "state": "TP1 HIT - RULEAZA SPRE TP2"
       }
     ],
     "best_bucket": {
@@ -106,16 +106,16 @@
     },
     "agent_status": "ACTIVE",
     "agent_reason": "acuratete echilibrata 71.3% vs euristica 30.4%",
-    "agent_samples": 4231,
-    "agent_balanced": 71.33512727689394,
-    "baseline_balanced": 30.443385594024484,
+    "agent_samples": 4232,
+    "agent_balanced": 71.34180386542593,
+    "baseline_balanced": 30.43620257695061,
     "agent_weights": {
-      "trend": 0.511188,
-      "momentum": 0.635961,
-      "volatility": -0.146331,
-      "volume": -0.149493,
+      "trend": 0.509056,
+      "momentum": 0.623339,
+      "volatility": -0.150343,
+      "volume": -0.163979,
       "is_long": 0.061662,
-      "persistence_n": 0.023398
+      "persistence_n": 0.008911
     }
   }
 }
