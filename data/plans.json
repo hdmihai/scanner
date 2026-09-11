@@ -1,5 +1,5 @@
 {
-  "next_id": 5771,
+  "next_id": 5772,
   "plans": [
     {
       "id": 1,
@@ -8483,7 +8483,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 25,
+      "bars_checked": 26,
       "score_at_entry": 56,
       "components": {
         "trend": 0.499,
@@ -9262,7 +9262,7 @@
       "state_detail": "TP1 HIT - RULEAZA SPRE TP2",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 13,
+      "bars_checked": 14,
       "score_at_entry": 52,
       "components": {
         "trend": 0.132,
@@ -9302,7 +9302,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 8,
+      "bars_checked": 9,
       "score_at_entry": 71,
       "components": {
         "trend": 0.04,
@@ -211962,7 +211962,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 7,
+      "bars_checked": 8,
       "score_at_entry": 70,
       "components": {
         "trend": 0.845,
@@ -212001,7 +212001,7 @@
       "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 7,
+      "bars_checked": 8,
       "score_at_entry": 70,
       "components": {
         "trend": 0.563,
@@ -212039,7 +212039,7 @@
       "state_detail": "TP1 HIT - RULEAZA SPRE TP2",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 7,
+      "bars_checked": 8,
       "score_at_entry": 66,
       "components": {
         "trend": 0.4,
@@ -212079,7 +212079,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 6,
+      "bars_checked": 7,
       "score_at_entry": 77,
       "components": {
         "trend": 0.491,
@@ -212118,7 +212118,7 @@
       "state_detail": "TP1 HIT - RULEAZA SPRE TP2",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 6,
+      "bars_checked": 7,
       "score_at_entry": 64,
       "components": {
         "trend": 0.378,
@@ -212158,7 +212158,7 @@
       "state_detail": "TP1 HIT - RULEAZA SPRE TP2",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 6,
+      "bars_checked": 7,
       "score_at_entry": 63,
       "components": {
         "trend": 0.403,
@@ -212198,7 +212198,7 @@
       "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 5,
+      "bars_checked": 6,
       "score_at_entry": 63,
       "components": {
         "trend": 0.251,
@@ -212294,6 +212294,44 @@
       },
       "geometry": "v4",
       "bar_seconds": 3600
+    },
+    {
+      "id": 5771,
+      "symbol": "ATOM/USDT",
+      "direction": "SHORT",
+      "created_ts": 1789089599.5601456,
+      "created_time": "2026-09-11 01:19 UTC",
+      "entry": 1.803,
+      "signal_price": 1.788,
+      "sl": 1.833,
+      "tp1": 1.493,
+      "tp2": 1.478,
+      "risk": 0.03,
+      "planned_r_tp2": 10.83,
+      "state": "PENDING",
+      "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
+      "realized_r": null,
+      "closed_ts": null,
+      "bars_checked": 0,
+      "score_at_entry": 63,
+      "components": {
+        "trend": 0.019,
+        "momentum": 0.35,
+        "volatility": 0.839,
+        "volume": 0.986
+      },
+      "persistence_at_entry": 1,
+      "decision": {
+        "action": "ISSUE",
+        "mode": "EXPLOATARE",
+        "reason": "valoare asteptata +0.01R la scor ~63, sansa din calibrare (46.2%, n=673) (IC calibrare 42.5-50.0%)",
+        "expected_value_r": 0.007,
+        "calibrated_prob": 46.2,
+        "agent_prob": 0.1633,
+        "agent_used": false
+      },
+      "geometry": "v4",
+      "bar_seconds": 3600
     }
   ],
   "calibration": {
@@ -212354,8 +212392,8 @@
     "legacy_closed": 174,
     "legacy_total_r": -70.2,
     "geometry": "v4",
-    "total_plans": 5770,
-    "open": 12,
+    "total_plans": 5771,
+    "open": 13,
     "closed": 4227,
     "by_state": {
       "SL_HIT": 3833,
@@ -212364,7 +212402,7 @@
       "NO_ENTRY": 1330,
       "OPEN": 4,
       "TP1_HIT": 4,
-      "PENDING": 4
+      "PENDING": 5
     },
     "win_rate": 30.4,
     "total_r": -725.13,
