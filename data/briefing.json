@@ -1,19 +1,26 @@
 {
-  "text": "Din 5546 planuri inchise, rata de succes e 30.5%, cu -727.15R cumulat (-0.172R in medie pe plan) si profit factor 0.78. 7 planuri sunt inca deschise. Separat, 174 planuri inchise (-70.20R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #5769 XRP/USDT -1.10R, #5770 BTC/USDT -1.18R, #5762 UNI/USDT +0.53R. Pe intervalele de scor cu destule date, cel mai bine merge 80-99 (60.0%, +0.41R mediu, n=65), iar cel mai slab 20-39 (23.5%, -0.25R, n=1389). Deciziile de a deschide sau refuza planuri se bazeaza pe aceste cifre masurate, nu pe scorul brut. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 71.3% fata de 30.4% baseline, pe 4233 planuri invatate.",
+  "text": "Din 5547 planuri inchise, rata de succes e 30.5%, cu -728.21R cumulat (-0.172R in medie pe plan) si profit factor 0.78. 6 planuri sunt inca deschise. Separat, 174 planuri inchise (-70.20R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #248 POL/USDT -1.06R, #5769 XRP/USDT -1.10R, #5770 BTC/USDT -1.18R. Pe intervalele de scor cu destule date, cel mai bine merge 80-99 (60.0%, +0.41R mediu, n=65), iar cel mai slab 20-39 (23.5%, -0.25R, n=1389). Deciziile de a deschide sau refuza planuri se bazeaza pe aceste cifre masurate, nu pe scorul brut. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 71.4% fata de 30.4% baseline, pe 4234 planuri invatate.",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-11 08:23 UTC",
+    "scan_time": "2026-09-11 09:21 UTC",
     "universe_size": 20,
     "plans_total": 5773,
-    "plans_open": 7,
-    "plans_closed": 5546,
+    "plans_open": 6,
+    "plans_closed": 5547,
     "legacy_closed": 174,
     "legacy_total_r": -70.2,
     "win_rate": 30.5,
-    "total_r": -727.15,
+    "total_r": -728.21,
     "avg_r": -0.172,
     "profit_factor": 0.78,
     "recent_closed": [
+      {
+        "id": 248,
+        "symbol": "POL/USDT",
+        "direction": "SHORT",
+        "state": "SL HIT - INVALIDATED",
+        "r": -1.062
+      },
       {
         "id": 5769,
         "symbol": "XRP/USDT",
@@ -41,13 +48,6 @@
         "direction": "SHORT",
         "state": "TP1 HIT - SL LA BREAKEVEN",
         "r": 0.401
-      },
-      {
-        "id": 5767,
-        "symbol": "DOGE/USDT",
-        "direction": "SHORT",
-        "state": "TP1 HIT - SL LA BREAKEVEN",
-        "r": 0.4
       }
     ],
     "open_now": [
@@ -76,10 +76,10 @@
         "state": "TP1 HIT - RULEAZA SPRE TP2"
       },
       {
-        "id": 248,
-        "symbol": "POL/USDT",
+        "id": 247,
+        "symbol": "GRAM/USDT",
         "direction": "SHORT",
-        "state": "INTRARE ATINSA - pozitie activa"
+        "state": "TP1 HIT - RULEAZA SPRE TP2"
       }
     ],
     "best_bucket": {
@@ -105,15 +105,15 @@
       "reliable": true
     },
     "agent_status": "ACTIVE",
-    "agent_reason": "acuratete echilibrata 71.3% vs euristica 30.4%",
-    "agent_samples": 4233,
-    "agent_balanced": 71.34847438708962,
-    "baseline_balanced": 30.429026086925415,
+    "agent_reason": "acuratete echilibrata 71.4% vs euristica 30.4%",
+    "agent_samples": 4234,
+    "agent_balanced": 71.35513885015055,
+    "baseline_balanced": 30.42185611505646,
     "agent_weights": {
-      "trend": 0.504721,
-      "momentum": 0.60833,
-      "volatility": -0.157891,
-      "volume": -0.179075,
+      "trend": 0.504248,
+      "momentum": 0.598738,
+      "volatility": -0.167491,
+      "volume": -0.190825,
       "is_long": 0.061662,
       "persistence_n": -0.006186
     }
