@@ -1,91 +1,53 @@
 {
-  "text": "Din 5551 planuri inchise, rata de succes e 30.5%, cu -729.38R cumulat (-0.172R in medie pe plan) si profit factor 0.78. 2 planuri sunt inca deschise. Separat, 174 planuri inchise (-70.20R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #247 GRAM/USDT +0.62R, #5764 LINK/USDT +0.41R, #5773 FET/USDT -1.07R. Pe intervalele de scor cu destule date, cel mai bine merge 80-99 (60.0%, +0.41R mediu, n=65), iar cel mai slab 20-39 (23.5%, -0.25R, n=1389). Deciziile de a deschide sau refuza planuri se bazeaza pe aceste cifre masurate, nu pe scorul brut. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 71.3% fata de 30.4% baseline, pe 4238 planuri invatate.",
+  "text": "9 planuri sunt deschise, niciunul inchis inca. Pana la primele inchideri nu pot spune nimic despre performanta - orice cifra ar fi speculatie. Separat, 5725 planuri inchise (-799.57R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 71.3% fata de 30.4% baseline, pe 4238 planuri invatate.",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-11 21:19 UTC",
-    "universe_size": 20,
-    "plans_total": 5773,
-    "plans_open": 2,
-    "plans_closed": 5551,
-    "legacy_closed": 174,
-    "legacy_total_r": -70.2,
-    "win_rate": 30.5,
-    "total_r": -729.38,
-    "avg_r": -0.172,
-    "profit_factor": 0.78,
-    "recent_closed": [
-      {
-        "id": 247,
-        "symbol": "GRAM/USDT",
-        "direction": "SHORT",
-        "state": "TP1 HIT - SL LA BREAKEVEN",
-        "r": 0.618
-      },
-      {
-        "id": 5764,
-        "symbol": "LINK/USDT",
-        "direction": "SHORT",
-        "state": "TP1 HIT - SL LA BREAKEVEN",
-        "r": 0.405
-      },
-      {
-        "id": 5773,
-        "symbol": "FET/USDT",
-        "direction": "SHORT",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.07
-      },
-      {
-        "id": 5772,
-        "symbol": "AVAX/USDT",
-        "direction": "SHORT",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.119
-      },
-      {
-        "id": 248,
-        "symbol": "POL/USDT",
-        "direction": "SHORT",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.062
-      }
-    ],
+    "scan_time": "2026-09-11 22:20 UTC",
+    "universe_size": 14,
+    "plans_total": 5782,
+    "plans_open": 9,
+    "plans_closed": 0,
+    "legacy_closed": 5725,
+    "legacy_total_r": -799.57,
+    "win_rate": null,
+    "total_r": 0,
+    "avg_r": null,
+    "profit_factor": null,
+    "recent_closed": [],
     "open_now": [
       {
-        "id": 5771,
-        "symbol": "ATOM/USDT",
+        "id": 5782,
+        "symbol": "LINK/USDT",
         "direction": "SHORT",
-        "state": "INTRARE ATINSA - pozitie activa"
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
       },
       {
-        "id": 227,
-        "symbol": "ARB/USDT",
+        "id": 5781,
+        "symbol": "ADA/USDT",
         "direction": "SHORT",
-        "state": "INTRARE ATINSA - pozitie activa"
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 5780,
+        "symbol": "FET/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 5779,
+        "symbol": "ALGO/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 5778,
+        "symbol": "AVAX/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
       }
     ],
-    "best_bucket": {
-      "range": "80-99",
-      "total": 65,
-      "win_rate": 60.0,
-      "ci_low": 47.9,
-      "ci_high": 71.0,
-      "avg_r": 0.406,
-      "avg_win_r": 1.379,
-      "avg_loss_r": 1.053,
-      "reliable": true
-    },
-    "worst_bucket": {
-      "range": "20-39",
-      "total": 1389,
-      "win_rate": 23.5,
-      "ci_low": 21.3,
-      "ci_high": 25.8,
-      "avg_r": -0.247,
-      "avg_win_r": 2.705,
-      "avg_loss_r": 1.152,
-      "reliable": true
-    },
+    "best_bucket": null,
+    "worst_bucket": null,
     "agent_status": "ACTIVE",
     "agent_reason": "acuratete echilibrata 71.3% vs euristica 30.4%",
     "agent_samples": 4238,
