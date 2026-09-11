@@ -56,7 +56,12 @@ MIN_BUCKET_SAMPLES = 20  # sub atat, nu pronunt o probabilitate calibrata
 # Calibrarea foloseste doar planuri din versiunea curenta.
 # v1 -> v2: TP1 nu mai poate fi sub 1R (v1 producea planuri cu asteptare
 # negativa prin constructie: 21 din 47 aveau TP1 sub 1R, unul la 0.00R).
-GEOMETRY_VERSION = "v4"
+# Timeframe-ul face parte din versiunea geometriei: un plan de pe 4h are alta
+# distributie de rezultate decat unul de pe 1h (miscari mai ample la acelasi
+# cost de tranzactie). Amestecarea lor in calibrare ar media doua sisteme
+# diferite - aceeasi eroare pe care am evitat-o la schimbarile de geometrie.
+# Asa, trecerea de la 1h la 4h separa automat datele, fara interventie manuala.
+GEOMETRY_VERSION = "v4-" + os.environ.get("SCAN_TIMEFRAME", "1h")
 # v3 -> v4: doua schimbari care fac rezultatele necomparabile cu cele anterioare.
 #   1. Scanarea nu mai foloseste lumanarea curenta, neinchisa. Cron-ul e :07 dar
 #      rulari reale au fost masurate intre :09 si :59, deci bara era prinsa intre
