@@ -1,24 +1,24 @@
 {
   "model": {
     "weights": {
-      "trend": 0.49958,
-      "momentum": 0.588172,
-      "volatility": -0.173211,
-      "volume": -0.201901,
-      "is_long": 0.061662,
-      "persistence_n": -0.01971
+      "trend": 0.515075,
+      "momentum": 0.630809,
+      "volatility": -0.145866,
+      "volume": -0.140072,
+      "is_long": 0.061661,
+      "persistence_n": 0.045412
     },
-    "bias": -1.413925
+    "bias": -1.348802
   },
-  "samples_trained": 4235,
+  "samples_trained": 4238,
   "last_trained_scan_ts": 0.0,
   "agent": {
-    "correct": 3021,
-    "total": 4235
+    "correct": 3022,
+    "total": 4238
   },
   "baseline": {
-    "correct": 1290,
-    "total": 4235
+    "correct": 1292,
+    "total": 4238
   },
   "by_direction": {
     "LONG": {
@@ -27,25 +27,13 @@
       "total": 2032
     },
     "SHORT": {
-      "agent": 1557,
-      "baseline": 695,
-      "total": 2203
+      "agent": 1558,
+      "baseline": 697,
+      "total": 2206
     }
   },
   "first_scan_ts": 1774216800.0,
   "pairs": [
-    [
-      0.2014,
-      0.0
-    ],
-    [
-      0.23017,
-      1.0
-    ],
-    [
-      0.27993,
-      0.0
-    ],
     [
       0.18491,
       0.0
@@ -2033,12 +2021,21 @@
     [
       0.27049,
       0.0
+    ],
+    [
+      0.20801,
+      1.0
+    ],
+    [
+      0.26899,
+      1.0
+    ],
+    [
+      0.22055,
+      0.0
     ]
   ],
   "recent": [
-    0,
-    1,
-    1,
     1,
     1,
     0,
@@ -2235,12 +2232,12 @@
     1,
     1,
     1,
+    1,
+    0,
+    0,
     1
   ],
   "recent_baseline": [
-    1,
-    0,
-    0,
     0,
     0,
     1,
@@ -2437,6 +2434,9 @@
     0,
     0,
     0,
+    0,
+    1,
+    1,
     0
   ],
   "curve": [
@@ -3457,19 +3457,19 @@
   ],
   "status": "ACTIVE",
   "source": "plans-v4",
-  "status_reason": "acuratete echilibrata 71.4% vs euristica 30.4%",
-  "days_covered": 172.58,
-  "balanced_agent": 71.36179726285916,
-  "balanced_baseline": 30.41469265246747,
+  "status_reason": "acuratete echilibrata 71.3% vs euristica 30.4%",
+  "days_covered": 172.62,
+  "balanced_agent": 71.33640536546713,
+  "balanced_baseline": 30.43857214754321,
   "balanced_directions": [
     "LONG",
     "SHORT"
   ],
-  "auc": 0.6925362637362638,
-  "majority_baseline": 65.0,
+  "auc": 0.6908494668911336,
+  "majority_baseline": 64.8,
   "predicted_positive_rate": 19.2,
-  "last_event_ts": 1789128000.0,
-  "auc_score_baseline": 0.3888888888888889,
+  "last_event_ts": 1789131600.0,
+  "auc_score_baseline": 0.4,
   "agent_superior": true,
   "score_pairs": [
     [
@@ -3506,6 +3506,18 @@
     ],
     [
       0.62,
+      0.0
+    ],
+    [
+      0.52,
+      1.0
+    ],
+    [
+      0.66,
+      1.0
+    ],
+    [
+      0.6,
       0.0
     ]
   ]

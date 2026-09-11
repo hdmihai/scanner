@@ -8483,7 +8483,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 38,
+      "bars_checked": 39,
       "score_at_entry": 56,
       "components": {
         "trend": 0.499,
@@ -9258,11 +9258,11 @@
       "tp2": 1.3211429,
       "risk": 0.0112143,
       "planned_r_tp2": 4.5,
-      "state": "TP1_HIT",
-      "state_detail": "TP1 HIT - RULEAZA SPRE TP2",
-      "realized_r": null,
-      "closed_ts": null,
-      "bars_checked": 26,
+      "state": "SL_HIT",
+      "state_detail": "TP1 HIT - SL LA BREAKEVEN",
+      "realized_r": 0.618,
+      "closed_ts": 1789131600.0,
+      "bars_checked": 27,
       "score_at_entry": 52,
       "components": {
         "trend": 0.132,
@@ -9283,7 +9283,9 @@
       "geometry": "v4",
       "bar_seconds": 3600,
       "entered_ts": 1789038000.0,
-      "tp1_hit_ts": 1789041600.0
+      "tp1_hit_ts": 1789041600.0,
+      "gross_r": 0.74,
+      "agent_trained": true
     },
     {
       "id": 248,
@@ -212041,11 +212043,11 @@
       "tp2": 11.151286,
       "risk": 0.121429,
       "planned_r_tp2": 4.5,
-      "state": "TP1_HIT",
-      "state_detail": "TP1 HIT - RULEAZA SPRE TP2",
-      "realized_r": null,
-      "closed_ts": null,
-      "bars_checked": 20,
+      "state": "SL_HIT",
+      "state_detail": "TP1 HIT - SL LA BREAKEVEN",
+      "realized_r": 0.405,
+      "closed_ts": 1789131600.0,
+      "bars_checked": 21,
       "score_at_entry": 66,
       "components": {
         "trend": 0.4,
@@ -212066,7 +212068,9 @@
       "geometry": "v4",
       "bar_seconds": 3600,
       "entered_ts": 1789059600.0,
-      "tp1_hit_ts": 1789074000.0
+      "tp1_hit_ts": 1789074000.0,
+      "gross_r": 0.501,
+      "agent_trained": true
     },
     {
       "id": 5765,
@@ -212331,7 +212335,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 11,
+      "bars_checked": 12,
       "score_at_entry": 63,
       "components": {
         "trend": 0.019,
@@ -212407,11 +212411,11 @@
       "tp2": 0.15781429,
       "risk": 0.00242143,
       "planned_r_tp2": 4.5,
-      "state": "OPEN",
-      "state_detail": "INTRARE ATINSA - pozitie activa",
-      "realized_r": null,
-      "closed_ts": null,
-      "bars_checked": 1,
+      "state": "SL_HIT",
+      "state_detail": "SL HIT - INVALIDATED",
+      "realized_r": -1.07,
+      "closed_ts": 1789131600.0,
+      "bars_checked": 2,
       "score_at_entry": 60,
       "components": {
         "trend": 0.394,
@@ -212431,17 +212435,19 @@
       },
       "geometry": "v4",
       "bar_seconds": 3600,
-      "entered_ts": 1789128000.0
+      "entered_ts": 1789128000.0,
+      "gross_r": -1.0,
+      "agent_trained": true
     }
   ],
   "calibration": {
     "40": {
-      "total": 2013,
+      "total": 2014,
       "win_rate": 29.0,
-      "ci_low": 27.0,
+      "ci_low": 27.1,
       "ci_high": 31.0,
       "avg_r": -0.206,
-      "avg_win_r": 2.032,
+      "avg_win_r": 2.03,
       "avg_loss_r": 1.119,
       "reliable": true
     },
@@ -212456,12 +212462,12 @@
       "reliable": true
     },
     "60": {
-      "total": 681,
+      "total": 683,
       "win_rate": 46.1,
       "ci_low": 42.4,
       "ci_high": 49.9,
-      "avg_r": 0.001,
-      "avg_win_r": 1.267,
+      "avg_r": -0.0,
+      "avg_win_r": 1.264,
       "avg_loss_r": 1.082,
       "reliable": true
     },
@@ -212493,18 +212499,17 @@
     "legacy_total_r": -70.2,
     "geometry": "v4",
     "total_plans": 5773,
-    "open": 5,
-    "closed": 4235,
+    "open": 2,
+    "closed": 4238,
     "by_state": {
-      "SL_HIT": 3841,
+      "SL_HIT": 3844,
       "TP2_HIT": 542,
       "EXPIRED": 53,
       "NO_ENTRY": 1332,
-      "OPEN": 3,
-      "TP1_HIT": 2
+      "OPEN": 2
     },
     "win_rate": 30.5,
-    "total_r": -729.33,
+    "total_r": -729.38,
     "avg_r": -0.172,
     "profit_factor": 0.78,
     "best": 14.433,
