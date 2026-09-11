@@ -69,12 +69,16 @@ CONFIG = {
     # de ATR conteaza mai mult decat numarul brut de simboluri, pentru ca da
     # regimuri diferite in ACEEASI perioada calendaristica.
     "watchlist": [
-        "ADA", "AVAX", "POL", "LINK", "FET", "NEAR", "GRAM",
-        "BTC", "ETH", "SOL", "XRP", "DOGE",
-        "BNB", "LTC", "DOT", "ATOM", "UNI", "AAVE", "ARB", "OP",
+        "POL", "DOT", "AVAX", "JASMY", "FET", "SEI", "EGLD", "NEAR",
+        "LINK", "ADA", "ALGO", "SUI", "TRX", "AXS", "CHZ",
     ],
-    "aliases": {"GRAM": ["GRAM", "TON"], "POL": ["POL", "MATIC"]},
-    "timeframe": "1h",
+    # Redenumiri de care sunt sigur. Backtest-ul alege aliasul cu istoricul
+    # cel mai adanc, nu pe cel cu volumul mai mare.
+    "aliases": {"POL": ["POL", "MATIC"], "EGLD": ["EGLD", "ERD"]},
+    # Configurabil din mediu, ca sa poata fi schimbat din workflow fara sa
+    # editezi codul. Backtest-ul citeste acelasi CONFIG, deci scanarea si
+    # backtest-ul raman mereu pe acelasi timeframe.
+    "timeframe": os.environ.get("SCAN_TIMEFRAME", "1h"),
     "candles": 200,
     "lookahead_hours": 24,     # dupa cate ore evaluam daca un semnal a "nimerit"
     "hit_threshold_atr": 0.5,  # miscare minima (in ATR-uri) ca sa conteze "hit"
