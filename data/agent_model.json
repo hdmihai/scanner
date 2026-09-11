@@ -1,24 +1,24 @@
 {
   "model": {
     "weights": {
-      "trend": 0.504248,
-      "momentum": 0.598738,
-      "volatility": -0.167491,
-      "volume": -0.190825,
+      "trend": 0.49958,
+      "momentum": 0.588172,
+      "volatility": -0.173211,
+      "volume": -0.201901,
       "is_long": 0.061662,
-      "persistence_n": -0.006186
+      "persistence_n": -0.01971
     },
-    "bias": -1.400401
+    "bias": -1.413925
   },
-  "samples_trained": 4234,
+  "samples_trained": 4235,
   "last_trained_scan_ts": 0.0,
   "agent": {
-    "correct": 3020,
-    "total": 4234
+    "correct": 3021,
+    "total": 4235
   },
   "baseline": {
     "correct": 1290,
-    "total": 4234
+    "total": 4235
   },
   "by_direction": {
     "LONG": {
@@ -27,17 +27,13 @@
       "total": 2032
     },
     "SHORT": {
-      "agent": 1556,
+      "agent": 1557,
       "baseline": 695,
-      "total": 2202
+      "total": 2203
     }
   },
   "first_scan_ts": 1774216800.0,
   "pairs": [
-    [
-      0.20805,
-      0.0
-    ],
     [
       0.2014,
       0.0
@@ -2033,11 +2029,14 @@
     [
       0.23503,
       0.0
+    ],
+    [
+      0.27049,
+      0.0
     ]
   ],
   "recent": [
     0,
-    0,
     1,
     1,
     1,
@@ -2233,13 +2232,13 @@
     0,
     0,
     0,
+    1,
     1,
     1,
     1
   ],
   "recent_baseline": [
     1,
-    1,
     0,
     0,
     0,
@@ -2435,6 +2434,7 @@
     1,
     1,
     1,
+    0,
     0,
     0,
     0
@@ -3458,18 +3458,18 @@
   "status": "ACTIVE",
   "source": "plans-v4",
   "status_reason": "acuratete echilibrata 71.4% vs euristica 30.4%",
-  "days_covered": 172.42,
-  "balanced_agent": 71.35513885015055,
-  "balanced_baseline": 30.42185611505646,
+  "days_covered": 172.58,
+  "balanced_agent": 71.36179726285916,
+  "balanced_baseline": 30.41469265246747,
   "balanced_directions": [
     "LONG",
     "SHORT"
   ],
-  "auc": 0.6932043956043956,
+  "auc": 0.6925362637362638,
   "majority_baseline": 65.0,
   "predicted_positive_rate": 19.2,
-  "last_event_ts": 1789113600.0,
-  "auc_score_baseline": 0.26666666666666666,
+  "last_event_ts": 1789128000.0,
+  "auc_score_baseline": 0.3888888888888889,
   "agent_superior": true,
   "score_pairs": [
     [
@@ -3502,6 +3502,10 @@
     ],
     [
       0.71,
+      0.0
+    ],
+    [
+      0.62,
       0.0
     ]
   ]
