@@ -16,6 +16,12 @@ on:
         default: "walk_forward"
         type: choice
         options: [walk_forward, sweep, single]
+      timeframe:
+        description: "Timeframe: 1h, 4h, 1d. Rezultatele de pe timeframe-uri diferite se separa automat in calibrare."
+        required: true
+        default: "1h"
+        type: choice
+        options: ["15m", "1h", "4h", "1d"]
       windows:
         description: "Cate ferestre de validare (doar pentru walk_forward)"
         required: false
@@ -70,6 +76,7 @@ jobs:
           BT_DAYS: ${{ inputs.days }}
           BT_MODE: ${{ inputs.mode }}
           BT_WINDOWS: ${{ inputs.windows }}
+          SCAN_TIMEFRAME: ${{ inputs.timeframe }}
           BT_MERGE: ${{ inputs.merge }}
         run: |
           set -o pipefail
@@ -83,6 +90,7 @@ jobs:
           [ "$BT_MODE" = "sweep" ] && ARGS="$ARGS --sweep"
           [ "$BT_MERGE" = "true" ] && ARGS="$ARGS --merge"
 
+          echo "Timeframe: ${SCAN_TIMEFRAME}  (geometria devine v4-${SCAN_TIMEFRAME})"
           echo "Rulez: python backtest.py $ARGS"
           # tee: iesirea ajunge si in log, si intr-un fisier pe care il pun in
           # rezumatul rularii, ca sa fie vizibila fara sa sapi prin log.
@@ -96,7 +104,7 @@ jobs:
           BT_MERGE: ${{ inputs.merge }}
         run: |
           {
-            echo "## Backtest - ${BT_DAYS} zile, mod ${BT_MODE}"
+            echo "## Backtest - ${BT_DAYS} zile, ${SCAN_TIMEFRAME}, mod ${BT_MODE}"
             echo ""
             if [ "$BT_MERGE" = "true" ]; then
               echo "Rezultatele au fost adaugate in \`data/plans.json\`."
