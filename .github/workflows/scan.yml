@@ -18,6 +18,10 @@ permissions:
 jobs:
   scan:
     runs-on: ubuntu-latest
+    env:
+      # Trebuie sa fie ACELASI ca la backtest, altfel scanarea live si
+      # backtest-ul produc geometrii diferite si nu invata din acelasi set.
+      SCAN_TIMEFRAME: "1h"
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
