@@ -42,11 +42,14 @@ RULARE
     python3 backtest.py                  # 180 de zile, watchlist-ul din CONFIG
     python3 backtest.py --days 90
     python3 backtest.py --sweep          # compara variante de intrare pe aceleasi date
+    python3 backtest.py --walk-forward   # validare pe ferestre nevazute (recomandat)
+    python3 backtest.py --walk-forward --rolling --windows 8
     python3 backtest.py --merge          # adauga rezultatele in data/plans.json
                                          # ca agentul sa invete din ele
 """
 
 import json
+import math
 import os
 import sys
 import time
@@ -314,12 +317,111 @@ def run_sweep(symbols, histories, weights):
     return rows
 
 
+# ===================== VALIDARE WALK-FORWARD ==============================
+
+def walk_forward(plans, n_windows=6, min_train=400, mode="anchored"):
+    """Validare walk-forward pe ferestre multiple.
+
+    DE CE E NECESARA: calibrarea invata pragurile din rezultate, iar poarta de
+    decizie le foloseste ca sa filtreze. Daca masori filtrul pe ACELEASI date din
+    care a invatat, rezultatul e circular - arata bine pentru ca a fost potrivit
+    pe ele. Masurat asa, poarta parea sa duca sistemul de la -0.171R la +0.041R;
+    pe date nevazute, cifra e alta.
+
+    Pentru fiecare fereastra de test: calibrez DOAR pe ce s-a inchis inainte de
+    ea, apoi aplic poarta pe fereastra si masor rezultatul. Niciun plan nu e
+    evaluat cu o calibrare care l-a vazut.
+
+    mode="anchored": antrenamentul creste (toata istoria de dinainte).
+    mode="rolling":  antrenamentul e o fereastra fixa care aluneca - se
+                     adapteaza mai bine la schimbari de regim, dar are mai
+                     putine date.
+    """
+    usable = [p for p in plans
+              if p.get("realized_r") is not None
+              and p.get("state") != plan_tracker.STATE_NO_ENTRY
+              and p.get("closed_ts")]
+    usable.sort(key=lambda p: p["closed_ts"])
+    n = len(usable)
+    if n < min_train + n_windows * 30:
+        print(f"\n[!] Prea putine planuri inchise ({n}) pentru {n_windows} ferestre "
+              f"cu minim {min_train} la antrenare. Sar peste walk-forward.")
+        return None
+
+    start = max(min_train, n // (n_windows + 1))
+    edges = [start + round(i * (n - start) / n_windows) for i in range(n_windows + 1)]
+
+    print("\n" + "=" * 74)
+    print(f"WALK-FORWARD ({mode}) - {n_windows} ferestre, {n} planuri inchise")
+    print("=" * 74)
+    print(f"{'fereastra':12s} {'antren':>8s} {'test':>6s} {'emise':>6s} "
+          f"{'%emise':>7s} {'R emise':>9s} {'R toate':>9s}")
+    print("-" * 74)
+
+    all_issued, all_test = [], []
+    for i in range(n_windows):
+        lo, hi = edges[i], edges[i + 1]
+        test = usable[lo:hi]
+        train = usable[:lo] if mode == "anchored" else usable[max(0, lo - min_train):lo]
+        if len(train) < min_train or not test:
+            continue
+        cal = plan_tracker.build_calibration({"plans": train})
+        issued = [p["realized_r"] for p in test
+                  if plan_tracker.decide(
+                      cal, {"risk_adjusted": p.get("score_at_entry") or 0})["action"] == "ISSUE"]
+        every = [p["realized_r"] for p in test]
+        all_issued += issued
+        all_test += every
+        r_iss = (sum(issued) / len(issued)) if issued else 0.0
+        print(f"{'#' + str(i + 1):12s} {len(train):8d} {len(test):6d} {len(issued):6d} "
+              f"{100 * len(issued) / len(test):6.0f}% {r_iss:+9.4f} "
+              f"{sum(every) / len(every):+9.4f}")
+
+    if not all_issued:
+        print("-" * 74)
+        print("Poarta nu a emis niciun plan pe ferestrele de test.")
+        return None
+
+    print("-" * 74)
+    m = sum(all_issued) / len(all_issued)
+    var = sum((x - m) ** 2 for x in all_issued) / max(len(all_issued) - 1, 1)
+    ci = 1.96 * math.sqrt(var / len(all_issued))
+    m_all = sum(all_test) / len(all_test)
+    wins = [x for x in all_issued if x > 0]
+    losses = [abs(x) for x in all_issued if x <= 0]
+    pf = (sum(wins) / sum(losses)) if losses else float("inf")
+
+    print(f"AGREGAT OUT-OF-SAMPLE ({len(all_issued)} planuri emise din {len(all_test)}):")
+    print(f"  R mediu emise : {m:+.4f}  (IC95 {m - ci:+.4f} .. {m + ci:+.4f})")
+    print(f"  R mediu toate : {m_all:+.4f}   -> poarta adauga {m - m_all:+.4f}R/plan")
+    print(f"  rata de castig: {100 * len(wins) / len(all_issued):.1f}%  |  profit factor {pf:.2f}")
+    if wins and losses:
+        aw, al = sum(wins) / len(wins), sum(losses) / len(losses)
+        print(f"  castig {aw:+.2f}R / pierdere {al:.2f}R = raport {aw / al:.2f}:1 "
+              f"(break-even la {100 * al / (aw + al):.0f}%)")
+    print()
+    if m - ci > 0:
+        print("  VERDICT: pozitiv SI semnificativ statistic pe date nevazute.")
+    elif m > 0:
+        print(f"  VERDICT: pozitiv dar NU semnificativ - intervalul include zero.")
+        need = int(var / (m / 1.96) ** 2) + 1 if m > 0 else 0
+        print(f"  Ar fi nevoie de ~{need} planuri emise pentru semnificatie la acest efect.")
+    else:
+        print("  VERDICT: negativ pe date nevazute - filtrul nu se transfera.")
+    return {"mean": m, "ci": ci, "n": len(all_issued)}
+
+
 def main():
     days = DEFAULT_DAYS
     if "--days" in sys.argv:
         days = int(sys.argv[sys.argv.index("--days") + 1])
     merge = "--merge" in sys.argv
     sweep = "--sweep" in sys.argv
+    wf = "--walk-forward" in sys.argv
+    wf_mode = "rolling" if "--rolling" in sys.argv else "anchored"
+    n_windows = 6
+    if "--windows" in sys.argv:
+        n_windows = int(sys.argv[sys.argv.index("--windows") + 1])
 
     exchange, markets, tickers, _, exchange_id = scanner.connect_exchange(scope=None)
     symbols = resolve_symbols(exchange, markets, tickers)
@@ -355,6 +457,29 @@ def main():
     if sweep:
         run_sweep(symbols, histories, weights)
         return
+
+    if wf:
+        walk_forward(all_plans, n_windows=n_windows, mode=wf_mode)
+
+    # RAPORT DE ACOPERIRE: bursele limiteaza adancimea istoricului pe lumanari
+    # de 1h (frecvent 1-2 ani), iar unele tokene nici nu existau acum 5 ani.
+    # Fara raportul asta, cerand 1825 de zile ai primi tacit mult mai putin si
+    # ai crede ca ai testat pe 5 ani.
+    print("\n" + "=" * 60)
+    print("ACOPERIRE REALA (cerut vs primit):")
+    short = []
+    for sym, candles in sorted(histories.items()):
+        got = (candles[-1][0] - candles[0][0]) / 86400000 if len(candles) > 1 else 0
+        pct = 100 * got / days if days else 0
+        flag = ""
+        if pct < 80:
+            flag = "  <- mult sub cerut"
+            short.append((sym, got))
+        print(f"  {sym:16s} {got:6.0f} zile din {days} cerute ({pct:3.0f}%){flag}")
+    if short:
+        print(f"\n  {len(short)}/{len(histories)} simboluri sub 80% din perioada ceruta.")
+        print("  Cauze: limita de adancime a bursei, sau tokenul nu exista atunci.")
+        print("  Rezultatele agregate sunt dominate de simbolurile cu istoric lung.")
 
     closed = [p for p in all_plans if p.get("realized_r") is not None]
     if not closed:
