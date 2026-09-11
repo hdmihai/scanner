@@ -139,14 +139,27 @@ def resolve_symbols(exchange, markets, tickers):
     resolved = {}
     for base in watchlist:
         candidates = scanner.CONFIG.get("aliases", {}).get(base, [base])
-        best, best_vol = None, -1
+        # Pentru BACKTEST conteaza ADANCIMEA istoricului, nu volumul de azi.
+        # Rularea pe 5 ani a aratat de ce: POL/USDT a dat 12 zile pe OKX, desi
+        # MATIC/USDT (acelasi proiect, denumirea veche) are ani intregi. Alegerea
+        # dupa volum prefera tickerul nou, care abia a fost listat. Sondez cate
+        # bare exista pentru fiecare alias si il iau pe cel mai adanc.
+        # -inf, nu -1: `depth` e un timestamp negat, deci mereu foarte negativ.
+        # Cu -1 ca valoare initiala niciun candidat nu ar fi trecut vreodata.
+        best, best_depth = None, float("-inf")
         for alias in candidates:
             for quote in scanner.CONFIG["quotes"]:
                 sym = f"{alias}/{quote}"
-                if sym in markets and markets[sym].get("active", True):
-                    vol = tickers.get(sym, {}).get("quoteVolume", 0) or 0
-                    if vol > best_vol:
-                        best, best_vol = sym, vol
+                if sym not in markets or not markets[sym].get("active", True):
+                    continue
+                try:
+                    probe = exchange.fetch_ohlcv(sym, timeframe=scanner.CONFIG["timeframe"],
+                                                 since=0, limit=1)
+                    depth = -probe[0][0] if probe else 0   # cu cat mai vechi, cu atat mai bine
+                except Exception:
+                    depth = 0
+                if depth > best_depth:
+                    best, best_depth = sym, depth
         if best:
             resolved[base] = best
         else:
