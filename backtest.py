@@ -88,6 +88,11 @@ def fetch_history(exchange, symbol, timeframe, days):
     ms_per_bar = exchange.parse_timeframe(timeframe) * 1000
     since = exchange.milliseconds() - days * 86400 * 1000
     out = []
+    # Unele burse returneaza GOL daca `since` e anterior listarii perechii, in
+    # loc sa dea ce au. Pe rularea de 5 ani, 6 din 20 de simboluri au primit 0
+    # bare exact asa (POL, FET, GRAM, BNB, ARB, OP) si au fost sarite complet.
+    # Daca prima cerere vine goala, reincerc fara `since`, ca sa iau ce exista.
+    first_empty = False
     while True:
         try:
             batch = exchange.fetch_ohlcv(symbol, timeframe=timeframe, since=since, limit=1000)
@@ -95,6 +100,16 @@ def fetch_history(exchange, symbol, timeframe, days):
             print(f"  [!] {symbol}: {e}")
             break
         if not batch:
+            if not out and not first_empty:
+                first_empty = True
+                try:
+                    batch = exchange.fetch_ohlcv(symbol, timeframe=timeframe, limit=1000)
+                except Exception:
+                    batch = None
+                if batch:
+                    out.extend(batch)
+                    since = batch[-1][0] + ms_per_bar
+                    continue
             break
         out.extend(batch)
         if len(batch) < 2:
