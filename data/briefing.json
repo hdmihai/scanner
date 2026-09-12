@@ -1,20 +1,48 @@
 {
-  "text": "14 planuri sunt deschise, niciunul inchis inca. Pana la primele inchideri nu pot spune nimic despre performanta - orice cifra ar fi speculatie. Separat, 5725 planuri inchise (-799.57R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 71.3% fata de 30.4% baseline, pe 4238 planuri invatate.",
+  "text": "Din 3 planuri inchise, rata de succes e 0.0%, cu -1.04R cumulat (-1.045R in medie pe plan) si profit factor 0.0. 12 planuri sunt inca deschise. Separat, 5725 planuri inchise (-799.57R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #5774 POL/USDT +0.00R, #5780 FET/USDT -1.04R, #5782 LINK/USDT +0.00R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 71.3% fata de 30.4% baseline, pe 4239 planuri invatate.",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-12 07:18 UTC",
+    "scan_time": "2026-09-12 08:20 UTC",
     "universe_size": 14,
-    "plans_total": 5787,
-    "plans_open": 14,
-    "plans_closed": 0,
+    "plans_total": 5788,
+    "plans_open": 12,
+    "plans_closed": 3,
     "legacy_closed": 5725,
     "legacy_total_r": -799.57,
-    "win_rate": null,
-    "total_r": 0,
-    "avg_r": null,
-    "profit_factor": null,
-    "recent_closed": [],
+    "win_rate": 0.0,
+    "total_r": -1.04,
+    "avg_r": -1.045,
+    "profit_factor": 0.0,
+    "recent_closed": [
+      {
+        "id": 5774,
+        "symbol": "POL/USDT",
+        "direction": "LONG",
+        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
+        "r": 0.0
+      },
+      {
+        "id": 5780,
+        "symbol": "FET/USDT",
+        "direction": "SHORT",
+        "state": "SL HIT - INVALIDATED",
+        "r": -1.045
+      },
+      {
+        "id": 5782,
+        "symbol": "LINK/USDT",
+        "direction": "SHORT",
+        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
+        "r": 0.0
+      }
+    ],
     "open_now": [
+      {
+        "id": 5788,
+        "symbol": "POL/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
       {
         "id": 5787,
         "symbol": "TRX/USDT",
@@ -25,7 +53,7 @@
         "id": 5786,
         "symbol": "AXS/USDT",
         "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
+        "state": "INTRARE ATINSA - pozitie activa"
       },
       {
         "id": 5785,
@@ -38,28 +66,22 @@
         "symbol": "CHZ/USDT",
         "direction": "LONG",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 5783,
-        "symbol": "SEI/USDT",
-        "direction": "SHORT",
-        "state": "INTRARE ATINSA - pozitie activa"
       }
     ],
     "best_bucket": null,
     "worst_bucket": null,
     "agent_status": "ACTIVE",
     "agent_reason": "acuratete echilibrata 71.3% vs euristica 30.4%",
-    "agent_samples": 4238,
-    "agent_balanced": 71.33640536546713,
-    "baseline_balanced": 30.43857214754321,
+    "agent_samples": 4239,
+    "agent_balanced": 71.34306019858076,
+    "baseline_balanced": 30.43141409402438,
     "agent_weights": {
-      "trend": 0.515075,
-      "momentum": 0.630809,
-      "volatility": -0.145866,
-      "volume": -0.140072,
+      "trend": 0.513743,
+      "momentum": 0.626985,
+      "volatility": -0.155749,
+      "volume": -0.14414,
       "is_long": 0.061661,
-      "persistence_n": 0.045412
+      "persistence_n": 0.040904
     }
   }
 }
