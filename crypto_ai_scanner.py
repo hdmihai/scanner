@@ -68,8 +68,12 @@ CONFIG = {
     # BTC/ETH au volatilitate mult mai mica, DOGE mult mai mare. Diversitatea
     # de ATR conteaza mai mult decat numarul brut de simboluri, pentru ca da
     # regimuri diferite in ACEEASI perioada calendaristica.
+    # JASMY scos: nu exista ca pereche pe OKX (verificat in log-ul rularii).
+    # POL, FET, SEI si SUI au primit doar 12-50 de zile de istoric pe OKX -
+    # raman in lista pentru scanarea live, dar contribuie aproape deloc la
+    # backtest. Raportul de acoperire le semnaleaza la fiecare rulare.
     "watchlist": [
-        "POL", "DOT", "AVAX", "JASMY", "FET", "SEI", "EGLD", "NEAR",
+        "POL", "DOT", "AVAX", "FET", "SEI", "EGLD", "NEAR",
         "LINK", "ADA", "ALGO", "SUI", "TRX", "AXS", "CHZ",
     ],
     # Redenumiri de care sunt sigur. Backtest-ul alege aliasul cu istoricul
