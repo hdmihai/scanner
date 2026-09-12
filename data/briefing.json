@@ -1,12 +1,12 @@
 {
-  "text": "Din 3 planuri inchise, rata de succes e 0.0%, cu -1.04R cumulat (-1.045R in medie pe plan) si profit factor 0.0. 14 planuri sunt inca deschise. Separat, 5725 planuri inchise (-799.57R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #5774 POL/USDT +0.00R, #5780 FET/USDT -1.04R, #5782 LINK/USDT +0.00R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 71.3% fata de 30.4% baseline, pe 4239 planuri invatate.",
+  "text": "Din 4 planuri inchise, rata de succes e 0.0%, cu -1.04R cumulat (-1.045R in medie pe plan) si profit factor 0.0. 14 planuri sunt inca deschise. Separat, 5725 planuri inchise (-799.57R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #5784 CHZ/USDT +0.00R, #5774 POL/USDT +0.00R, #5780 FET/USDT -1.04R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 71.3% fata de 30.4% baseline, pe 4239 planuri invatate.",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-12 11:18 UTC",
+    "scan_time": "2026-09-12 12:24 UTC",
     "universe_size": 14,
-    "plans_total": 5790,
+    "plans_total": 5791,
     "plans_open": 14,
-    "plans_closed": 3,
+    "plans_closed": 4,
     "legacy_closed": 5725,
     "legacy_total_r": -799.57,
     "win_rate": 0.0,
@@ -14,6 +14,13 @@
     "avg_r": -1.045,
     "profit_factor": 0.0,
     "recent_closed": [
+      {
+        "id": 5784,
+        "symbol": "CHZ/USDT",
+        "direction": "LONG",
+        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
+        "r": 0.0
+      },
       {
         "id": 5774,
         "symbol": "POL/USDT",
@@ -38,6 +45,12 @@
     ],
     "open_now": [
       {
+        "id": 5791,
+        "symbol": "CHZ/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
         "id": 5790,
         "symbol": "LINK/USDT",
         "direction": "SHORT",
@@ -47,7 +60,7 @@
         "id": 5789,
         "symbol": "FET/USDT",
         "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
+        "state": "INTRARE ATINSA - pozitie activa"
       },
       {
         "id": 5788,
@@ -58,12 +71,6 @@
       {
         "id": 5787,
         "symbol": "TRX/USDT",
-        "direction": "LONG",
-        "state": "INTRARE ATINSA - pozitie activa"
-      },
-      {
-        "id": 5786,
-        "symbol": "AXS/USDT",
         "direction": "LONG",
         "state": "INTRARE ATINSA - pozitie activa"
       }
