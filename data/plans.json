@@ -1,5 +1,5 @@
 {
-  "next_id": 5797,
+  "next_id": 5798,
   "plans": [
     {
       "id": 1,
@@ -212499,7 +212499,7 @@
       "state_detail": "TP1 HIT - RULEAZA SPRE TP2",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 23,
+      "bars_checked": 24,
       "score_at_entry": 77,
       "components": {
         "trend": 0.57,
@@ -212539,7 +212539,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 22,
+      "bars_checked": 23,
       "score_at_entry": 54,
       "components": {
         "trend": 0.349,
@@ -212578,7 +212578,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 21,
+      "bars_checked": 22,
       "score_at_entry": 49,
       "components": {
         "trend": 0.39,
@@ -212617,7 +212617,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 21,
+      "bars_checked": 22,
       "score_at_entry": 49,
       "components": {
         "trend": 0.235,
@@ -212656,7 +212656,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 20,
+      "bars_checked": 21,
       "score_at_entry": 48,
       "components": {
         "trend": 0.333,
@@ -212736,7 +212736,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 21,
+      "bars_checked": 22,
       "score_at_entry": 44,
       "components": {
         "trend": 0.228,
@@ -212933,7 +212933,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 15,
+      "bars_checked": 16,
       "score_at_entry": 28,
       "components": {
         "trend": 0.009,
@@ -212972,7 +212972,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 14,
+      "bars_checked": 15,
       "score_at_entry": 41,
       "components": {
         "trend": 0.019,
@@ -213011,7 +213011,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 13,
+      "bars_checked": 14,
       "score_at_entry": 29,
       "components": {
         "trend": 0.113,
@@ -213091,7 +213091,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 10,
+      "bars_checked": 11,
       "score_at_entry": 31,
       "components": {
         "trend": 0.171,
@@ -213130,7 +213130,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 3,
+      "bars_checked": 4,
       "score_at_entry": 43,
       "components": {
         "trend": 0.303,
@@ -213165,10 +213165,10 @@
       "tp2": 0.043955357,
       "risk": 0.00024929,
       "planned_r_tp2": 4.77,
-      "state": "PENDING",
-      "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
-      "realized_r": null,
-      "closed_ts": null,
+      "state": "NO_ENTRY",
+      "state_detail": "PRETUL NU A REVENIT in 8 bare - anulat",
+      "realized_r": 0.0,
+      "closed_ts": 1789250400.0,
       "bars_checked": 8,
       "score_at_entry": 33,
       "components": {
@@ -213188,7 +213188,8 @@
         "agent_used": false
       },
       "geometry": "v4-1h",
-      "bar_seconds": 3600
+      "bar_seconds": 3600,
+      "gross_r": 0.0
     },
     {
       "id": 5793,
@@ -213248,7 +213249,7 @@
       "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 5,
+      "bars_checked": 6,
       "score_at_entry": 54,
       "components": {
         "trend": 0.262,
@@ -213286,7 +213287,7 @@
       "state_detail": "INTRARE ATINSA - pozitie activa",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 3,
+      "bars_checked": 4,
       "score_at_entry": 35,
       "components": {
         "trend": 0.029,
@@ -213325,7 +213326,7 @@
       "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
       "realized_r": null,
       "closed_ts": null,
-      "bars_checked": 0,
+      "bars_checked": 1,
       "score_at_entry": 27,
       "components": {
         "trend": 0.009,
@@ -213341,6 +213342,44 @@
         "expected_value_r": null,
         "calibrated_prob": null,
         "agent_prob": 0.2199,
+        "agent_used": false
+      },
+      "geometry": "v4-1h",
+      "bar_seconds": 3600
+    },
+    {
+      "id": 5797,
+      "symbol": "SEI/USDT",
+      "direction": "SHORT",
+      "created_ts": 1789255163.8984263,
+      "created_time": "2026-09-12 23:19 UTC",
+      "entry": 0.044562143,
+      "signal_price": 0.04445,
+      "sl": 0.044786429,
+      "tp1": 0.04408,
+      "tp2": 0.043552857,
+      "risk": 0.00022429,
+      "planned_r_tp2": 4.5,
+      "state": "PENDING",
+      "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
+      "realized_r": null,
+      "closed_ts": null,
+      "bars_checked": 0,
+      "score_at_entry": 41,
+      "components": {
+        "trend": 0.15,
+        "momentum": 0.457,
+        "volatility": 0.252,
+        "volume": 0.734
+      },
+      "persistence_at_entry": 25,
+      "decision": {
+        "action": "ISSUE",
+        "mode": "EXPLORARE",
+        "reason": "inca nu am destule planuri inchise la scor ~41 (prag 20) - deschid ca sa invat",
+        "expected_value_r": null,
+        "calibrated_prob": null,
+        "agent_prob": 0.2352,
         "agent_used": false
       },
       "geometry": "v4-1h",
@@ -213370,19 +213409,19 @@
     }
   },
   "summary": {
-    "no_entry": 4,
-    "no_entry_pct": 50.0,
+    "no_entry": 5,
+    "no_entry_pct": 55.6,
     "legacy_closed": 5725,
     "legacy_total_r": -799.57,
     "geometry": "v4-1h",
-    "total_plans": 5796,
+    "total_plans": 5797,
     "open": 15,
     "closed": 4,
     "by_state": {
       "SL_HIT": 3848,
       "TP2_HIT": 542,
       "EXPIRED": 55,
-      "NO_ENTRY": 1336,
+      "NO_ENTRY": 1337,
       "TP1_HIT": 1,
       "OPEN": 11,
       "PENDING": 3
