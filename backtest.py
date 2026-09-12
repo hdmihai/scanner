@@ -456,6 +456,12 @@ def main():
     if not symbols:
         raise SystemExit("Niciun simbol de testat.")
 
+    missing = [s_ for s_ in (scanner.CONFIG.get("watchlist") or []) if s_ not in symbols]
+    if missing:
+        print(f"\n[!] NEREZOLVATE pe {exchange_id}: {', '.join(missing)}")
+        print("    Nu exista ca pereche pe aceasta bursa. Optiuni: adauga un alias")
+        print("    in CONFIG['aliases'], scoate-le din watchlist, sau schimba bursa.")
+
     print(f"\nBacktest pe {exchange_id}: {len(symbols)} simboluri, {days} zile, "
           f"timeframe {scanner.CONFIG['timeframe']}")
     for base, sym in symbols.items():
