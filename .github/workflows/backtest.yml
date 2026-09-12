@@ -87,9 +87,13 @@ jobs:
           esac
 
           ARGS="--days $BT_DAYS"
-          [ "$BT_MODE" = "sweep" ] && ARGS="$ARGS --sweep"
+          case "$BT_MODE" in
+            sweep)        ARGS="$ARGS --sweep" ;;
+            walk_forward) ARGS="$ARGS --walk-forward --windows $BT_WINDOWS" ;;
+            single)       : ;;
+            *) echo "[EROARE] mod necunoscut: $BT_MODE"; exit 1 ;;
+          esac
           [ "$BT_MERGE" = "true" ] && ARGS="$ARGS --merge"
-
           echo "Timeframe: ${SCAN_TIMEFRAME}  (geometria devine v4-${SCAN_TIMEFRAME})"
           echo "Rulez: python backtest.py $ARGS"
           # tee: iesirea ajunge si in log, si intr-un fisier pe care il pun in
