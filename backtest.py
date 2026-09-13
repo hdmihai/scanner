@@ -57,6 +57,7 @@ import time
 import ccxt
 
 import crypto_ai_scanner as scanner
+import evidence as ev_mod
 import plan_tracker
 
 DATA_DIR = "data"
@@ -199,6 +200,13 @@ def replay_symbol(symbol, candles, weights, start_id):
         lows = [c[3] for c in window]
         structure = scanner.compute_structure_levels(highs, lows)
         fib = scanner.compute_fibonacci(highs, lows)
+        # Aceleasi evidente ca in live. Daca backtest-ul nu le-ar calcula,
+        # agentul ar invata din planuri fara evidente si le-ar primi apoi in
+        # live - exact nepotrivirea pe care versionarea geometriei o previne.
+        bt_ind = scanner.indicators.compute_all(window)
+        bt_rsi = scanner.rsi([c[4] for c in window], 14)
+        bt_ev = ev_mod.build_evidence(bt_ind, scored["price"], scored["atr"],
+                                      bt_rsi, scored.get("components"))
         levels = scanner.compute_trade_plan(
             scored["direction"], scored["price"], scored["atr"], structure, fib)
         if not levels:
@@ -228,7 +236,10 @@ def replay_symbol(symbol, candles, weights, start_id):
             "state_detail": "OPEN",
             "realized_r": None, "closed_ts": None, "bars_checked": 0,
             "score_at_entry": scored["risk_adjusted"],
-            "components": scored["components"],
+            "components": {**(scored.get("components") or {}),
+                           **ev_mod.evidence_features(bt_ev, scored["direction"])},
+            "evidence": bt_ev,
+            "fusion": ev_mod.fusion(bt_ev, scored["direction"]),
             "persistence_at_entry": 0,
             "decision": {"action": "ISSUE", "mode": "BACKTEST",
                          "reason": "replay istoric, fara poarta de decizie"},
