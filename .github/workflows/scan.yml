@@ -126,73 +126,80 @@ jobs:
           git diff --staged --quiet || git commit -m "scan $(date -u +'%Y-%m-%d %H:%M UTC')"
           git push
 
-      - name: Pastreaza doar ultimele 30 de run-uri
-        # Sterge DOAR inregistrarile de executie din tab-ul Actions (loguri,
-        # status, durata). NU atinge datele agentului: plans.json,
-        # agent_model.json si scan_history.json sunt comise in git de pasul de
-        # mai sus, deci traiesc in istoricul repo-ului.
+      - name: Curata istoricul de rulari (pastreaza ultimele 3 zile)
+        # Sterge inregistrarile de executie din tab-ul Actions - loguri, status,
+        # durata. NU atinge datele agentului: plans.json, agent_model.json si
+        # scan_history.json sunt comise in git de pasul de mai sus.
         #
-        # Rezultatul se scrie SI in rezumatul rularii ($GITHUB_STEP_SUMMARY),
-        # vizibil direct pe pagina run-ului. Motiv: `continue-on-error` face ca
-        # un esec sa nu opreasca scanarea - corect - dar il face si invizibil,
-        # jobul aparand verde. Asa s-a intamplat ca rularile sa se acumuleze
-        # fara ca nimic sa semnaleze.
+        # DOUA SCHIMBARI fata de varianta anterioara, dupa ce s-au acumulat 299
+        # de rulari:
+        #   1. Criteriu de TIMP (3 zile), nu de numar (30). La o cadenta orara,
+        #      30 de rulari inseamna ~1.2 zile; la una manuala, luni intregi.
+        #      Timpul e masura pe care o vrei de fapt.
+        #   2. TOATE workflow-urile, nu doar scan.yml. Varianta veche interoga
+        #      `actions/workflows/scan.yml/runs`, deci Backtest si
+        #      pages-build-deployment se acumulau nelimitat - cele din urma
+        #      sunt generate automat de GitHub Pages la fiecare commit.
+        #
+        # Plasa de siguranta: ultimele KEEP_MIN rulari raman mereu, indiferent
+        # de varsta, ca sa nu ramai fara niciun log daca repo-ul sta o saptamana.
         if: always()
         continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          KEEP: 30
+          KEEP_DAYS: 3
+          KEEP_MIN: 5
+          MAX_PAGES: 5
         run: |
           set -o pipefail
-          echo "### Curatare run-uri" >> "$GITHUB_STEP_SUMMARY"
+          CUTOFF=$(date -u -d "${KEEP_DAYS} days ago" +%Y-%m-%dT%H:%M:%SZ)
+          echo "Sterg rularile finalizate inainte de ${CUTOFF} (pastrez minim ${KEEP_MIN})."
+          echo "### Curatare istoric rulari" >> "$GITHUB_STEP_SUMMARY"
 
-          if ! all_ids=$(gh api \
-              "repos/${GITHUB_REPOSITORY}/actions/workflows/scan.yml/runs?per_page=100" \
-              --jq '.workflow_runs
-                    | map(select(.status != "in_progress" and .status != "queued"))
-                    | sort_by(.created_at) | reverse
-                    | .[].id' 2>&1); then
-            echo "[!] Nu am putut lista run-urile. Raspuns: ${all_ids}"
-            {
-              echo "**ESUAT** - nu am putut lista run-urile."
-              echo ""
-              echo "Cauze uzuale: lipseste \`actions: write\` din \`permissions\`,"
-              echo "sau tokenul nu are drepturi pe Actions."
-              echo ""
-              echo "\`\`\`"; echo "${all_ids}"; echo "\`\`\`"
-            } >> "$GITHUB_STEP_SUMMARY"
-            exit 0
-          fi
-
-          total=$(printf '%s\n' "$all_ids" | grep -c . || true)
-          ids=$(printf '%s\n' "$all_ids" | tail -n +$((KEEP + 1)))
-          count=$(printf '%s\n' "$ids" | grep -c . || true)
-          echo "Run-uri finalizate: ${total}. Pastrez ${KEEP}, sterg ${count}."
-
-          deleted=0; failed=0; last_err=""
-          for id in $ids; do
-            if err=$(gh api -X DELETE "repos/${GITHUB_REPOSITORY}/actions/runs/$id" 2>&1); then
-              deleted=$((deleted + 1))
-            else
-              failed=$((failed + 1)); last_err="$err"
-              echo "  [!] run $id: $err"
+          total=0; deleted=0; failed=0; kept=0; idx=0
+          for page in $(seq 1 "$MAX_PAGES"); do
+            if ! batch=$(gh api \
+                "repos/${GITHUB_REPOSITORY}/actions/runs?per_page=100&page=${page}" \
+                --jq '.workflow_runs
+                      | map(select(.status != "in_progress" and .status != "queued"))
+                      | sort_by(.created_at) | reverse
+                      | .[] | [.id, .created_at, .name] | @tsv' 2>&1); then
+              echo "[!] Nu am putut lista rularile: ${batch}"
+              {
+                echo "**ESUAT** - nu am putut lista rularile."
+                echo "Verifica permisiunea \`actions: write\`."
+                echo "\`\`\`"; echo "${batch}"; echo "\`\`\`"
+              } >> "$GITHUB_STEP_SUMMARY"
+              exit 0
             fi
+            [ -z "$batch" ] && break
+
+            while IFS=$'\t' read -r id created name; do
+              [ -z "$id" ] && continue
+              total=$((total + 1)); idx=$((idx + 1))
+              if [ "$idx" -le "$KEEP_MIN" ]; then kept=$((kept + 1)); continue; fi
+              if [[ "$created" < "$CUTOFF" ]]; then
+                if gh api -X DELETE "repos/${GITHUB_REPOSITORY}/actions/runs/$id" >/dev/null 2>&1; then
+                  deleted=$((deleted + 1))
+                else
+                  failed=$((failed + 1))
+                  echo "  [!] nu am putut sterge ${id} (${name})"
+                fi
+              else
+                kept=$((kept + 1))
+              fi
+            done <<< "$batch"
           done
 
-          echo "Sterse: ${deleted}. Esuate: ${failed}."
+          echo "Analizate ${total}. Pastrate ${kept}. Sterse ${deleted}. Esuate ${failed}."
           {
-            echo "- Run-uri finalizate: **${total}**"
-            echo "- De sters (peste ${KEEP}): **${count}**"
+            echo "- Prag: rulari mai vechi de **${KEEP_DAYS} zile**"
+            echo "- Analizate: **${total}** | Pastrate: **${kept}**"
             echo "- Sterse: **${deleted}** | Esuate: **${failed}**"
           } >> "$GITHUB_STEP_SUMMARY"
 
-          if [ "$count" -gt 0 ] && [ "$deleted" -eq 0 ]; then
-            echo "[!] ATENTIE: aveam ${count} de sters si niciunul nu a mers."
-            {
-              echo ""
-              echo "**ATENTIE:** aveam ${count} de sters si niciunul nu a reusit."
-              echo "Ultima eroare:"
-              echo "\`\`\`"; echo "${last_err}"; echo "\`\`\`"
-            } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$failed" -gt 0 ] && [ "$deleted" -eq 0 ]; then
+            echo "[!] ATENTIE: nicio stergere nu a reusit."
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "**ATENTIE:** nicio stergere nu a reusit - verifica \`actions: write\`." >> "$GITHUB_STEP_SUMMARY"
           fi
-
