@@ -1,11 +1,11 @@
 {
-  "text": "Din 13 planuri inchise, rata de succes e 0.0%, cu -7.72R cumulat (-1.103R in medie pe plan) si profit factor 0.0. 14 planuri sunt inca deschise. Separat, 5725 planuri inchise (-799.57R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #5799 FET/USDT -1.11R, #5797 SEI/USDT -1.20R, #5796 FET/USDT -1.11R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 71.4% fata de 30.4% baseline, pe 4245 planuri invatate.",
+  "text": "Din 13 planuri inchise, rata de succes e 0.0%, cu -7.72R cumulat (-1.103R in medie pe plan) si profit factor 0.0. 15 planuri sunt inca deschise. Separat, 5725 planuri inchise (-799.57R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #5799 FET/USDT -1.11R, #5797 SEI/USDT -1.20R, #5796 FET/USDT -1.11R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 71.4% fata de 30.4% baseline, pe 4245 planuri invatate.",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-13 06:29 UTC",
+    "scan_time": "2026-09-13 07:19 UTC",
     "universe_size": 14,
-    "plans_total": 5800,
-    "plans_open": 14,
+    "plans_total": 5801,
+    "plans_open": 15,
     "plans_closed": 13,
     "legacy_closed": 5725,
     "legacy_total_r": -799.57,
@@ -52,10 +52,16 @@
     ],
     "open_now": [
       {
+        "id": 5801,
+        "symbol": "FET/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
         "id": 5800,
         "symbol": "SEI/USDT",
         "direction": "SHORT",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
+        "state": "INTRARE ATINSA - pozitie activa"
       },
       {
         "id": 5798,
@@ -74,12 +80,6 @@
         "symbol": "CHZ/USDT",
         "direction": "LONG",
         "state": "TP1 HIT - RULEAZA SPRE TP2"
-      },
-      {
-        "id": 5790,
-        "symbol": "LINK/USDT",
-        "direction": "SHORT",
-        "state": "INTRARE ATINSA - pozitie activa"
       }
     ],
     "best_bucket": null,
