@@ -1,30 +1,30 @@
 {
   "model": {
     "weights": {
-      "trend": 0.504063,
-      "momentum": 0.272572,
-      "volatility": -0.113667,
-      "volume": -0.470402,
-      "is_long": -0.117663,
+      "trend": 0.497982,
+      "momentum": 0.260448,
+      "volatility": -0.126416,
+      "volume": -0.485354,
+      "is_long": -0.135885,
       "persistence_n": 0.0
     },
-    "bias": -1.24593
+    "bias": -1.264154
   },
-  "samples_trained": 20430,
+  "samples_trained": 20432,
   "last_trained_scan_ts": 0.0,
   "agent": {
-    "correct": 14465,
-    "total": 20430
+    "correct": 14467,
+    "total": 20432
   },
   "baseline": {
     "correct": 6516,
-    "total": 20430
+    "total": 20432
   },
   "by_direction": {
     "LONG": {
-      "agent": 6987,
+      "agent": 6989,
       "baseline": 2876,
-      "total": 9597
+      "total": 9599
     },
     "SHORT": {
       "agent": 7478,
@@ -34,14 +34,6 @@
   },
   "first_scan_ts": 1634500800.0,
   "pairs": [
-    [
-      0.44207,
-      1.0
-    ],
-    [
-      0.30223,
-      1.0
-    ],
     [
       0.56542,
       1.0
@@ -2033,6 +2025,14 @@
     [
       0.16319,
       1.0
+    ],
+    [
+      0.19821,
+      0.0
+    ],
+    [
+      0.16626,
+      0.0
     ]
   ],
   "recent": [
@@ -2044,8 +2044,6 @@
     1,
     1,
     1,
-    1,
-    1,
     0,
     1,
     1,
@@ -2235,7 +2233,9 @@
     1,
     1,
     1,
-    0
+    0,
+    1,
+    1
   ],
   "recent_baseline": [
     0,
@@ -2246,8 +2246,6 @@
     0,
     0,
     0,
-    0,
-    0,
     1,
     0,
     0,
@@ -2437,7 +2435,9 @@
     0,
     0,
     0,
-    1
+    1,
+    0,
+    0
   ],
   "curve": [
     {
@@ -7347,14 +7347,6 @@
   "source": "plans-v4-4h",
   "score_pairs": [
     [
-      0.84,
-      1.0
-    ],
-    [
-      0.42,
-      1.0
-    ],
-    [
       0.54,
       1.0
     ],
@@ -9345,20 +9337,28 @@
     [
       0.8,
       1.0
+    ],
+    [
+      0.81,
+      0.0
+    ],
+    [
+      0.48,
+      0.0
     ]
   ],
-  "last_event_ts": 1789290000.0,
-  "status_reason": "acuratetea 70.8% nu bate regula triviala 'prezice mereu clasa majoritara' (72.6%)",
-  "days_covered": 1791.54,
-  "balanced_agent": 70.91690877621541,
-  "balanced_baseline": 31.784366058499252,
+  "last_event_ts": 1789300800.0,
+  "status_reason": "acuratetea 70.8% nu bate regula triviala 'prezice mereu clasa majoritara' (73.0%)",
+  "days_covered": 1791.67,
+  "balanced_agent": 70.91974198787804,
+  "balanced_baseline": 31.781244098061812,
   "balanced_directions": [
     "LONG",
     "SHORT"
   ],
-  "auc": 0.6165369688926424,
-  "auc_score_baseline": 0.5534777100802316,
+  "auc": 0.6159715880263825,
+  "auc_score_baseline": 0.5516692034500253,
   "agent_superior": true,
-  "majority_baseline": 72.6,
+  "majority_baseline": 73.0,
   "predicted_positive_rate": 7.4
 }
