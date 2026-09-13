@@ -86,15 +86,19 @@ CONFIG = {
         "BTC", "ETH", "XRP", "BNB", "SOL", "DOGE", "LTC", "BCH",
         # L1 si L2 consacrate
         "XLM", "HBAR", "ATOM", "ETC", "ICP", "APT", "ARB", "OP",
-        "IMX", "INJ", "STX", "TIA", "VET", "XTZ", "EOS", "NEO", "IOTA",
+        "IMX", "INJ", "STX", "TIA", "XTZ", "NEO", "IOTA",
         # DeFi
-        "UNI", "AAVE", "CRV", "LDO", "MKR", "SNX", "COMP", "ENS", "DYDX", "RUNE",
+        "UNI", "AAVE", "CRV", "LDO", "SNX", "COMP", "ENS", "DYDX",
         # infrastructura si date
-        "FIL", "GRT", "THETA", "KAVA",
+        "FIL", "GRT", "THETA", 
         # gaming si metavers
         "SAND", "MANA", "GALA",
         # volatilitate mare, capat opus al spectrului
         "PEPE", "SHIB", "FLOW",
+        # privacy si veterani cu istoric lung - inlocuiesc VET, EOS, MKR, RUNE,
+        # KAVA, care nu exista ca pereche pe OKX (confirmat in log-ul rularii).
+        # Toate listate din 2017-2018, deci acopera integral cei 5 ani.
+        "DASH", "ZEC", "ZEN", "QTUM", "ONT",
     ],
     # Redenumiri de care sunt sigur. Backtest-ul alege aliasul cu istoricul
     # cel mai adanc, nu pe cel cu volumul mai mare.
