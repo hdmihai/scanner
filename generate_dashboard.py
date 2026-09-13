@@ -32,6 +32,7 @@ AGENT_MODEL_FILE = os.path.join(DATA_DIR, "agent_model.json")
 PLANS_FILE = os.path.join(DATA_DIR, "plans.json")
 BRIEFING_FILE = os.path.join(DATA_DIR, "briefing.json")
 DETAILS_FILE = os.path.join(DATA_DIR, "latest_details.json")
+EXCHANGES_FILE = os.path.join(DATA_DIR, "exchanges.json")
 CHART_FILE = os.path.join(DATA_DIR, "latest_chart.json")
 OUTPUT_FILE = os.path.join(DOCS_DIR, "index.html")
 
@@ -381,6 +382,81 @@ def honest_probability(score, plans_store):
     return f'{e["win_rate"]}%', f'masurat, IC {e["ci_low"]}-{e["ci_high"]}%, n={e["total"]}'
 
 
+CAP_LABELS = {
+    "ohlcv": "Lumanari istorice",
+    "orderbook_live": "Adancime live",
+    "trades_live": "Flux de tranzactii live",
+    "orderbook_history": "Order book istoric",
+}
+
+
+def render_exchange_tabs(store):
+    """Tab-uri per bursa, cu starea fiecareia.
+
+    Fara JavaScript: radio ascuns + label, cu selectorul :checked din CSS. Merge
+    in orice browser si pe telefon, si nu depinde de niciun CDN.
+    """
+    cards = (store or {}).get("exchanges") or []
+    if not cards:
+        return '<p class="dim">Bursele apar dupa prima scanare.</p>'
+
+    active_sig = (store or {}).get("active_signature")
+    used = (store or {}).get("used")
+
+    tabs, panels = [], []
+    for i, c in enumerate(cards):
+        eid = c.get("id", f"ex{i}")
+        ok = c.get("connected")
+        checked = " checked" if i == 0 else ""
+        dot = "ok" if ok else "bad"
+        badge = ' <span class="tab-used">activa</span>' if eid == used else ""
+        tabs.append(
+            '<input type="radio" name="extab" id="tab-{0}" class="tab-radio"{1}>'
+            '<label for="tab-{0}" class="tab-label"><i class="dot-{2}"></i>{3}{4}</label>'.format(
+                eid, checked, dot, c.get("label", eid), badge))
+
+        if not ok:
+            body = ('<div class="ex-fail">Nu m-am putut conecta.</div>'
+                    '<div class="ex-err">{}</div>'.format(c.get("error") or "motiv necunoscut"))
+        else:
+            avail = set(c.get("available") or [])
+            rows = []
+            for cap in c.get("declared") or []:
+                has = cap in avail
+                rows.append(
+                    '<div class="cap-row"><span class="tag tag-{}">{}</span>'
+                    '<span>{}</span></div>'.format(
+                        "bull" if has else "bear",
+                        "disponibil" if has else "indisponibil",
+                        CAP_LABELS.get(cap, cap)))
+            missing = [CAP_LABELS.get(cap, cap) for cap in c.get("declared") or []
+                       if cap not in avail]
+            note = ""
+            if missing:
+                note = ('<div class="ex-note">Evidentele care depind de: {} '
+                        'sunt OMISE pentru aceasta bursa - nu inlocuite cu valori '
+                        'neutre, care ar minti modelul despre ce a vazut.</div>').format(
+                            ", ".join(missing))
+            body = ('<div class="ex-meta"><div><span class="dim">PIETE</span><br>{}</div>'
+                    '<div><span class="dim">VERIFICAT</span><br>{}</div></div>'
+                    '<div class="cap-list">{}</div>{}').format(
+                        c.get("markets", 0), c.get("checked_at", "-"), "".join(rows), note)
+        panels.append('<div class="tab-panel tab-panel-{}">{}</div>'.format(eid, body))
+    # Regula CSS care leaga fiecare radio de panoul lui. Generata dinamic, ca
+    # sa nu depinda de o lista fixa de burse.
+    rules = "".join(
+        "#tab-{0}:checked ~ .tab-panel-{0}{{display:block;}}".format(c.get("id", f"ex{i}"))
+        for i, c in enumerate(cards))
+    panels.append("<style>" + rules + "</style>")
+
+    sig = ""
+    if active_sig:
+        sig = ('<div class="ex-sig">Semnatura activa: <strong>{}</strong> '
+               '&middot; planurile create cu seturi diferite de capabilitati se '
+               'invata separat</div>').format(active_sig)
+    return '<div class="tabs">' + "".join(tabs) + "".join(panels) + "</div>" + sig
+
+
 def render_evidence(plan):
     """Lista de evidente, exact cum a fost la momentul deciziei.
 
@@ -718,7 +794,7 @@ def render_learning_curve(history, weights_history, health, agent_state=None):
     '''
 
 
-def build_html(scan, best, deep, chart, health, weights, session, token_meta, narrative, history, weights_history, agent_state, plans_store, briefing, details):
+def build_html(scan, best, deep, chart, health, weights, session, token_meta, narrative, history, weights_history, agent_state, plans_store, briefing, details, exchanges_store):
     plan_html = render_plan(best, deep)
     levels_html = render_levels(deep)
     liquidity_html = render_liquidity(deep)
@@ -729,6 +805,7 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
     _all = (plans_store or {}).get("plans") or []
     _latest = max(_all, key=lambda p: p.get("id", 0)) if _all else None
     evidence_html = render_evidence(_latest)
+    exchanges_html = render_exchange_tabs(exchanges_store)
     evidence_symbol = (_latest or {}).get("symbol", "-")
     calibration_html = render_calibration(plans_store)
     indicators_html = render_indicators(deep)
@@ -862,6 +939,27 @@ header{{display:flex;justify-content:space-between;align-items:baseline;
 .tok-meta div{{background:var(--panel);border-radius:6px;padding:7px 9px;}}
 .briefing-card{{margin-bottom:14px;border-left:3px solid var(--amber);}}
 .briefing-text{{font-size:14px;line-height:1.7;margin:0;}}
+.tabs{{display:flex;flex-wrap:wrap;gap:6px;}}
+.tab-radio{{position:absolute;opacity:0;pointer-events:none;}}
+.tab-label{{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;
+  border-radius:7px;background:var(--panel-2);cursor:pointer;font-size:12px;
+  font-family:var(--font-mono);border:1px solid transparent;}}
+.tab-radio:checked + .tab-label{{border-color:var(--amber);color:var(--amber);}}
+.tab-used{{font-size:9px;background:rgba(230,180,80,.2);color:var(--amber);
+  padding:1px 5px;border-radius:4px;}}
+.dot-ok{{width:7px;height:7px;border-radius:50%;background:var(--bull);display:inline-block;}}
+.dot-bad{{width:7px;height:7px;border-radius:50%;background:var(--bear);display:inline-block;}}
+.tab-panel{{display:none;width:100%;margin-top:12px;}}
+.ex-meta{{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;
+  font-family:var(--font-mono);font-size:13px;}}
+.ex-meta div{{background:var(--panel-2);border-radius:6px;padding:7px 9px;}}
+.cap-list{{display:flex;flex-direction:column;gap:5px;}}
+.cap-row{{display:grid;grid-template-columns:100px 1fr;gap:8px;align-items:center;font-size:12px;}}
+.ex-fail{{color:var(--bear);font-family:var(--font-mono);font-size:13px;margin-bottom:6px;}}
+.ex-err{{font-size:11px;color:var(--text-dim);font-family:var(--font-mono);
+  background:var(--panel-2);padding:7px 9px;border-radius:6px;word-break:break-all;}}
+.ex-note{{margin-top:10px;font-size:11px;color:var(--text-dim);line-height:1.5;}}
+.ex-sig{{margin-top:12px;font-size:11px;color:var(--text-dim);}}
 .ev-fusion{{font-family:var(--font-mono);font-size:12px;margin-bottom:10px;
   padding:7px 10px;background:var(--panel-2);border-radius:6px;}}
 .ev-list{{display:flex;flex-direction:column;gap:4px;}}
@@ -955,6 +1053,11 @@ footer{{margin-top:26px;color:var(--text-dim);font-size:11px;line-height:1.6;}}
     <div class="brand">SCANLINE<small>AI market scanner &middot; self-learning</small></div>
     <div class="meta">{scan_time}<br>universe {universe}</div>
   </header>
+
+  <div class="card">
+    <h2>Burse &middot; <span class="dim">capabilitati si stare</span></h2>
+    {exchanges_html}
+  </div>
 
   {briefing_html}
 
@@ -1074,6 +1177,7 @@ def main():
     plans_store = load_json(PLANS_FILE, {})
     briefing = load_json(BRIEFING_FILE, {})
     details = load_json(DETAILS_FILE, {})
+    exchanges_store = load_json(EXCHANGES_FILE, {})
 
     scan = history[-1] if history else {"scan_time": "-", "universe_size": 0, "top_long": [], "top_short": []}
     best = scan.get("best_candidate")
@@ -1089,7 +1193,7 @@ def main():
             narrative = None  # narativul e vechi, pt alt candidat - nu-l arat ca fiind curent
 
     os.makedirs(DOCS_DIR, exist_ok=True)
-    html = build_html(scan, best, deep, chart, health, weights, session, token_meta, narrative, history, weights_history, agent_state, plans_store, briefing, details)
+    html = build_html(scan, best, deep, chart, health, weights, session, token_meta, narrative, history, weights_history, agent_state, plans_store, briefing, details, exchanges_store)
     with open(OUTPUT_FILE, "w") as f:
         f.write(html)
     print(f"Dashboard generat: {OUTPUT_FILE}")
