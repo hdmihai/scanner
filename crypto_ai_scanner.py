@@ -31,6 +31,7 @@ scoreaza si notifica. Nu este sfat financiar.
 import ccxt
 import plan_tracker
 import indicators
+import evidence as ev_mod
 import ai_agent
 import json
 import os
@@ -816,6 +817,10 @@ def main():
 
     # 3) decid daca deschid planuri noi - cu contributia agentului daca e ACTIVE
     agent_model, agent_state = ai_agent.load_agent()
+    closed_for_neighbors = [p for p in plan_store["plans"]
+                            if p.get("realized_r") is not None
+                            and p.get("geometry") == plan_tracker.GEOMETRY_VERSION
+                            and p.get("state") != plan_tracker.STATE_NO_ENTRY]
     issued, skipped = [], []
     for sig in (longs[: CONFIG["top_n_per_direction"]] + shorts[: CONFIG["top_n_per_direction"]]):
         if plan_tracker.has_open_plan(plan_store, sig["symbol"], sig["direction"]):
@@ -825,15 +830,35 @@ def main():
             continue
         highs_s = [c[2] for c in candles]
         lows_s = [c[3] for c in candles]
+        closes_s = [c[4] for c in candles]
         struct_s = compute_structure_levels(highs_s, lows_s)
         fib_s = compute_fibonacci(highs_s, lows_s)
         levels = compute_trade_plan(sig["direction"], sig["price"], sig["atr"], struct_s, fib_s)
+
+        # EVIDENTE: din OHLCV-ul deja descarcat, deci zero apeluri API in plus.
+        # Acelasi obiect alimenteaza si agentul (ca vector orientat) si
+        # dashboard-ul (ca lista citibila) - o singura sursa de adevar.
+        sig_ind = indicators.compute_all(candles)
+        sig_rsi = rsi(closes_s, 14)
+        sig_evidence = ev_mod.build_evidence(sig_ind, sig["price"], sig["atr"],
+                                             sig_rsi, sig.get("components"))
+        sig = {**sig,
+               "evidence": sig_evidence,
+               "fusion": ev_mod.fusion(sig_evidence, sig["direction"]),
+               "indicators": sig_ind,
+               "components": {**(sig.get("components") or {}),
+                              **ev_mod.evidence_features(sig_evidence, sig["direction"])}}
         if not levels:
             # geometrie degenerata (ex. ATR efectiv zero) - sar peste simbol,
             # nu opresc scanarea din cauza unuia singur
             print(f"  [!] {sig['symbol']}: niveluri invalide, sar peste")
             continue
 
+        # Verdictul planurilor comparabile: se calculeaza din memoria acumulata
+        # si se salveaza pe plan, ca sa apara in dashboard exact asa cum a fost
+        # la momentul deciziei - nu recalculat mai tarziu, cu alte date.
+        sig["neighbors"] = ai_agent.comparable_entries(
+            ai_agent.extract_features(sig), closed_for_neighbors)
         agent_pred = ai_agent.predict_for_signal(agent_model, agent_state, sig)
         sig = {**sig, "bar_seconds": timeframe_seconds()}
         decision = plan_tracker.decide(calibration, sig, agent_pred)
