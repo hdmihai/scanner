@@ -1,101 +1,121 @@
 {
-  "text": "Din 16 planuri inchise, rata de succes e 10.0%, cu -6.94R cumulat (-0.694R in medie pe plan) si profit factor 0.3. 25 planuri sunt inca deschise. Separat, 5725 planuri inchise (-799.57R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #5790 LINK/USDT +3.01R, #5788 POL/USDT -1.12R, #5795 FET/USDT -1.11R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 10)).",
+  "text": "Din 26986 planuri inchise, rata de succes e 31.9%, cu +576.83R cumulat (+0.028R in medie pe plan) si profit factor 1.04. 16 planuri sunt inca deschise. Separat, 5741 planuri inchise (-806.52R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #8249 NEAR/USDT +1.08R, #13709 ETH/USDT -1.05R, #23672 UNI/USDT -1.03R. Pe intervalele de scor cu destule date, cel mai bine merge 0-19 (27.9%, +0.32R mediu, n=122), iar cel mai slab 20-39 (25.0%, +0.00R, n=3394). Deciziile de a deschide sau refuza planuri se bazeaza pe aceste cifre masurate, nu pe scorul brut. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (acuratetea 70.8% nu bate regula triviala 'prezice mereu clasa majoritara' (72.6%)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-13 11:19 UTC",
-    "universe_size": 54,
-    "plans_total": 5814,
-    "plans_open": 25,
-    "plans_closed": 16,
-    "legacy_closed": 5725,
-    "legacy_total_r": -799.57,
-    "win_rate": 10.0,
-    "total_r": -6.94,
-    "avg_r": -0.694,
-    "profit_factor": 0.3,
+    "scan_time": "2026-09-13 11:51 UTC",
+    "universe_size": 59,
+    "plans_total": 32816,
+    "plans_open": 16,
+    "plans_closed": 26986,
+    "legacy_closed": 5741,
+    "legacy_total_r": -806.52,
+    "win_rate": 31.9,
+    "total_r": 576.83,
+    "avg_r": 0.028,
+    "profit_factor": 1.04,
     "recent_closed": [
       {
-        "id": 5790,
-        "symbol": "LINK/USDT",
-        "direction": "SHORT",
-        "state": "TP2 HIT - CLOSED",
-        "r": 3.014
+        "id": 8249,
+        "symbol": "NEAR/USDT",
+        "direction": "LONG",
+        "state": "TP1 HIT - SL LA BREAKEVEN",
+        "r": 1.085
       },
       {
-        "id": 5788,
-        "symbol": "POL/USDT",
+        "id": 13709,
+        "symbol": "ETH/USDT",
         "direction": "LONG",
         "state": "SL HIT - INVALIDATED",
-        "r": -1.118
+        "r": -1.052
       },
       {
-        "id": 5795,
-        "symbol": "FET/USDT",
+        "id": 23672,
+        "symbol": "UNI/USDT",
         "direction": "LONG",
         "state": "SL HIT - INVALIDATED",
-        "r": -1.113
+        "r": -1.029
       },
       {
-        "id": 5799,
-        "symbol": "FET/USDT",
-        "direction": "SHORT",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.112
+        "id": 28368,
+        "symbol": "GRT/USDT",
+        "direction": "LONG",
+        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
+        "r": 0.0
       },
       {
-        "id": 5797,
-        "symbol": "SEI/USDT",
-        "direction": "SHORT",
+        "id": 31462,
+        "symbol": "ZEC/USDT",
+        "direction": "LONG",
         "state": "SL HIT - INVALIDATED",
-        "r": -1.199
+        "r": -1.02
       }
     ],
     "open_now": [
       {
-        "id": 5814,
-        "symbol": "BTC/USDT",
+        "id": 32816,
+        "symbol": "ONT/USDT",
         "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       },
       {
-        "id": 5813,
-        "symbol": "OP/USDT",
+        "id": 32815,
+        "symbol": "GALA/USDT",
         "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       },
       {
-        "id": 5812,
-        "symbol": "ATOM/USDT",
+        "id": 32814,
+        "symbol": "IMX/USDT",
         "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       },
       {
-        "id": 5811,
-        "symbol": "APT/USDT",
+        "id": 32813,
+        "symbol": "SAND/USDT",
         "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       },
       {
-        "id": 5810,
-        "symbol": "TIA/USDT",
+        "id": 32812,
+        "symbol": "BCH/USDT",
         "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       }
     ],
-    "best_bucket": null,
-    "worst_bucket": null,
+    "best_bucket": {
+      "range": "0-19",
+      "total": 122,
+      "win_rate": 27.9,
+      "ci_low": 20.7,
+      "ci_high": 36.4,
+      "avg_r": 0.321,
+      "avg_win_r": 3.813,
+      "avg_loss_r": 1.028,
+      "reliable": true
+    },
+    "worst_bucket": {
+      "range": "20-39",
+      "total": 3394,
+      "win_rate": 25.0,
+      "ci_low": 23.6,
+      "ci_high": 26.5,
+      "avg_r": 0.002,
+      "avg_win_r": 3.136,
+      "avg_loss_r": 1.042,
+      "reliable": true
+    },
     "agent_status": "SHADOW",
-    "agent_reason": "are nevoie de 300 exemple (are 10)",
-    "agent_samples": 10,
-    "agent_balanced": null,
-    "baseline_balanced": null,
+    "agent_reason": "acuratetea 70.8% nu bate regula triviala 'prezice mereu clasa majoritara' (72.6%)",
+    "agent_samples": 20430,
+    "agent_balanced": 70.91690877621541,
+    "baseline_balanced": 31.784366058499252,
     "agent_weights": {
-      "trend": -0.021556,
-      "momentum": -0.066218,
-      "volatility": -0.09995,
-      "volume": -0.082191,
-      "is_long": -0.064084,
-      "persistence_n": -0.07986
+      "trend": 0.504063,
+      "momentum": 0.272572,
+      "volatility": -0.113667,
+      "volume": -0.470402,
+      "is_long": -0.117663,
+      "persistence_n": 0.0
     }
   }
 }
