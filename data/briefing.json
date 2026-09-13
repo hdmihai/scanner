@@ -1,121 +1,75 @@
 {
-  "text": "Din 26988 planuri inchise, rata de succes e 31.9%, cu +574.72R cumulat (+0.028R in medie pe plan) si profit factor 1.04. 25 planuri sunt inca deschise. Separat, 5741 planuri inchise (-806.52R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #32801 QTUM/USDT -1.04R, #32807 ETH/USDT -1.07R, #8249 NEAR/USDT +1.08R. Pe intervalele de scor cu destule date, cel mai bine merge 0-19 (27.9%, +0.32R mediu, n=122), iar cel mai slab 20-39 (25.0%, +0.00R, n=3394). Deciziile de a deschide sau refuza planuri se bazeaza pe aceste cifre masurate, nu pe scorul brut. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (acuratetea 70.8% nu bate regula triviala 'prezice mereu clasa majoritara' (73.0%)).",
+  "text": "16 planuri sunt deschise, niciunul inchis inca. Pana la primele inchideri nu pot spune nimic despre performanta - orice cifra ar fi speculatie. Separat, 32729 planuri inchise (-231.79R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 0)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-13 17:19 UTC",
+    "scan_time": "2026-09-13 18:22 UTC",
     "universe_size": 59,
-    "plans_total": 32827,
-    "plans_open": 25,
-    "plans_closed": 26988,
-    "legacy_closed": 5741,
-    "legacy_total_r": -806.52,
-    "win_rate": 31.9,
-    "total_r": 574.72,
-    "avg_r": 0.028,
-    "profit_factor": 1.04,
-    "recent_closed": [
-      {
-        "id": 32801,
-        "symbol": "QTUM/USDT",
-        "direction": "LONG",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.037
-      },
-      {
-        "id": 32807,
-        "symbol": "ETH/USDT",
-        "direction": "LONG",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.068
-      },
-      {
-        "id": 8249,
-        "symbol": "NEAR/USDT",
-        "direction": "LONG",
-        "state": "TP1 HIT - SL LA BREAKEVEN",
-        "r": 1.085
-      },
-      {
-        "id": 13709,
-        "symbol": "ETH/USDT",
-        "direction": "LONG",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.052
-      },
-      {
-        "id": 23672,
-        "symbol": "UNI/USDT",
-        "direction": "LONG",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.029
-      }
-    ],
+    "plans_total": 32843,
+    "plans_open": 16,
+    "plans_closed": 0,
+    "legacy_closed": 32729,
+    "legacy_total_r": -231.79,
+    "win_rate": null,
+    "total_r": 0,
+    "avg_r": null,
+    "profit_factor": null,
+    "recent_closed": [],
     "open_now": [
       {
-        "id": 32827,
-        "symbol": "LINK/USDT",
+        "id": 32843,
+        "symbol": "IMX/USDT",
         "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       },
       {
-        "id": 32826,
-        "symbol": "INJ/USDT",
-        "direction": "LONG",
+        "id": 32842,
+        "symbol": "GALA/USDT",
+        "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       },
       {
-        "id": 32825,
-        "symbol": "QTUM/USDT",
-        "direction": "LONG",
+        "id": 32841,
+        "symbol": "SUI/USDT",
+        "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       },
       {
-        "id": 32824,
-        "symbol": "ICP/USDT",
-        "direction": "LONG",
+        "id": 32840,
+        "symbol": "SAND/USDT",
+        "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       },
       {
-        "id": 32823,
+        "id": 32839,
         "symbol": "OP/USDT",
         "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       }
     ],
-    "best_bucket": {
-      "range": "0-19",
-      "total": 122,
-      "win_rate": 27.9,
-      "ci_low": 20.7,
-      "ci_high": 36.4,
-      "avg_r": 0.321,
-      "avg_win_r": 3.813,
-      "avg_loss_r": 1.028,
-      "reliable": true
-    },
-    "worst_bucket": {
-      "range": "20-39",
-      "total": 3394,
-      "win_rate": 25.0,
-      "ci_low": 23.6,
-      "ci_high": 26.5,
-      "avg_r": 0.002,
-      "avg_win_r": 3.136,
-      "avg_loss_r": 1.042,
-      "reliable": true
-    },
+    "best_bucket": null,
+    "worst_bucket": null,
     "agent_status": "SHADOW",
-    "agent_reason": "acuratetea 70.8% nu bate regula triviala 'prezice mereu clasa majoritara' (73.0%)",
-    "agent_samples": 20432,
-    "agent_balanced": 70.91974198787804,
-    "baseline_balanced": 31.781244098061812,
+    "agent_reason": "are nevoie de 300 exemple (are 0)",
+    "agent_samples": 0,
+    "agent_balanced": null,
+    "baseline_balanced": null,
     "agent_weights": {
-      "trend": 0.497982,
-      "momentum": 0.260448,
-      "volatility": -0.126416,
-      "volume": -0.485354,
-      "is_long": -0.135885,
-      "persistence_n": 0.0
+      "trend": 0.0,
+      "momentum": 0.0,
+      "volatility": 0.0,
+      "volume": 0.0,
+      "persistence_n": 0.0,
+      "ev_ema_fast": 0.0,
+      "ev_ema_stack": 0.0,
+      "ev_supertrend": 0.0,
+      "ev_macd": 0.0,
+      "ev_vwap": 0.0,
+      "ev_poc": 0.0,
+      "ev_value_area": 0.0,
+      "ev_rsi": 0.0,
+      "ev_volume": 0.0,
+      "ev_volatility": 0.0,
+      "ev_fusion": 0.0
     }
   }
 }
