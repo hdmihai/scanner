@@ -49,7 +49,9 @@ jobs:
     # 30 de minute e amplu, dar impiedica un job blocat sa ruleze la nesfarsit.
     # 5 ani x 20 simboluri: ~6 min descarcare + ~3 min replay. 60 de minute
     # lasa marja pentru rate limit mai strict sau burse mai lente.
-    timeout-minutes: 60
+    # 59 de simboluri: ~7 min pe 4h, ~26 min pe 1h. 90 lasa marja pentru
+    # rate limit mai strict sau o bursa mai lenta.
+    timeout-minutes: 90
 
     steps:
       - name: Checkout repo
