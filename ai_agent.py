@@ -58,7 +58,12 @@ PLANS_FILE = os.path.join(DATA_DIR, "plans.json")
 # sisteme, deci antrenarea pe amandoua ar invata media a doua functii diferite.
 # La schimbarea geometriei, agentul reporneste - costa exemplele acumulate, dar
 # oricum ramane in SHADOW pana la 300, deci pierderea e doar contabila.
-STATE_SOURCE = "plans-v4"
+# Legata de GEOMETRIA curenta, care include timeframe-ul. Era fixa ("plans-v4"),
+# deci la trecerea de la 1h la 4h calibrarea se separa corect, dar agentul ramanea
+# antrenat pe greutatile invatate din celalalt sistem - prezicea folosind relatii
+# invatate pe miscari de 1h, aplicate unor planuri de 4h. Acum orice schimbare de
+# timeframe declanseaza automat resetul si reinvatarea din geometria potrivita.
+STATE_SOURCE = "plans-" + plan_tracker.GEOMETRY_VERSION
 # Versiunea urcata odata cu adaugarea metricilor pentru date dezechilibrate
 # (AUC, prag de clasa majoritara, rata de predictii pozitive). Perechile
 # (predictie, rezultat) pe care se calculeaza se acumuleaza doar la invatare,
