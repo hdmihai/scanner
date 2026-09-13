@@ -7,7 +7,14 @@ name: Crypto AI Scanner
 on:
   schedule:
     - cron: '7 * * * *'
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      timeframe:
+        description: "Timeframe pentru ACEASTA rulare manuala. Implicit 1h la rularile programate."
+        required: true
+        default: "1h"
+        type: choice
+        options: ["15m", "1h", "4h", "1d"]
 
 # Necesar ca job-ul sa poata face "git push" cu rezultatele scanarii
 # (data/scan_history.json si data/weights.json) inapoi in repo.
@@ -21,7 +28,15 @@ jobs:
     env:
       # Trebuie sa fie ACELASI ca la backtest, altfel scanarea live si
       # backtest-ul produc geometrii diferite si nu invata din acelasi set.
-      SCAN_TIMEFRAME: "1h"
+      # La rularile MANUALE ia valoarea din formular; la cele programate `inputs`
+      # e gol, deci cade pe implicit. Asa poti testa alt timeframe cu un click,
+      # fara sa editezi fisierul.
+      #
+      # ATENTIE: timeframe-ul si cadenta cron sunt lucruri DIFERITE. Scanarea
+      # renunta la lumanarea neinchisa, deci datele se schimba doar cand se
+      # inchide o bara noua. Cu timeframe 4h si cron orar, 3 din 4 rulari vad
+      # exact aceleasi bare si nu produc nimic nou - inofensiv, dar inutil.
+      SCAN_TIMEFRAME: ${{ inputs.timeframe || '1h' }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
