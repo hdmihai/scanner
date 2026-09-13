@@ -10,14 +10,20 @@ on:
   workflow_dispatch:
     inputs:
       timeframe:
-        description: "Timeframe pentru ACEASTA rulare manuala. Implicit 1h la rularile programate."
+        description: "Timeframe pentru ACEASTA rulare manuala. Implicit 4h la rularile programate."
         required: true
-        default: "1h"
+        default: "4h"
         type: choice
         options: ["15m", "1h", "4h", "1d"]
 
 # Necesar ca job-ul sa poata face "git push" cu rezultatele scanarii
 # (data/scan_history.json si data/weights.json) inapoi in repo.
+# Serializeaza cu backtest.yml: amandoua scriu in data/ si ar intra in conflict
+# la push daca ar rula simultan. Grupul functioneaza doar daca AMBELE il declara.
+concurrency:
+  group: scanner-data
+  cancel-in-progress: false
+
 permissions:
   contents: write
   actions: write   # necesar pentru stergerea run-urilor vechi (pasul de la final)
@@ -32,11 +38,21 @@ jobs:
       # e gol, deci cade pe implicit. Asa poti testa alt timeframe cu un click,
       # fara sa editezi fisierul.
       #
-      # ATENTIE: timeframe-ul si cadenta cron sunt lucruri DIFERITE. Scanarea
-      # renunta la lumanarea neinchisa, deci datele se schimba doar cand se
-      # inchide o bara noua. Cu timeframe 4h si cron orar, 3 din 4 rulari vad
-      # exact aceleasi bare si nu produc nimic nou - inofensiv, dar inutil.
-      SCAN_TIMEFRAME: ${{ inputs.timeframe || '1h' }}
+      # DE CE 4h, MASURAT pe 5 ani si 54 de simboluri, walk-forward:
+      #   1h -> -0.0355R/plan, profit factor 0.95
+      #   4h -> +0.0232R/plan, profit factor 1.04, IC95 +0.0004..+0.0460
+      # Rata de castig e aproape identica (32.4% vs 31.9%). Diferenta e strict
+      # economica: costul de tranzactionare e fix (~0.085R), iar pe 4h aceeasi
+      # logica prinde miscari de patru ori mai ample, deci costul cantareste
+      # mult mai putin relativ la castig.
+      #
+      # CRON-UL RAMANE ORAR, desi timeframe-ul e 4h. Nu e o scapare: programarile
+      # GitHub intarzie imprevizibil (am masurat rulari intre minutul 9 si 59 la
+      # un cron setat pe 7). Cu cron la 4h ai risca sa scanezi chiar inainte de
+      # inchiderea unei bare si sa astepti alte 4 ore. Scanand orar, prinzi bara
+      # noua in cel mult o ora. Cele 3 rulari din 4 care vad aceleasi bare inchise
+      # nu produc nimic si nu strica nimic - minutele sunt nelimitate pe repo public.
+      SCAN_TIMEFRAME: ${{ inputs.timeframe || '4h' }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
