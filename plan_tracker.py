@@ -51,6 +51,25 @@ PLANS_FILE = os.path.join(DATA_DIR, "plans.json")
 MAX_BARS = 48          # cate lumanari las un plan deschis (48 = 2 zile pe 1h)
 MIN_BUCKET_SAMPLES = 20  # sub atat, nu pronunt o probabilitate calibrata
 
+# POARTA DE DECIZIE: implicit DEZACTIVATA, pe baza de dovezi.
+#
+# A fost construita ca sa refuze intervalele de scor cu valoare asteptata
+# negativa. In-sample parea sa functioneze (ducea -0.171R la +0.041R). Dar
+# walk-forward-ul, pe ferestre nevazute, a masurat altceva, de trei ori:
+#
+#   1h, 14 simboluri:  cu poarta -0.0614R | fara -0.0355R  -> pierde 0.0259R
+#   4h, 14 simboluri:  cu poarta +0.0364R | fara +0.0343R  -> castiga 0.0021R
+#   4h, 54 simboluri:  cu poarta -0.0046R | fara +0.0232R  -> pierde 0.0278R
+#
+# Pe cel mai mare esantion (12.864 planuri emise), poarta transforma un sistem
+# semnificativ pozitiv intr-unul plat. Cauza: calibrarea invata praguri de pe
+# ferestrele trecute, iar ele nu se transfera - clasica potrivire pe trecut.
+#
+# Codul ramane, pentru ca infrastructura de calibrare e folosita si la afisare,
+# si pentru ca pe alt set de date poarta ar putea deveni utila. Dar nu mai
+# filtreaza nimic implicit. Pune True doar daca ai dovezi walk-forward proprii.
+USE_DECISION_GATE = os.environ.get("USE_DECISION_GATE", "false").lower() == "true"
+
 # Versiunea geometriei planului. Cand regulile de plasare a TP1/TP2 se schimba,
 # rezultatele vechi devin necomparabile: descriu o structura care nu mai exista.
 # Calibrarea foloseste doar planuri din versiunea curenta.
@@ -480,6 +499,17 @@ def decide(calibration, signal, agent_pred=None, bucket_size=20):
     """
     score = signal.get("risk_adjusted", 0)
     cal = calibrated_probability(calibration, score, bucket_size)
+
+    if not USE_DECISION_GATE:
+        # Masuram si raportam in continuare - cifrele apar in dashboard si pe
+        # plan - dar nu refuzam nimic. Vezi nota de la USE_DECISION_GATE.
+        return {"action": "ISSUE", "mode": "POARTA_DEZACTIVATA",
+                "reason": ("poarta dezactivata: pe walk-forward a inrautatit "
+                           "rezultatul in 2 din 3 rulari"),
+                "expected_value_r": None,
+                "calibrated_prob": cal["win_rate"] if cal else None,
+                "agent_prob": (agent_pred or {}).get("probability"),
+                "agent_used": False}
     agent_p = (agent_pred or {}).get("probability")
     agent_active = bool((agent_pred or {}).get("active"))
 
