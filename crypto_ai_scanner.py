@@ -32,6 +32,7 @@ import ccxt
 import plan_tracker
 import indicators
 import evidence as ev_mod
+import exchanges as ex_mod
 import ai_agent
 import json
 import os
@@ -601,6 +602,23 @@ def build_eligible_pairs(markets, tickers, scope):
 
     pairs = sorted(by_base.values(), key=lambda t: t[1], reverse=True)
     return [symbol for symbol, _ in pairs]
+
+
+def probe_all_exchanges(scope):
+    """Sondeaza TOATE bursele din lista, nu doar pana la prima care merge.
+
+    Costa cateva secunde in plus, dar dashboard-ul are nevoie de starea fiecareia
+    ca sa poata arata un tab per bursa, inclusiv pentru cele care nu raspund.
+    Fisele se salveaza si se folosesc si la alegerea bursei de lucru.
+    """
+    cards = []
+    for eid in CONFIG["exchange_fallback"]:
+        card, ex = ex_mod.probe_exchange(ccxt, eid)
+        cards.append(card)
+        status = "conectat" if card["connected"] else f"esuat: {card['error']}"
+        caps = ",".join(card["available"]) or "-"
+        print(f"  [{eid}] {status} | capabilitati: {caps}")
+    return cards
 
 
 def connect_exchange(scope):
