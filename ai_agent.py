@@ -48,6 +48,7 @@ import json
 import math
 import os
 
+import evidence as ev_mod
 import plan_tracker
 
 DATA_DIR = "data"
@@ -71,7 +72,13 @@ STATE_SOURCE = "plans-" + plan_tracker.GEOMETRY_VERSION
 # nimic: agentul e oricum in SHADOW pana la 300 de exemple.
 MODEL_FILE = os.path.join(DATA_DIR, "agent_model.json")
 
-FEATURES = ["trend", "momentum", "volatility", "volume", "is_long", "persistence_n"]
+# Caracteristicile de baza plus EVIDENTELE orientate dupa directie.
+# `is_long` a fost SCOS intentionat: orientarea face fiecare evidenta sa spuna
+# "sustine sau contrazice planul", deci directia nu mai trebuie invatata separat.
+# Masurat inainte: greutatea `is_long` ajunsese -1.93 si domina tot restul -
+# modelul memorase regimul de piata, nu o relatie reala.
+BASE_FEATURES = ["trend", "momentum", "volatility", "volume", "persistence_n"]
+FEATURES = BASE_FEATURES + ev_mod.FEATURE_KEYS
 
 LEARNING_RATE = 0.05
 L2 = 1e-4
@@ -152,15 +159,23 @@ def extract_features(result):
     Componentele sunt deja 0-1; persistenta o normalizez si o plafonez, ca sa
     nu domine restul doar pentru ca e un numar mai mare."""
     comp = result.get("components") or {}
-    return {
+    feats = {
         "trend": float(comp.get("trend", 0.0)),
         "momentum": float(comp.get("momentum", 0.0)),
         "volatility": float(comp.get("volatility", 0.0)),
         "volume": float(comp.get("volume", 0.0)),
-        "is_long": 1.0 if result.get("direction") == "LONG" else 0.0,
         "persistence_n": min(float(
             result.get("persistence", result.get("persistence_at_entry", 0)) or 0) / 10.0, 1.0),
     }
+    # Evidentele: fie deja calculate si salvate pe plan, fie derivate din lista
+    # de evidente. Planurile vechi nu le au - primesc 0, ceea ce inseamna
+    # "evidenta absenta", nu "evidenta contra".
+    stored = {k: comp[k] for k in ev_mod.FEATURE_KEYS if k in comp}
+    if not stored and result.get("evidence"):
+        stored = ev_mod.evidence_features(result["evidence"], result.get("direction"))
+    for k in ev_mod.FEATURE_KEYS:
+        feats[k] = float(stored.get(k, 0.0))
+    return feats
 
 
 def heuristic_proba(result):
@@ -429,6 +444,50 @@ def train_from_plans(plans, model, state):
 
     state["samples_trained"] = state.get("samples_trained", 0) + new_samples
     return new_samples
+
+
+def comparable_entries(features, closed_plans, k=60, min_n=20):
+    """Verdictul planurilor COMPARABILE - mecanismul "favors X from N comparable
+    completed entries" din sistemul de referinta.
+
+    Cauta cele mai apropiate k planuri INCHISE in spatiul caracteristicilor si
+    se uita la ce au facut. E o a doua sursa de invatare, independenta de
+    regresia logistica si complementara ei: modelul liniar invata o relatie
+    globala, vecinii surprind tipare locale pe care o dreapta nu le poate prinde.
+
+    Si, spre deosebire de greutatile modelului, verdictul e VERIFICABIL: poti
+    arata exact din cate intrari comparabile provine.
+    """
+    pool = []
+    for p in closed_plans:
+        if p.get("realized_r") is None:
+            continue
+        f = extract_features(p)
+        d = sum((f.get(key, 0.0) - features.get(key, 0.0)) ** 2 for key in FEATURES)
+        pool.append((d, p["realized_r"]))
+    if len(pool) < min_n:
+        return {"n": len(pool), "verdict": None,
+                "reason": f"doar {len(pool)} intrari comparabile (prag {min_n})"}
+
+    pool.sort(key=lambda t: t[0])
+    near = pool[:k]
+    rs = [r for _, r in near]
+    wins = sum(1 for r in rs if r > 0)
+    avg_r = sum(rs) / len(rs)
+    base = [r for _, r in pool]
+    base_avg = sum(base) / len(base)
+    # "puncte" = cu cat e mai bun grupul apropiat fata de media generala,
+    # exprimat pe o scala 0-100 ca sa fie citibil
+    points = round(100 * (avg_r - base_avg), 1)
+    return {
+        "n": len(near), "pool": len(pool),
+        "win_rate": round(100 * wins / len(near), 1),
+        "avg_r": round(avg_r, 4), "base_avg_r": round(base_avg, 4),
+        "points": points,
+        "verdict": "FAVORABIL" if points > 0 else ("NEFAVORABIL" if points < 0 else "NEUTRU"),
+        "reason": (f"intrarile comparabile inclina {'favorabil' if points > 0 else 'nefavorabil'} "
+                   f"cu {abs(points):.1f} puncte, din {len(near)} intrari similare inchise"),
+    }
 
 
 def predict_for_signal(model, state, signal):
