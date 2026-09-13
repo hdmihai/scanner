@@ -34,6 +34,13 @@ in backtest - iar o evidenta care exista doar live si lipseste in backtest ar
 face cele doua incomparabile. Prefer sa lipseasca din amandoua.
 """
 
+# Ce capabilitate cere fiecare evidenta. Cele care nu apar aici au nevoie doar
+# de OHLCV, deci merg peste tot. Evidentele fara suport pe bursa curenta sunt
+# OMISE - nu inlocuite cu zero, care ar insemna "evidenta neutra" si ar minti
+# modelul despre ce a vazut.
+REQUIRES = {"order_flow": "trades_live", "book_imbalance": "orderbook_live"}
+
+
 DIR_LONG = "LONG"
 DIR_SHORT = "SHORT"
 DIR_NEUTRAL = "NEUTRU"
@@ -49,7 +56,8 @@ def _item(key, label, direction, strength, value=None):
             "value": value}
 
 
-def build_evidence(ind, price, atr, rsi=None, components=None):
+def build_evidence(ind, price, atr, rsi=None, components=None,
+                   flow=None, book=None, caps=None):
     """Construieste lista de evidente dintr-un set de indicatori.
 
     `ind` e iesirea lui indicators.compute_all(). Orice lipseste se sare -
@@ -132,6 +140,35 @@ def build_evidence(ind, price, atr, rsi=None, components=None):
             ev.append(_item("rsi", f"RSI in zona neutra, inclinat {'in sus' if up else 'in jos'} ({rsi:.0f})",
                             DIR_LONG if up else DIR_SHORT, abs(rsi - 50) / 20, round(rsi, 1)))
 
+    caps = set(caps or [])
+
+    # ORDER FLOW - cere trades_live. Echivalentul "order flow favors sellers
+    # (78.2% sell)" din sistemul de referinta. Exista doar live: arhivele
+    # istorice de tranzactii sunt de ordinul zecilor de mii de GB pentru
+    # universul nostru, deci backtest-ul ruleaza fara evidenta asta, iar
+    # semnatura de capabilitati tine cele doua seturi separate la invatare.
+    if flow and REQUIRES["order_flow"] in caps:
+        sell_pct = flow.get("sell_pct")
+        if sell_pct is not None:
+            sellers = sell_pct > 50
+            ev.append(_item("order_flow",
+                            f"Fluxul recent favorizeaza {'vanzatorii' if sellers else 'cumparatorii'} "
+                            f"({max(sell_pct, 100 - sell_pct):.1f}%)",
+                            DIR_SHORT if sellers else DIR_LONG,
+                            _clip(abs(sell_pct - 50) / 30, 0, 1), sell_pct))
+
+    # DEZECHILIBRU DE CARTE - cere orderbook_live.
+    if book and REQUIRES["book_imbalance"] in caps:
+        b, a = book.get("bid_volume"), book.get("ask_volume")
+        if b and a and (b + a) > 0:
+            bid_pct = 100 * b / (b + a)
+            heavy_bid = bid_pct > 50
+            ev.append(_item("book_imbalance",
+                            f"Cartea de ordine e mai grea pe {'cumparare' if heavy_bid else 'vanzare'} "
+                            f"({max(bid_pct, 100 - bid_pct):.1f}%)",
+                            DIR_LONG if heavy_bid else DIR_SHORT,
+                            _clip(abs(bid_pct - 50) / 25, 0, 1), round(bid_pct, 1)))
+
     comp = components or {}
     if comp.get("volume") is not None:
         v = comp["volume"]
@@ -164,7 +201,8 @@ def fusion(evidence, direction):
 # Ordinea e fixa: vectorul de caracteristici trebuie sa aiba mereu aceeasi
 # forma, altfel greutatile invatate nu mai corespund aceleiasi evidente.
 EVIDENCE_KEYS = ["ema_fast", "ema_stack", "supertrend", "macd", "vwap",
-                 "poc", "value_area", "rsi", "volume", "volatility"]
+                 "poc", "value_area", "rsi", "volume", "volatility",
+                 "order_flow", "book_imbalance"]
 
 
 def evidence_features(evidence, direction):
