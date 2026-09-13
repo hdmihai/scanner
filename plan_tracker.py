@@ -80,7 +80,12 @@ USE_DECISION_GATE = os.environ.get("USE_DECISION_GATE", "false").lower() == "tru
 # cost de tranzactie). Amestecarea lor in calibrare ar media doua sisteme
 # diferite - aceeasi eroare pe care am evitat-o la schimbarile de geometrie.
 # Asa, trecerea de la 1h la 4h separa automat datele, fara interventie manuala.
-GEOMETRY_VERSION = "v4-" + os.environ.get("SCAN_TIMEFRAME", "1h")
+# v5: STRAT DE EVIDENTE. Caracteristicile agentului au trecut de la 6 numere
+# abstracte la 16, din care 11 sunt evidente orientate dupa directia planului.
+# `is_long` a fost scos. Planurile v4 nu au evidente, deci un model antrenat pe
+# ele nu poate fi comparat cu unul antrenat pe v5 - resetul e obligatoriu, nu
+# optional. Datele v4 raman in fisier ca urma auditabila.
+GEOMETRY_VERSION = "v5-" + os.environ.get("SCAN_TIMEFRAME", "1h")
 # v3 -> v4: doua schimbari care fac rezultatele necomparabile cu cele anterioare.
 #   1. Scanarea nu mai foloseste lumanarea curenta, neinchisa. Cron-ul e :07 dar
 #      rulari reale au fost masurate intre :09 si :59, deci bara era prinsa intre
@@ -228,6 +233,12 @@ def create_plan(store, signal, plan_levels, decision):
         "components": signal.get("components"),
         "persistence_at_entry": signal.get("persistence"),
         "decision": decision,
+        # Lista de evidente si rezumatul lor, exact ce se afiseaza in dashboard.
+        # Salvate pe plan, nu recalculate: dashboard-ul citeste din memoria
+        # agentului, nu face propriul calcul paralel care ar putea diverge.
+        "evidence": signal.get("evidence") or [],
+        "fusion": signal.get("fusion"),
+        "neighbors": signal.get("neighbors"),
         "geometry": GEOMETRY_VERSION,
         "bar_seconds": signal.get("bar_seconds", DEFAULT_BAR_SECONDS),
     }
