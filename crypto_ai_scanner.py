@@ -68,13 +68,33 @@ CONFIG = {
     # BTC/ETH au volatilitate mult mai mica, DOGE mult mai mare. Diversitatea
     # de ATR conteaza mai mult decat numarul brut de simboluri, pentru ca da
     # regimuri diferite in ACEEASI perioada calendaristica.
-    # JASMY scos: nu exista ca pereche pe OKX (verificat in log-ul rularii).
-    # POL, FET, SEI si SUI au primit doar 12-50 de zile de istoric pe OKX -
-    # raman in lista pentru scanarea live, dar contribuie aproape deloc la
-    # backtest. Raportul de acoperire le semnaleaza la fiecare rulare.
+    # UNIVERS EXTINS pentru putere statistica. Walk-forward pe 4h a dat +0.036R
+    # dar cu interval de incredere care atinge zero; ar fi nevoie de ~15.000 de
+    # planuri emise, iar 14 simboluri dau ~295 fiecare pe 5 ani. De aici 59 de
+    # simboluri: ~17.000 de planuri, peste pragul de semnificatie.
+    #
+    # Selectie: active lichide din zona top 5-70 dupa capitalizare, fara
+    # stablecoins (nu au volatilitate, deci niciun semnal) si fara tokene
+    # wrapped (dubleaza acelasi activ). Lista e din cunostintele mele, deci
+    # unele pot lipsi de pe bursa aleasa - raportul de acoperire le semnaleaza
+    # la fiecare rulare, iar cele nerezolvate apar explicit inainte de descarcare.
     "watchlist": [
+        # nucleul precedent
         "POL", "DOT", "AVAX", "FET", "SEI", "EGLD", "NEAR",
         "LINK", "ADA", "ALGO", "SUI", "TRX", "AXS", "CHZ",
+        # capitalizare mare, volatilitate mai mica - largesc spectrul de regimuri
+        "BTC", "ETH", "XRP", "BNB", "SOL", "DOGE", "LTC", "BCH",
+        # L1 si L2 consacrate
+        "XLM", "HBAR", "ATOM", "ETC", "ICP", "APT", "ARB", "OP",
+        "IMX", "INJ", "STX", "TIA", "VET", "XTZ", "EOS", "NEO", "IOTA",
+        # DeFi
+        "UNI", "AAVE", "CRV", "LDO", "MKR", "SNX", "COMP", "ENS", "DYDX", "RUNE",
+        # infrastructura si date
+        "FIL", "GRT", "THETA", "KAVA",
+        # gaming si metavers
+        "SAND", "MANA", "GALA",
+        # volatilitate mare, capat opus al spectrului
+        "PEPE", "SHIB", "FLOW",
     ],
     # Redenumiri de care sunt sigur. Backtest-ul alege aliasul cu istoricul
     # cel mai adanc, nu pe cel cu volumul mai mare.
