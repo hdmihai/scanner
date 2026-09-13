@@ -66,6 +66,13 @@ jobs:
       - name: Instaleaza dependinte
         run: pip install ccxt requests
 
+      - name: Verifica coerenta versiunilor din repo
+        # Prinde amestecul de versiuni: fisiere lipsa apelate de workflow,
+        # geometrie fara timeframe, agent care nu urmeaza geometria, poarta
+        # de decizie fara comutator. Fara verificarea asta, un repo cu fisiere
+        # inlocuite partial ruleaza si invata din date corupte, in tacere.
+        run: python check_integrity.py
+
       - name: Verifica compatibilitatea cu Python 3.11
         run: python check_py311.py
 
