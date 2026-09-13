@@ -381,6 +381,54 @@ def honest_probability(score, plans_store):
     return f'{e["win_rate"]}%', f'masurat, IC {e["ci_low"]}-{e["ci_high"]}%, n={e["total"]}'
 
 
+def render_evidence(plan):
+    """Lista de evidente, exact cum a fost la momentul deciziei.
+
+    Citeste din `plan["evidence"]` - memoria agentului - nu recalculeaza nimic.
+    Daca dashboard-ul si-ar calcula propriile valori, ar arata starea de ACUM,
+    nu pe cea din care agentul a invatat, iar cele doua ar diverge in timp.
+    """
+    ev = (plan or {}).get("evidence") or []
+    if not ev:
+        return '<p class="dim">Fara evidente inregistrate (plan din geometrie anterioara).</p>'
+    d = plan.get("direction")
+    rows = []
+    for e in ev:
+        if e["direction"] == d:
+            cls, mark = "ok", "sustine"
+        elif e["direction"] == "NEUTRU":
+            cls, mark = "neu", "context"
+        else:
+            cls, mark = "bad", "contrazice"
+        bar = int(round(e["strength"] * 100))
+        rows.append(
+            '<div class="ev-row ev-{}"><span class="ev-mark">{}</span>'
+            '<span class="ev-label">{}</span>'
+            '<span class="ev-bar"><i style="width:{}%"></i></span></div>'.format(
+                cls, mark, e["label"], bar))
+
+    f = plan.get("fusion") or {}
+    head = ""
+    if f.get("score") is not None:
+        head = ('<div class="ev-fusion">Evidente: <strong>{}</strong> sustin, '
+                '<strong>{}</strong> contrazic, {} context '
+                '&middot; aliniere <strong>{}%</strong></div>').format(
+                    f["support"], f["oppose"], f["neutral"], f["score"])
+
+    n = plan.get("neighbors") or {}
+    nb = ""
+    if n.get("verdict"):
+        nb = ('<div class="ev-neighbors nb-{}">Intrari comparabile: <strong>{}</strong> '
+              '&middot; {}</div>').format(
+                  "ok" if n["verdict"] == "FAVORABIL" else
+                  ("bad" if n["verdict"] == "NEFAVORABIL" else "neu"),
+                  n["verdict"], n["reason"])
+    elif n.get("reason"):
+        nb = '<div class="ev-neighbors nb-neu dim">{}</div>'.format(n["reason"])
+
+    return head + '<div class="ev-list">' + "".join(rows) + "</div>" + nb
+
+
 def render_sparkline(values, width=200, height=36):
     """Linie de pret minimala, desenata ca SVG. Fara librarie, fara CDN."""
     vals = [v for v in (values or []) if v is not None]
@@ -678,6 +726,10 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
     learning_curve_html = render_learning_curve(history, weights_history, health, agent_state)
     agent_html = render_agent_card(agent_state)
     plans_html = render_plan_memory(plans_store)
+    _all = (plans_store or {}).get("plans") or []
+    _latest = max(_all, key=lambda p: p.get("id", 0)) if _all else None
+    evidence_html = render_evidence(_latest)
+    evidence_symbol = (_latest or {}).get("symbol", "-")
     calibration_html = render_calibration(plans_store)
     indicators_html = render_indicators(deep)
     briefing_html = render_briefing(briefing)
@@ -810,6 +862,25 @@ header{{display:flex;justify-content:space-between;align-items:baseline;
 .tok-meta div{{background:var(--panel);border-radius:6px;padding:7px 9px;}}
 .briefing-card{{margin-bottom:14px;border-left:3px solid var(--amber);}}
 .briefing-text{{font-size:14px;line-height:1.7;margin:0;}}
+.ev-fusion{{font-family:var(--font-mono);font-size:12px;margin-bottom:10px;
+  padding:7px 10px;background:var(--panel-2);border-radius:6px;}}
+.ev-list{{display:flex;flex-direction:column;gap:4px;}}
+.ev-row{{display:grid;grid-template-columns:74px 1fr 60px;align-items:center;gap:8px;
+  font-size:12px;padding:4px 0;border-bottom:1px solid var(--border);}}
+.ev-mark{{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;
+  letter-spacing:.05em;}}
+.ev-ok .ev-mark{{color:var(--bull);}}
+.ev-bad .ev-mark{{color:var(--bear);}}
+.ev-neu .ev-mark{{color:var(--text-dim);}}
+.ev-bar{{height:5px;background:var(--panel-2);border-radius:3px;overflow:hidden;}}
+.ev-bar i{{display:block;height:100%;background:var(--text-dim);}}
+.ev-ok .ev-bar i{{background:var(--bull);}}
+.ev-bad .ev-bar i{{background:var(--bear);}}
+.ev-neighbors{{margin-top:10px;padding:8px 10px;border-radius:6px;font-size:12px;
+  background:var(--panel-2);}}
+.nb-ok{{border-left:3px solid var(--bull);}}
+.nb-bad{{border-left:3px solid var(--bear);}}
+.nb-neu{{border-left:3px solid var(--text-dim);}}
 .plan-summary{{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;
   font-family:var(--font-mono);font-size:14px;}}
 .plan-summary div{{background:var(--panel-2);border-radius:7px;padding:8px 10px;}}
@@ -946,6 +1017,11 @@ footer{{margin-top:26px;color:var(--text-dim);font-size:11px;line-height:1.6;}}
           <span class="dim">{health["evaluated"]}/{health["min_samples"]} evaluated &middot; hit-rate {health["hit_rate"] if health["hit_rate"] is not None else "-"}%</span>
           <span class="health-status">{health["status"]}</span>
         </div>
+      </div>
+
+      <div class="card">
+        <h2>Evidente &middot; <span class="dim">{evidence_symbol}, din memoria agentului</span></h2>
+        {evidence_html}
       </div>
 
       <div class="card">
