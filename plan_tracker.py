@@ -85,7 +85,13 @@ USE_DECISION_GATE = os.environ.get("USE_DECISION_GATE", "false").lower() == "tru
 # `is_long` a fost scos. Planurile v4 nu au evidente, deci un model antrenat pe
 # ele nu poate fi comparat cu unul antrenat pe v5 - resetul e obligatoriu, nu
 # optional. Datele v4 raman in fisier ca urma auditabila.
-GEOMETRY_VERSION = "v5-" + os.environ.get("SCAN_TIMEFRAME", "1h")
+# Semnatura include si CAPABILITATILE active. Un plan creat cu order flow are
+# alt vector de caracteristici decat unul fara. Fara separare, agentul ar invata
+# din amandoua ca si cum ar fi acelasi sistem - aceeasi eroare pe care
+# versionarea o previne la schimbarile de timeframe si de geometrie.
+# Backtest-ul ruleaza mereu cu "o" (doar OHLCV); scanarea live poate avea "obf".
+GEOMETRY_VERSION = ("v5-" + os.environ.get("SCAN_TIMEFRAME", "1h")
+                    + "-" + os.environ.get("SCAN_CAPS", "o"))
 # v3 -> v4: doua schimbari care fac rezultatele necomparabile cu cele anterioare.
 #   1. Scanarea nu mai foloseste lumanarea curenta, neinchisa. Cron-ul e :07 dar
 #      rulari reale au fost masurate intre :09 si :59, deci bara era prinsa intre
