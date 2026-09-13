@@ -11,11 +11,11 @@ on:
         required: true
         default: "1825"
       mode:
-        description: "walk_forward = validare pe ferestre nevazute (recomandat) | sweep = compara variante | single = raport simplu"
+        description: "walk_forward = validare pe ferestre nevazute | sweep = compara variante | single = raport simplu | merge_only = integreaza un backtest DEJA rulat, fara redescarcare (~10 secunde)"
         required: true
         default: "walk_forward"
         type: choice
-        options: [walk_forward, sweep, single]
+        options: [walk_forward, sweep, single, merge_only]
       timeframe:
         description: "Timeframe: 1h, 4h, 1d. Rezultatele de pe timeframe-uri diferite se separa automat in calibrare."
         required: true
@@ -93,6 +93,7 @@ jobs:
             sweep)        ARGS="$ARGS --sweep" ;;
             walk_forward) ARGS="$ARGS --walk-forward --windows $BT_WINDOWS" ;;
             single)       : ;;
+            merge_only)   : ;;   # tratat separat mai jos, fara descarcare
             *) echo "[EROARE] mod necunoscut: $BT_MODE"; exit 1 ;;
           esac
           [ "$BT_MERGE" = "true" ] && ARGS="$ARGS --merge"
@@ -100,7 +101,23 @@ jobs:
           echo "Rulez: python backtest.py $ARGS"
           # tee: iesirea ajunge si in log, si intr-un fisier pe care il pun in
           # rezumatul rularii, ca sa fie vizibila fara sa sapi prin log.
-          python backtest.py $ARGS 2>&1 | tee /tmp/backtest.log
+          if [ "$BT_MODE" = "merge_only" ]; then
+            echo "Mod merge_only: folosesc data/backtest_plans.json existent." | tee /tmp/backtest.log
+            python merge_backtest.py 2>&1 | tee -a /tmp/backtest.log
+          else
+            python backtest.py $ARGS 2>&1 | tee /tmp/backtest.log
+          fi
+
+      - name: Antreneaza agentul pe datele integrate
+        # Ruleaza doar cand chiar s-au integrat date. Fara pasul asta, agentul
+        # ar invata abia la urmatoarea scanare orara - iar merge_backtest.py
+        # nu era apelat de niciun workflow, deci nu putea fi rulat de pe telefon.
+        if: inputs.merge == 'true' || inputs.mode == 'merge_only'
+        env:
+          SCAN_TIMEFRAME: ${{ inputs.timeframe }}
+        run: |
+          set -o pipefail
+          python ai_agent.py 2>&1 | tee /tmp/agent.log
 
       - name: Pune rezultatul in rezumatul rularii
         if: always()
