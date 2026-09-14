@@ -33,6 +33,7 @@ PLANS_FILE = os.path.join(DATA_DIR, "plans.json")
 BRIEFING_FILE = os.path.join(DATA_DIR, "briefing.json")
 DETAILS_FILE = os.path.join(DATA_DIR, "latest_details.json")
 EXCHANGES_FILE = os.path.join(DATA_DIR, "exchanges.json")
+EXCHANGE_SCANS_FILE = os.path.join(DATA_DIR, "exchange_scans.json")
 CHART_FILE = os.path.join(DATA_DIR, "latest_chart.json")
 OUTPUT_FILE = os.path.join(DOCS_DIR, "index.html")
 
@@ -536,7 +537,61 @@ def render_rich_chart(chart):
             f'{"".join(body)}{vol}{rsi_svg}{macd_svg}</svg>')
 
 
-def render_exchange_tabs(store):
+def render_exchange_scan(scan, label):
+    """Ce vede o bursa ACUM: lista ei de simboluri, semnalele si indicatorii.
+
+    Planurile se creeaza doar pe bursa activa - vezi nota din scanner. Aici e
+    strict afisare, ca sa poti compara ce arata fiecare bursa fara sa imparti
+    memoria agentului in cinci.
+    """
+    if not scan:
+        return '<p class="dim">Nicio scanare inregistrata pentru aceasta bursa.</p>'
+    if scan.get("error"):
+        return ('<div class="ex-fail">Scanarea nu a putut rula.</div>'
+                '<div class="ex-err">{}</div>'.format(scan["error"]))
+
+    res = scan.get("results") or []
+    resolved = scan.get("resolved") or []
+    missing = scan.get("missing") or []
+    head = ('<div class="scan-head"><strong>{}</strong> simboluri gasite aici'
+            '{} &middot; <strong>{}</strong> cu semnal{}</div>').format(
+        len(resolved),
+        (' &middot; <span class="dim">{} lipsesc: {}</span>'.format(
+            len(missing), ", ".join(missing[:8]) + ("..." if len(missing) > 8 else "")))
+        if missing else "",
+        len(res),
+        ' <span class="tab-used">activa - aici se creeaza planuri</span>'
+        if scan.get("primary") else
+        ' <span class="dim">(doar afisare)</span>')
+
+    if scan.get("truncated"):
+        head += ('<div class="ex-note">Scanare trunchiata la limita de timp - '
+                 'bursele secundare au buget fix ca sa nu intinda rularea.</div>')
+    if not res:
+        return head + '<p class="dim">Niciun semnal pe aceasta bursa acum.</p>'
+
+    det = scan.get("details") or {}
+    rows = []
+    for r in res[:20]:
+        d = det.get(r["symbol"]) or {}
+        st = d.get("supertrend")
+        rows.append(
+            '<div class="scan-row">'
+            '<span class="scan-sym">{}</span>'
+            '<span class="badge badge-{}">{}</span>'
+            '<span class="scan-score">{}</span>'
+            '<span class="scan-px">{}</span>'
+            '<span class="tag tag-{}">{}</span>'
+            '<span class="dim scan-pos">{}</span>'
+            '</div>'.format(
+                r["symbol"], "bull" if r["direction"] == "LONG" else "bear",
+                r["direction"], r["score"], fmt_price(r["price"]),
+                "bull" if st == "BULLISH" else ("bear" if st == "BEARISH" else "info"),
+                st or "-", d.get("position") or ""))
+    return head + '<div class="scan-list">' + "".join(rows) + "</div>"
+
+
+def render_exchange_tabs(store, scans_store=None):
     """Tab-uri per bursa, cu starea fiecareia.
 
     Fara JavaScript: radio ascuns + label, cu selectorul :checked din CSS. Merge
@@ -587,6 +642,10 @@ def render_exchange_tabs(store):
                     '<div><span class="dim">VERIFICAT</span><br>{}</div></div>'
                     '<div class="cap-list">{}</div>{}').format(
                         c.get("markets", 0), c.get("checked_at", "-"), "".join(rows), note)
+        # scanul bursei, sub fisa de capabilitati
+        scan = ((scans_store or {}).get("scans") or {}).get(eid)
+        body += ('<h4 class="scan-h">Ce vede aceasta bursa acum</h4>'
+                 + render_exchange_scan(scan, c.get("label", eid)))
         panels.append('<div class="tab-panel tab-panel-{}">{}</div>'.format(eid, body))
     # Regula CSS care leaga fiecare radio de panoul lui. Generata dinamic, ca
     # sa nu depinda de o lista fixa de burse.
@@ -940,7 +999,8 @@ def render_learning_curve(history, weights_history, health, agent_state=None):
     '''
 
 
-def build_html(scan, best, deep, chart, health, weights, session, token_meta, narrative, history, weights_history, agent_state, plans_store, briefing, details, exchanges_store):
+def build_html(scan, best, deep, chart, health, weights, session, token_meta, narrative, history, weights_history, agent_state, plans_store, briefing, details, exchanges_store,
+               exchange_scans=None):
     plan_html = render_plan(best, deep)
     levels_html = render_levels(deep)
     liquidity_html = render_liquidity(deep)
@@ -951,7 +1011,7 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
     _all = (plans_store or {}).get("plans") or []
     _latest = max(_all, key=lambda p: p.get("id", 0)) if _all else None
     evidence_html = render_evidence(_latest)
-    exchanges_html = render_exchange_tabs(exchanges_store)
+    exchanges_html = render_exchange_tabs(exchanges_store, exchange_scans)
     evidence_symbol = (_latest or {}).get("symbol", "-")
     calibration_html = render_calibration(plans_store)
     indicators_html = render_indicators(deep)
@@ -1088,6 +1148,19 @@ header{{display:flex;justify-content:space-between;align-items:baseline;
 .tok-meta div{{background:var(--panel);border-radius:6px;padding:7px 9px;}}
 .briefing-card{{margin-bottom:14px;border-left:3px solid var(--amber);}}
 .briefing-text{{font-size:14px;line-height:1.7;margin:0;}}
+.scan-head{{font-family:var(--font-mono);font-size:12px;margin:8px 0 10px;
+  padding:7px 10px;background:var(--panel-2);border-radius:6px;line-height:1.6;}}
+.scan-h{{font-size:10px;text-transform:uppercase;letter-spacing:.07em;
+  color:var(--text-dim);margin:16px 0 4px;font-weight:600;}}
+.scan-list{{display:flex;flex-direction:column;gap:3px;}}
+.scan-row{{display:grid;grid-template-columns:96px 52px 34px 1fr 64px 84px;
+  gap:6px;align-items:center;font-size:11px;font-family:var(--font-mono);
+  padding:4px 0;border-bottom:1px solid var(--border);}}
+.scan-sym{{font-weight:700;}}
+.scan-score{{color:var(--text-dim);}}
+.scan-pos{{font-size:9px;}}
+@media(max-width:560px){{.scan-row{{grid-template-columns:90px 48px 32px 1fr;}}
+  .scan-row .tag,.scan-pos{{display:none;}}}}
 .rich-chart{{width:100%;height:auto;display:block;}}
 .chart-head{{font-family:var(--font-mono);font-size:12px;margin-bottom:8px;}}
 .cnd-up{{stroke:var(--bull);}} .cnd-dn{{stroke:var(--bear);}}
@@ -1352,6 +1425,7 @@ def main():
     briefing = load_json(BRIEFING_FILE, {})
     details = load_json(DETAILS_FILE, {})
     exchanges_store = load_json(EXCHANGES_FILE, {})
+    exchange_scans = load_json(EXCHANGE_SCANS_FILE, {})
 
     scan = history[-1] if history else {"scan_time": "-", "universe_size": 0, "top_long": [], "top_short": []}
     best = scan.get("best_candidate")
@@ -1367,7 +1441,8 @@ def main():
             narrative = None  # narativul e vechi, pt alt candidat - nu-l arat ca fiind curent
 
     os.makedirs(DOCS_DIR, exist_ok=True)
-    html = build_html(scan, best, deep, chart, health, weights, session, token_meta, narrative, history, weights_history, agent_state, plans_store, briefing, details, exchanges_store)
+    html = build_html(scan, best, deep, chart, health, weights, session, token_meta, narrative, history, weights_history, agent_state, plans_store, briefing, details, exchanges_store,
+                      exchange_scans)
     with open(OUTPUT_FILE, "w") as f:
         f.write(html)
     print(f"Dashboard generat: {OUTPUT_FILE}")
