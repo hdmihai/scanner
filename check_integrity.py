@@ -69,16 +69,33 @@ def check_geometry_versioning():
     if pt is None:
         problems.append("plan_tracker.py lipseste")
         return
-    m = re.search(r"^GEOMETRY_VERSION\s*=\s*(.+)$", pt, re.M)
-    if not m:
+    # Verific COMPORTAMENTUL, nu textul sursei. Verificarea pe sir dadea alarme
+    # false dupa ce logica a fost mutata intr-o functie: `GEOMETRY_VERSION =
+    # _build_geometry()` nu contine literal "SCAN_TIMEFRAME", desi il foloseste.
+    # Un test care se uita la forma codului, nu la ce face, imbatraneste prost.
+    if "GEOMETRY_VERSION" not in pt:
         problems.append("plan_tracker.py nu defineste GEOMETRY_VERSION")
         return
-    expr = m.group(1).strip()
-    if "SCAN_TIMEFRAME" not in expr:
-        problems.append(
-            f"GEOMETRY_VERSION = {expr} nu include timeframe-ul. Rezultatele de pe "
-            f"timeframe-uri diferite s-ar amesteca in aceeasi calibrare, desi "
-            f"masuratorile arata ca 1h da -0.035R si 4h +0.023R.")
+    import subprocess
+    probe = (
+        "import os,sys,importlib\n"
+        "res=[]\n"
+        "for tf in ('1h','4h'):\n"
+        "    os.environ['SCAN_TIMEFRAME']=tf\n"
+        "    sys.modules.pop('plan_tracker',None)\n"
+        "    import plan_tracker as p; res.append(p.GEOMETRY_VERSION)\n"
+        "print('|'.join(res))\n")
+    try:
+        out = subprocess.run([sys.executable, "-c", probe], cwd=ROOT,
+                             capture_output=True, text=True, timeout=30)
+        vals = (out.stdout or "").strip().split("|")
+        if len(vals) != 2 or vals[0] == vals[1]:
+            problems.append(
+                f"GEOMETRY_VERSION nu se schimba cu timeframe-ul (1h si 4h dau "
+                f"{vals}). Rezultatele de pe timeframe-uri diferite s-ar amesteca "
+                f"in aceeasi calibrare.")
+    except Exception as exc:
+        notes.append(f"nu am putut testa geometria: {exc}")
 
 
 def check_agent_source_follows_geometry():
@@ -88,15 +105,31 @@ def check_agent_source_follows_geometry():
     if ag is None:
         problems.append("ai_agent.py lipseste")
         return
-    m = re.search(r"^STATE_SOURCE\s*=\s*(.+)$", ag, re.M)
-    if not m:
-        problems.append("ai_agent.py nu defineste STATE_SOURCE")
+    # Tot pe comportament: sursa trebuie sa se schimbe odata cu geometria.
+    if "STATE_SOURCE" not in ag and "current_source" not in ag:
+        problems.append("ai_agent.py nu defineste sursa de invatare")
         return
-    if "GEOMETRY_VERSION" not in m.group(1):
-        problems.append(
-            f"STATE_SOURCE = {m.group(1).strip()} nu urmeaza GEOMETRY_VERSION. "
-            f"La schimbarea timeframe-ului agentul nu s-ar reseta si ar prezice "
-            f"folosind greutati invatate pe alt timeframe.")
+    import subprocess
+    probe = (
+        "import os,sys\n"
+        "res=[]\n"
+        "for tf in ('1h','4h'):\n"
+        "    os.environ['SCAN_TIMEFRAME']=tf\n"
+        "    for m in ('plan_tracker','ai_agent'): sys.modules.pop(m,None)\n"
+        "    import ai_agent as a\n"
+        "    res.append(a.current_source() if hasattr(a,'current_source') else a.STATE_SOURCE)\n"
+        "print('|'.join(res))\n")
+    try:
+        out = subprocess.run([sys.executable, "-c", probe], cwd=ROOT,
+                             capture_output=True, text=True, timeout=30)
+        vals = (out.stdout or "").strip().split("|")
+        if len(vals) != 2 or vals[0] == vals[1]:
+            problems.append(
+                f"Sursa agentului nu urmeaza geometria (1h si 4h dau {vals}). "
+                f"La schimbarea timeframe-ului agentul nu s-ar reseta si ar prezice "
+                f"folosind greutati invatate pe alt timeframe.")
+    except Exception as exc:
+        notes.append(f"nu am putut testa sursa agentului: {exc}")
 
 
 def check_decision_gate():
