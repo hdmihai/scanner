@@ -1,42 +1,42 @@
 {
   "model": {
     "weights": {
-      "trend": 0.0,
-      "momentum": 0.0,
-      "volatility": 0.0,
-      "volume": 0.0,
+      "trend": -0.001775,
+      "momentum": -0.0187,
+      "volatility": -0.01985,
+      "volume": -0.025,
       "persistence_n": 0.0,
-      "ev_ema_fast": 0.0,
+      "ev_ema_fast": -0.00621,
       "ev_ema_stack": 0.0,
-      "ev_supertrend": 0.0,
-      "ev_macd": 0.0,
-      "ev_vwap": 0.0,
-      "ev_poc": 0.0,
+      "ev_supertrend": -0.025,
+      "ev_macd": -0.016485,
+      "ev_vwap": -0.025,
+      "ev_poc": -0.010718,
       "ev_value_area": 0.0,
-      "ev_rsi": 0.0,
+      "ev_rsi": -0.021798,
       "ev_volume": 0.0,
       "ev_volatility": 0.0,
       "ev_order_flow": 0.0,
       "ev_book_imbalance": 0.0,
-      "ev_fusion": 0.0
+      "ev_fusion": -0.025
     },
-    "bias": 0.0
+    "bias": -0.025
   },
-  "samples_trained": 0,
+  "samples_trained": 1,
   "last_trained_scan_ts": 0.0,
   "agent": {
     "correct": 0,
-    "total": 0
+    "total": 1
   },
   "baseline": {
     "correct": 0,
-    "total": 0
+    "total": 1
   },
   "by_direction": {
     "LONG": {
       "agent": 0,
       "baseline": 0,
-      "total": 0
+      "total": 1
     },
     "SHORT": {
       "agent": 0,
@@ -44,21 +44,37 @@
       "total": 0
     }
   },
-  "first_scan_ts": 0.0,
-  "pairs": [],
-  "recent": [],
-  "recent_baseline": [],
+  "first_scan_ts": 1634500800.0,
+  "pairs": [
+    [
+      0.5,
+      0.0
+    ]
+  ],
+  "recent": [
+    0
+  ],
+  "recent_baseline": [
+    0
+  ],
   "curve": [],
   "status": "SHADOW",
   "source": "plans-v5-4h-o",
-  "status_reason": "are nevoie de 300 exemple (are 0)",
-  "days_covered": 1791.67,
+  "status_reason": "are nevoie de 300 exemple (are 1)",
+  "days_covered": 1792.17,
   "balanced_agent": null,
   "balanced_baseline": null,
   "balanced_directions": [],
   "auc": null,
   "auc_score_baseline": null,
   "agent_superior": false,
-  "majority_baseline": null,
-  "predicted_positive_rate": null
+  "majority_baseline": 100.0,
+  "predicted_positive_rate": 100.0,
+  "score_pairs": [
+    [
+      0.73,
+      0.0
+    ]
+  ],
+  "last_event_ts": 1789344000.0
 }
