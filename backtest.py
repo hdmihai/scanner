@@ -68,10 +68,15 @@ DEFAULT_DAYS = 180
 WARMUP_BARS = 200      # cate bare are nevoie score_symbol ca sa fie valid
 
 
-def save_json(path, data):
+def save_json(path, data, compact=False):
     os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
     with open(path, "w") as f:
-        json.dump(data, f, indent=2)
+        if compact:
+            # Fisierele cu zeci de mii de planuri: `indent=2` aproape dubleaza
+            # dimensiunea fara niciun castig.
+            f.write(json.dumps(data, separators=(",", ":")))
+        else:
+            json.dump(data, f, indent=2)
 
 
 def load_json(path, default):
@@ -236,10 +241,11 @@ def replay_symbol(symbol, candles, weights, start_id):
             "state_detail": "OPEN",
             "realized_r": None, "closed_ts": None, "bars_checked": 0,
             "score_at_entry": scored["risk_adjusted"],
+            # Doar vectorul numeric, nu si lista cu etichete: agentul citeste
+            # `components`, iar planurile de backtest nu se afiseaza individual.
+            # Cu lista inclusa, cele ~27.000 de planuri ajungeau la 87 MB.
             "components": {**(scored.get("components") or {}),
                            **ev_mod.evidence_features(bt_ev, scored["direction"])},
-            "evidence": bt_ev,
-            "fusion": ev_mod.fusion(bt_ev, scored["direction"]),
             "persistence_at_entry": 0,
             "decision": {"action": "ISSUE", "mode": "BACKTEST",
                          "reason": "replay istoric, fara poarta de decizie"},
@@ -534,7 +540,7 @@ def main():
     store = {"next_id": next_id, "plans": all_plans}
     store["calibration"] = plan_tracker.build_calibration(store)
     store["summary"] = plan_tracker.summarize(store)
-    save_json(BACKTEST_FILE, store)
+    save_json(BACKTEST_FILE, store, compact=True)
 
     print("\n" + "=" * 60)
     plan_tracker.print_summary(store)
