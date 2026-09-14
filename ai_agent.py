@@ -64,7 +64,13 @@ PLANS_FILE = os.path.join(DATA_DIR, "plans.json")
 # antrenat pe greutatile invatate din celalalt sistem - prezicea folosind relatii
 # invatate pe miscari de 1h, aplicate unor planuri de 4h. Acum orice schimbare de
 # timeframe declanseaza automat resetul si reinvatarea din geometria potrivita.
-STATE_SOURCE = "plans-" + plan_tracker.GEOMETRY_VERSION
+def current_source():
+    """Sursa se calculeaza la APEL, nu la import: geometria se stabileste abia
+    dupa sondarea bursei, iar o valoare fixata la import ar fi ramas in urma."""
+    return "plans-" + plan_tracker.GEOMETRY_VERSION
+
+
+STATE_SOURCE = current_source()
 # Versiunea urcata odata cu adaugarea metricilor pentru date dezechilibrate
 # (AUC, prag de clasa majoritara, rata de predictii pozitive). Perechile
 # (predictie, rezultat) pe care se calculeaza se acumuleaza doar la invatare,
@@ -578,10 +584,11 @@ def main():
     state = load_json(MODEL_FILE, None)
     # Daca starea salvata provine din alta sursa/geometrie de semnal (campul `outcome`),
     # o resetez: etichetele masurau altceva. Vezi nota din train_from_plans.
-    if state is None or state.get("source") != STATE_SOURCE:
+    source = current_source()
+    if state is None or state.get("source") != source:
         if state is not None:
             print(f"[i] Resetez agentul: sursa de invatare s-a schimbat "
-                  f"({state.get('source')} -> {STATE_SOURCE}).")
+                  f"({state.get('source')} -> {source}).")
             # BUG FIX: la reset trebuie sterse si marcajele `agent_trained` de pe
             # planurile geometriei CURENTE. Fara asta, planurile deja marcate erau
             # sarite dupa reset, iar agentul repornea la zero si ramanea acolo -
@@ -595,7 +602,7 @@ def main():
                 print(f"[i] Am eliberat {cleared} planuri {plan_tracker.GEOMETRY_VERSION} "
                       f"pentru reinvatare.")
         state = default_state()
-        state["source"] = STATE_SOURCE
+        state["source"] = source
     model = OnlineLogisticRegression.from_dict(state.get("model", {}))
 
     if not plans:
