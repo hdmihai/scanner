@@ -126,6 +126,7 @@ WEIGHTS_FILE = os.path.join(CONFIG["data_dir"], "weights.json")
 WEIGHTS_HISTORY_FILE = os.path.join(CONFIG["data_dir"], "weights_history.json")
 CHART_FILE = os.path.join(CONFIG["data_dir"], "latest_chart.json")
 DETAILS_FILE = os.path.join(CONFIG["data_dir"], "latest_details.json")
+EXCHANGES_FILE = os.path.join(CONFIG["data_dir"], "exchanges.json")
 SPARKLINE_BARS = 40   # cate preturi de inchidere pastrez pentru graficul mic
 
 DEFAULT_WEIGHTS = {"trend": 1.0, "momentum": 1.0, "volatility": 1.0, "volume": 1.0}
@@ -612,7 +613,13 @@ def probe_all_exchanges(scope):
     Fisele se salveaza si se folosesc si la alegerea bursei de lucru.
     """
     cards = []
-    for eid in CONFIG["exchange_fallback"]:
+    # Sondez tot registrul, nu doar lantul de fallback: dashboard-ul trebuie sa
+    # arate un tab si pentru bursele care nu sunt candidate de lucru dar au
+    # capabilitati relevante (ex. Bybit, singura cu arhive de order book).
+    # Ordinea de fallback ramane prima, ca alegerea sa fie determinista.
+    order = CONFIG["exchange_fallback"] + [e for e in ex_mod.DEFAULT_ORDER
+                                           if e not in CONFIG["exchange_fallback"]]
+    for eid in order:
         card, ex = ex_mod.probe_exchange(ccxt, eid)
         cards.append(card)
         status = "conectat" if card["connected"] else f"esuat: {card['error']}"
@@ -686,7 +693,36 @@ def main():
         if not coingecko_scope:
             print("[!] Nu am putut lua lista CoinGecko - continui fara filtrul de scope.")
 
+    # Sondez TOATE bursele: dashboard-ul are nevoie de starea fiecareia pentru
+    # tab-uri, inclusiv pentru cele care nu raspund.
+    exchange_cards = probe_all_exchanges(coingecko_scope)
+
     exchange, markets, all_tickers, eligible, exchange_id = connect_exchange(coingecko_scope)
+
+    # Fixez semnatura de capabilitati INAINTE de a crea orice plan. Geometria
+    # trebuie sa reflecte ce a oferit efectiv bursa, nu implicitul din mediu.
+    active_card = next((c for c in exchange_cards if c["id"] == exchange_id), None)
+    active_caps = (active_card or {}).get("available") or [ex_mod.CAP_OHLCV]
+    caps_sig = ex_mod.capability_signature(active_caps)
+    plan_tracker.set_capabilities(caps_sig)
+    print(f"Capabilitati active pe {exchange_id}: {','.join(active_caps)} "
+          f"-> geometria {plan_tracker.GEOMETRY_VERSION}")
+
+    # Capabilitatile bursei ALESE decid ce evidente se pot calcula si intra in
+    # semnatura geometriei. Fara pasul asta, order flow-ul nu ar aparea niciodata
+    # chiar daca bursa il suporta, iar semnatura ar ramane blocata pe "o".
+    active_caps = next((c["available"] for c in exchange_cards
+                        if c["id"] == exchange_id and c["connected"]), [ex_mod.CAP_OHLCV])
+    active_sig = ex_mod.capability_signature(active_caps)
+    if os.environ.get("SCAN_CAPS") != active_sig:
+        print(f"[i] Capabilitati active pe {exchange_id}: {','.join(active_caps)} "
+              f"-> semnatura '{active_sig}'")
+        print(f"    Geometria e {plan_tracker.GEOMETRY_VERSION}. Daca semnatura difera, "
+              f"seteaza SCAN_CAPS={active_sig} in workflow ca planurile sa fie "
+              f"grupate corect la invatare.")
+    save_json(EXCHANGES_FILE, {"exchanges": exchange_cards, "used": exchange_id,
+                               "active_signature": active_sig,
+                               "geometry": plan_tracker.GEOMETRY_VERSION})
     universe = eligible[: CONFIG["universe_size"]]
     print(f"Universe final: {len(universe)} simboluri pe {exchange_id}.")
 
@@ -858,8 +894,18 @@ def main():
         # dashboard-ul (ca lista citibila) - o singura sursa de adevar.
         sig_ind = indicators.compute_all(candles)
         sig_rsi = rsi(closes_s, 14)
+        # Order flow si dezechilibrul cartii: exista doar daca bursa le suporta.
+        # Daca lipsesc, evidentele corespunzatoare sunt pur si simplu absente -
+        # nu inlocuite cu valori neutre, care ar minti modelul.
+        sig_flow = ex_mod.order_flow(exchange, sig["symbol"], active_caps)
+        sig_book = None
+        if liquidity and liquidity.get("bids") and liquidity.get("asks"):
+            sig_book = {"bid_volume": sum(b["amount"] for b in liquidity["bids"]),
+                        "ask_volume": sum(a["amount"] for a in liquidity["asks"])}
         sig_evidence = ev_mod.build_evidence(sig_ind, sig["price"], sig["atr"],
-                                             sig_rsi, sig.get("components"))
+                                             sig_rsi, sig.get("components"),
+                                             flow=sig_flow, book=sig_book,
+                                             caps=active_caps)
         sig = {**sig,
                "evidence": sig_evidence,
                "fusion": ev_mod.fusion(sig_evidence, sig["direction"]),
