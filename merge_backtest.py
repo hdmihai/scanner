@@ -48,7 +48,7 @@ def load_json(path, default=None):
 def save_json(path, data):
     os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
     with open(path, "w") as f:
-        json.dump(data, f, indent=2)
+        f.write(json.dumps(data, separators=(",", ":")))
 
 
 def plan_key(p):
@@ -104,7 +104,17 @@ def main():
     live["next_id"] = offset + len(incoming)
     live["calibration"] = plan_tracker.build_calibration(live)
     live["summary"] = plan_tracker.summarize(live)
-    save_json(PLANS_FILE, live)
+    # Prin plan_tracker.save_plans: curata campurile de afisare de pe planurile
+    # vechi si verifica dimensiunea INAINTE de scriere.
+    plan_tracker.save_plans(live)
+
+    # Fisierul de backtest devine redundant dupa integrare: planurile sunt
+    # acum in plans.json. Il sterg ca sa nu dublez zeci de MB in fiecare commit.
+    try:
+        os.remove(BACKTEST_FILE)
+        print(f"  {BACKTEST_FILE} sters (planurile sunt acum in plans.json)")
+    except OSError:
+        pass
 
     print(f"\nIntegrate {len(incoming)} planuri. Total acum: {len(live['plans'])}.")
     s = live["summary"]
