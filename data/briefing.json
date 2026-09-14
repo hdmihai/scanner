@@ -1,19 +1,33 @@
 {
-  "text": "Din 2 planuri inchise, rata de succes e 0.0%, cu -2.08R cumulat (-1.040R in medie pe plan) si profit factor 0.0. 30 planuri sunt inca deschise. Separat, 59728 planuri inchise (+307.21R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #59872 QTUM/USDT -1.03R, #59880 OP/USDT -1.05R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 72.1% fata de 31.7% baseline, pe 20429 planuri invatate.",
+  "text": "Din 4 planuri inchise, rata de succes e 0.0%, cu -4.21R cumulat (-1.052R in medie pe plan) si profit factor 0.0. 32 planuri sunt inca deschise. Separat, 59728 planuri inchise (+307.21R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #59877 BCH/USDT -1.07R, #59879 SUI/USDT -1.06R, #59872 QTUM/USDT -1.03R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 72.1% fata de 31.7% baseline, pe 20429 planuri invatate.",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-14 19:55 UTC",
+    "scan_time": "2026-09-14 20:10 UTC",
     "universe_size": 59,
-    "plans_total": 59900,
-    "plans_open": 30,
-    "plans_closed": 2,
+    "plans_total": 59904,
+    "plans_open": 32,
+    "plans_closed": 4,
     "legacy_closed": 59728,
     "legacy_total_r": 307.21,
     "win_rate": 0.0,
-    "total_r": -2.08,
-    "avg_r": -1.04,
+    "total_r": -4.21,
+    "avg_r": -1.052,
     "profit_factor": 0.0,
     "recent_closed": [
+      {
+        "id": 59877,
+        "symbol": "BCH/USDT",
+        "direction": "SHORT",
+        "state": "SL HIT - INVALIDATED",
+        "r": -1.067
+      },
+      {
+        "id": 59879,
+        "symbol": "SUI/USDT",
+        "direction": "SHORT",
+        "state": "SL HIT - INVALIDATED",
+        "r": -1.061
+      },
       {
         "id": 59872,
         "symbol": "QTUM/USDT",
@@ -31,33 +45,33 @@
     ],
     "open_now": [
       {
+        "id": 59904,
+        "symbol": "APT/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 59903,
+        "symbol": "BCH/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 59902,
+        "symbol": "SUI/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 59901,
+        "symbol": "UNI/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
         "id": 59900,
         "symbol": "SNX/USDT",
         "direction": "SHORT",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 59899,
-        "symbol": "IMX/USDT",
-        "direction": "SHORT",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 59898,
-        "symbol": "LDO/USDT",
-        "direction": "SHORT",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 59897,
-        "symbol": "LTC/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 59896,
-        "symbol": "QTUM/USDT",
-        "direction": "LONG",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       }
     ],
