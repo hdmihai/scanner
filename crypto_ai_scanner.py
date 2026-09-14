@@ -769,30 +769,6 @@ def main():
     # 3) analiza detaliata (structura + fibonacci + plan SL/TP) pentru
     # cel mai bun candidat, plus datele de grafic pentru dashboard
     deep_analysis = None
-    if best:
-        best_ohlcv = ohlcv_cache[best["symbol"]]
-        highs = [c[2] for c in best_ohlcv]
-        lows = [c[3] for c in best_ohlcv]
-        closes = [c[4] for c in best_ohlcv]
-
-        structure = compute_structure_levels(highs, lows)
-        fib = compute_fibonacci(highs, lows)
-        plan = compute_trade_plan(best["direction"], best["price"], best["atr"], structure, fib)
-        liquidity = fetch_liquidity_levels(exchange, best["symbol"])
-        # indicatorii din poze - calculati din OHLCV deja descarcat, zero apeluri API in plus
-        inds = indicators.compute_all(best_ohlcv)
-        deep_analysis = {"structure": structure, "fibonacci": fib, "plan": plan,
-                         "liquidity": liquidity, "indicators": inds}
-
-        n = CONFIG["chart_candles"]
-        save_json(CHART_FILE, {
-            "symbol": best["symbol"],
-            "direction": best["direction"],
-            "candles": best_ohlcv[-n:],
-            "ema20": ema_series_full(closes, 20)[-n:],
-            "ema50": ema_series_full(closes, 50)[-n:],
-        })
-
     # ---- DETALII PER SIMBOL, pentru dashboard.
     # Se calculeaza din ohlcv_cache, deci ZERO apeluri API in plus - doar CPU.
     # Fisierul se SUPRASCRIE la fiecare rulare, nu se acumuleaza: un instantaneu
@@ -843,6 +819,76 @@ def main():
             print(f"  PLAN #{pid} {sym} {direction} (era {prev})")
         if len(migrated) > 8:
             print(f"  ... si inca {len(migrated) - 8}")
+
+    if best:
+        best_ohlcv = ohlcv_cache[best["symbol"]]
+        highs = [c[2] for c in best_ohlcv]
+        lows = [c[3] for c in best_ohlcv]
+        closes = [c[4] for c in best_ohlcv]
+
+        structure = compute_structure_levels(highs, lows)
+        fib = compute_fibonacci(highs, lows)
+        plan = compute_trade_plan(best["direction"], best["price"], best["atr"], structure, fib)
+        liquidity = fetch_liquidity_levels(exchange, best["symbol"])
+        # indicatorii din poze - calculati din OHLCV deja descarcat, zero apeluri API in plus
+        inds = indicators.compute_all(best_ohlcv)
+        deep_analysis = {"structure": structure, "fibonacci": fib, "plan": plan,
+                         "liquidity": liquidity, "indicators": inds}
+
+        n = CONFIG["chart_candles"]
+        # GRAFIC IMBOGATIT: tot ce se desena in sistemul de referinta exista deja
+        # calculat aici - nivelurile planului, VWAP, POC/VAH/VAL, SuperTrend,
+        # MACD, RSI. Pana acum ajungeau doar in carduri de text. Le salvez ca sa
+        # poata fi desenate ca linii etichetate peste lumanari.
+        best_ind = indicators.compute_all(best_ohlcv)
+        best_struct = compute_structure_levels(
+            [c[2] for c in best_ohlcv], [c[3] for c in best_ohlcv])
+        best_plan = compute_trade_plan(best["direction"], best["price"], best["atr"],
+                                       best_struct, fib)
+        # Planul INGHETAT pentru acest simbol, daca exista unul deschis. Asta e
+        # distinctia "LOCKED vs CURRENT" din poze: ce s-a decis atunci, langa
+        # ce ar rezulta acum.
+        locked = None
+        for pl_ in reversed(plan_store.get("plans") or []):
+            if (pl_.get("symbol") == best["symbol"]
+                    and pl_.get("state") in (plan_tracker.STATE_PENDING,
+                                             plan_tracker.STATE_OPEN,
+                                             plan_tracker.STATE_TP1)):
+                locked = {"id": pl_["id"], "direction": pl_["direction"],
+                          "entry": pl_["entry"], "sl": pl_["sl"],
+                          "tp1": pl_["tp1"], "tp2": pl_["tp2"],
+                          "state": pl_.get("state_detail") or pl_.get("state")}
+                break
+
+        def _tail(series):
+            return [None if v is None else round_price(v) for v in series[-n:]]
+
+        rsi_series = []
+        for i in range(len(closes)):
+            rsi_series.append(rsi(closes[:i + 1], 14) if i >= 14 else None)
+
+        save_json(CHART_FILE, {
+            "symbol": best["symbol"],
+            "direction": best["direction"],
+            "candles": best_ohlcv[-n:],
+            "ema9": _tail(ema_series_full(closes, 9)),
+            "ema20": _tail(ema_series_full(closes, 20)),
+            "ema50": _tail(ema_series_full(closes, 50)),
+            "ema200": _tail(ema_series_full(closes, 200)),
+            "rsi": _tail(rsi_series),
+            "macd": best_ind.get("macd"),
+            "indicators": {
+                "vwap": best_ind.get("vwap"),
+                "poc": (best_ind.get("volume_profile") or {}).get("poc"),
+                "vah": (best_ind.get("volume_profile") or {}).get("vah"),
+                "val": (best_ind.get("volume_profile") or {}).get("val"),
+                "supertrend": best_ind.get("supertrend"),
+            },
+            "current": best_plan,
+            "locked": locked,
+            "structure": best_struct,
+            "timeframe": CONFIG["timeframe"],
+        })
 
     # 1) evaluez planurile deschise pe lumanarile proaspete
     closed_now = []
