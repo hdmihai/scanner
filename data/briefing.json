@@ -1,85 +1,77 @@
 {
-  "text": "Din 1 planuri inchise, rata de succes e 0.0%, cu -1.04R cumulat (-1.041R in medie pe plan) si profit factor 0.0. 26 planuri sunt inca deschise. Separat, 32729 planuri inchise (-231.79R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #32860 FLOW/USDT -1.04R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 1)).",
+  "text": "16 planuri sunt deschise, niciunul inchis inca. Pana la primele inchideri nu pot spune nimic despre performanta - orice cifra ar fi speculatie. Separat, 59728 planuri inchise (+307.21R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 72.1% fata de 31.7% baseline, pe 20429 planuri invatate.",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-14 07:23 UTC",
+    "scan_time": "2026-09-14 08:01 UTC",
     "universe_size": 59,
-    "plans_total": 32870,
-    "plans_open": 26,
-    "plans_closed": 1,
-    "legacy_closed": 32729,
-    "legacy_total_r": -231.79,
-    "win_rate": 0.0,
-    "total_r": -1.04,
-    "avg_r": -1.041,
-    "profit_factor": 0.0,
-    "recent_closed": [
-      {
-        "id": 32860,
-        "symbol": "FLOW/USDT",
-        "direction": "LONG",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.041
-      }
-    ],
+    "plans_total": 59884,
+    "plans_open": 16,
+    "plans_closed": 0,
+    "legacy_closed": 59728,
+    "legacy_total_r": 307.21,
+    "win_rate": null,
+    "total_r": 0,
+    "avg_r": null,
+    "profit_factor": null,
+    "recent_closed": [],
     "open_now": [
       {
-        "id": 32870,
-        "symbol": "SNX/USDT",
+        "id": 59884,
+        "symbol": "DASH/USDT",
         "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       },
       {
-        "id": 32869,
-        "symbol": "STX/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 32868,
-        "symbol": "AXS/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 32867,
-        "symbol": "ETC/USDT",
+        "id": 59883,
+        "symbol": "SAND/USDT",
         "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       },
       {
-        "id": 32866,
-        "symbol": "IMX/USDT",
+        "id": 59882,
+        "symbol": "TIA/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 59881,
+        "symbol": "GALA/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 59880,
+        "symbol": "OP/USDT",
         "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       }
     ],
     "best_bucket": null,
     "worst_bucket": null,
-    "agent_status": "SHADOW",
-    "agent_reason": "are nevoie de 300 exemple (are 1)",
-    "agent_samples": 1,
-    "agent_balanced": null,
-    "baseline_balanced": null,
+    "agent_status": "ACTIVE",
+    "agent_reason": "acuratete echilibrata 72.1% vs euristica 31.7%",
+    "agent_samples": 20429,
+    "agent_balanced": 72.12331815333748,
+    "baseline_balanced": 31.73566787219635,
     "agent_weights": {
-      "trend": -0.001775,
-      "momentum": -0.0187,
-      "volatility": -0.01985,
-      "volume": -0.025,
+      "trend": 0.187588,
+      "momentum": -0.262404,
+      "volatility": -0.159912,
+      "volume": -0.378145,
       "persistence_n": 0.0,
-      "ev_ema_fast": -0.00621,
-      "ev_ema_stack": 0.0,
-      "ev_supertrend": -0.025,
-      "ev_macd": -0.016485,
-      "ev_vwap": -0.025,
-      "ev_poc": -0.010718,
-      "ev_value_area": 0.0,
-      "ev_rsi": -0.021798,
+      "ev_ema_fast": 0.195373,
+      "ev_ema_stack": 0.971333,
+      "ev_supertrend": -0.064568,
+      "ev_macd": 0.70575,
+      "ev_vwap": 0.250634,
+      "ev_poc": -0.083556,
+      "ev_value_area": -0.053123,
+      "ev_rsi": -0.054302,
       "ev_volume": 0.0,
       "ev_volatility": 0.0,
       "ev_order_flow": 0.0,
       "ev_book_imbalance": 0.0,
-      "ev_fusion": -0.025
+      "ev_fusion": -0.341938
     }
   }
 }

@@ -1,0 +1,112 @@
+{
+  "exchanges": [
+    {
+      "id": "okx",
+      "label": "OKX",
+      "declared": [
+        "ohlcv",
+        "orderbook_live",
+        "trades_live"
+      ],
+      "available": [
+        "ohlcv",
+        "orderbook_live",
+        "trades_live"
+      ],
+      "connected": true,
+      "markets": 4470,
+      "error": null,
+      "checked_at": "2026-09-14 08:01 UTC"
+    },
+    {
+      "id": "kucoin",
+      "label": "KuCoin",
+      "declared": [
+        "ohlcv",
+        "orderbook_live",
+        "trades_live"
+      ],
+      "available": [
+        "ohlcv",
+        "orderbook_live",
+        "trades_live"
+      ],
+      "connected": true,
+      "markets": 1674,
+      "error": null,
+      "checked_at": "2026-09-14 08:01 UTC"
+    },
+    {
+      "id": "gate",
+      "label": "Gate.io",
+      "declared": [
+        "ohlcv",
+        "orderbook_live",
+        "trades_live"
+      ],
+      "available": [
+        "ohlcv",
+        "orderbook_live",
+        "trades_live"
+      ],
+      "connected": true,
+      "markets": 6350,
+      "error": null,
+      "checked_at": "2026-09-14 08:01 UTC"
+    },
+    {
+      "id": "mexc",
+      "label": "MEXC",
+      "declared": [
+        "ohlcv",
+        "orderbook_live",
+        "trades_live"
+      ],
+      "available": [
+        "ohlcv",
+        "orderbook_live",
+        "trades_live"
+      ],
+      "connected": true,
+      "markets": 3199,
+      "error": null,
+      "checked_at": "2026-09-14 08:01 UTC"
+    },
+    {
+      "id": "kraken",
+      "label": "Kraken",
+      "declared": [
+        "ohlcv",
+        "orderbook_live",
+        "trades_live"
+      ],
+      "available": [
+        "ohlcv",
+        "orderbook_live",
+        "trades_live"
+      ],
+      "connected": true,
+      "markets": 1449,
+      "error": null,
+      "checked_at": "2026-09-14 08:01 UTC"
+    },
+    {
+      "id": "bybit",
+      "label": "Bybit",
+      "declared": [
+        "ohlcv",
+        "orderbook_live",
+        "trades_live",
+        "orderbook_history"
+      ],
+      "available": [],
+      "connected": false,
+      "markets": 0,
+      "error": "bybit GET https://api.bybit.com/v5/market/instruments-info?category=spot 403 Forbidden {\n    error:The Amazon CloudFront distribution is configured to block access from your countr",
+      "checked_at": "2026-09-14 08:01 UTC"
+    }
+  ],
+  "used": "okx",
+  "active_signature": "obf",
+  "geometry": "v5-4h-obf"
+}
