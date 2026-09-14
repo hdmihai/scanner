@@ -90,8 +90,28 @@ USE_DECISION_GATE = os.environ.get("USE_DECISION_GATE", "false").lower() == "tru
 # din amandoua ca si cum ar fi acelasi sistem - aceeasi eroare pe care
 # versionarea o previne la schimbarile de timeframe si de geometrie.
 # Backtest-ul ruleaza mereu cu "o" (doar OHLCV); scanarea live poate avea "obf".
-GEOMETRY_VERSION = ("v5-" + os.environ.get("SCAN_TIMEFRAME", "1h")
-                    + "-" + os.environ.get("SCAN_CAPS", "o"))
+def _build_geometry(caps_sig=None):
+    return ("v5-" + os.environ.get("SCAN_TIMEFRAME", "1h")
+            + "-" + (caps_sig or os.environ.get("SCAN_CAPS", "o")))
+
+
+GEOMETRY_VERSION = _build_geometry()
+
+
+def set_capabilities(caps_sig):
+    """Fixeaza semnatura de capabilitati DUPA ce bursa a fost sondata.
+
+    BUG FIX: semnatura se citea din mediu la import, adica inainte ca scanerul
+    sa stie ce ofera bursa. Rezultatul: un plan creat CU order flow primea
+    eticheta "v5-4h-o" - aceeasi ca planurile de backtest, care nu au order
+    flow. Ar fi ajuns in aceeasi calibrare, adica exact nepotrivirea tacuta pe
+    care semnatura trebuia sa o previna.
+    Se apeleaza o data, la inceputul scanarii, dupa sondare.
+    """
+    global GEOMETRY_VERSION
+    GEOMETRY_VERSION = _build_geometry(caps_sig)
+    os.environ["SCAN_CAPS"] = caps_sig or "o"
+    return GEOMETRY_VERSION
 # v3 -> v4: doua schimbari care fac rezultatele necomparabile cu cele anterioare.
 #   1. Scanarea nu mai foloseste lumanarea curenta, neinchisa. Cron-ul e :07 dar
 #      rulari reale au fost masurate intre :09 si :59, deci bara era prinsa intre
