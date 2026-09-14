@@ -127,6 +127,18 @@ WEIGHTS_HISTORY_FILE = os.path.join(CONFIG["data_dir"], "weights_history.json")
 CHART_FILE = os.path.join(CONFIG["data_dir"], "latest_chart.json")
 DETAILS_FILE = os.path.join(CONFIG["data_dir"], "latest_details.json")
 EXCHANGES_FILE = os.path.join(CONFIG["data_dir"], "exchanges.json")
+EXCHANGE_SCANS_FILE = os.path.join(CONFIG["data_dir"], "exchange_scans.json")
+
+# Scanarea secundara: fiecare bursa conectata e scanata pentru AFISARE, dar
+# planurile se creeaza doar pe bursa activa.
+#
+# DE CE doar pe cea activa: aceleasi simboluri au preturi aproape identice intre
+# burse - arbitrajul le aliniaza. Cinci seturi separate de planuri ar imparti
+# memoria agentului in cinci si ar invata de cinci ori acelasi lucru, mai prost,
+# exact cand tocmai a atins pragul de activare. Afisarea per bursa iti arata ce
+# vede fiecare acum; invatarea ramane unificata.
+SECONDARY_SCAN_LIMIT = 25      # cate simboluri scanez pe o bursa secundara
+SECONDARY_TIME_BUDGET = 120    # secunde totale pentru TOATE bursele secundare
 SPARKLINE_BARS = 40   # cate preturi de inchidere pastrez pentru graficul mic
 
 DEFAULT_WEIGHTS = {"trend": 1.0, "momentum": 1.0, "volatility": 1.0, "volume": 1.0}
@@ -605,6 +617,71 @@ def build_eligible_pairs(markets, tickers, scope):
     return [symbol for symbol, _ in pairs]
 
 
+def scan_exchange_for_display(ex, exchange_id, scope, weights, limit, deadline):
+    """Scaneaza o bursa DOAR pentru afisare: rezolva ce simboluri exista acolo,
+    calculeaza scorurile si indicatorii, si se opreste la `deadline`.
+
+    Nu creeaza planuri si nu atinge memoria agentului. Orice esec pe un simbol
+    sau pe bursa intreaga e o stare raportata, nu o exceptie - o bursa lenta nu
+    are voie sa strice scanarea principala.
+    """
+    out = {"resolved": [], "missing": [], "results": [], "details": {},
+           "truncated": False, "error": None}
+    try:
+        markets = ex.load_markets()
+    except Exception as exc:
+        out["error"] = str(exc)[:160]
+        return out
+
+    watchlist = CONFIG.get("watchlist") or []
+    for base in watchlist:
+        found = None
+        for alias in CONFIG.get("aliases", {}).get(base, [base]):
+            for quote in CONFIG["quotes"]:
+                sym = f"{alias}/{quote}"
+                if sym in markets and markets[sym].get("active", True):
+                    found = sym
+                    break
+            if found:
+                break
+        (out["resolved"] if found else out["missing"]).append(found or base)
+
+    for sym in out["resolved"][:limit]:
+        if time.time() > deadline:
+            out["truncated"] = True
+            break
+        try:
+            ohlcv = ex.fetch_ohlcv(sym, timeframe=CONFIG["timeframe"],
+                                   limit=CONFIG["candles"])
+        except Exception:
+            continue
+        if not ohlcv or len(ohlcv) < 60:
+            continue
+        if len(ohlcv) > 1:
+            ohlcv = ohlcv[:-1]          # aceeasi regula: fara lumanarea neinchisa
+        scored = score_symbol(ohlcv, weights)
+        if not scored:
+            continue
+        scored = {**scored, "symbol": sym}
+        out["results"].append({
+            "symbol": sym, "direction": scored["direction"],
+            "score": scored["risk_adjusted"], "price": scored["price"],
+            "atr": scored["atr"], "components": scored["components"],
+        })
+        ind = indicators.compute_all(ohlcv)
+        st = ind.get("supertrend") or {}
+        vp = ind.get("volume_profile") or {}
+        out["details"][sym] = {
+            "supertrend": st.get("direction"), "supertrend_level": st.get("level"),
+            "vwap": ind.get("vwap"), "poc": vp.get("poc"),
+            "vah": vp.get("vah"), "val": vp.get("val"),
+            "macd_hist": (ind.get("macd") or {}).get("histogram"),
+            "position": ind.get("price_vs_value_area"),
+        }
+    out["results"].sort(key=lambda r: -r["score"])
+    return out
+
+
 def probe_all_exchanges(scope):
     """Sondeaza TOATE bursele din lista, nu doar pana la prima care merge.
 
@@ -619,13 +696,18 @@ def probe_all_exchanges(scope):
     # Ordinea de fallback ramane prima, ca alegerea sa fie determinista.
     order = CONFIG["exchange_fallback"] + [e for e in ex_mod.DEFAULT_ORDER
                                            if e not in CONFIG["exchange_fallback"]]
+    handles = {}
     for eid in order:
         card, ex = ex_mod.probe_exchange(ccxt, eid)
         cards.append(card)
+        if ex is not None and card["connected"]:
+            # pastrez conexiunea: scanarea de afisare o refoloseste, ca sa nu
+            # platesc inca o data load_markets pentru fiecare bursa
+            handles[eid] = ex
         status = "conectat" if card["connected"] else f"esuat: {card['error']}"
         caps = ",".join(card["available"]) or "-"
         print(f"  [{eid}] {status} | capabilitati: {caps}")
-    return cards
+    return cards, handles
 
 
 def connect_exchange(scope):
@@ -695,7 +777,7 @@ def main():
 
     # Sondez TOATE bursele: dashboard-ul are nevoie de starea fiecareia pentru
     # tab-uri, inclusiv pentru cele care nu raspund.
-    exchange_cards = probe_all_exchanges(coingecko_scope)
+    exchange_cards, exchange_handles = probe_all_exchanges(coingecko_scope)
 
     exchange, markets, all_tickers, eligible, exchange_id = connect_exchange(coingecko_scope)
 
@@ -803,6 +885,50 @@ def main():
         }
     save_json(DETAILS_FILE, {"scan_time": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
                              "exchange": exchange_id, "symbols": details})
+
+    # SCANARE PER BURSA, doar pentru afisare. Bursa activa refoloseste datele
+    # deja descarcate, deci nu costa nimic in plus; celelalte se scaneaza in
+    # limita de timp, ca sa nu intinda rularea.
+    scans = {}
+    if exchange_id:
+        scans[exchange_id] = {
+            "resolved": sorted(ohlcv_cache.keys()),
+            "missing": [b for b in (CONFIG.get("watchlist") or [])
+                        if not any(s_.split("/")[0] in
+                                   CONFIG.get("aliases", {}).get(b, [b])
+                                   for s_ in ohlcv_cache)],
+            "results": [{"symbol": r["symbol"], "direction": r["direction"],
+                         "score": r["risk_adjusted"], "price": r["price"],
+                         "atr": r["atr"], "components": r["components"]}
+                        for r in sorted(results, key=lambda r: -r["risk_adjusted"])],
+            "details": {k: {"supertrend": (v.get("indicators") or {}).get("supertrend", {}).get("direction"),
+                            "vwap": (v.get("indicators") or {}).get("vwap"),
+                            "poc": ((v.get("indicators") or {}).get("volume_profile") or {}).get("poc"),
+                            "vah": ((v.get("indicators") or {}).get("volume_profile") or {}).get("vah"),
+                            "val": ((v.get("indicators") or {}).get("volume_profile") or {}).get("val"),
+                            "macd_hist": ((v.get("indicators") or {}).get("macd") or {}).get("histogram"),
+                            "position": (v.get("indicators") or {}).get("price_vs_value_area")}
+                        for k, v in details.items()},
+            "truncated": False, "error": None, "primary": True,
+        }
+    deadline = time.time() + SECONDARY_TIME_BUDGET
+    for card in exchange_cards:
+        eid = card["id"]
+        if eid == exchange_id or not card["connected"] or eid not in exchange_handles:
+            continue
+        if time.time() > deadline:
+            scans[eid] = {"resolved": [], "missing": [], "results": [], "details": {},
+                          "truncated": True, "error": "buget de timp depasit", "primary": False}
+            continue
+        sc = scan_exchange_for_display(exchange_handles[eid], eid, coingecko_scope,
+                                       weights, SECONDARY_SCAN_LIMIT, deadline)
+        sc["primary"] = False
+        scans[eid] = sc
+        print(f"  [{eid}] scanat pentru afisare: {len(sc['results'])} semnale "
+              f"din {len(sc['resolved'])} simboluri"
+              + ("  (trunchiat)" if sc["truncated"] else ""))
+    save_json(EXCHANGE_SCANS_FILE, {"scans": scans, "primary": exchange_id,
+                                    "timeframe": CONFIG["timeframe"]})
 
     # ---- PLANURI: creez pentru toate semnalele din top, nu doar pentru cel
     # mai bun. Reutilizez ohlcv_cache, deci in mod normal nu costa apeluri
