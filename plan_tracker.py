@@ -181,8 +181,74 @@ def load_plans():
     return load_json(PLANS_FILE, {"next_id": 1, "plans": []})
 
 
+# Cate planuri RECENTE pastreaza lista de evidente cu etichete text.
+# Restul pastreaza doar `components`, unde evidentele sunt deja numere - exact
+# ce citeste agentul. Lista cu etichete e strict pentru afisare, iar dashboard-ul
+# arata un singur plan. Masurat: cu evidente pe toate cele 27.000 de planuri,
+# fisierul ajunge la 101 MB si GitHub respinge push-ul la 100 MB.
+KEEP_EVIDENCE_ON = 100
+
+# Prag de avertizare. GitHub respinge fisierele peste 100 MB si avertizeaza
+# peste 50. Verific INAINTE de scriere, nu dupa push - altfel afli dupa 18
+# minute de backtest ca munca nu se poate salva.
+SIZE_WARN_MB = 45
+SIZE_FAIL_MB = 90
+
+
+def _strip_display_fields(store):
+    """Scoate campurile de afisare de pe planurile vechi.
+
+    `evidence`, `fusion` si `neighbors` nu sunt citite de agent: el foloseste
+    `components`, unde aceleasi evidente sunt deja numere. Le pastrez doar pe
+    cele mai recente KEEP_EVIDENCE_ON planuri, pentru dashboard.
+    """
+    plans = store.get("plans") or []
+    if len(plans) <= KEEP_EVIDENCE_ON:
+        return 0
+    keep_ids = {p.get("id") for p in sorted(plans, key=lambda x: x.get("id", 0),
+                                            reverse=True)[:KEEP_EVIDENCE_ON]}
+    stripped = 0
+    for p in plans:
+        if p.get("id") in keep_ids:
+            continue
+        for field in ("evidence", "fusion", "neighbors"):
+            if field in p:
+                del p[field]
+                stripped = stripped or 1
+    return stripped
+
+
 def save_plans(store):
-    save_json(PLANS_FILE, store)
+    _strip_display_fields(store)
+    # separators compacte: `indent=2` aproape dubleaza dimensiunea pe fisiere
+    # cu zeci de mii de inregistrari, fara niciun castig - nimeni nu citeste
+    # plans.json cu ochiul.
+    payload = json.dumps(store, separators=(",", ":"))
+    mb = len(payload.encode("utf-8")) / 1024 / 1024
+
+    # Daca depaseste pragul, TAI cele mai vechi planuri in loc sa esuez.
+    # A arunca o exceptie ar insemna sa pierd toata munca rularii - inclusiv
+    # 18 minute de backtest. Planurile vechi au fost deja invatate de agent
+    # (marcate `agent_trained`); pierderea lor costa ceva istoric la vecini si
+    # calibrare, dar infinit mai putin decat pierderea intregii rulari.
+    if mb > SIZE_FAIL_MB:
+        plans = sorted(store.get("plans") or [], key=lambda p: p.get("id", 0))
+        before = len(plans)
+        while plans and mb > SIZE_FAIL_MB * 0.8:
+            drop = max(1, len(plans) // 20)          # taie 5% odata
+            plans = plans[drop:]
+            store["plans"] = plans
+            payload = json.dumps(store, separators=(",", ":"))
+            mb = len(payload.encode("utf-8")) / 1024 / 1024
+        print(f"[!] plans.json depasea {SIZE_FAIL_MB} MB. Am taiat cele mai vechi "
+              f"{before - len(plans)} planuri; raman {len(plans)} ({mb:.1f} MB).")
+        print("    Agentul invatase deja din ele. Pentru mai mult istoric, "
+              "mareste SIZE_FAIL_MB sau muta memoria intr-un fisier separat.")
+    elif mb > SIZE_WARN_MB:
+        print(f"[!] plans.json: {mb:.1f} MB - se apropie de limita GitHub de 100 MB.")
+    os.makedirs(os.path.dirname(PLANS_FILE) or ".", exist_ok=True)
+    with open(PLANS_FILE, "w") as f:
+        f.write(payload)
 
 
 # ============================ CREARE DE PLANURI =============================
