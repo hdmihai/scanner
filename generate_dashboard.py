@@ -390,6 +390,152 @@ CAP_LABELS = {
 }
 
 
+def render_rich_chart(chart):
+    """Grafic cu lumanari, niveluri etichetate si panouri de volum / RSI / MACD.
+
+    Reproduce ce arata sistemul de referinta din capturile de ecran: nivelurile
+    planului INGHETAT (LOCKED) langa cele recalculate ACUM (CURRENT), plus
+    VWAP, POC, VAH, VAL si SuperTrend - toate ca linii orizontale etichetate,
+    nu ca numere intr-un card separat.
+
+    Toate valorile veneau deja calculate; singurul lucru care lipsea era
+    desenarea. SVG pur, fara librarie si fara CDN.
+    """
+    candles = (chart or {}).get("candles") or []
+    if len(candles) < 5:
+        return '<p class="dim">Graficul apare dupa prima scanare cu semnale.</p>'
+
+    W, H = 760, 300
+    VOL_H, IND_H, GAP = 54, 58, 10
+    PAD_R = 132                      # spatiu pentru etichetele de nivel
+    plot_w = W - PAD_R
+
+    highs = [c[2] for c in candles]
+    lows = [c[3] for c in candles]
+    vols = [c[5] or 0 for c in candles]
+    n = len(candles)
+
+    levels = []            # (pret, eticheta, clasa, stil linie)
+    ind = (chart.get("indicators") or {})
+    cur = chart.get("current") or {}
+    lock = chart.get("locked") or {}
+
+    for key, lbl in (("tp2", "TP2"), ("tp1", "TP1"), ("entry", "ENTRY"), ("sl", "SL")):
+        if cur.get(key) is not None:
+            levels.append((cur[key], f"CURRENT {lbl}",
+                           "lv-sl" if key == "sl" else ("lv-entry" if key == "entry" else "lv-tp"),
+                           "6 3"))
+        if lock.get(key) is not None:
+            levels.append((lock[key], f"PLAN #{lock.get('id','?')} {lbl} - LOCKED",
+                           "lv-sl" if key == "sl" else ("lv-entry" if key == "entry" else "lv-tp"),
+                           None))
+    for key, lbl, cls in (("vwap", "VWAP", "lv-vwap"), ("poc", "POC", "lv-poc"),
+                          ("vah", "VAH", "lv-va"), ("val", "VAL", "lv-va")):
+        if ind.get(key):
+            levels.append((ind[key], lbl, cls, "2 3"))
+    st = ind.get("supertrend") or {}
+    if st.get("level"):
+        levels.append((st["level"], f"SuperTrend {st.get('direction','')}",
+                       "lv-tp" if st.get("direction") == "BULLISH" else "lv-sl", "2 3"))
+
+    lo = min(lows + [l[0] for l in levels])
+    hi = max(highs + [l[0] for l in levels])
+    rng = (hi - lo) or (hi or 1)
+    lo -= rng * 0.04
+    hi += rng * 0.04
+    rng = hi - lo
+
+    def y(v):
+        return H - ((v - lo) / rng) * H
+
+    def x(i):
+        return (i / max(n - 1, 1)) * plot_w
+
+    cw = max(1.5, plot_w / n * 0.62)
+    body = []
+    for i, c in enumerate(candles):
+        o, h, l, cl = c[1], c[2], c[3], c[4]
+        up = cl >= o
+        cls = "cnd-up" if up else "cnd-dn"
+        cx = x(i)
+        body.append(f'<line class="{cls}" x1="{cx:.1f}" y1="{y(h):.1f}" '
+                    f'x2="{cx:.1f}" y2="{y(l):.1f}" stroke-width="1"/>')
+        top, bot = y(max(o, cl)), y(min(o, cl))
+        body.append(f'<rect class="{cls}-f" x="{cx - cw/2:.1f}" y="{top:.1f}" '
+                    f'width="{cw:.1f}" height="{max(bot - top, 1):.1f}"/>')
+
+    for key, cls in (("ema9", "ema9"), ("ema20", "ema20"),
+                     ("ema50", "ema50"), ("ema200", "ema200")):
+        series = chart.get(key) or []
+        pts = " ".join(f"{x(i):.1f},{y(v):.1f}"
+                       for i, v in enumerate(series) if v is not None)
+        if pts:
+            body.append(f'<polyline class="{cls}" points="{pts}" fill="none"/>')
+
+    # etichetele se impraștie vertical ca sa nu se suprapuna
+    levels.sort(key=lambda t: t[0], reverse=True)
+    last_y = -99
+    for price, label, cls, dash in levels:
+        ly = y(price)
+        ty = max(ly, last_y + 12)
+        last_y = ty
+        d = f' stroke-dasharray="{dash}"' if dash else ""
+        body.append(f'<line class="{cls}" x1="0" y1="{ly:.1f}" x2="{plot_w:.1f}" '
+                    f'y2="{ly:.1f}"{d}/>')
+        body.append(f'<text class="lv-t {cls}-t" x="{plot_w + 4}" y="{ty + 3:.1f}">'
+                    f'{label} {fmt_price(price)}</text>')
+
+    vmax = max(vols) or 1
+    vy0 = H + GAP
+    vol = "".join(
+        f'<rect class="{"cnd-up-f" if candles[i][4] >= candles[i][1] else "cnd-dn-f"}" '
+        f'x="{x(i) - cw/2:.1f}" y="{vy0 + VOL_H - (v/vmax)*VOL_H:.1f}" '
+        f'width="{cw:.1f}" height="{(v/vmax)*VOL_H:.1f}"/>'
+        for i, v in enumerate(vols))
+    vol += f'<text class="pnl-t" x="2" y="{vy0 + 10}">VOLUM</text>'
+
+    ry0 = vy0 + VOL_H + GAP
+    rs = chart.get("rsi") or []
+    rpts = " ".join(f"{x(i):.1f},{ry0 + IND_H - (min(max(v,0),100)/100)*IND_H:.1f}"
+                    for i, v in enumerate(rs) if v is not None)
+    rsi_svg = ""
+    if rpts:
+        for lvl in (30, 70):
+            ly = ry0 + IND_H - (lvl / 100) * IND_H
+            rsi_svg += (f'<line class="gridline" x1="0" y1="{ly:.1f}" '
+                        f'x2="{plot_w:.1f}" y2="{ly:.1f}" stroke-dasharray="2 3"/>')
+        last = next((v for v in reversed(rs) if v is not None), None)
+        rsi_svg += f'<polyline class="rsi-l" points="{rpts}" fill="none"/>'
+        rsi_svg += (f'<text class="pnl-t" x="2" y="{ry0 + 10}">RSI 14'
+                    f'{f" &middot; {last:.0f}" if last is not None else ""}</text>')
+
+    macd = chart.get("macd") or {}
+    my0 = ry0 + IND_H + GAP
+    macd_svg = ""
+    if macd.get("histogram") is not None:
+        h_ = macd["histogram"]
+        mid = my0 + IND_H / 2
+        bar_h = min(abs(h_) / (abs(h_) or 1) * (IND_H / 2 - 4), IND_H / 2 - 4)
+        cls = "cnd-up-f" if h_ > 0 else "cnd-dn-f"
+        macd_svg = (f'<line class="gridline" x1="0" y1="{mid:.1f}" x2="{plot_w:.1f}" '
+                    f'y2="{mid:.1f}"/>'
+                    f'<rect class="{cls}" x="{plot_w - 40}" '
+                    f'y="{mid - bar_h if h_ > 0 else mid:.1f}" width="34" '
+                    f'height="{bar_h:.1f}"/>'
+                    f'<text class="pnl-t" x="2" y="{my0 + 10}">MACD hist '
+                    f'{h_:+.6f}</text>')
+        my0 += IND_H
+
+    total_h = my0 + (IND_H if not macd_svg else 0) + 6
+    tf = chart.get("timeframe", "")
+    return (f'<div class="chart-head"><strong>{chart.get("symbol","")}</strong> '
+            f'&middot; {chart.get("direction","")} &middot; {tf} '
+            f'&middot; <span class="dim">{n} lumanari</span></div>'
+            f'<svg viewBox="0 0 {W} {total_h:.0f}" class="rich-chart" '
+            f'preserveAspectRatio="xMidYMid meet">'
+            f'{"".join(body)}{vol}{rsi_svg}{macd_svg}</svg>')
+
+
 def render_exchange_tabs(store):
     """Tab-uri per bursa, cu starea fiecareia.
 
@@ -811,7 +957,7 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
     indicators_html = render_indicators(deep)
     briefing_html = render_briefing(briefing)
     tokens_html = render_token_details(details, plans_store)
-    chart_svg = render_svg_chart(chart)
+    chart_svg = render_rich_chart(chart)
     weight_bars = render_weight_bars(weights)
     long_rows = render_opportunity_rows(scan.get("top_long", []))
     short_rows = render_opportunity_rows(scan.get("top_short", []))
@@ -833,7 +979,10 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
   --bg:#0B0F14; --panel:#131920; --panel-2:#1A222B; --border:#232C36;
   --text:#E7E4DD; --text-dim:#8A93A0;
   --bull:#34D399; --bear:#FB7A6C; --amber:#E6B450;
-  --ema20:#6FB7FF; --ema50:#C792EA;
+  --ema20:#6FB7FF;
+      --ema9: #7ec8e3;
+      --ema200: #9b8ec4;
+      --info: #4ea3d1; --ema50:#C792EA;
   --font-sans:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
   --font-mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
 }}
@@ -939,6 +1088,25 @@ header{{display:flex;justify-content:space-between;align-items:baseline;
 .tok-meta div{{background:var(--panel);border-radius:6px;padding:7px 9px;}}
 .briefing-card{{margin-bottom:14px;border-left:3px solid var(--amber);}}
 .briefing-text{{font-size:14px;line-height:1.7;margin:0;}}
+.rich-chart{{width:100%;height:auto;display:block;}}
+.chart-head{{font-family:var(--font-mono);font-size:12px;margin-bottom:8px;}}
+.cnd-up{{stroke:var(--bull);}} .cnd-dn{{stroke:var(--bear);}}
+.cnd-up-f{{fill:var(--bull);}} .cnd-dn-f{{fill:var(--bear);}}
+.ema9{{stroke:var(--ema9);stroke-width:1.1;}}
+.ema20{{stroke:var(--ema20);stroke-width:1.1;}}
+.ema50{{stroke:var(--ema50);stroke-width:1.1;}}
+.ema200{{stroke:var(--ema200);stroke-width:1.1;}}
+.lv-tp{{stroke:var(--bull);stroke-width:1;}}
+.lv-sl{{stroke:var(--bear);stroke-width:1;}}
+.lv-entry{{stroke:var(--info);stroke-width:1;}}
+.lv-vwap,.lv-poc,.lv-va{{stroke:var(--amber);stroke-width:.8;opacity:.75;}}
+.lv-t{{font-family:var(--font-mono);font-size:7.5px;}}
+.lv-tp-t{{fill:var(--bull);}} .lv-sl-t{{fill:var(--bear);}}
+.lv-entry-t{{fill:var(--info);}}
+.lv-vwap-t,.lv-poc-t,.lv-va-t{{fill:var(--amber);}}
+.pnl-t{{font-family:var(--font-mono);font-size:8px;fill:var(--text-dim);}}
+.rsi-l{{stroke:var(--info);stroke-width:1;}}
+.gridline{{stroke:var(--border);stroke-width:.6;}}
 .tabs{{display:flex;flex-wrap:wrap;gap:6px;}}
 .tab-radio{{position:absolute;opacity:0;pointer-events:none;}}
 .tab-label{{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;
@@ -1064,11 +1232,17 @@ footer{{margin-top:26px;color:var(--text-dim);font-size:11px;line-height:1.6;}}
   <div class="grid">
     <div>
       <div class="card">
-        <h2>Chart &middot; {(best or {}).get("symbol", "-")}</h2>
+        <h2>Chart &middot; niveluri LOCKED si CURRENT, indicatori, volum, RSI, MACD</h2>
         {chart_svg}
         <div class="legend">
+          <span><i class="dot" style="background:var(--ema9)"></i>EMA 9</span>
           <span><i class="dot" style="background:var(--ema20)"></i>EMA 20</span>
           <span><i class="dot" style="background:var(--ema50)"></i>EMA 50</span>
+          <span><i class="dot" style="background:var(--ema200)"></i>EMA 200</span>
+          <span><i class="dot" style="background:var(--bull)"></i>TP</span>
+          <span><i class="dot" style="background:var(--bear)"></i>SL</span>
+          <span><i class="dot" style="background:var(--info)"></i>entry</span>
+          <span><i class="dot" style="background:var(--amber)"></i>VWAP/POC/VA</span>
         </div>
       </div>
 
