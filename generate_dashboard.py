@@ -391,7 +391,65 @@ CAP_LABELS = {
 }
 
 
-def render_rich_chart(chart):
+def render_token_chart(sym, d, plans_by_symbol):
+    """Grafic mic pentru un token scanat, desenat din date DEJA salvate.
+
+    Foloseste `sparkline` (40 de preturi de inchidere) plus nivelurile planului
+    si indicatorii care sunt oricum in latest_details.json. Costa zero bytes in
+    plus: daca as fi salvat lumanari complete pentru toti cei 28 de tokeni, ar
+    fi insemnat ~500 KB pe scanare, comise la fiecare ora.
+    """
+    vals = [v for v in (d.get("sparkline") or []) if v is not None]
+    if len(vals) < 3:
+        return '<div class="tk-na">N/A</div>'
+
+    W, H, PAD_R = 420, 110, 96
+    plot_w = W - PAD_R
+    plan = d.get("plan") or {}
+    ind = d.get("indicators") or {}
+    vp = ind.get("volume_profile") or {}
+
+    levels = []
+    for key, lbl, cls in (("tp2", "TP2", "lv-tp"), ("tp1", "TP1", "lv-tp"),
+                          ("entry", "ENTRY", "lv-entry"), ("sl", "SL", "lv-sl")):
+        if plan.get(key) is not None:
+            levels.append((plan[key], lbl, cls))
+    for key, src, lbl in (("vwap", ind, "VWAP"), ("poc", vp, "POC"),
+                          ("vah", vp, "VAH"), ("val", vp, "VAL")):
+        if src.get(key):
+            levels.append((src[key], lbl, "lv-va"))
+
+    lo = min(vals + [l[0] for l in levels])
+    hi = max(vals + [l[0] for l in levels])
+    rng = (hi - lo) or (hi or 1)
+    lo -= rng * 0.05
+    hi += rng * 0.05
+    rng = hi - lo
+
+    def y(v):
+        return H - ((v - lo) / rng) * H
+
+    n = len(vals)
+    pts = " ".join(f"{(i/(n-1))*plot_w:.1f},{y(v):.1f}" for i, v in enumerate(vals))
+    up = vals[-1] >= vals[0]
+    body = [f'<polyline class="{"tk-up" if up else "tk-dn"}" points="{pts}" fill="none"/>']
+
+    levels.sort(key=lambda t: t[0], reverse=True)
+    last = -99
+    for price, lbl, cls in levels:
+        ly = y(price)
+        ty = max(ly, last + 10)
+        last = ty
+        body.append(f'<line class="{cls}" x1="0" y1="{ly:.1f}" x2="{plot_w:.1f}" '
+                    f'y2="{ly:.1f}" stroke-dasharray="3 3"/>')
+        body.append(f'<text class="lv-t {cls}-t" x="{plot_w + 4}" y="{ty + 3:.1f}">'
+                    f'{lbl} {fmt_price(price)}</text>')
+
+    return (f'<svg viewBox="0 0 {W} {H}" class="tk-chart" '
+            f'preserveAspectRatio="xMidYMid meet">{"".join(body)}</svg>')
+
+
+def render_rich_chart(chart, fullscreen_id=None):
     """Grafic cu lumanari, niveluri etichetate si panouri de volum / RSI / MACD.
 
     Reproduce ce arata sistemul de referinta din capturile de ecran: nivelurile
@@ -529,12 +587,23 @@ def render_rich_chart(chart):
 
     total_h = my0 + (IND_H if not macd_svg else 0) + 6
     tf = chart.get("timeframe", "")
-    return (f'<div class="chart-head"><strong>{chart.get("symbol","")}</strong> '
+    svg = (f'<svg viewBox="0 0 {W} {total_h:.0f}" class="rich-chart" '
+           f'preserveAspectRatio="xMidYMid meet">'
+           f'{"".join(body)}{vol}{rsi_svg}{macd_svg}</svg>')
+    head = (f'<div class="chart-head"><strong>{chart.get("symbol","")}</strong> '
             f'&middot; {chart.get("direction","")} &middot; {tf} '
-            f'&middot; <span class="dim">{n} lumanari</span></div>'
-            f'<svg viewBox="0 0 {W} {total_h:.0f}" class="rich-chart" '
-            f'preserveAspectRatio="xMidYMid meet">'
-            f'{"".join(body)}{vol}{rsi_svg}{macd_svg}</svg>')
+            f'&middot; <span class="dim">{n} lumanari</span>')
+    if fullscreen_id:
+        # Maximizare fara JavaScript: ancora #id + selectorul :target din CSS.
+        # Merge in orice browser si pe telefon, si nu depinde de niciun script.
+        head += (f'<a class="fs-btn" href="#{fullscreen_id}">Maximizeaza</a>')
+    head += '</div>'
+    out = head + svg
+    if fullscreen_id:
+        out += (f'<div id="{fullscreen_id}" class="fs-overlay">'
+                f'<a class="fs-close" href="#">Inchide</a>'
+                f'<div class="fs-inner">{svg}</div></div>')
+    return out
 
 
 def render_exchange_scan(scan, label):
@@ -727,12 +796,12 @@ def render_sparkline(values, width=200, height=36):
             f'<polyline points="{pts}" fill="none" stroke="{color}" stroke-width="1.5"/></svg>')
 
 
-def render_token_details(details, plans_store):
+def render_token_details(details, plans_store, watchlist=None):
     """Un panou pliabil per simbol scanat. Foloseste <details>/<summary> nativ:
     zero JavaScript, merge in orice browser, se deschide cu un tap pe telefon,
     si ramane inchis implicit ca pagina sa nu devina grea."""
     symbols = (details or {}).get("symbols") or {}
-    if not symbols:
+    if not symbols and not watchlist:
         return '<p class="dim">Detaliile apar dupa prima scanare cu semnale.</p>'
 
     # istoricul de planuri pe simbol, ca sa vezi ce a facut agentul pe fiecare
@@ -750,6 +819,7 @@ def render_token_details(details, plans_store):
         macd = ind.get("macd") or {}
         plan = d.get("plan") or {}
         prob_txt, prob_note = honest_probability(d.get("score"), plans_store)
+        chart_html = render_token_chart(sym, d, by_symbol)
 
         rows = []
         if st:
@@ -832,6 +902,7 @@ def render_token_details(details, plans_store):
           <div><span class="dim">PERSISTENTA</span><br>{d.get("persistence")}</div>
           <div><span class="dim">PROBABILITATE</span><br>{prob_txt}<br><span class="dim" style="font-size:10px;">{prob_note}</span></div>
         </div>
+        <h4>Grafic</h4>{chart_html}
         <h4>Plan propus</h4>{plan_html}
         <h4>Indicatori</h4>{ind_html}
         <div class="ema-line dim">{ema_html}</div>
@@ -839,6 +910,23 @@ def render_token_details(details, plans_store):
         <h4>Istoricul planurilor pe acest simbol</h4>{hist_html}
       </div>
     </details>''')
+
+    # Simbolurile din watchlist pentru care agentul NU a putut aduce date:
+    # panou gol cu N/A, fara alte informatii. A inventa valori sau a le omite
+    # tacut ar ascunde faptul ca acoperirea e incompleta.
+    scanned_bases = set()
+    for sym in symbols:
+        scanned_bases.add(sym.split("/")[0])
+    for base in (watchlist or []):
+        if base in scanned_bases:
+            continue
+        blocks.append(
+            '<details class="tok tok-na"><summary>'
+            '<span class="tok-sym">{}</span>'
+            '<span class="badge badge-na">N/A</span>'
+            '<span class="tok-score">-</span></summary>'
+            '<div class="tok-body"><div class="tk-na">N/A</div></div>'
+            '</details>'.format(base))
 
     return "".join(blocks)
 
@@ -1016,8 +1104,15 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
     calibration_html = render_calibration(plans_store)
     indicators_html = render_indicators(deep)
     briefing_html = render_briefing(briefing)
-    tokens_html = render_token_details(details, plans_store)
-    chart_svg = render_rich_chart(chart)
+    # Watchlist-ul cerut: din scanarea bursei principale, care stie si ce a
+    # gasit si ce lipseste. Asa panourile N/A reflecta ce s-a cerut efectiv,
+    # nu o lista fixata in dashboard care ar putea ramane in urma.
+    _pri = (exchange_scans or {}).get("primary")
+    _pscan = ((exchange_scans or {}).get("scans") or {}).get(_pri) or {}
+    watchlist = sorted({s_.split("/")[0] for s_ in (_pscan.get("resolved") or [])}
+                       | set(_pscan.get("missing") or []))
+    tokens_html = render_token_details(details, plans_store, watchlist)
+    chart_svg = render_rich_chart(chart, fullscreen_id="chart-max")
     weight_bars = render_weight_bars(weights)
     long_rows = render_opportunity_rows(scan.get("top_long", []))
     short_rows = render_opportunity_rows(scan.get("top_short", []))
@@ -1148,6 +1243,26 @@ header{{display:flex;justify-content:space-between;align-items:baseline;
 .tok-meta div{{background:var(--panel);border-radius:6px;padding:7px 9px;}}
 .briefing-card{{margin-bottom:14px;border-left:3px solid var(--amber);}}
 .briefing-text{{font-size:14px;line-height:1.7;margin:0;}}
+.fs-btn{{margin-left:auto;font-size:10px;font-family:var(--font-mono);
+  padding:3px 9px;border-radius:5px;background:var(--panel-2);color:var(--amber);
+  text-decoration:none;border:1px solid var(--border);}}
+.chart-head{{display:flex;align-items:center;gap:6px;}}
+.fs-overlay{{display:none;}}
+.fs-overlay:target{{display:flex;position:fixed;inset:0;z-index:99;
+  background:var(--bg);flex-direction:column;padding:12px;overflow:auto;}}
+.fs-inner{{flex:1;display:flex;align-items:center;justify-content:center;}}
+.fs-inner svg{{width:100%;height:auto;max-height:92vh;}}
+.fs-close{{align-self:flex-end;font-size:12px;font-family:var(--font-mono);
+  padding:7px 14px;border-radius:6px;background:var(--panel-2);
+  color:var(--amber);text-decoration:none;border:1px solid var(--border);
+  margin-bottom:8px;}}
+.tk-chart{{width:100%;height:auto;display:block;margin:4px 0 2px;}}
+.tk-up{{stroke:var(--bull);stroke-width:1.4;}}
+.tk-dn{{stroke:var(--bear);stroke-width:1.4;}}
+.tk-na{{font-family:var(--font-mono);font-size:13px;color:var(--text-dim);
+  padding:14px 0;text-align:center;}}
+.tok-na summary{{opacity:.55;}}
+.badge-na{{background:var(--panel-2);color:var(--text-dim);}}
 .scan-head{{font-family:var(--font-mono);font-size:12px;margin:8px 0 10px;
   padding:7px 10px;background:var(--panel-2);border-radius:6px;line-height:1.6;}}
 .scan-h{{font-size:10px;text-transform:uppercase;letter-spacing:.07em;
