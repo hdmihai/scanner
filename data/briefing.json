@@ -1,19 +1,26 @@
 {
-  "text": "Din 30 planuri inchise, rata de succes e 6.7%, cu -27.19R cumulat (-0.906R in medie pe plan) si profit factor 0.07. 31 planuri sunt inca deschise. Separat, 72805 planuri inchise (+949.66R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #59873 ZEC/USDT +1.28R, #59885 INJ/USDT -1.03R, #59888 AXS/USDT -1.06R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 71.4% fata de 32.0% baseline, pe 30286 planuri invatate.",
+  "text": "Din 31 planuri inchise, rata de succes e 9.7%, cu -26.41R cumulat (-0.852R in medie pe plan) si profit factor 0.1. 30 planuri sunt inca deschise. Separat, 72805 planuri inchise (+949.66R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #59893 XLM/USDT +0.78R, #59873 ZEC/USDT +1.28R, #59885 INJ/USDT -1.03R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 71.4% fata de 32.0% baseline, pe 30286 planuri invatate.",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-15 16:22 UTC",
+    "scan_time": "2026-09-15 17:20 UTC",
     "universe_size": 28,
     "plans_total": 73006,
-    "plans_open": 31,
-    "plans_closed": 30,
+    "plans_open": 30,
+    "plans_closed": 31,
     "legacy_closed": 72805,
     "legacy_total_r": 949.66,
-    "win_rate": 6.7,
-    "total_r": -27.19,
-    "avg_r": -0.906,
-    "profit_factor": 0.07,
+    "win_rate": 9.7,
+    "total_r": -26.41,
+    "avg_r": -0.852,
+    "profit_factor": 0.1,
     "recent_closed": [
+      {
+        "id": 59893,
+        "symbol": "XLM/USDT",
+        "direction": "LONG",
+        "state": "TP1 HIT - SL LA BREAKEVEN",
+        "r": 0.782
+      },
       {
         "id": 59873,
         "symbol": "ZEC/USDT",
@@ -41,13 +48,6 @@
         "direction": "LONG",
         "state": "SL HIT - INVALIDATED",
         "r": -1.037
-      },
-      {
-        "id": 59896,
-        "symbol": "QTUM/USDT",
-        "direction": "LONG",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.031
       }
     ],
     "open_now": [
