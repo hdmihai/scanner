@@ -1,19 +1,40 @@
 {
-  "text": "Din 13 planuri inchise, rata de succes e 0.0%, cu -13.66R cumulat (-1.051R in medie pe plan) si profit factor 0.0. 36 planuri sunt inca deschise. Separat, 59728 planuri inchise (+307.21R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #59871 ICP/USDT -1.05R, #59875 MANA/USDT -1.05R, #59876 FET/USDT -1.04R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 72.1% fata de 31.7% baseline, pe 20429 planuri invatate.",
+  "text": "Din 16 planuri inchise, rata de succes e 6.2%, cu -14.95R cumulat (-0.935R in medie pe plan) si profit factor 0.05. 35 planuri sunt inca deschise. Separat, 59728 planuri inchise (+307.21R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #59869 NEO/USDT -1.04R, #59870 NEAR/USDT +0.78R, #59874 GRT/USDT -1.03R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 72.1% fata de 31.7% baseline, pe 20429 planuri invatate.",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-15 07:25 UTC",
+    "scan_time": "2026-09-15 08:26 UTC",
     "universe_size": 59,
-    "plans_total": 59917,
-    "plans_open": 36,
-    "plans_closed": 13,
+    "plans_total": 59919,
+    "plans_open": 35,
+    "plans_closed": 16,
     "legacy_closed": 59728,
     "legacy_total_r": 307.21,
-    "win_rate": 0.0,
-    "total_r": -13.66,
-    "avg_r": -1.051,
-    "profit_factor": 0.0,
+    "win_rate": 6.2,
+    "total_r": -14.95,
+    "avg_r": -0.935,
+    "profit_factor": 0.05,
     "recent_closed": [
+      {
+        "id": 59869,
+        "symbol": "NEO/USDT",
+        "direction": "LONG",
+        "state": "SL HIT - INVALIDATED",
+        "r": -1.038
+      },
+      {
+        "id": 59870,
+        "symbol": "NEAR/USDT",
+        "direction": "LONG",
+        "state": "TP1 HIT - SL LA BREAKEVEN",
+        "r": 0.779
+      },
+      {
+        "id": 59874,
+        "symbol": "GRT/USDT",
+        "direction": "LONG",
+        "state": "SL HIT - INVALIDATED",
+        "r": -1.035
+      },
       {
         "id": 59871,
         "symbol": "ICP/USDT",
@@ -27,30 +48,21 @@
         "direction": "LONG",
         "state": "SL HIT - INVALIDATED",
         "r": -1.047
-      },
-      {
-        "id": 59876,
-        "symbol": "FET/USDT",
-        "direction": "LONG",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.043
-      },
-      {
-        "id": 59883,
-        "symbol": "SAND/USDT",
-        "direction": "SHORT",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.065
-      },
-      {
-        "id": 59884,
-        "symbol": "DASH/USDT",
-        "direction": "SHORT",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.042
       }
     ],
     "open_now": [
+      {
+        "id": 59919,
+        "symbol": "DOGE/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 59918,
+        "symbol": "NEAR/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
       {
         "id": 59917,
         "symbol": "ADA/USDT",
@@ -67,18 +79,6 @@
         "id": 59915,
         "symbol": "POL/USDT",
         "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 59914,
-        "symbol": "MANA/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 59913,
-        "symbol": "SAND/USDT",
-        "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       }
     ],
