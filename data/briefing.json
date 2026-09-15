@@ -1,19 +1,26 @@
 {
-  "text": "Din 25 planuri inchise, rata de succes e 4.0%, cu -24.25R cumulat (-0.970R in medie pe plan) si profit factor 0.03. 33 planuri sunt inca deschise. Separat, 72805 planuri inchise (+949.66R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #59885 INJ/USDT -1.03R, #59896 QTUM/USDT -1.03R, #59901 UNI/USDT -1.03R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 71.4% fata de 32.0% baseline, pe 30286 planuri invatate.",
+  "text": "Din 30 planuri inchise, rata de succes e 6.7%, cu -27.19R cumulat (-0.906R in medie pe plan) si profit factor 0.07. 31 planuri sunt inca deschise. Separat, 72805 planuri inchise (+949.66R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #59873 ZEC/USDT +1.28R, #59885 INJ/USDT -1.03R, #59888 AXS/USDT -1.06R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 71.4% fata de 32.0% baseline, pe 30286 planuri invatate.",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-15 15:22 UTC",
+    "scan_time": "2026-09-15 16:22 UTC",
     "universe_size": 28,
-    "plans_total": 73003,
-    "plans_open": 33,
-    "plans_closed": 25,
+    "plans_total": 73006,
+    "plans_open": 31,
+    "plans_closed": 30,
     "legacy_closed": 72805,
     "legacy_total_r": 949.66,
-    "win_rate": 4.0,
-    "total_r": -24.25,
-    "avg_r": -0.97,
-    "profit_factor": 0.03,
+    "win_rate": 6.7,
+    "total_r": -27.19,
+    "avg_r": -0.906,
+    "profit_factor": 0.07,
     "recent_closed": [
+      {
+        "id": 59873,
+        "symbol": "ZEC/USDT",
+        "direction": "LONG",
+        "state": "TP1 HIT - SL LA BREAKEVEN",
+        "r": 1.279
+      },
       {
         "id": 59885,
         "symbol": "INJ/USDT",
@@ -22,35 +29,46 @@
         "r": -1.029
       },
       {
+        "id": 59888,
+        "symbol": "AXS/USDT",
+        "direction": "LONG",
+        "state": "SL HIT - INVALIDATED",
+        "r": -1.057
+      },
+      {
+        "id": 59889,
+        "symbol": "FLOW/USDT",
+        "direction": "LONG",
+        "state": "SL HIT - INVALIDATED",
+        "r": -1.037
+      },
+      {
         "id": 59896,
         "symbol": "QTUM/USDT",
         "direction": "LONG",
         "state": "SL HIT - INVALIDATED",
         "r": -1.031
-      },
-      {
-        "id": 59901,
-        "symbol": "UNI/USDT",
-        "direction": "LONG",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.032
-      },
-      {
-        "id": 59908,
-        "symbol": "STX/USDT",
-        "direction": "LONG",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.04
-      },
-      {
-        "id": 59892,
-        "symbol": "XTZ/USDT",
-        "direction": "LONG",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.025
       }
     ],
     "open_now": [
+      {
+        "id": 73006,
+        "symbol": "DASH/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 73005,
+        "symbol": "ZEC/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 73004,
+        "symbol": "XRP/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
       {
         "id": 59926,
         "symbol": "LINK/USDT",
@@ -62,28 +80,30 @@
         "symbol": "FET/USDT",
         "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 59924,
-        "symbol": "TRX/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 59923,
-        "symbol": "EGLD/USDT",
-        "direction": "SHORT",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 59922,
-        "symbol": "DYDX/USDT",
-        "direction": "SHORT",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
       }
     ],
-    "best_bucket": null,
-    "worst_bucket": null,
+    "best_bucket": {
+      "range": "40-59",
+      "total": 22,
+      "win_rate": 9.1,
+      "ci_low": 2.5,
+      "ci_high": 27.8,
+      "avg_r": -0.854,
+      "avg_win_r": 1.029,
+      "avg_loss_r": 1.042,
+      "reliable": true
+    },
+    "worst_bucket": {
+      "range": "40-59",
+      "total": 22,
+      "win_rate": 9.1,
+      "ci_low": 2.5,
+      "ci_high": 27.8,
+      "avg_r": -0.854,
+      "avg_win_r": 1.029,
+      "avg_loss_r": 1.042,
+      "reliable": true
+    },
     "agent_status": "ACTIVE",
     "agent_reason": "acuratete echilibrata 71.4% vs euristica 32.0%",
     "agent_samples": 30286,
