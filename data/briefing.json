@@ -1,19 +1,33 @@
 {
-  "text": "Din 11 planuri inchise, rata de succes e 0.0%, cu -11.57R cumulat (-1.052R in medie pe plan) si profit factor 0.0. 34 planuri sunt inca deschise. Separat, 59728 planuri inchise (+307.21R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #59876 FET/USDT -1.04R, #59883 SAND/USDT -1.06R, #59884 DASH/USDT -1.04R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 72.1% fata de 31.7% baseline, pe 20429 planuri invatate.",
+  "text": "Din 13 planuri inchise, rata de succes e 0.0%, cu -13.66R cumulat (-1.051R in medie pe plan) si profit factor 0.0. 36 planuri sunt inca deschise. Separat, 59728 planuri inchise (+307.21R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #59871 ICP/USDT -1.05R, #59875 MANA/USDT -1.05R, #59876 FET/USDT -1.04R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 72.1% fata de 31.7% baseline, pe 20429 planuri invatate.",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-15 03:24 UTC",
+    "scan_time": "2026-09-15 04:24 UTC",
     "universe_size": 59,
-    "plans_total": 59913,
-    "plans_open": 34,
-    "plans_closed": 11,
+    "plans_total": 59917,
+    "plans_open": 36,
+    "plans_closed": 13,
     "legacy_closed": 59728,
     "legacy_total_r": 307.21,
     "win_rate": 0.0,
-    "total_r": -11.57,
-    "avg_r": -1.052,
+    "total_r": -13.66,
+    "avg_r": -1.051,
     "profit_factor": 0.0,
     "recent_closed": [
+      {
+        "id": 59871,
+        "symbol": "ICP/USDT",
+        "direction": "LONG",
+        "state": "SL HIT - INVALIDATED",
+        "r": -1.046
+      },
+      {
+        "id": 59875,
+        "symbol": "MANA/USDT",
+        "direction": "LONG",
+        "state": "SL HIT - INVALIDATED",
+        "r": -1.047
+      },
       {
         "id": 59876,
         "symbol": "FET/USDT",
@@ -34,50 +48,36 @@
         "direction": "SHORT",
         "state": "SL HIT - INVALIDATED",
         "r": -1.042
-      },
-      {
-        "id": 59886,
-        "symbol": "IOTA/USDT",
-        "direction": "LONG",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.037
-      },
-      {
-        "id": 59887,
-        "symbol": "STX/USDT",
-        "direction": "LONG",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.043
       }
     ],
     "open_now": [
       {
+        "id": 59917,
+        "symbol": "ADA/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 59916,
+        "symbol": "THETA/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 59915,
+        "symbol": "POL/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 59914,
+        "symbol": "MANA/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
         "id": 59913,
         "symbol": "SAND/USDT",
-        "direction": "SHORT",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 59912,
-        "symbol": "ETC/USDT",
-        "direction": "SHORT",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 59911,
-        "symbol": "LDO/USDT",
-        "direction": "SHORT",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 59910,
-        "symbol": "DOT/USDT",
-        "direction": "SHORT",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 59909,
-        "symbol": "SEI/USDT",
         "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       }
