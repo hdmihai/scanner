@@ -1,18 +1,18 @@
 {
-  "text": "Din 31 planuri inchise, rata de succes e 9.7%, cu -26.41R cumulat (-0.852R in medie pe plan) si profit factor 0.1. 30 planuri sunt inca deschise. Separat, 72805 planuri inchise (+949.66R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #59893 XLM/USDT +0.78R, #59873 ZEC/USDT +1.28R, #59885 INJ/USDT -1.03R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 71.4% fata de 32.0% baseline, pe 30286 planuri invatate.",
+  "text": "Din 35 planuri inchise, rata de succes e 8.6%, cu -30.75R cumulat (-0.879R in medie pe plan) si profit factor 0.08. 28 planuri sunt inca deschise. Separat, 72805 planuri inchise (+949.66R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #59893 XLM/USDT +0.78R, #59914 MANA/USDT -1.04R, #59915 POL/USDT -1.06R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 71.4% fata de 32.0% baseline, pe 30286 planuri invatate.",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-15 19:21 UTC",
+    "scan_time": "2026-09-15 20:21 UTC",
     "universe_size": 28,
-    "plans_total": 73006,
-    "plans_open": 30,
-    "plans_closed": 31,
+    "plans_total": 73008,
+    "plans_open": 28,
+    "plans_closed": 35,
     "legacy_closed": 72805,
     "legacy_total_r": 949.66,
-    "win_rate": 9.7,
-    "total_r": -26.41,
-    "avg_r": -0.852,
-    "profit_factor": 0.1,
+    "win_rate": 8.6,
+    "total_r": -30.75,
+    "avg_r": -0.879,
+    "profit_factor": 0.08,
     "recent_closed": [
       {
         "id": 59893,
@@ -22,35 +22,47 @@
         "r": 0.782
       },
       {
-        "id": 59873,
-        "symbol": "ZEC/USDT",
-        "direction": "LONG",
-        "state": "TP1 HIT - SL LA BREAKEVEN",
-        "r": 1.279
-      },
-      {
-        "id": 59885,
-        "symbol": "INJ/USDT",
+        "id": 59914,
+        "symbol": "MANA/USDT",
         "direction": "LONG",
         "state": "SL HIT - INVALIDATED",
-        "r": -1.029
+        "r": -1.042
       },
       {
-        "id": 59888,
-        "symbol": "AXS/USDT",
+        "id": 59915,
+        "symbol": "POL/USDT",
         "direction": "LONG",
         "state": "SL HIT - INVALIDATED",
-        "r": -1.057
+        "r": -1.065
       },
       {
-        "id": 59889,
-        "symbol": "FLOW/USDT",
+        "id": 59921,
+        "symbol": "ALGO/USDT",
         "direction": "LONG",
         "state": "SL HIT - INVALIDATED",
-        "r": -1.037
+        "r": -1.035
+      },
+      {
+        "id": 59924,
+        "symbol": "TRX/USDT",
+        "direction": "LONG",
+        "state": "SL HIT - INVALIDATED",
+        "r": -1.198
       }
     ],
     "open_now": [
+      {
+        "id": 73008,
+        "symbol": "ETH/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 73007,
+        "symbol": "SOL/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
       {
         "id": 73006,
         "symbol": "DASH/USDT",
@@ -68,40 +80,28 @@
         "symbol": "XRP/USDT",
         "direction": "LONG",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 59926,
-        "symbol": "LINK/USDT",
-        "direction": "SHORT",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 59925,
-        "symbol": "FET/USDT",
-        "direction": "SHORT",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
       }
     ],
     "best_bucket": {
       "range": "40-59",
-      "total": 22,
-      "win_rate": 9.1,
-      "ci_low": 2.5,
-      "ci_high": 27.8,
-      "avg_r": -0.854,
+      "total": 24,
+      "win_rate": 8.3,
+      "ci_low": 2.3,
+      "ci_high": 25.8,
+      "avg_r": -0.871,
       "avg_win_r": 1.029,
-      "avg_loss_r": 1.042,
+      "avg_loss_r": 1.043,
       "reliable": true
     },
     "worst_bucket": {
       "range": "40-59",
-      "total": 22,
-      "win_rate": 9.1,
-      "ci_low": 2.5,
-      "ci_high": 27.8,
-      "avg_r": -0.854,
+      "total": 24,
+      "win_rate": 8.3,
+      "ci_low": 2.3,
+      "ci_high": 25.8,
+      "avg_r": -0.871,
       "avg_win_r": 1.029,
-      "avg_loss_r": 1.042,
+      "avg_loss_r": 1.043,
       "reliable": true
     },
     "agent_status": "ACTIVE",

@@ -1,47 +1,47 @@
 {
-  "scan_time": "2026-09-15 19:20 UTC",
+  "scan_time": "2026-09-15 20:21 UTC",
   "exchange": "okx",
   "symbols": {
     "BTC/USDT": {
       "direction": "SHORT",
-      "score": 55,
-      "probability": 69.2,
+      "score": 60,
+      "probability": 71.0,
       "components": {
-        "trend": 0.088,
-        "momentum": 0.534,
-        "volatility": 0.577,
+        "trend": 0.104,
+        "momentum": 0.616,
+        "volatility": 0.659,
         "volume": 1.0
       },
-      "price": 76505.7,
-      "atr": 883.29286,
-      "persistence": 20,
-      "age_minutes": 1130,
+      "price": 76183.9,
+      "atr": 1003.9929,
+      "persistence": 21,
+      "age_minutes": 1191,
       "indicators": {
         "emas": {
-          "ema9": 77352.2956879029,
-          "ema20": 77483.62065309224,
-          "ema50": 77798.75450069277,
-          "ema100": 77297.0200923062,
+          "ema9": 77118.61655032232,
+          "ema20": 77359.83773365857,
+          "ema50": 77734.96139532293,
+          "ema100": 77279.24473677088,
           "ema200": null
         },
-        "vwap": 78466.428377312,
+        "vwap": 78387.29584032104,
         "volume_profile": {
           "poc": 77755.93333333,
-          "vah": 81049.8,
+          "vah": 80226.33333333,
           "val": 76109.0,
-          "value_area_pct": 72.8
+          "value_area_pct": 70.0
         },
         "supertrend": {
           "direction": "BEARISH",
-          "level": 78910.17266573
+          "level": 78910.17266544
         },
         "macd": {
-          "macd": -135.11125939,
-          "signal": -70.54497124,
-          "histogram": -64.56628815,
+          "macd": -222.96323585,
+          "signal": -101.02851372,
+          "histogram": -121.93472213,
           "bullish": false
         },
-        "price": 76505.7,
+        "price": 76183.9,
         "price_vs_value_area": "IN VALUE AREA"
       },
       "structure": {
@@ -58,30 +58,29 @@
       },
       "fibonacci": {
         "swing_high": 82285.0,
-        "swing_low": 75603.0,
+        "swing_low": 74955.5,
         "retracement": {
-          "0.236": 80708.048,
-          "0.382": 79732.476,
-          "0.5": 78944.0,
-          "0.618": 78155.524,
-          "0.786": 77032.948
+          "0.236": 80555.238,
+          "0.382": 79485.131,
+          "0.5": 78620.25,
+          "0.618": 77755.369,
+          "0.786": 76524.013
         },
         "extension": {
-          "1.272": 84102.504,
-          "1.618": 86414.476,
-          "2.0": 88967.0
+          "1.272": 84278.624,
+          "1.618": 86814.631,
+          "2.0": 89614.5
         }
       },
       "plan": {
-        "entry": 76947.346,
-        "sl": 77830.639,
-        "signal_price": 76505.7,
+        "entry": 76685.896,
+        "sl": 77689.889,
+        "signal_price": 76183.9,
         "tp1": 75559.5,
-        "tp2": 72972.529,
+        "tp2": 72167.928,
         "expected_r": 4.5
       },
       "sparkline": [
-        78636.7,
         79270.8,
         79325.4,
         78595.3,
@@ -120,50 +119,172 @@
         77686.3,
         76931.6,
         76923.6,
-        76505.7
+        76505.7,
+        76183.9
+      ]
+    },
+    "ETH/USDT": {
+      "direction": "SHORT",
+      "score": 67,
+      "probability": 73.5,
+      "components": {
+        "trend": 0.017,
+        "momentum": 0.678,
+        "volatility": 0.964,
+        "volume": 1.0
+      },
+      "price": 2416.73,
+      "atr": 46.59,
+      "persistence": 0,
+      "age_minutes": 0,
+      "indicators": {
+        "emas": {
+          "ema9": 2470.3372752822143,
+          "ema20": 2487.315307055823,
+          "ema50": 2488.261601037924,
+          "ema100": 2451.4737330081407,
+          "ema200": null
+        },
+        "vwap": 2478.1502283649625,
+        "volume_profile": {
+          "poc": 2482.908125,
+          "vah": 2516.379375,
+          "val": 2382.494375,
+          "value_area_pct": 71.1
+        },
+        "supertrend": {
+          "direction": "BEARISH",
+          "level": 2546.58849445
+        },
+        "macd": {
+          "macd": -11.86983926,
+          "signal": -0.79386682,
+          "histogram": -11.07597243,
+          "bullish": false
+        },
+        "price": 2416.73,
+        "price_vs_value_area": "IN VALUE AREA"
+      },
+      "structure": {
+        "resistance": [
+          2667.0,
+          2615.0,
+          2566.46
+        ],
+        "support": [
+          2356.19,
+          1885.84,
+          1869.41
+        ]
+      },
+      "fibonacci": {
+        "swing_high": 2667.0,
+        "swing_low": 2356.72,
+        "retracement": {
+          "0.236": 2593.7739,
+          "0.382": 2548.473,
+          "0.5": 2511.86,
+          "0.618": 2475.247,
+          "0.786": 2423.1199
+        },
+        "extension": {
+          "1.272": 2751.3962,
+          "1.618": 2858.753,
+          "2.0": 2977.28
+        }
+      },
+      "plan": {
+        "entry": 2440.025,
+        "sl": 2486.615,
+        "signal_price": 2416.73,
+        "tp1": 2356.19,
+        "tp2": 2230.37,
+        "expected_r": 4.5
+      },
+      "sparkline": [
+        2510.19,
+        2501.01,
+        2490.41,
+        2465.6,
+        2468.26,
+        2475.48,
+        2473.11,
+        2462.55,
+        2441.34,
+        2462.72,
+        2438.2,
+        2447.0,
+        2467.51,
+        2458.63,
+        2559.3,
+        2539.52,
+        2516.5,
+        2513.46,
+        2523.8,
+        2536.28,
+        2535.12,
+        2519.38,
+        2525.95,
+        2520.95,
+        2518.16,
+        2481.45,
+        2491.18,
+        2506.08,
+        2476.89,
+        2512.85,
+        2522.62,
+        2509.18,
+        2508.53,
+        2539.72,
+        2515.75,
+        2499.22,
+        2474.32,
+        2476.43,
+        2424.68,
+        2416.73
       ]
     },
     "XRP/USDT": {
-      "direction": "LONG",
-      "score": 48,
-      "probability": 66.8,
+      "direction": "SHORT",
+      "score": 51,
+      "probability": 67.8,
       "components": {
-        "trend": 0.037,
-        "momentum": 0.192,
-        "volatility": 0.68,
+        "trend": 0.04,
+        "momentum": 0.685,
+        "volatility": 0.3,
         "volume": 1.0
       },
-      "price": 1.3897,
-      "atr": 0.036685714,
-      "persistence": 20,
-      "age_minutes": 1130,
+      "price": 1.2963,
+      "atr": 0.044085714,
+      "persistence": 0,
+      "age_minutes": 0,
       "indicators": {
         "emas": {
-          "ema9": 1.3991112883254613,
-          "ema20": 1.3893508780109338,
-          "ema50": 1.38550027969374,
-          "ema100": 1.3690644489627017,
+          "ema9": 1.3785490306603692,
+          "ema20": 1.3804888896370022,
+          "ema50": 1.381986126464267,
+          "ema100": 1.3677912708285263,
           "ema200": null
         },
-        "vwap": 1.3961469055814195,
+        "vwap": 1.3920072115285123,
         "volume_profile": {
           "poc": 1.41785,
           "vah": 1.50695,
           "val": 1.35845,
-          "value_area_pct": 71.0
+          "value_area_pct": 70.9
         },
         "supertrend": {
-          "direction": "BULLISH",
-          "level": 1.35532343
+          "direction": "BEARISH",
+          "level": 1.48591924
         },
         "macd": {
-          "macd": 0.00890977,
-          "signal": 0.00606117,
-          "histogram": 0.0028486,
-          "bullish": true
+          "macd": 0.00030409,
+          "signal": 0.00490975,
+          "histogram": -0.00460566,
+          "bullish": false
         },
-        "price": 1.3897,
-        "price_vs_value_area": "IN VALUE AREA"
+        "price": 1.2963,
+        "price_vs_value_area": "SUB VAL"
       },
       "structure": {
         "resistance": [
@@ -179,30 +300,29 @@
       },
       "fibonacci": {
         "swing_high": 1.4921,
-        "swing_low": 1.3099,
+        "swing_low": 1.2884,
         "retracement": {
-          "0.236": 1.4491008,
-          "0.382": 1.4224996,
-          "0.5": 1.401,
-          "0.618": 1.3795004,
-          "0.786": 1.3488908
+          "0.236": 1.4440268,
+          "0.382": 1.4142866,
+          "0.5": 1.39025,
+          "0.618": 1.3662134,
+          "0.786": 1.3319918
         },
         "extension": {
-          "1.272": 1.5416584,
-          "1.618": 1.6046996,
-          "2.0": 1.6743
+          "1.272": 1.5475064,
+          "1.618": 1.6179866,
+          "2.0": 1.6958
         }
       },
       "plan": {
-        "entry": 1.3713571,
-        "sl": 1.3346714,
-        "signal_price": 1.3897,
-        "tp1": 1.5509,
-        "tp2": 1.6046996,
-        "expected_r": 6.36
+        "entry": 1.3183429,
+        "sl": 1.3624286,
+        "signal_price": 1.2963,
+        "tp1": 0.9888,
+        "tp2": 0.96675714,
+        "expected_r": 7.98
       },
       "sparkline": [
-        1.417,
         1.4413,
         1.4272,
         1.4174,
@@ -241,49 +361,50 @@
         1.4159,
         1.3941,
         1.4012,
-        1.3897
+        1.3897,
+        1.2963
       ]
     },
     "SOL/USDT": {
       "direction": "SHORT",
-      "score": 61,
-      "probability": 71.3,
+      "score": 69,
+      "probability": 74.2,
       "components": {
-        "trend": 0.082,
-        "momentum": 0.469,
-        "volatility": 0.876,
+        "trend": 0.116,
+        "momentum": 0.636,
+        "volatility": 0.986,
         "volume": 1.0
       },
-      "price": 99.37,
-      "atr": 1.74,
-      "persistence": 16,
-      "age_minutes": 897,
+      "price": 97.9,
+      "atr": 1.985,
+      "persistence": 17,
+      "age_minutes": 957,
       "indicators": {
         "emas": {
-          "ema9": 100.95352871480401,
-          "ema20": 101.17235784240088,
-          "ema50": 101.57756558854426,
-          "ema100": 100.23240895063428,
+          "ema9": 100.3428229718432,
+          "ema20": 100.86070471514223,
+          "ema50": 101.43279631466817,
+          "ema100": 100.18405263034805,
           "ema200": null
         },
-        "vwap": 102.60410224934225,
+        "vwap": 102.48314249796422,
         "volume_profile": {
           "poc": 102.24791667,
           "vah": 106.82541667,
           "val": 94.61875,
-          "value_area_pct": 72.4
+          "value_area_pct": 72.8
         },
         "supertrend": {
           "direction": "BEARISH",
-          "level": 104.10925732
+          "level": 104.10925731
         },
         "macd": {
-          "macd": -0.22656765,
-          "signal": -0.13604999,
-          "histogram": -0.09051766,
+          "macd": -0.46053215,
+          "signal": -0.20094638,
+          "histogram": -0.25958577,
           "bullish": false
         },
-        "price": 99.37,
+        "price": 97.9,
         "price_vs_value_area": "IN VALUE AREA"
       },
       "structure": {
@@ -300,30 +421,29 @@
       },
       "fibonacci": {
         "swing_high": 107.48,
-        "swing_low": 97.39,
+        "swing_low": 95.79,
         "retracement": {
-          "0.236": 105.09876,
-          "0.382": 103.62562,
-          "0.5": 102.435,
-          "0.618": 101.24438,
-          "0.786": 99.54926
+          "0.236": 104.72116,
+          "0.382": 103.01442,
+          "0.5": 101.635,
+          "0.618": 100.25558,
+          "0.786": 98.29166
         },
         "extension": {
-          "1.272": 110.22448,
-          "1.618": 113.71562,
-          "2.0": 117.57
+          "1.272": 110.65968,
+          "1.618": 114.70442,
+          "2.0": 119.17
         }
       },
       "plan": {
-        "entry": 100.24,
-        "sl": 101.98,
-        "signal_price": 99.37,
+        "entry": 98.8925,
+        "sl": 100.8775,
+        "signal_price": 97.9,
         "tp1": 93.26,
-        "tp2": 92.39,
-        "expected_r": 4.51
+        "tp2": 89.96,
+        "expected_r": 4.5
       },
       "sparkline": [
-        103.3,
         104.58,
         104.25,
         103.07,
@@ -362,56 +482,57 @@
         101.56,
         100.44,
         100.84,
-        99.37
+        99.37,
+        97.9
       ]
     },
     "ZEC/USDT": {
       "direction": "LONG",
-      "score": 30,
-      "probability": 60.5,
+      "score": 34,
+      "probability": 61.9,
       "components": {
-        "trend": 0.254,
-        "momentum": 0.088,
+        "trend": 0.24,
+        "momentum": 0.145,
         "volatility": 0.0,
-        "volume": 0.85
+        "volume": 1.0
       },
-      "price": 1123.65,
-      "atr": 46.737857,
-      "persistence": 43,
-      "age_minutes": 2338,
+      "price": 1132.0,
+      "atr": 47.546429,
+      "persistence": 44,
+      "age_minutes": 2398,
       "indicators": {
         "emas": {
-          "ema9": 1136.027639709664,
-          "ema20": 1135.1501068428433,
-          "ema50": 1120.190854863307,
-          "ema100": 1041.682311648758,
+          "ema9": 1135.2221117677313,
+          "ema20": 1134.8500966708884,
+          "ema50": 1120.6452701474343,
+          "ema100": 1043.4876153118444,
           "ema200": null
         },
-        "vwap": 1072.2905280877435,
+        "vwap": 1073.9422840381771,
         "volume_profile": {
           "poc": 838.274375,
           "vah": 1110.704375,
           "val": 497.736875,
-          "value_area_pct": 70.2
+          "value_area_pct": 70.1
         },
         "supertrend": {
           "direction": "BEARISH",
           "level": 1207.00464153
         },
         "macd": {
-          "macd": -0.15545504,
-          "signal": -2.05660756,
-          "histogram": 1.90115252,
+          "macd": -0.39883055,
+          "signal": -1.72505103,
+          "histogram": 1.32622048,
           "bullish": true
         },
-        "price": 1123.65,
+        "price": 1132.0,
         "price_vs_value_area": "PESTE VAH"
       },
       "structure": {
         "resistance": [
           1298.0,
           1256.92,
-          1219.68
+          1224.7
         ],
         "support": [
           500.6,
@@ -436,15 +557,14 @@
         }
       },
       "plan": {
-        "entry": 1100.2811,
-        "sl": 1053.5432,
-        "signal_price": 1123.65,
-        "tp1": 1219.68,
-        "tp2": 1310.6014,
+        "entry": 1108.2268,
+        "sl": 1060.6804,
+        "signal_price": 1132.0,
+        "tp1": 1224.7,
+        "tp2": 1322.1857,
         "expected_r": 4.5
       },
       "sparkline": [
-        1186.63,
         1238.4,
         1267.47,
         1270.01,
@@ -483,49 +603,50 @@
         1141.08,
         1138.95,
         1133.46,
-        1123.65
+        1123.65,
+        1132.0
       ]
     },
     "DOGE/USDT": {
       "direction": "SHORT",
-      "score": 72,
-      "probability": 75.2,
+      "score": 78,
+      "probability": 77.3,
       "components": {
-        "trend": 0.289,
-        "momentum": 0.702,
-        "volatility": 0.899,
+        "trend": 0.316,
+        "momentum": 0.81,
+        "volatility": 0.965,
         "volume": 1.0
       },
-      "price": 0.08169,
-      "atr": 0.0014685714,
-      "persistence": 63,
-      "age_minutes": 3361,
+      "price": 0.0809,
+      "atr": 0.001675,
+      "persistence": 64,
+      "age_minutes": 3422,
       "indicators": {
         "emas": {
-          "ema9": 0.08306385446654549,
-          "ema20": 0.08373851309864794,
-          "ema50": 0.08490275197019571,
-          "ema100": 0.08474828403651137,
+          "ema9": 0.0826310835732364,
+          "ema20": 0.08346817851826772,
+          "ema50": 0.08474498485650325,
+          "ema100": 0.08468173653604029,
           "ema200": null
         },
-        "vwap": 0.08631579155621895,
+        "vwap": 0.0861715508567347,
         "volume_profile": {
           "poc": 0.08434708,
           "vah": 0.09230208,
           "val": 0.08302125,
-          "value_area_pct": 71.6
+          "value_area_pct": 71.2
         },
         "supertrend": {
           "direction": "BEARISH",
-          "level": 0.08624245
+          "level": 0.0855827
         },
         "macd": {
-          "macd": -0.0007742,
-          "signal": -0.0006675,
-          "histogram": -0.0001067,
+          "macd": -0.00090658,
+          "signal": -0.00071532,
+          "histogram": -0.00019126,
           "bullish": false
         },
-        "price": 0.08169,
+        "price": 0.0809,
         "price_vs_value_area": "SUB VAL"
       },
       "structure": {
@@ -542,30 +663,29 @@
       },
       "fibonacci": {
         "swing_high": 0.09511,
-        "swing_low": 0.08013,
+        "swing_low": 0.0785,
         "retracement": {
-          "0.236": 0.09157472,
-          "0.382": 0.08938764,
-          "0.5": 0.08762,
-          "0.618": 0.08585236,
-          "0.786": 0.08333572
+          "0.236": 0.09119004,
+          "0.382": 0.08876498,
+          "0.5": 0.086805,
+          "0.618": 0.08484502,
+          "0.786": 0.08205454
         },
         "extension": {
-          "1.272": 0.09918456,
-          "1.618": 0.10436764,
-          "2.0": 0.11009
+          "1.272": 0.09962792,
+          "1.618": 0.10537498,
+          "2.0": 0.11172
         }
       },
       "plan": {
-        "entry": 0.082424286,
-        "sl": 0.083892857,
-        "signal_price": 0.08169,
-        "tp1": 0.08013,
-        "tp2": 0.075815714,
-        "expected_r": 4.5
+        "entry": 0.0817375,
+        "sl": 0.0834125,
+        "signal_price": 0.0809,
+        "tp1": 0.06961,
+        "tp2": 0.0687725,
+        "expected_r": 7.74
       },
       "sparkline": [
-        0.08961,
         0.09088,
         0.09086,
         0.08896,
@@ -604,49 +724,50 @@
         0.0833,
         0.08253,
         0.08252,
-        0.08169
+        0.08169,
+        0.0809
       ]
     },
     "SUI/USDT": {
       "direction": "SHORT",
-      "score": 73,
-      "probability": 75.5,
+      "score": 72,
+      "probability": 75.2,
       "components": {
-        "trend": 0.519,
-        "momentum": 0.603,
-        "volatility": 0.778,
+        "trend": 0.545,
+        "momentum": 0.733,
+        "volatility": 0.622,
         "volume": 1.0
       },
-      "price": 0.7019,
-      "atr": 0.017157143,
-      "persistence": 100,
-      "age_minutes": 5580,
+      "price": 0.6911,
+      "atr": 0.01905,
+      "persistence": 101,
+      "age_minutes": 5641,
       "indicators": {
         "emas": {
-          "ema9": 0.7132751985379342,
-          "ema20": 0.7206412277360924,
-          "ema50": 0.7393250048411267,
-          "ema100": 0.7475994314127391,
+          "ema9": 0.7088401588303473,
+          "ema20": 0.7178277774791207,
+          "ema50": 0.7374265610357223,
+          "ema100": 0.7465518397424423,
           "ema200": null
         },
-        "vwap": 0.7636284665917076,
+        "vwap": 0.7623461932502326,
         "volume_profile": {
           "poc": 0.73345,
           "vah": 0.81365,
           "val": 0.72008333,
-          "value_area_pct": 73.1
+          "value_area_pct": 72.4
         },
         "supertrend": {
           "direction": "BEARISH",
-          "level": 0.75290102
+          "level": 0.74992092
         },
         "macd": {
-          "macd": -0.00998796,
-          "signal": -0.0104753,
-          "histogram": 0.00048733,
-          "bullish": true
+          "macd": -0.01117011,
+          "signal": -0.01061426,
+          "histogram": -0.00055585,
+          "bullish": false
         },
-        "price": 0.7019,
+        "price": 0.6911,
         "price_vs_value_area": "SUB VAL"
       },
       "structure": {
@@ -663,30 +784,29 @@
       },
       "fibonacci": {
         "swing_high": 0.8448,
-        "swing_low": 0.6873,
+        "swing_low": 0.6726,
         "retracement": {
-          "0.236": 0.80763,
-          "0.382": 0.784635,
-          "0.5": 0.76605,
-          "0.618": 0.747465,
-          "0.786": 0.721005
+          "0.236": 0.8041608,
+          "0.382": 0.7790196,
+          "0.5": 0.7587,
+          "0.618": 0.7383804,
+          "0.786": 0.7094508
         },
         "extension": {
-          "1.272": 0.88764,
-          "1.618": 0.942135,
-          "2.0": 1.0023
+          "1.272": 0.8916384,
+          "1.618": 0.9512196,
+          "2.0": 1.017
         }
       },
       "plan": {
-        "entry": 0.71047857,
-        "sl": 0.72763571,
-        "signal_price": 0.7019,
-        "tp1": 0.6926,
-        "tp2": 0.63327143,
+        "entry": 0.700625,
+        "sl": 0.719675,
+        "signal_price": 0.6911,
+        "tp1": 0.6332,
+        "tp2": 0.6149,
         "expected_r": 4.5
       },
       "sparkline": [
-        0.8072,
         0.8231,
         0.813,
         0.7946,
@@ -725,49 +845,50 @@
         0.7163,
         0.7049,
         0.7075,
-        0.7019
+        0.7019,
+        0.6911
       ]
     },
     "NEAR/USDT": {
       "direction": "LONG",
-      "score": 39,
-      "probability": 63.6,
+      "score": 30,
+      "probability": 60.5,
       "components": {
-        "trend": 0.306,
-        "momentum": 0.101,
-        "volatility": 0.159,
-        "volume": 1.0
+        "trend": 0.267,
+        "momentum": 0.022,
+        "volatility": 0.038,
+        "volume": 0.894
       },
-      "price": 2.367,
-      "atr": 0.087142857,
-      "persistence": 43,
-      "age_minutes": 2338,
+      "price": 2.337,
+      "atr": 0.091714286,
+      "persistence": 44,
+      "age_minutes": 2398,
       "indicators": {
         "emas": {
-          "ema9": 2.3934788447303794,
-          "ema20": 2.392652189349596,
-          "ema50": 2.3556594531565422,
-          "ema100": 2.240038306463142,
+          "ema9": 2.3821830757843037,
+          "ema20": 2.3873519808405046,
+          "ema50": 2.3549141614609157,
+          "ema100": 2.242019236815813,
           "ema200": null
         },
-        "vwap": 2.267125882270752,
+        "vwap": 2.269228592462993,
         "volume_profile": {
           "poc": 1.92775,
           "vah": 2.31575,
           "val": 1.58825,
-          "value_area_pct": 72.7
+          "value_area_pct": 72.4
         },
         "supertrend": {
           "direction": "BULLISH",
           "level": 2.23316516
         },
         "macd": {
-          "macd": 0.00276368,
-          "signal": 0.00374282,
-          "histogram": -0.00097913,
+          "macd": -0.00193479,
+          "signal": 0.0026073,
+          "histogram": -0.00454209,
           "bullish": false
         },
-        "price": 2.367,
+        "price": 2.337,
         "price_vs_value_area": "PESTE VAH"
       },
       "structure": {
@@ -799,15 +920,14 @@
         }
       },
       "plan": {
-        "entry": 2.3234286,
-        "sl": 2.2362857,
-        "signal_price": 2.367,
+        "entry": 2.2911429,
+        "sl": 2.1994286,
+        "signal_price": 2.337,
         "tp1": 2.598,
-        "tp2": 2.7155714,
+        "tp2": 2.7038571,
         "expected_r": 4.5
       },
       "sparkline": [
-        2.274,
         2.436,
         2.595,
         2.591,
@@ -846,153 +966,33 @@
         2.419,
         2.358,
         2.372,
-        2.367
-      ]
-    },
-    "LINK/USDT": {
-      "direction": "SHORT",
-      "score": 66,
-      "probability": 73.1,
-      "components": {
-        "trend": 0.298,
-        "momentum": 0.458,
-        "volatility": 0.887,
-        "volume": 1.0
-      },
-      "price": 11.279,
-      "atr": 0.251,
-      "persistence": 20,
-      "age_minutes": 1130,
-      "indicators": {
-        "emas": {
-          "ema9": 11.410137103222587,
-          "ema20": 11.467108963464046,
-          "ema50": 11.635428329533338,
-          "ema100": 11.57662637034353,
-          "ema200": null
-        },
-        "vwap": 11.924132479573387,
-        "volume_profile": {
-          "poc": 11.4954375,
-          "vah": 12.5385625,
-          "val": 11.0781875,
-          "value_area_pct": 70.5
-        },
-        "supertrend": {
-          "direction": "BEARISH",
-          "level": 11.84199641
-        },
-        "macd": {
-          "macd": -0.08769205,
-          "signal": -0.10206679,
-          "histogram": 0.01437474,
-          "bullish": true
-        },
-        "price": 11.279,
-        "price_vs_value_area": "IN VALUE AREA"
-      },
-      "structure": {
-        "resistance": [
-          13.686,
-          12.614,
-          12.21
-        ],
-        "support": [
-          10.907,
-          9.333,
-          9.296
-        ]
-      },
-      "fibonacci": {
-        "swing_high": 13.686,
-        "swing_low": 10.911,
-        "retracement": {
-          "0.236": 13.0311,
-          "0.382": 12.62595,
-          "0.5": 12.2985,
-          "0.618": 11.97105,
-          "0.786": 11.50485
-        },
-        "extension": {
-          "1.272": 14.4408,
-          "1.618": 15.40095,
-          "2.0": 16.461
-        }
-      },
-      "plan": {
-        "entry": 11.4045,
-        "sl": 11.6555,
-        "signal_price": 11.279,
-        "tp1": 10.907,
-        "tp2": 10.275,
-        "expected_r": 4.5
-      },
-      "sparkline": [
-        12.397,
-        12.493,
-        12.114,
-        12.006,
-        11.865,
-        11.803,
-        11.814,
-        11.783,
-        11.818,
-        11.637,
-        11.616,
-        11.455,
-        11.499,
-        11.481,
-        11.4,
-        11.71,
-        11.613,
-        11.551,
-        11.486,
-        11.571,
-        11.573,
-        11.59,
-        11.483,
-        11.508,
-        11.481,
-        11.431,
-        11.291,
-        11.262,
-        11.414,
-        11.204,
-        11.379,
-        11.413,
-        11.391,
-        11.462,
-        11.745,
-        11.52,
-        11.509,
-        11.341,
-        11.384,
-        11.279
+        2.367,
+        2.337
       ]
     },
     "ADA/USDT": {
       "direction": "SHORT",
-      "score": 62,
-      "probability": 71.7,
+      "score": 63,
+      "probability": 72.0,
       "components": {
-        "trend": 0.219,
-        "momentum": 0.493,
-        "volatility": 0.765,
+        "trend": 0.259,
+        "momentum": 0.652,
+        "volatility": 0.587,
         "volume": 1.0
       },
-      "price": 0.2021,
-      "atr": 0.0049928571,
-      "persistence": 20,
-      "age_minutes": 1130,
+      "price": 0.1982,
+      "atr": 0.0056,
+      "persistence": 21,
+      "age_minutes": 1191,
       "indicators": {
         "emas": {
-          "ema9": 0.2057918488114278,
-          "ema20": 0.2070744190096788,
-          "ema50": 0.2092085936030381,
-          "ema100": 0.20850612616720235,
+          "ema9": 0.20427347904914228,
+          "ema20": 0.20622923624758657,
+          "ema50": 0.2087746120941587,
+          "ema100": 0.20832205907817714,
           "ema200": null
         },
-        "vwap": 0.2108876461145169,
+        "vwap": 0.21063959052856435,
         "volume_profile": {
           "poc": 0.22030625,
           "vah": 0.22394375,
@@ -1001,16 +1001,16 @@
         },
         "supertrend": {
           "direction": "BEARISH",
-          "level": 0.21666807
+          "level": 0.2153749
         },
         "macd": {
-          "macd": -0.00143191,
-          "signal": -0.00113949,
-          "histogram": -0.00029242,
+          "macd": -0.00196656,
+          "signal": -0.00130491,
+          "histogram": -0.00066165,
           "bullish": false
         },
-        "price": 0.2021,
-        "price_vs_value_area": "IN VALUE AREA"
+        "price": 0.1982,
+        "price_vs_value_area": "SUB VAL"
       },
       "structure": {
         "resistance": [
@@ -1041,15 +1041,14 @@
         }
       },
       "plan": {
-        "entry": 0.20459643,
-        "sl": 0.20958929,
-        "signal_price": 0.2021,
-        "tp1": 0.199,
-        "tp2": 0.18212857,
+        "entry": 0.201,
+        "sl": 0.2066,
+        "signal_price": 0.1982,
+        "tp1": 0.1919,
+        "tp2": 0.1758,
         "expected_r": 4.5
       },
       "sparkline": [
-        0.2165,
         0.2215,
         0.2203,
         0.2156,
@@ -1088,56 +1087,178 @@
         0.2052,
         0.2036,
         0.2047,
-        0.2021
+        0.2021,
+        0.1982
+      ]
+    },
+    "LINK/USDT": {
+      "direction": "SHORT",
+      "score": 67,
+      "probability": 73.5,
+      "components": {
+        "trend": 0.323,
+        "momentum": 0.624,
+        "volatility": 0.736,
+        "volume": 1.0
+      },
+      "price": 11.091,
+      "atr": 0.28042857,
+      "persistence": 21,
+      "age_minutes": 1191,
+      "indicators": {
+        "emas": {
+          "ema9": 11.346309682578068,
+          "ema20": 11.431289062379522,
+          "ema50": 11.614018316742644,
+          "ema100": 11.568644064336965,
+          "ema200": null
+        },
+        "vwap": 11.907128375600827,
+        "volume_profile": {
+          "poc": 11.49675,
+          "vah": 12.53925,
+          "val": 11.07975,
+          "value_area_pct": 70.9
+        },
+        "supertrend": {
+          "direction": "BEARISH",
+          "level": 11.84199641
+        },
+        "macd": {
+          "macd": -0.10763144,
+          "signal": -0.10317974,
+          "histogram": -0.0044517,
+          "bullish": false
+        },
+        "price": 11.091,
+        "price_vs_value_area": "IN VALUE AREA"
+      },
+      "structure": {
+        "resistance": [
+          13.686,
+          12.614,
+          12.21
+        ],
+        "support": [
+          10.907,
+          9.333,
+          9.296
+        ]
+      },
+      "fibonacci": {
+        "swing_high": 13.686,
+        "swing_low": 10.8,
+        "retracement": {
+          "0.236": 13.004904,
+          "0.382": 12.583548,
+          "0.5": 12.243,
+          "0.618": 11.902452,
+          "0.786": 11.417604
+        },
+        "extension": {
+          "1.272": 14.470992,
+          "1.618": 15.469548,
+          "2.0": 16.572
+        }
+      },
+      "plan": {
+        "entry": 11.231214,
+        "sl": 11.511643,
+        "signal_price": 11.091,
+        "tp1": 10.907,
+        "tp2": 9.9692857,
+        "expected_r": 4.5
+      },
+      "sparkline": [
+        12.493,
+        12.114,
+        12.006,
+        11.865,
+        11.803,
+        11.814,
+        11.783,
+        11.818,
+        11.637,
+        11.616,
+        11.455,
+        11.499,
+        11.481,
+        11.4,
+        11.71,
+        11.613,
+        11.551,
+        11.486,
+        11.571,
+        11.573,
+        11.59,
+        11.483,
+        11.508,
+        11.481,
+        11.431,
+        11.291,
+        11.262,
+        11.414,
+        11.204,
+        11.379,
+        11.413,
+        11.391,
+        11.462,
+        11.745,
+        11.52,
+        11.509,
+        11.341,
+        11.384,
+        11.279,
+        11.091
       ]
     },
     "DOT/USDT": {
       "direction": "SHORT",
-      "score": 70,
-      "probability": 74.5,
+      "score": 71,
+      "probability": 74.8,
       "components": {
-        "trend": 0.169,
-        "momentum": 0.659,
-        "volatility": 0.962,
+        "trend": 0.223,
+        "momentum": 0.847,
+        "volatility": 0.781,
         "volume": 1.0
       },
-      "price": 0.9834,
-      "atr": 0.020407143,
-      "persistence": 20,
-      "age_minutes": 1130,
+      "price": 0.9589,
+      "atr": 0.023378571,
+      "persistence": 21,
+      "age_minutes": 1191,
       "indicators": {
         "emas": {
-          "ema9": 0.9975662488277373,
-          "ema20": 1.0139930579306153,
-          "ema50": 1.0220971006560782,
-          "ema100": 0.9870527932038043,
+          "ema9": 0.9898329990621899,
+          "ema20": 1.0087461000347868,
+          "ema50": 1.0196114513412233,
+          "ema100": 0.9865682461700914,
           "ema200": null
         },
-        "vwap": 1.0246339362331398,
+        "vwap": 1.0240138149136278,
         "volume_profile": {
           "poc": 0.87476458,
           "vah": 1.08517708,
           "val": 0.82800625,
-          "value_area_pct": 70.3
+          "value_area_pct": 70.8
         },
         "supertrend": {
           "direction": "BEARISH",
-          "level": 1.05046506
+          "level": 1.04113355
         },
         "macd": {
-          "macd": -0.01818331,
-          "signal": -0.0165529,
-          "histogram": -0.00163041,
+          "macd": -0.02029094,
+          "signal": -0.01730051,
+          "histogram": -0.00299043,
           "bullish": false
         },
-        "price": 0.9834,
+        "price": 0.9589,
         "price_vs_value_area": "IN VALUE AREA"
       },
       "structure": {
         "resistance": [
           1.2839,
           1.1623,
-          1.0323
+          1.0381
         ],
         "support": [
           0.7529,
@@ -1162,15 +1283,14 @@
         }
       },
       "plan": {
-        "entry": 0.99360357,
-        "sl": 1.0140107,
-        "signal_price": 0.9834,
+        "entry": 0.97058929,
+        "sl": 0.99396786,
+        "signal_price": 0.9589,
         "tp1": 0.7529,
-        "tp2": 0.74269643,
-        "expected_r": 12.3
+        "tp2": 0.74121071,
+        "expected_r": 9.81
       },
       "sparkline": [
-        1.2045,
         1.1714,
         1.1798,
         1.136,
@@ -1209,49 +1329,50 @@
         0.9918,
         0.9835,
         0.9892,
-        0.9834
+        0.9834,
+        0.9589
       ]
     },
     "AVAX/USDT": {
       "direction": "SHORT",
-      "score": 61,
-      "probability": 71.3,
+      "score": 64,
+      "probability": 72.4,
       "components": {
-        "trend": 0.144,
-        "momentum": 0.305,
-        "volatility": 0.965,
+        "trend": 0.157,
+        "momentum": 0.481,
+        "volatility": 0.894,
         "volume": 1.0
       },
-      "price": 7.437,
-      "atr": 0.1435,
-      "persistence": 20,
-      "age_minutes": 1130,
+      "price": 7.351,
+      "atr": 0.16264286,
+      "persistence": 21,
+      "age_minutes": 1191,
       "indicators": {
         "emas": {
-          "ema9": 7.473631658258427,
-          "ema20": 7.475609218249615,
-          "ema50": 7.526586079292874,
-          "ema100": 7.47353739747031,
+          "ema9": 7.449105326606742,
+          "ema20": 7.4637416737754245,
+          "ema50": 7.519647961458297,
+          "ema100": 7.471536604292387,
           "ema200": null
         },
-        "vwap": 7.565435653781599,
+        "vwap": 7.5628460448244645,
         "volume_profile": {
           "poc": 7.49258333,
           "vah": 8.01958333,
           "val": 7.14125,
-          "value_area_pct": 70.5
+          "value_area_pct": 71.1
         },
         "supertrend": {
           "direction": "BEARISH",
           "level": 7.67400576
         },
         "macd": {
-          "macd": -0.01931366,
-          "signal": -0.03683929,
-          "histogram": 0.01752562,
+          "macd": -0.02735914,
+          "signal": -0.03494327,
+          "histogram": 0.00758412,
           "bullish": true
         },
-        "price": 7.437,
+        "price": 7.351,
         "price_vs_value_area": "IN VALUE AREA"
       },
       "structure": {
@@ -1283,15 +1404,14 @@
         }
       },
       "plan": {
-        "entry": 7.50875,
-        "sl": 7.65225,
-        "signal_price": 7.437,
+        "entry": 7.4323214,
+        "sl": 7.5949643,
+        "signal_price": 7.351,
         "tp1": 6.992,
-        "tp2": 6.863,
+        "tp2": 6.7004286,
         "expected_r": 4.5
       },
       "sparkline": [
-        7.959,
         8.031,
         7.977,
         7.892,
@@ -1330,56 +1450,57 @@
         7.544,
         7.465,
         7.475,
-        7.437
+        7.437,
+        7.351
       ]
     },
     "GRAM/USDT": {
       "direction": "SHORT",
-      "score": 63,
-      "probability": 72.0,
+      "score": 65,
+      "probability": 72.8,
       "components": {
-        "trend": 0.196,
-        "momentum": 0.7,
-        "volatility": 0.615,
+        "trend": 0.212,
+        "momentum": 0.723,
+        "volatility": 0.656,
         "volume": 1.0
       },
-      "price": 1.325,
-      "atr": 0.016285714,
-      "persistence": 7,
-      "age_minutes": 382,
+      "price": 1.323,
+      "atr": 0.017357143,
+      "persistence": 8,
+      "age_minutes": 443,
       "indicators": {
         "emas": {
-          "ema9": 1.3428066953239526,
-          "ema20": 1.351252675656249,
-          "ema50": 1.3640149337811887,
-          "ema100": 1.3718791141515772,
+          "ema9": 1.338845356259162,
+          "ema20": 1.3485619446466588,
+          "ema50": 1.362400287808567,
+          "ema100": 1.3710316786116619,
           "ema200": null
         },
-        "vwap": 1.3724272988954231,
+        "vwap": 1.3720064411902837,
         "volume_profile": {
-          "poc": 1.344875,
+          "poc": 1.33379167,
           "vah": 1.43354167,
           "val": 1.32270833,
-          "value_area_pct": 70.6
+          "value_area_pct": 70.4
         },
         "supertrend": {
           "direction": "BEARISH",
-          "level": 1.38196594
+          "level": 1.37631934
         },
         "macd": {
-          "macd": -0.00909051,
-          "signal": -0.00725244,
-          "histogram": -0.00183808,
+          "macd": -0.01021932,
+          "signal": -0.00784581,
+          "histogram": -0.00237351,
           "bullish": false
         },
-        "price": 1.325,
+        "price": 1.323,
         "price_vs_value_area": "IN VALUE AREA"
       },
       "structure": {
         "resistance": [
-          1.561,
           1.545,
-          1.506
+          1.506,
+          1.457
         ],
         "support": [
           1.333,
@@ -1404,15 +1525,14 @@
         }
       },
       "plan": {
-        "entry": 1.3331429,
-        "sl": 1.3494286,
-        "signal_price": 1.325,
+        "entry": 1.3316786,
+        "sl": 1.3490357,
+        "signal_price": 1.323,
         "tp1": 1.295,
-        "tp2": 1.2598571,
+        "tp2": 1.2535714,
         "expected_r": 4.5
       },
       "sparkline": [
-        1.385,
         1.409,
         1.401,
         1.381,
@@ -1451,170 +1571,50 @@
         1.341,
         1.337,
         1.342,
-        1.325
-      ]
-    },
-    "POL/USDT": {
-      "direction": "LONG",
-      "score": 56,
-      "probability": 69.6,
-      "components": {
-        "trend": 0.026,
-        "momentum": 0.329,
-        "volatility": 0.888,
-        "volume": 1.0
-      },
-      "price": 0.09737,
-      "atr": 0.00173,
-      "persistence": 51,
-      "age_minutes": 2820,
-      "indicators": {
-        "emas": {
-          "ema9": 0.09673106005432193,
-          "ema20": 0.09652263419185311,
-          "ema50": 0.0963077823165939,
-          "ema100": 0.09565310913116028,
-          "ema200": null
-        },
-        "vwap": 0.09492373645262023,
-        "volume_profile": {
-          "poc": 0.09454542,
-          "vah": 0.11547792,
-          "val": 0.08989375,
-          "value_area_pct": 71.5
-        },
-        "supertrend": {
-          "direction": "BEARISH",
-          "level": 0.09995686
-        },
-        "macd": {
-          "macd": 0.00024833,
-          "signal": 0.0002456,
-          "histogram": 2.72e-06,
-          "bullish": true
-        },
-        "price": 0.09737,
-        "price_vs_value_area": "IN VALUE AREA"
-      },
-      "structure": {
-        "resistance": [
-          0.12827,
-          0.12133,
-          0.1003
-        ],
-        "support": [
-          0.0805,
-          0.07958,
-          0.07462
-        ]
-      },
-      "fibonacci": {
-        "swing_high": 0.10711,
-        "swing_low": 0.08631,
-        "retracement": {
-          "0.236": 0.1022012,
-          "0.382": 0.0991644,
-          "0.5": 0.09671,
-          "0.618": 0.0942556,
-          "0.786": 0.0907612
-        },
-        "extension": {
-          "1.272": 0.1127676,
-          "1.618": 0.1199644,
-          "2.0": 0.12791
-        }
-      },
-      "plan": {
-        "entry": 0.096505,
-        "sl": 0.094775,
-        "signal_price": 0.09737,
-        "tp1": 0.1003,
-        "tp2": 0.10429,
-        "expected_r": 4.5
-      },
-      "sparkline": [
-        0.09526,
-        0.09926,
-        0.09909,
-        0.09641,
-        0.09592,
-        0.09795,
-        0.09784,
-        0.09657,
-        0.09294,
-        0.09307,
-        0.09349,
-        0.09209,
-        0.09286,
-        0.09299,
-        0.09297,
-        0.09549,
-        0.0961,
-        0.09736,
-        0.09665,
-        0.09653,
-        0.09643,
-        0.09729,
-        0.09604,
-        0.09657,
-        0.09628,
-        0.0961,
-        0.09577,
-        0.09713,
-        0.09742,
-        0.09589,
-        0.09619,
-        0.09624,
-        0.09689,
-        0.09827,
-        0.0972,
-        0.09659,
-        0.0961,
-        0.09574,
-        0.09688,
-        0.09737
+        1.325,
+        1.323
       ]
     },
     "DASH/USDT": {
       "direction": "SHORT",
-      "score": 65,
-      "probability": 72.8,
+      "score": 63,
+      "probability": 72.0,
       "components": {
-        "trend": 0.499,
-        "momentum": 0.709,
-        "volatility": 0.395,
+        "trend": 0.545,
+        "momentum": 0.776,
+        "volatility": 0.224,
         "volume": 1.0
       },
-      "price": 51.72,
-      "atr": 1.66,
-      "persistence": 62,
-      "age_minutes": 3329,
+      "price": 51.11,
+      "atr": 1.8157143,
+      "persistence": 63,
+      "age_minutes": 3390,
       "indicators": {
         "emas": {
-          "ema9": 53.323882916772796,
-          "ema20": 54.287606753532,
-          "ema50": 55.647406544345806,
-          "ema100": 53.293536515783856,
+          "ema9": 52.88110633341824,
+          "ema20": 53.984977538913455,
+          "ema50": 55.4691187973781,
+          "ema100": 53.250624865666886,
           "ema200": null
         },
-        "vwap": 58.8499824795986,
+        "vwap": 58.84258016658978,
         "volume_profile": {
           "poc": 42.849375,
           "vah": 65.440625,
           "val": 36.688125,
-          "value_area_pct": 72.7
+          "value_area_pct": 72.9
         },
         "supertrend": {
           "direction": "BEARISH",
-          "level": 57.23398042
+          "level": 57.21408238
         },
         "macd": {
-          "macd": -1.20494031,
-          "signal": -1.18927951,
-          "histogram": -0.01566081,
+          "macd": -1.31345765,
+          "signal": -1.21411511,
+          "histogram": -0.09934254,
           "bullish": false
         },
-        "price": 51.72,
+        "price": 51.11,
         "price_vs_value_area": "IN VALUE AREA"
       },
       "structure": {
@@ -1646,15 +1646,14 @@
         }
       },
       "plan": {
-        "entry": 52.55,
-        "sl": 54.21,
-        "signal_price": 51.72,
+        "entry": 52.017857,
+        "sl": 53.833571,
+        "signal_price": 51.11,
         "tp1": 36.85,
-        "tp2": 36.02,
-        "expected_r": 9.96
+        "tp2": 35.942143,
+        "expected_r": 8.85
       },
       "sparkline": [
-        62.27,
         65.44,
         65.42,
         62.87,
@@ -1693,7 +1692,8 @@
         53.4,
         53.0,
         52.99,
-        51.72
+        51.72,
+        51.11
       ]
     },
     "FET/USDT": {
@@ -1701,41 +1701,41 @@
       "score": 62,
       "probability": 71.7,
       "components": {
-        "trend": 0.232,
-        "momentum": 0.766,
-        "volatility": 0.476,
-        "volume": 1.0
+        "trend": 0.303,
+        "momentum": 0.866,
+        "volatility": 0.353,
+        "volume": 0.973
       },
-      "price": 0.1561,
-      "atr": 0.0047571429,
-      "persistence": 20,
-      "age_minutes": 1130,
+      "price": 0.1533,
+      "atr": 0.00505,
+      "persistence": 21,
+      "age_minutes": 1191,
       "indicators": {
         "emas": {
-          "ema9": 0.16197348055861102,
-          "ema20": 0.16492261925296772,
-          "ema50": 0.1667309152541552,
-          "ema100": 0.16388690007968926,
+          "ema9": 0.16023878444688883,
+          "ema20": 0.1638157031380515,
+          "ema50": 0.16620202959977343,
+          "ema100": 0.16368711954086476,
           "ema200": null
         },
-        "vwap": 0.16733849090802339,
+        "vwap": 0.16721559370066158,
         "volume_profile": {
           "poc": 0.16515417,
           "vah": 0.17994583,
           "val": 0.1503625,
-          "value_area_pct": 72.2
+          "value_area_pct": 72.7
         },
         "supertrend": {
           "direction": "BEARISH",
-          "level": 0.17034162
+          "level": 0.16816246
         },
         "macd": {
-          "macd": -0.00262576,
-          "signal": -0.00135596,
-          "histogram": -0.00126979,
+          "macd": -0.00321417,
+          "signal": -0.0017276,
+          "histogram": -0.00148656,
           "bullish": false
         },
-        "price": 0.1561,
+        "price": 0.1533,
         "price_vs_value_area": "IN VALUE AREA"
       },
       "structure": {
@@ -1767,15 +1767,14 @@
         }
       },
       "plan": {
-        "entry": 0.15847857,
-        "sl": 0.16323571,
-        "signal_price": 0.1561,
+        "entry": 0.155825,
+        "sl": 0.160875,
+        "signal_price": 0.1533,
         "tp1": 0.1458,
-        "tp2": 0.13707143,
+        "tp2": 0.1331,
         "expected_r": 4.5
       },
       "sparkline": [
-        0.1753,
         0.1799,
         0.1796,
         0.1741,
@@ -1814,7 +1813,8 @@
         0.1621,
         0.1588,
         0.1573,
-        0.1561
+        0.1561,
+        0.1533
       ]
     },
     "ATOM/USDT": {
@@ -1822,41 +1822,41 @@
       "score": 68,
       "probability": 73.8,
       "components": {
-        "trend": 0.35,
-        "momentum": 0.616,
-        "volatility": 0.744,
+        "trend": 0.384,
+        "momentum": 0.703,
+        "volatility": 0.63,
         "volume": 1.0
       },
-      "price": 1.553,
-      "atr": 0.039,
-      "persistence": 60,
-      "age_minutes": 3296,
+      "price": 1.535,
+      "atr": 0.042071429,
+      "persistence": 61,
+      "age_minutes": 3356,
       "indicators": {
         "emas": {
-          "ema9": 1.5784062117431326,
-          "ema20": 1.6024464381729835,
-          "ema50": 1.6305954664676168,
-          "ema100": 1.611349451954592,
+          "ema9": 1.5697249693945061,
+          "ema20": 1.5960229678901405,
+          "ema50": 1.6268382845031892,
+          "ema100": 1.609863580664084,
           "ema200": null
         },
-        "vwap": 1.6798685743886232,
+        "vwap": 1.6782293236531594,
         "volume_profile": {
           "poc": 1.500625,
           "vah": 1.636875,
           "val": 1.418875,
-          "value_area_pct": 72.9
+          "value_area_pct": 72.7
         },
         "supertrend": {
           "direction": "BEARISH",
           "level": 1.66093581
         },
         "macd": {
-          "macd": -0.03015543,
-          "signal": -0.03181588,
-          "histogram": 0.00166044,
-          "bullish": true
+          "macd": -0.03183946,
+          "signal": -0.0318206,
+          "histogram": -1.887e-05,
+          "bullish": false
         },
-        "price": 1.553,
+        "price": 1.535,
         "price_vs_value_area": "IN VALUE AREA"
       },
       "structure": {
@@ -1888,15 +1888,14 @@
         }
       },
       "plan": {
-        "entry": 1.5725,
-        "sl": 1.6115,
-        "signal_price": 1.553,
+        "entry": 1.5560357,
+        "sl": 1.5981071,
+        "signal_price": 1.535,
         "tp1": 1.435,
-        "tp2": 1.397,
+        "tp2": 1.3667143,
         "expected_r": 4.5
       },
       "sparkline": [
-        1.806,
         1.888,
         1.899,
         1.891,
@@ -1935,49 +1934,171 @@
         1.579,
         1.587,
         1.578,
-        1.553
+        1.553,
+        1.535
+      ]
+    },
+    "ALGO/USDT": {
+      "direction": "SHORT",
+      "score": 46,
+      "probability": 66.1,
+      "components": {
+        "trend": 0.032,
+        "momentum": 0.611,
+        "volatility": 0.27,
+        "volume": 0.928
+      },
+      "price": 0.09014,
+      "atr": 0.0031185714,
+      "persistence": 0,
+      "age_minutes": 0,
+      "indicators": {
+        "emas": {
+          "ema9": 0.09385745276767658,
+          "ema20": 0.0943481969123316,
+          "ema50": 0.09445404149976595,
+          "ema100": 0.09317528082323102,
+          "ema200": null
+        },
+        "vwap": 0.09396358810047009,
+        "volume_profile": {
+          "poc": 0.09367938,
+          "vah": 0.09837438,
+          "val": 0.08781063,
+          "value_area_pct": 70.2
+        },
+        "supertrend": {
+          "direction": "BEARISH",
+          "level": 0.09979529
+        },
+        "macd": {
+          "macd": -0.00034979,
+          "signal": 1.799e-05,
+          "histogram": -0.00036777,
+          "bullish": false
+        },
+        "price": 0.09014,
+        "price_vs_value_area": "IN VALUE AREA"
+      },
+      "structure": {
+        "resistance": [
+          0.10483,
+          0.10337,
+          0.1014
+        ],
+        "support": [
+          0.08369,
+          0.07732,
+          0.07666
+        ]
+      },
+      "fibonacci": {
+        "swing_high": 0.10337,
+        "swing_low": 0.08369,
+        "retracement": {
+          "0.236": 0.09872552,
+          "0.382": 0.09585224,
+          "0.5": 0.09353,
+          "0.618": 0.09120776,
+          "0.786": 0.08790152
+        },
+        "extension": {
+          "1.272": 0.10872296,
+          "1.618": 0.11553224,
+          "2.0": 0.12305
+        }
+      },
+      "plan": {
+        "entry": 0.091699286,
+        "sl": 0.094817857,
+        "signal_price": 0.09014,
+        "tp1": 0.08369,
+        "tp2": 0.077665714,
+        "expected_r": 4.5
+      },
+      "sparkline": [
+        0.09922,
+        0.09833,
+        0.0991,
+        0.10098,
+        0.09891,
+        0.10056,
+        0.09779,
+        0.09722,
+        0.09765,
+        0.09402,
+        0.0913,
+        0.0904,
+        0.09162,
+        0.08948,
+        0.09196,
+        0.09246,
+        0.09352,
+        0.09444,
+        0.09313,
+        0.09345,
+        0.09454,
+        0.0929,
+        0.09273,
+        0.09192,
+        0.09291,
+        0.09316,
+        0.0932,
+        0.0964,
+        0.0946,
+        0.09692,
+        0.09661,
+        0.09509,
+        0.09578,
+        0.09713,
+        0.09607,
+        0.09538,
+        0.09474,
+        0.09428,
+        0.09318,
+        0.09014
       ]
     },
     "SEI/USDT": {
       "direction": "SHORT",
-      "score": 75,
-      "probability": 76.2,
+      "score": 82,
+      "probability": 78.7,
       "components": {
-        "trend": 0.455,
-        "momentum": 0.755,
-        "volatility": 0.974,
-        "volume": 0.809
+        "trend": 0.487,
+        "momentum": 0.894,
+        "volatility": 0.887,
+        "volume": 1.0
       },
-      "price": 0.0432,
-      "atr": 0.00084142857,
-      "persistence": 100,
-      "age_minutes": 5580,
+      "price": 0.04253,
+      "atr": 0.00094714286,
+      "persistence": 101,
+      "age_minutes": 5641,
       "indicators": {
         "emas": {
-          "ema9": 0.04402873849637881,
-          "ema20": 0.044505698428750316,
-          "ema50": 0.04552241215711159,
-          "ema100": 0.045808098326358446,
+          "ema9": 0.04372899079710305,
+          "ema20": 0.04431753667360201,
+          "ema50": 0.04540468508988177,
+          "ema100": 0.045744889915630874,
           "ema200": null
         },
-        "vwap": 0.04740327605477639,
+        "vwap": 0.04735908177196887,
         "volume_profile": {
           "poc": 0.04751938,
           "vah": 0.04919562,
           "val": 0.04472562,
-          "value_area_pct": 70.6
+          "value_area_pct": 70.4
         },
         "supertrend": {
           "direction": "BEARISH",
-          "level": 0.04581146
+          "level": 0.04543932
         },
         "macd": {
-          "macd": -0.00057724,
-          "signal": -0.00052664,
-          "histogram": -5.06e-05,
+          "macd": -0.00066574,
+          "signal": -0.00055446,
+          "histogram": -0.00011128,
           "bullish": false
         },
-        "price": 0.0432,
+        "price": 0.04253,
         "price_vs_value_area": "SUB VAL"
       },
       "structure": {
@@ -1994,30 +2115,29 @@
       },
       "fibonacci": {
         "swing_high": 0.05171,
-        "swing_low": 0.04271,
+        "swing_low": 0.04151,
         "retracement": {
-          "0.236": 0.049586,
-          "0.382": 0.048272,
-          "0.5": 0.04721,
-          "0.618": 0.046148,
-          "0.786": 0.044636
+          "0.236": 0.0493028,
+          "0.382": 0.0478136,
+          "0.5": 0.04661,
+          "0.618": 0.0454064,
+          "0.786": 0.0436928
         },
         "extension": {
-          "1.272": 0.054158,
-          "1.618": 0.057272,
-          "2.0": 0.06071
+          "1.272": 0.0544844,
+          "1.618": 0.0580136,
+          "2.0": 0.06191
         }
       },
       "plan": {
-        "entry": 0.043620714,
-        "sl": 0.044462143,
-        "signal_price": 0.0432,
-        "tp1": 0.042779286,
-        "tp2": 0.039834286,
+        "entry": 0.043003571,
+        "sl": 0.043950714,
+        "signal_price": 0.04253,
+        "tp1": 0.042056429,
+        "tp2": 0.038741429,
         "expected_r": 4.5
       },
       "sparkline": [
-        0.04957,
         0.05092,
         0.05004,
         0.04912,
@@ -2056,49 +2176,50 @@
         0.04412,
         0.04374,
         0.04345,
-        0.0432
+        0.0432,
+        0.04253
       ]
     },
     "ZEN/USDT": {
       "direction": "SHORT",
-      "score": 58,
-      "probability": 70.3,
+      "score": 55,
+      "probability": 69.2,
       "components": {
-        "trend": 0.353,
-        "momentum": 0.431,
-        "volatility": 0.552,
+        "trend": 0.358,
+        "momentum": 0.434,
+        "volatility": 0.405,
         "volume": 1.0
       },
-      "price": 6.269,
-      "atr": 0.1815,
-      "persistence": 62,
-      "age_minutes": 3329,
+      "price": 6.267,
+      "atr": 0.19992857,
+      "persistence": 63,
+      "age_minutes": 3390,
       "indicators": {
         "emas": {
-          "ema9": 6.301787475377917,
-          "ema20": 6.370063893395338,
-          "ema50": 6.480275342814417,
-          "ema100": 6.261647869603079,
+          "ema9": 6.2948299803023335,
+          "ema20": 6.360248284525891,
+          "ema50": 6.471858951804819,
+          "ema100": 6.262153994365827,
           "ema200": null
         },
-        "vwap": 6.77969939763569,
+        "vwap": 6.779420927970422,
         "volume_profile": {
           "poc": 7.09625,
           "vah": 7.63175,
           "val": 5.48975,
-          "value_area_pct": 74.2
+          "value_area_pct": 74.4
         },
         "supertrend": {
           "direction": "BEARISH",
           "level": 6.76552397
         },
         "macd": {
-          "macd": -0.09591475,
-          "signal": -0.10847997,
-          "histogram": 0.01256522,
+          "macd": -0.09276816,
+          "signal": -0.1053376,
+          "histogram": 0.01256944,
           "bullish": true
         },
-        "price": 6.269,
+        "price": 6.267,
         "price_vs_value_area": "IN VALUE AREA"
       },
       "structure": {
@@ -2130,15 +2251,14 @@
         }
       },
       "plan": {
-        "entry": 6.35975,
-        "sl": 6.54125,
-        "signal_price": 6.269,
+        "entry": 6.3669643,
+        "sl": 6.5668929,
+        "signal_price": 6.267,
         "tp1": 4.584,
-        "tp2": 4.49325,
-        "expected_r": 10.28
+        "tp2": 4.4840357,
+        "expected_r": 9.42
       },
       "sparkline": [
-        6.973,
         7.292,
         7.511,
         7.519,
@@ -2177,50 +2297,172 @@
         6.275,
         6.233,
         6.254,
-        6.269
+        6.269,
+        6.267
+      ]
+    },
+    "AXS/USDT": {
+      "direction": "SHORT",
+      "score": 65,
+      "probability": 72.8,
+      "components": {
+        "trend": 0.014,
+        "momentum": 0.567,
+        "volatility": 0.978,
+        "volume": 1.0
+      },
+      "price": 0.9138,
+      "atr": 0.018678571,
+      "persistence": 0,
+      "age_minutes": 0,
+      "indicators": {
+        "emas": {
+          "ema9": 0.9329080908536524,
+          "ema20": 0.9361688130340655,
+          "ema50": 0.9363034543204207,
+          "ema100": 0.9340022512845317,
+          "ema200": null
+        },
+        "vwap": 0.930393407627997,
+        "volume_profile": {
+          "poc": 0.95078125,
+          "vah": 0.98734375,
+          "val": 0.87765625,
+          "value_area_pct": 73.2
+        },
+        "supertrend": {
+          "direction": "BEARISH",
+          "level": 0.95886439
+        },
+        "macd": {
+          "macd": -0.00146985,
+          "signal": 0.00205761,
+          "histogram": -0.00352746,
+          "bullish": false
+        },
+        "price": 0.9138,
+        "price_vs_value_area": "IN VALUE AREA"
+      },
+      "structure": {
+        "resistance": [
+          1.1275,
+          1.0269,
+          0.9871
+        ],
+        "support": [
+          0.86,
+          0.8569,
+          0.835
+        ]
+      },
+      "fibonacci": {
+        "swing_high": 0.9871,
+        "swing_low": 0.86,
+        "retracement": {
+          "0.236": 0.9571044,
+          "0.382": 0.9385478,
+          "0.5": 0.92355,
+          "0.618": 0.9085522,
+          "0.786": 0.8871994
+        },
+        "extension": {
+          "1.272": 1.0216712,
+          "1.618": 1.0656478,
+          "2.0": 1.1142
+        }
+      },
+      "plan": {
+        "entry": 0.92313929,
+        "sl": 0.94181786,
+        "signal_price": 0.9138,
+        "tp1": 0.86,
+        "tp2": 0.83908572,
+        "expected_r": 4.5
+      },
+      "sparkline": [
+        0.9661,
+        0.9551,
+        0.9476,
+        0.9407,
+        0.9281,
+        0.9203,
+        0.9104,
+        0.9107,
+        0.9084,
+        0.9048,
+        0.892,
+        0.9096,
+        0.9139,
+        0.9027,
+        0.9198,
+        0.9155,
+        0.9161,
+        0.9315,
+        0.924,
+        0.9406,
+        0.9331,
+        0.9253,
+        0.9316,
+        0.9521,
+        0.9425,
+        0.9407,
+        0.9491,
+        0.9523,
+        0.9382,
+        0.9467,
+        0.9459,
+        0.9471,
+        0.9499,
+        0.956,
+        0.9514,
+        0.9471,
+        0.9317,
+        0.9278,
+        0.9238,
+        0.9138
       ]
     },
     "MANA/USDT": {
       "direction": "SHORT",
-      "score": 63,
-      "probability": 72.0,
+      "score": 65,
+      "probability": 72.8,
       "components": {
-        "trend": 0.009,
-        "momentum": 0.551,
-        "volatility": 0.935,
+        "trend": 0.042,
+        "momentum": 0.629,
+        "volatility": 0.897,
         "volume": 1.0
       },
-      "price": 0.07249,
-      "atr": 0.0015435714,
-      "persistence": 3,
-      "age_minutes": 178,
+      "price": 0.072,
+      "atr": 0.0015885714,
+      "persistence": 4,
+      "age_minutes": 239,
       "indicators": {
         "emas": {
-          "ema9": 0.07385559487470382,
-          "ema20": 0.07421834532406583,
-          "ema50": 0.07422389208048658,
-          "ema100": 0.0736743491271369,
+          "ema9": 0.07348447589976306,
+          "ema20": 0.07400707434214289,
+          "ema50": 0.0741362322603069,
+          "ema100": 0.07364240985821101,
           "ema200": null
         },
-        "vwap": 0.07461453733527434,
+        "vwap": 0.07441396850775774,
         "volume_profile": {
           "poc": 0.0747925,
           "vah": 0.0772375,
           "val": 0.0723475,
-          "value_area_pct": 73.7
+          "value_area_pct": 73.4
         },
         "supertrend": {
           "direction": "BEARISH",
-          "level": 0.0772379
+          "level": 0.07686811
         },
         "macd": {
-          "macd": -0.00017631,
-          "signal": 0.00018348,
-          "histogram": -0.00035979,
+          "macd": -0.00032736,
+          "signal": 8.131e-05,
+          "histogram": -0.00040867,
           "bullish": false
         },
-        "price": 0.07249,
-        "price_vs_value_area": "IN VALUE AREA"
+        "price": 0.072,
+        "price_vs_value_area": "SUB VAL"
       },
       "structure": {
         "resistance": [
@@ -2251,15 +2493,14 @@
         }
       },
       "plan": {
-        "entry": 0.073261786,
-        "sl": 0.074805357,
-        "signal_price": 0.07249,
+        "entry": 0.072794286,
+        "sl": 0.074382857,
+        "signal_price": 0.072,
         "tp1": 0.07022,
-        "tp2": 0.066315714,
+        "tp2": 0.065645714,
         "expected_r": 4.5
       },
       "sparkline": [
-        0.07548,
         0.07667,
         0.07558,
         0.07505,
@@ -2298,49 +2539,50 @@
         0.07398,
         0.07331,
         0.07306,
-        0.07249
+        0.07249,
+        0.072
       ]
     },
     "EGLD/USDT": {
       "direction": "SHORT",
-      "score": 66,
-      "probability": 73.1,
+      "score": 64,
+      "probability": 72.4,
       "components": {
-        "trend": 0.766,
-        "momentum": 0.69,
-        "volatility": 0.201,
+        "trend": 0.814,
+        "momentum": 0.724,
+        "volatility": 0.065,
         "volume": 1.0
       },
-      "price": 3.976,
-      "atr": 0.14307143,
-      "persistence": 100,
-      "age_minutes": 5580,
+      "price": 3.944,
+      "atr": 0.15264286,
+      "persistence": 101,
+      "age_minutes": 5641,
       "indicators": {
         "emas": {
-          "ema9": 4.114694111192226,
-          "ema20": 4.239550675748024,
-          "ema50": 4.406990055820299,
-          "ema100": 4.295614032441443,
+          "ema9": 4.080555288953781,
+          "ema20": 4.21140299236706,
+          "ema50": 4.3888154015331065,
+          "ema100": 4.288395351984006,
           "ema200": null
         },
-        "vwap": 4.672657914193326,
+        "vwap": 4.671050537003809,
         "volume_profile": {
           "poc": 4.64879167,
           "vah": 5.45929167,
-          "val": 3.70320833,
-          "value_area_pct": 71.8
+          "val": 3.83829167,
+          "value_area_pct": 70.6
         },
         "supertrend": {
           "direction": "BEARISH",
-          "level": 4.45575058
+          "level": 4.43277552
         },
         "macd": {
-          "macd": -0.14849254,
-          "signal": -0.14324384,
-          "histogram": -0.0052487,
+          "macd": -0.15383871,
+          "signal": -0.14536281,
+          "histogram": -0.0084759,
           "bullish": false
         },
-        "price": 3.976,
+        "price": 3.944,
         "price_vs_value_area": "IN VALUE AREA"
       },
       "structure": {
@@ -2357,30 +2599,29 @@
       },
       "fibonacci": {
         "swing_high": 5.797,
-        "swing_low": 3.617,
+        "swing_low": 3.679,
         "retracement": {
-          "0.236": 5.28252,
-          "0.382": 4.96424,
-          "0.5": 4.707,
-          "0.618": 4.44976,
-          "0.786": 4.08352
+          "0.236": 5.297152,
+          "0.382": 4.987924,
+          "0.5": 4.738,
+          "0.618": 4.488076,
+          "0.786": 4.132252
         },
         "extension": {
-          "1.272": 6.38996,
-          "1.618": 7.14424,
-          "2.0": 7.977
+          "1.272": 6.373096,
+          "1.618": 7.105924,
+          "2.0": 7.915
         }
       },
       "plan": {
-        "entry": 4.0475357,
-        "sl": 4.1906071,
-        "signal_price": 3.976,
+        "entry": 4.0203214,
+        "sl": 4.1729643,
+        "signal_price": 3.944,
         "tp1": 2.713,
-        "tp2": 2.6414643,
-        "expected_r": 9.83
+        "tp2": 2.6366786,
+        "expected_r": 9.06
       },
       "sparkline": [
-        4.931,
         4.995,
         4.849,
         5.024,
@@ -2419,49 +2660,50 @@
         4.155,
         4.156,
         4.012,
-        3.976
+        3.976,
+        3.944
       ]
     },
     "GRT/USDT": {
       "direction": "SHORT",
-      "score": 39,
-      "probability": 63.6,
+      "score": 49,
+      "probability": 67.2,
       "components": {
-        "trend": 0.036,
-        "momentum": 0.506,
-        "volatility": 0.571,
-        "volume": 0.444
+        "trend": 0.079,
+        "momentum": 0.552,
+        "volatility": 0.482,
+        "volume": 0.839
       },
-      "price": 0.01764,
-      "atr": 0.00050428571,
-      "persistence": 3,
-      "age_minutes": 178,
+      "price": 0.01753,
+      "atr": 0.00053214286,
+      "persistence": 4,
+      "age_minutes": 239,
       "indicators": {
         "emas": {
-          "ema9": 0.018073918405890725,
-          "ema20": 0.018231681122329407,
-          "ema50": 0.018254897457690884,
-          "ema100": 0.01780744778095318,
+          "ema9": 0.017965134724712582,
+          "ema20": 0.01816485434874501,
+          "ema50": 0.01822630111996468,
+          "ema100": 0.01780297923781942,
           "ema200": null
         },
-        "vwap": 0.018816423305464743,
+        "vwap": 0.018807998567525314,
         "volume_profile": {
           "poc": 0.01762937,
           "vah": 0.01968687,
           "val": 0.01660063,
-          "value_area_pct": 72.0
+          "value_area_pct": 72.4
         },
         "supertrend": {
           "direction": "BEARISH",
           "level": 0.01910366
         },
         "macd": {
-          "macd": -0.00012311,
-          "signal": -2.924e-05,
-          "histogram": -9.387e-05,
+          "macd": -0.0001629,
+          "signal": -5.597e-05,
+          "histogram": -0.00010692,
           "bullish": false
         },
-        "price": 0.01764,
+        "price": 0.01753,
         "price_vs_value_area": "IN VALUE AREA"
       },
       "structure": {
@@ -2493,15 +2735,14 @@
         }
       },
       "plan": {
-        "entry": 0.017892143,
-        "sl": 0.018396429,
-        "signal_price": 0.01764,
+        "entry": 0.017796071,
+        "sl": 0.018328214,
+        "signal_price": 0.01753,
         "tp1": 0.01536,
-        "tp2": 0.015107857,
-        "expected_r": 5.52
+        "tp2": 0.015093929,
+        "expected_r": 5.08
       },
       "sparkline": [
-        0.0193,
         0.01955,
         0.01945,
         0.01905,
@@ -2540,49 +2781,50 @@
         0.01799,
         0.01785,
         0.01779,
-        0.01764
+        0.01764,
+        0.01753
       ]
     },
     "FLOW/USDT": {
       "direction": "SHORT",
-      "score": 47,
-      "probability": 66.5,
+      "score": 45,
+      "probability": 65.8,
       "components": {
-        "trend": 0.078,
-        "momentum": 0.571,
-        "volatility": 0.508,
-        "volume": 0.708
+        "trend": 0.132,
+        "momentum": 0.659,
+        "volatility": 0.451,
+        "volume": 0.568
       },
-      "price": 0.02702,
-      "atr": 0.00080642857,
-      "persistence": 8,
-      "age_minutes": 414,
+      "price": 0.02667,
+      "atr": 0.00082642857,
+      "persistence": 9,
+      "age_minutes": 475,
       "indicators": {
         "emas": {
-          "ema9": 0.027847081000793833,
-          "ema20": 0.028094138159082845,
-          "ema50": 0.0281982924198369,
-          "ema100": 0.028333524587865276,
+          "ema9": 0.027611664800635066,
+          "ema20": 0.02795850595341603,
+          "ema50": 0.028138120936572978,
+          "ema100": 0.028298157886215296,
           "ema200": null
         },
-        "vwap": 0.028207396224272152,
+        "vwap": 0.02818697632301691,
         "volume_profile": {
           "poc": 0.02863625,
           "vah": 0.03021542,
           "val": 0.02737292,
-          "value_area_pct": 70.5
+          "value_area_pct": 71.9
         },
         "supertrend": {
           "direction": "BEARISH",
-          "level": 0.02918239
+          "level": 0.02883515
         },
         "macd": {
-          "macd": -0.00017316,
-          "signal": -2.18e-06,
-          "histogram": -0.00017098,
+          "macd": -0.00026341,
+          "signal": -5.442e-05,
+          "histogram": -0.00020898,
           "bullish": false
         },
-        "price": 0.02702,
+        "price": 0.02667,
         "price_vs_value_area": "SUB VAL"
       },
       "structure": {
@@ -2614,15 +2856,14 @@
         }
       },
       "plan": {
-        "entry": 0.027423214,
-        "sl": 0.028229643,
-        "signal_price": 0.02702,
+        "entry": 0.027083214,
+        "sl": 0.027909643,
+        "signal_price": 0.02667,
         "tp1": 0.02578,
-        "tp2": 0.023794286,
+        "tp2": 0.023364286,
         "expected_r": 4.5
       },
       "sparkline": [
-        0.02835,
         0.02901,
         0.02883,
         0.02865,
@@ -2661,7 +2902,8 @@
         0.02832,
         0.02769,
         0.02732,
-        0.02702
+        0.02702,
+        0.02667
       ]
     }
   }
