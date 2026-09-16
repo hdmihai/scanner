@@ -39,6 +39,9 @@ face cele doua incomparabile. Prefer sa lipseasca din amandoua.
 # OMISE - nu inlocuite cu zero, care ar insemna "evidenta neutra" si ar minti
 # modelul despre ce a vazut.
 REQUIRES = {"order_flow": "trades_live", "book_imbalance": "orderbook_live"}
+# `liq_magnet` NU apare aici: harta de lichidari se construieste din OHLCV, deci
+# exista si in backtest. Asta e diferenta fata de order flow - si motivul pentru
+# care poate intra in invatare fara sa fragmenteze datele.
 
 
 DIR_LONG = "LONG"
@@ -57,7 +60,7 @@ def _item(key, label, direction, strength, value=None):
 
 
 def build_evidence(ind, price, atr, rsi=None, components=None,
-                   flow=None, book=None, caps=None):
+                   flow=None, book=None, caps=None, liq=None, liq_bias=None):
     """Construieste lista de evidente dintr-un set de indicatori.
 
     `ind` e iesirea lui indicators.compute_all(). Orice lipseste se sare -
@@ -169,6 +172,22 @@ def build_evidence(ind, price, atr, rsi=None, components=None,
                             DIR_LONG if heavy_bid else DIR_SHORT,
                             _clip(abs(bid_pct - 50) / 25, 0, 1), round(bid_pct, 1)))
 
+    # MAGNET DE LICHIDARE. Clusterele dense atrag pretul: lichidarile fortate
+    # genereaza ordine in acea directie. Deasupra pretului sunt lichidari de
+    # SHORT (magnet in sus), dedesubt de LONG (magnet in jos).
+    if liq and liq_bias is not None:
+        above, below = liq.get("above"), liq.get("below")
+        target = above if liq_bias > 0 else below
+        if target:
+            up = target["price"] > price
+            ev.append(_item("liq_magnet",
+                            f"Cluster de lichidari {'SHORT' if up else 'LONG'} la "
+                            f"{abs(target['distance_pct']):.1f}% "
+                            f"{'peste' if up else 'sub'} pret",
+                            DIR_LONG if up else DIR_SHORT,
+                            _clip(abs(liq_bias), 0, 1),
+                            round(target["price"], 8)))
+
     comp = components or {}
     if comp.get("volume") is not None:
         v = comp["volume"]
@@ -202,7 +221,7 @@ def fusion(evidence, direction):
 # forma, altfel greutatile invatate nu mai corespund aceleiasi evidente.
 EVIDENCE_KEYS = ["ema_fast", "ema_stack", "supertrend", "macd", "vwap",
                  "poc", "value_area", "rsi", "volume", "volatility",
-                 "order_flow", "book_imbalance"]
+                 "order_flow", "book_imbalance", "liq_magnet"]
 
 
 def evidence_features(evidence, direction):
