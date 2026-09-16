@@ -1,11 +1,11 @@
 {
-  "text": "Din 1 planuri inchise, rata de succes e 0.0%, cu -1.04R cumulat (-1.044R in medie pe plan) si profit factor 0.0. 14 planuri sunt inca deschise. Separat, 72841 planuri inchise (+917.88R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #73019 POL/USDT -1.04R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 0)).",
+  "text": "Din 1 planuri inchise, rata de succes e 0.0%, cu -1.04R cumulat (-1.044R in medie pe plan) si profit factor 0.0. 15 planuri sunt inca deschise. Separat, 72841 planuri inchise (+917.88R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #73019 POL/USDT -1.04R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 0)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-16 14:23 UTC",
+    "scan_time": "2026-09-16 15:22 UTC",
     "universe_size": 28,
-    "plans_total": 73025,
-    "plans_open": 14,
+    "plans_total": 73026,
+    "plans_open": 15,
     "plans_closed": 1,
     "legacy_closed": 72841,
     "legacy_total_r": 917.88,
@@ -23,6 +23,12 @@
       }
     ],
     "open_now": [
+      {
+        "id": 73026,
+        "symbol": "GRAM/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
       {
         "id": 73025,
         "symbol": "FLOW/USDT",
@@ -44,12 +50,6 @@
       {
         "id": 73022,
         "symbol": "FET/USDT",
-        "direction": "SHORT",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 73021,
-        "symbol": "ETH/USDT",
         "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       }
