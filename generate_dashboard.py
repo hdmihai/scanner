@@ -497,6 +497,10 @@ def render_rich_chart(chart, fullscreen_id=None):
         levels.append((st["level"], f"SuperTrend {st.get('direction','')}",
                        "lv-tp" if st.get("direction") == "BULLISH" else "lv-sl", "2 3"))
 
+    liq = chart.get("liquidation") or {}
+    liq_clusters = [c for c in (liq.get("clusters") or [])
+                    if c.get("price") and c.get("intensity")]
+
     lo = min(lows + [l[0] for l in levels])
     hi = max(highs + [l[0] for l in levels])
     rng = (hi - lo) or (hi or 1)
@@ -512,6 +516,18 @@ def render_rich_chart(chart, fullscreen_id=None):
 
     cw = max(1.5, plot_w / n * 0.62)
     body = []
+
+    # BENZI DE LICHIDARE, desenate INAINTE de lumanari ca sa ramana in fundal.
+    # Echivalentul vizual al heatmap-ului: cu cat banda e mai intensa, cu atat
+    # densitatea estimata de pozitii lichidabile la acel pret e mai mare.
+    for c in liq_clusters:
+        cy = y(c["price"])
+        if not (0 <= cy <= H):
+            continue
+        op = 0.06 + 0.30 * c["intensity"]
+        cls = "liq-short" if c["side"] == "SHORT" else "liq-long"
+        body.append(f'<rect class="{cls}" x="0" y="{cy - 2.5:.1f}" '
+                    f'width="{plot_w:.1f}" height="5" opacity="{op:.3f}"/>')
     for i, c in enumerate(candles):
         o, h, l, cl = c[1], c[2], c[3], c[4]
         up = cl >= o
@@ -604,6 +620,42 @@ def render_rich_chart(chart, fullscreen_id=None):
                 f'<a class="fs-close" href="#">Inchide</a>'
                 f'<div class="fs-inner">{svg}</div></div>')
     return out
+
+
+def render_liquidation(liq, price=None):
+    """Zonele magnet, in cuvinte.
+
+    Clusterele dense atrag pretul: lichidarile fortate genereaza ordine in acea
+    directie. Deasupra pretului sunt lichidari de SHORT, dedesubt de LONG.
+    Cifrele sunt o APROXIMARE construita din profilul de volum si nivelurile de
+    levier uzuale - nu open interest real - deci se citesc ca tendinta, nu ca
+    masuratoare exacta.
+    """
+    if not liq or liq.get("bias") is None:
+        return '<div class="tk-na">N/A</div>'
+    a, b = liq.get("above"), liq.get("below")
+    bias = liq["bias"]
+    cls = "nb-ok" if bias > 0.05 else ("nb-bad" if bias < -0.05 else "nb-neu")
+    rows = []
+    if a:
+        rows.append('<div class="liq-row"><span class="tag tag-bear">SHORT</span>'
+                    '<span>{:+.1f}% &middot; {}</span>'
+                    '<span class="liq-bar"><i style="width:{}%"></i></span></div>'.format(
+                        a["distance_pct"], fmt_price(a["price"]),
+                        int(round(100 * a.get("intensity", 0)))))
+    if b:
+        rows.append('<div class="liq-row"><span class="tag tag-bull">LONG</span>'
+                    '<span>{:+.1f}% &middot; {}</span>'
+                    '<span class="liq-bar"><i style="width:{}%"></i></span></div>'.format(
+                        b["distance_pct"], fmt_price(b["price"]),
+                        int(round(100 * b.get("intensity", 0)))))
+    note = ("magnetul dominant e DEASUPRA" if bias > 0.05 else
+            ("magnetul dominant e DEDESUBT" if bias < -0.05 else "magneti echilibrati"))
+    scaled = " &middot; scalat cu open interest" if liq.get("oi_scaled") else ""
+    return ('<div class="ev-neighbors {}">Magnet: <strong>{}</strong> '
+            '&middot; bias {:+.2f}{}</div>'
+            '<div class="liq-list">{}</div>').format(
+                cls, note, bias, scaled, "".join(rows))
 
 
 def render_exchange_scan(scan, label):
@@ -820,6 +872,7 @@ def render_token_details(details, plans_store, watchlist=None):
         plan = d.get("plan") or {}
         prob_txt, prob_note = honest_probability(d.get("score"), plans_store)
         chart_html = render_token_chart(sym, d, by_symbol)
+        liq_html = render_liquidation(d.get("liquidation"), d.get("price"))
 
         rows = []
         if st:
@@ -903,6 +956,7 @@ def render_token_details(details, plans_store, watchlist=None):
           <div><span class="dim">PROBABILITATE</span><br>{prob_txt}<br><span class="dim" style="font-size:10px;">{prob_note}</span></div>
         </div>
         <h4>Grafic</h4>{chart_html}
+        <h4>Zone de lichidare</h4>{liq_html}
         <h4>Plan propus</h4>{plan_html}
         <h4>Indicatori</h4>{ind_html}
         <div class="ema-line dim">{ema_html}</div>
@@ -1256,6 +1310,13 @@ header{{display:flex;justify-content:space-between;align-items:baseline;
   padding:7px 14px;border-radius:6px;background:var(--panel-2);
   color:var(--amber);text-decoration:none;border:1px solid var(--border);
   margin-bottom:8px;}}
+.liq-short{{fill:var(--bear);}}
+.liq-long{{fill:var(--bull);}}
+.liq-list{{display:flex;flex-direction:column;gap:4px;margin-top:6px;}}
+.liq-row{{display:grid;grid-template-columns:58px 1fr 70px;gap:8px;
+  align-items:center;font-size:11px;font-family:var(--font-mono);}}
+.liq-bar{{height:5px;background:var(--panel-2);border-radius:3px;overflow:hidden;}}
+.liq-bar i{{display:block;height:100%;background:var(--amber);}}
 .tk-chart{{width:100%;height:auto;display:block;margin:4px 0 2px;}}
 .tk-up{{stroke:var(--bull);stroke-width:1.4;}}
 .tk-dn{{stroke:var(--bear);stroke-width:1.4;}}
