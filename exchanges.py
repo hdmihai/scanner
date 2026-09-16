@@ -41,23 +41,30 @@ CAP_OHLCV = "ohlcv"
 CAP_ORDERBOOK_LIVE = "orderbook_live"
 CAP_TRADES_LIVE = "trades_live"
 CAP_ORDERBOOK_HISTORY = "orderbook_history"
+# Open interest curent (ccxt fetch_open_interest). Rafineaza harta de lichidari
+# scaland densitatile cu expunerea reala. NU e obligatoriu: harta se construieste
+# din profilul de volum si nivelurile de levier, iar deciziile se iau pe densitate
+# RELATIVA. Lipsa lui schimba magnitudinea, nu forma.
+CAP_OPEN_INTEREST = "open_interest"
 
-ALL_CAPS = [CAP_OHLCV, CAP_ORDERBOOK_LIVE, CAP_TRADES_LIVE, CAP_ORDERBOOK_HISTORY]
+ALL_CAPS = [CAP_OHLCV, CAP_ORDERBOOK_LIVE, CAP_TRADES_LIVE,
+            CAP_ORDERBOOK_HISTORY, CAP_OPEN_INTEREST]
 
 # Capabilitatile DECLARATE. Sunt un punct de plecare; `probe_exchange` le
 # verifica efectiv, pentru ca o bursa poate declara o metoda in ccxt si totusi
 # sa o blocheze pe IP-uri de cloud sau sa o limiteze pe regiune.
 REGISTRY = {
-    "okx":    {"label": "OKX",     "declared": [CAP_OHLCV, CAP_ORDERBOOK_LIVE, CAP_TRADES_LIVE]},
-    "kucoin": {"label": "KuCoin",  "declared": [CAP_OHLCV, CAP_ORDERBOOK_LIVE, CAP_TRADES_LIVE]},
-    "gate":   {"label": "Gate.io", "declared": [CAP_OHLCV, CAP_ORDERBOOK_LIVE, CAP_TRADES_LIVE]},
-    "mexc":   {"label": "MEXC",    "declared": [CAP_OHLCV, CAP_ORDERBOOK_LIVE, CAP_TRADES_LIVE]},
-    "kraken": {"label": "Kraken",  "declared": [CAP_OHLCV, CAP_ORDERBOOK_LIVE, CAP_TRADES_LIVE]},
+    "okx":    {"label": "OKX",     "declared": [CAP_OHLCV, CAP_ORDERBOOK_LIVE, CAP_TRADES_LIVE, CAP_OPEN_INTEREST]},
+    "kucoin": {"label": "KuCoin",  "declared": [CAP_OHLCV, CAP_ORDERBOOK_LIVE, CAP_TRADES_LIVE, CAP_OPEN_INTEREST]},
+    "gate":   {"label": "Gate.io", "declared": [CAP_OHLCV, CAP_ORDERBOOK_LIVE, CAP_TRADES_LIVE, CAP_OPEN_INTEREST]},
+    "mexc":   {"label": "MEXC",    "declared": [CAP_OHLCV, CAP_ORDERBOOK_LIVE, CAP_TRADES_LIVE, CAP_OPEN_INTEREST]},
+    "kraken": {"label": "Kraken",  "declared": [CAP_OHLCV, CAP_ORDERBOOK_LIVE, CAP_TRADES_LIVE, CAP_OPEN_INTEREST]},
     # Bybit publica arhive L2 gratuite la public.bybit.com. Declarat ca sa fie
     # vizibil in dashboard, dar NEFOLOSIT: pentru 59 de simboluri pe 5 ani ar
     # insemna zeci de mii de GB, adica sute de ore de descarcare.
     "bybit":  {"label": "Bybit",   "declared": [CAP_OHLCV, CAP_ORDERBOOK_LIVE,
-                                                CAP_TRADES_LIVE, CAP_ORDERBOOK_HISTORY]},
+                                                CAP_TRADES_LIVE, CAP_ORDERBOOK_HISTORY,
+                                                CAP_OPEN_INTEREST]},
 }
 
 DEFAULT_ORDER = ["okx", "kucoin", "gate", "mexc", "kraken", "bybit"]
@@ -111,6 +118,14 @@ def probe_exchange(ccxt_mod, exchange_id, probe_symbol=None, timeout_note=""):
         except Exception:
             pass
 
+    if CAP_OPEN_INTEREST in info["declared"]:
+        try:
+            oi = ex.fetch_open_interest(sym)
+            if oi and (oi.get("openInterestAmount") or oi.get("openInterestValue")):
+                card["available"].append(CAP_OPEN_INTEREST)
+        except Exception:
+            pass
+
     if CAP_TRADES_LIVE in info["declared"]:
         try:
             tr = ex.fetch_trades(sym, limit=50)
@@ -130,7 +145,7 @@ def capability_signature(caps):
     backtest-ului), `ofl` = ohlcv + order flow live, si asa mai departe.
     """
     letters = {CAP_OHLCV: "o", CAP_ORDERBOOK_LIVE: "b", CAP_TRADES_LIVE: "f",
-               CAP_ORDERBOOK_HISTORY: "h"}
+               CAP_ORDERBOOK_HISTORY: "h", CAP_OPEN_INTEREST: "i"}
     return "".join(letters[c] for c in ALL_CAPS if c in set(caps or [])) or "none"
 
 
@@ -161,3 +176,17 @@ def order_flow(ex, symbol, caps, limit=200):
             "sell_pct": round(100 * sell / total, 1),
             "buy_pct": round(100 * buy / total, 1),
             "trades": len(trades or [])}
+
+
+def open_interest(ex, symbol, caps):
+    """Open interest curent, daca bursa il ofera. None altfel - iar atunci harta
+    de lichidari se construieste nescalata, ceea ce e perfect utilizabil."""
+    if CAP_OPEN_INTEREST not in (caps or []):
+        return None
+    try:
+        oi = ex.fetch_open_interest(symbol)
+    except Exception:
+        return None
+    if not oi:
+        return None
+    return oi.get("openInterestAmount") or oi.get("openInterestValue")
