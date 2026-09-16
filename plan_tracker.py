@@ -80,6 +80,10 @@ USE_DECISION_GATE = os.environ.get("USE_DECISION_GATE", "false").lower() == "tru
 # cost de tranzactie). Amestecarea lor in calibrare ar media doua sisteme
 # diferite - aceeasi eroare pe care am evitat-o la schimbarile de geometrie.
 # Asa, trecerea de la 1h la 4h separa automat datele, fara interventie manuala.
+# v6: HARTA DE LICHIDARI. S-a adaugat evidenta `liq_magnet`, deci vectorul de
+# caracteristici a trecut de la 16 la 17. Planurile v5 nu o au, deci un model
+# antrenat pe ele nu e comparabil - resetul e obligatoriu.
+#
 # v5: STRAT DE EVIDENTE. Caracteristicile agentului au trecut de la 6 numere
 # abstracte la 16, din care 11 sunt evidente orientate dupa directia planului.
 # `is_long` a fost scos. Planurile v4 nu au evidente, deci un model antrenat pe
@@ -91,7 +95,7 @@ USE_DECISION_GATE = os.environ.get("USE_DECISION_GATE", "false").lower() == "tru
 # versionarea o previne la schimbarile de timeframe si de geometrie.
 # Backtest-ul ruleaza mereu cu "o" (doar OHLCV); scanarea live poate avea "obf".
 def _build_geometry(caps_sig=None):
-    return ("v5-" + os.environ.get("SCAN_TIMEFRAME", "1h")
+    return ("v6-" + os.environ.get("SCAN_TIMEFRAME", "1h")
             + "-" + (caps_sig or os.environ.get("SCAN_CAPS", "o")))
 
 
