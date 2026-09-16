@@ -1,19 +1,26 @@
 {
-  "text": "Din 35 planuri inchise, rata de succes e 8.6%, cu -30.75R cumulat (-0.879R in medie pe plan) si profit factor 0.08. 28 planuri sunt inca deschise. Separat, 72805 planuri inchise (+949.66R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #59893 XLM/USDT +0.78R, #59914 MANA/USDT -1.04R, #59915 POL/USDT -1.06R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 71.4% fata de 32.0% baseline, pe 30286 planuri invatate.",
+  "text": "Din 36 planuri inchise, rata de succes e 8.3%, cu -31.79R cumulat (-0.883R in medie pe plan) si profit factor 0.08. 28 planuri sunt inca deschise. Separat, 72805 planuri inchise (+949.66R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #73004 XRP/USDT -1.04R, #59893 XLM/USDT +0.78R, #59914 MANA/USDT -1.04R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 71.4% fata de 32.0% baseline, pe 30286 planuri invatate.",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-15 23:20 UTC",
+    "scan_time": "2026-09-16 00:28 UTC",
     "universe_size": 28,
-    "plans_total": 73008,
+    "plans_total": 73009,
     "plans_open": 28,
-    "plans_closed": 35,
+    "plans_closed": 36,
     "legacy_closed": 72805,
     "legacy_total_r": 949.66,
-    "win_rate": 8.6,
-    "total_r": -30.75,
-    "avg_r": -0.879,
+    "win_rate": 8.3,
+    "total_r": -31.79,
+    "avg_r": -0.883,
     "profit_factor": 0.08,
     "recent_closed": [
+      {
+        "id": 73004,
+        "symbol": "XRP/USDT",
+        "direction": "LONG",
+        "state": "SL HIT - INVALIDATED",
+        "r": -1.037
+      },
       {
         "id": 59893,
         "symbol": "XLM/USDT",
@@ -41,16 +48,15 @@
         "direction": "LONG",
         "state": "SL HIT - INVALIDATED",
         "r": -1.035
-      },
-      {
-        "id": 59924,
-        "symbol": "TRX/USDT",
-        "direction": "LONG",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.198
       }
     ],
     "open_now": [
+      {
+        "id": 73009,
+        "symbol": "AVAX/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
       {
         "id": 73008,
         "symbol": "ETH/USDT",
@@ -73,33 +79,27 @@
         "id": 73005,
         "symbol": "ZEC/USDT",
         "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 73004,
-        "symbol": "XRP/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
+        "state": "INTRARE ATINSA - pozitie activa"
       }
     ],
     "best_bucket": {
       "range": "40-59",
-      "total": 24,
-      "win_rate": 8.3,
-      "ci_low": 2.3,
-      "ci_high": 25.8,
-      "avg_r": -0.871,
+      "total": 25,
+      "win_rate": 8.0,
+      "ci_low": 2.2,
+      "ci_high": 25.0,
+      "avg_r": -0.877,
       "avg_win_r": 1.029,
       "avg_loss_r": 1.043,
       "reliable": true
     },
     "worst_bucket": {
       "range": "40-59",
-      "total": 24,
-      "win_rate": 8.3,
-      "ci_low": 2.3,
-      "ci_high": 25.8,
-      "avg_r": -0.871,
+      "total": 25,
+      "win_rate": 8.0,
+      "ci_low": 2.2,
+      "ci_high": 25.0,
+      "avg_r": -0.877,
       "avg_win_r": 1.029,
       "avg_loss_r": 1.043,
       "reliable": true
