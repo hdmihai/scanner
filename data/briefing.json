@@ -1,133 +1,78 @@
 {
-  "text": "Din 36 planuri inchise, rata de succes e 8.3%, cu -31.79R cumulat (-0.883R in medie pe plan) si profit factor 0.08. 29 planuri sunt inca deschise. Separat, 72805 planuri inchise (+949.66R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #73004 XRP/USDT -1.04R, #59893 XLM/USDT +0.78R, #59914 MANA/USDT -1.04R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 71.4% fata de 32.0% baseline, pe 30286 planuri invatate.",
+  "text": "10 planuri sunt deschise, niciunul inchis inca. Pana la primele inchideri nu pot spune nimic despre performanta - orice cifra ar fi speculatie. Separat, 72841 planuri inchise (+917.88R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 0)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-16 07:23 UTC",
+    "scan_time": "2026-09-16 07:40 UTC",
     "universe_size": 28,
-    "plans_total": 73010,
-    "plans_open": 29,
-    "plans_closed": 36,
-    "legacy_closed": 72805,
-    "legacy_total_r": 949.66,
-    "win_rate": 8.3,
-    "total_r": -31.79,
-    "avg_r": -0.883,
-    "profit_factor": 0.08,
-    "recent_closed": [
-      {
-        "id": 73004,
-        "symbol": "XRP/USDT",
-        "direction": "LONG",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.037
-      },
-      {
-        "id": 59893,
-        "symbol": "XLM/USDT",
-        "direction": "LONG",
-        "state": "TP1 HIT - SL LA BREAKEVEN",
-        "r": 0.782
-      },
-      {
-        "id": 59914,
-        "symbol": "MANA/USDT",
-        "direction": "LONG",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.042
-      },
-      {
-        "id": 59915,
-        "symbol": "POL/USDT",
-        "direction": "LONG",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.065
-      },
-      {
-        "id": 59921,
-        "symbol": "ALGO/USDT",
-        "direction": "LONG",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.035
-      }
-    ],
+    "plans_total": 73020,
+    "plans_open": 10,
+    "plans_closed": 0,
+    "legacy_closed": 72841,
+    "legacy_total_r": 917.88,
+    "win_rate": null,
+    "total_r": 0,
+    "avg_r": null,
+    "profit_factor": null,
+    "recent_closed": [],
     "open_now": [
       {
-        "id": 73010,
-        "symbol": "POL/USDT",
-        "direction": "SHORT",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 73009,
-        "symbol": "AVAX/USDT",
-        "direction": "SHORT",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 73008,
-        "symbol": "ETH/USDT",
-        "direction": "SHORT",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 73007,
+        "id": 73020,
         "symbol": "SOL/USDT",
         "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       },
       {
-        "id": 73006,
-        "symbol": "DASH/USDT",
+        "id": 73019,
+        "symbol": "POL/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 73018,
+        "symbol": "ADA/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 73017,
+        "symbol": "SUI/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 73016,
+        "symbol": "EGLD/USDT",
         "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       }
     ],
-    "best_bucket": {
-      "range": "40-59",
-      "total": 25,
-      "win_rate": 8.0,
-      "ci_low": 2.2,
-      "ci_high": 25.0,
-      "avg_r": -0.877,
-      "avg_win_r": 1.029,
-      "avg_loss_r": 1.043,
-      "reliable": true
-    },
-    "worst_bucket": {
-      "range": "40-59",
-      "total": 25,
-      "win_rate": 8.0,
-      "ci_low": 2.2,
-      "ci_high": 25.0,
-      "avg_r": -0.877,
-      "avg_win_r": 1.029,
-      "avg_loss_r": 1.043,
-      "reliable": true
-    },
-    "agent_status": "ACTIVE",
-    "agent_reason": "acuratete echilibrata 71.4% vs euristica 32.0%",
-    "agent_samples": 30286,
-    "agent_balanced": 71.38034283146308,
-    "baseline_balanced": 31.964293410365052,
+    "best_bucket": null,
+    "worst_bucket": null,
+    "agent_status": "SHADOW",
+    "agent_reason": "are nevoie de 300 exemple (are 0)",
+    "agent_samples": 0,
+    "agent_balanced": null,
+    "baseline_balanced": null,
     "agent_weights": {
-      "trend": 0.003958,
-      "momentum": -0.188689,
-      "volatility": -0.246694,
-      "volume": -0.424535,
+      "trend": 0.0,
+      "momentum": 0.0,
+      "volatility": 0.0,
+      "volume": 0.0,
       "persistence_n": 0.0,
-      "ev_ema_fast": -0.076734,
-      "ev_ema_stack": 0.692502,
-      "ev_supertrend": 0.007605,
-      "ev_macd": 0.484239,
-      "ev_vwap": 0.266504,
-      "ev_poc": 0.311692,
-      "ev_value_area": 0.059733,
-      "ev_rsi": -0.11384,
+      "ev_ema_fast": 0.0,
+      "ev_ema_stack": 0.0,
+      "ev_supertrend": 0.0,
+      "ev_macd": 0.0,
+      "ev_vwap": 0.0,
+      "ev_poc": 0.0,
+      "ev_value_area": 0.0,
+      "ev_rsi": 0.0,
       "ev_volume": 0.0,
       "ev_volatility": 0.0,
       "ev_order_flow": 0.0,
       "ev_book_imbalance": 0.0,
-      "ev_fusion": -0.508719
+      "ev_liq_magnet": 0.0,
+      "ev_fusion": 0.0
     }
   }
 }
