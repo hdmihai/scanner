@@ -58,6 +58,7 @@ import ccxt
 
 import crypto_ai_scanner as scanner
 import evidence as ev_mod
+import liquidation as liq_mod
 import plan_tracker
 
 DATA_DIR = "data"
@@ -210,8 +211,14 @@ def replay_symbol(symbol, candles, weights, start_id):
         # live - exact nepotrivirea pe care versionarea geometriei o previne.
         bt_ind = scanner.indicators.compute_all(window)
         bt_rsi = scanner.rsi([c[4] for c in window], 14)
+        # Aceeasi harta ca in live: se construieste din OHLCV, fara open
+        # interest. Forma clusterelor e identica; doar scalarea absoluta
+        # lipseste, iar deciziile nu depind de ea.
+        bt_liq = liq_mod.build_map(window, scored["price"])
+        bt_bias = liq_mod.magnet_bias(bt_liq, scored["price"], scored["direction"])
         bt_ev = ev_mod.build_evidence(bt_ind, scored["price"], scored["atr"],
-                                      bt_rsi, scored.get("components"))
+                                      bt_rsi, scored.get("components"),
+                                      liq=bt_liq, liq_bias=bt_bias)
         levels = scanner.compute_trade_plan(
             scored["direction"], scored["price"], scored["atr"], structure, fib)
         if not levels:
