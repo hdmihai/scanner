@@ -1,85 +1,85 @@
 {
-  "text": "Din 11 planuri inchise, rata de succes e 0.0%, cu -11.51R cumulat (-1.046R in medie pe plan) si profit factor 0.0. 14 planuri sunt inca deschise. Separat, 72841 planuri inchise (+917.88R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #73025 FLOW/USDT -1.05R, #73026 GRAM/USDT -1.08R, #73020 SOL/USDT -1.05R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 0)).",
+  "text": "Din 15 planuri inchise, rata de succes e 0.0%, cu -15.69R cumulat (-1.046R in medie pe plan) si profit factor 0.0. 15 planuri sunt inca deschise. Separat, 72841 planuri inchise (+917.88R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #73014 DOGE/USDT -1.05R, #73015 LINK/USDT -1.04R, #73018 ADA/USDT -1.03R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 0)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-17 15:23 UTC",
+    "scan_time": "2026-09-17 16:23 UTC",
     "universe_size": 28,
-    "plans_total": 73035,
-    "plans_open": 14,
-    "plans_closed": 11,
+    "plans_total": 73040,
+    "plans_open": 15,
+    "plans_closed": 15,
     "legacy_closed": 72841,
     "legacy_total_r": 917.88,
     "win_rate": 0.0,
-    "total_r": -11.51,
+    "total_r": -15.69,
     "avg_r": -1.046,
     "profit_factor": 0.0,
     "recent_closed": [
+      {
+        "id": 73014,
+        "symbol": "DOGE/USDT",
+        "direction": "SHORT",
+        "state": "SL HIT - INVALIDATED",
+        "r": -1.048
+      },
+      {
+        "id": 73015,
+        "symbol": "LINK/USDT",
+        "direction": "SHORT",
+        "state": "SL HIT - INVALIDATED",
+        "r": -1.038
+      },
+      {
+        "id": 73018,
+        "symbol": "ADA/USDT",
+        "direction": "SHORT",
+        "state": "SL HIT - INVALIDATED",
+        "r": -1.035
+      },
+      {
+        "id": 73021,
+        "symbol": "ETH/USDT",
+        "direction": "SHORT",
+        "state": "SL HIT - INVALIDATED",
+        "r": -1.054
+      },
       {
         "id": 73025,
         "symbol": "FLOW/USDT",
         "direction": "SHORT",
         "state": "SL HIT - INVALIDATED",
         "r": -1.047
-      },
-      {
-        "id": 73026,
-        "symbol": "GRAM/USDT",
-        "direction": "SHORT",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.083
-      },
-      {
-        "id": 73020,
-        "symbol": "SOL/USDT",
-        "direction": "SHORT",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.049
-      },
-      {
-        "id": 73013,
-        "symbol": "SEI/USDT",
-        "direction": "SHORT",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.046
-      },
-      {
-        "id": 73017,
-        "symbol": "SUI/USDT",
-        "direction": "SHORT",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.037
       }
     ],
     "open_now": [
       {
-        "id": 73035,
-        "symbol": "FLOW/USDT",
+        "id": 73040,
+        "symbol": "ETH/USDT",
         "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       },
       {
-        "id": 73034,
-        "symbol": "ATOM/USDT",
+        "id": 73039,
+        "symbol": "THETA/USDT",
         "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       },
       {
-        "id": 73033,
-        "symbol": "AXS/USDT",
+        "id": 73038,
+        "symbol": "LINK/USDT",
         "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       },
       {
-        "id": 73032,
-        "symbol": "ZEN/USDT",
-        "direction": "LONG",
+        "id": 73037,
+        "symbol": "ADA/USDT",
+        "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       },
       {
-        "id": 73031,
-        "symbol": "SEI/USDT",
+        "id": 73036,
+        "symbol": "DOGE/USDT",
         "direction": "SHORT",
-        "state": "INTRARE ATINSA - pozitie activa"
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
       }
     ],
     "best_bucket": null,
