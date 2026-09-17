@@ -1,19 +1,33 @@
 {
-  "text": "Din 9 planuri inchise, rata de succes e 0.0%, cu -9.38R cumulat (-1.042R in medie pe plan) si profit factor 0.0. 15 planuri sunt inca deschise. Separat, 72841 planuri inchise (+917.88R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #73020 SOL/USDT -1.05R, #73013 SEI/USDT -1.05R, #73017 SUI/USDT -1.04R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 0)).",
+  "text": "Din 11 planuri inchise, rata de succes e 0.0%, cu -11.51R cumulat (-1.046R in medie pe plan) si profit factor 0.0. 14 planuri sunt inca deschise. Separat, 72841 planuri inchise (+917.88R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #73025 FLOW/USDT -1.05R, #73026 GRAM/USDT -1.08R, #73020 SOL/USDT -1.05R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 0)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-17 11:22 UTC",
+    "scan_time": "2026-09-17 12:28 UTC",
     "universe_size": 28,
-    "plans_total": 73034,
-    "plans_open": 15,
-    "plans_closed": 9,
+    "plans_total": 73035,
+    "plans_open": 14,
+    "plans_closed": 11,
     "legacy_closed": 72841,
     "legacy_total_r": 917.88,
     "win_rate": 0.0,
-    "total_r": -9.38,
-    "avg_r": -1.042,
+    "total_r": -11.51,
+    "avg_r": -1.046,
     "profit_factor": 0.0,
     "recent_closed": [
+      {
+        "id": 73025,
+        "symbol": "FLOW/USDT",
+        "direction": "SHORT",
+        "state": "SL HIT - INVALIDATED",
+        "r": -1.047
+      },
+      {
+        "id": 73026,
+        "symbol": "GRAM/USDT",
+        "direction": "SHORT",
+        "state": "SL HIT - INVALIDATED",
+        "r": -1.083
+      },
       {
         "id": 73020,
         "symbol": "SOL/USDT",
@@ -34,23 +48,15 @@
         "direction": "SHORT",
         "state": "SL HIT - INVALIDATED",
         "r": -1.037
-      },
-      {
-        "id": 73028,
-        "symbol": "ALGO/USDT",
-        "direction": "SHORT",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.034
-      },
-      {
-        "id": 73022,
-        "symbol": "FET/USDT",
-        "direction": "SHORT",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.035
       }
     ],
     "open_now": [
+      {
+        "id": 73035,
+        "symbol": "FLOW/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
       {
         "id": 73034,
         "symbol": "ATOM/USDT",
@@ -73,13 +79,7 @@
         "id": 73031,
         "symbol": "SEI/USDT",
         "direction": "SHORT",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 73030,
-        "symbol": "FET/USDT",
-        "direction": "SHORT",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
+        "state": "INTRARE ATINSA - pozitie activa"
       }
     ],
     "best_bucket": null,
