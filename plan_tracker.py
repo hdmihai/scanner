@@ -46,10 +46,85 @@ import time
 from datetime import datetime, timezone
 
 DATA_DIR = "data"
+ARCHIVE_DIR = os.path.join(DATA_DIR, "archive")
+ARCHIVE_INDEX_FILE = os.path.join(ARCHIVE_DIR, "_index.json")
 PLANS_FILE = os.path.join(DATA_DIR, "plans.json")
 
 MAX_BARS = 48          # cate lumanari las un plan deschis (48 = 2 zile pe 1h)
 MIN_BUCKET_SAMPLES = 20  # sub atat, nu pronunt o probabilitate calibrata
+
+def _archive_filename(geometry):
+    safe = "".join(c if (c.isalnum() or c in "-_.") else "_" for c in geometry) or "unknown"
+    if len(safe) > 100:
+        # Nume de fisier limitat: gasit de testul de proprietati cu o geometrie
+        # de 300 de caractere, care arunca "File name too long" pe Linux (limita
+        # tipica 255 pentru intreaga cale). SCAN_TIMEFRAME e citit din mediu -
+        # o valoare custom neobisnuit de lunga nu trebuie sa poata crapa
+        # arhivarea intregii rulari. Hash-ul pastreaza unicitatea.
+        import hashlib
+        h = hashlib.sha256(geometry.encode("utf-8")).hexdigest()[:16]
+        safe = safe[:80] + "-" + h
+    return os.path.join(ARCHIVE_DIR, f"{safe}.json")
+
+
+def archive_stale_plans(store):
+    """Muta DEFINITIV planurile din geometrii vechi in fisiere de arhiva
+    separate, unul per geometrie. plans.json ramane cu DOAR geometria curenta.
+
+    DE CE ASTA, SI NU DOAR O GARDA DE DIMENSIUNE
+    ---------------------------------------------
+    Verificat pe date reale: 73.020 de planuri acumulate din 9 geometrii
+    anterioare (proiectul a schimbat geometria de 9 ori pana acum), plus
+    13.077 noi intr-o singura rulare de backtest - 86.097 in total, 100.83 MB,
+    respins de GitHub. O garda care doar TAIE cele mai vechi ID-uri cand se
+    depaseste un prag are un defect serios: daca se ruleaza backtest de doua
+    ori pe ACEEASI geometrie curenta, planurile din prima rulare au ID mai mic
+    decat cele din a doua. Daca totalul depaseste pragul, taierea le-ar elimina
+    pe cele din prima rulare - planuri din geometria ACTIVA, nu doar istoric
+    mort - stricand direct calibrarea, nu doar arhiva.
+
+    O geometrie veche e INCHISA definitiv: nu mai primeste NICIODATA planuri
+    noi dupa ce geometria curenta se schimba. Deci fiecare fisier de arhiva
+    are dimensiune FINITA garantat, iar plans.json ramane mereu mic - oricat
+    de multe schimbari de geometrie mai vin.
+
+    Fisierele de arhiva individuale raman disponibile pe disc pentru audit;
+    doar nu mai sunt pe calea critica de citire/scriere la fiecare rulare.
+    Un index mic (_index.json) tine count si R total per geometrie arhivata,
+    ca summarize() sa poata raporta legacy_total_r fara sa recitesca totul.
+    """
+    plans = store.get("plans") or []
+    keep, by_geo = [], {}
+    for p in plans:
+        geo = p.get("geometry", "v1")
+        (keep if geo == GEOMETRY_VERSION else by_geo.setdefault(geo, [])).append(p)
+
+    if not by_geo:
+        return 0
+
+    os.makedirs(ARCHIVE_DIR, exist_ok=True)
+    index = load_json(ARCHIVE_INDEX_FILE, {})
+    moved = 0
+    for geo, geo_plans in by_geo.items():
+        path = _archive_filename(geo)
+        existing = load_json(path, {"plans": []})
+        existing_ids = {p.get("id") for p in existing["plans"]}
+        fresh = [p for p in geo_plans if p.get("id") not in existing_ids]
+        if fresh:
+            existing["plans"].extend(fresh)
+            save_json(path, existing)
+            moved += len(fresh)
+        closed = [p for p in existing["plans"] if p.get("realized_r") is not None
+                 and p.get("state") != STATE_NO_ENTRY]
+        index[geo] = {
+            "count": len(existing["plans"]), "closed": len(closed),
+            "total_r": round(sum(p["realized_r"] for p in closed), 2),
+        }
+
+    store["plans"] = keep
+    save_json(ARCHIVE_INDEX_FILE, index)
+    return moved
+
 
 # POARTA DE DECIZIE: implicit DEZACTIVATA, pe baza de dovezi.
 #
@@ -243,6 +318,16 @@ def _strip_display_fields(store):
 
 
 def save_plans(store):
+    # ARHIVAREA vine INAINTEA gardei de dimensiune, nu dupa: o geometrie veche e
+    # inchisa definitiv, deci arhivarea completa e mereu sigura si mereu de
+    # dimensiune finita. Taierea oarba de mai jos ramane doar ca plasa de
+    # siguranta pentru cazul (rar) in care GEOMETRIA CURENTA singura ar
+    # depasi pragul - caz in care nu exista alta solutie decat sa astepti mai
+    # putine planuri per rulare sau sa muti memoria pe un fisier separat.
+    archived = archive_stale_plans(store)
+    if archived:
+        print(f"Arhivate {archived} planuri din geometrii vechi in {ARCHIVE_DIR}/ "
+              f"(plans.json pastreaza doar geometria curenta: {GEOMETRY_VERSION}).")
     _strip_display_fields(store)
     # separators compacte: `indent=2` aproape dubleaza dimensiunea pe fisiere
     # cu zeci de mii de inregistrari, fara niciun castig - nimeni nu citeste
@@ -670,8 +755,16 @@ def summarize(store):
     current_geo = [p for p in all_closed if p.get("geometry", "v1") == GEOMETRY_VERSION]
     no_entry = [p for p in current_geo if p.get("state") == STATE_NO_ENTRY]
     closed = [p for p in current_geo if p.get("state") != STATE_NO_ENTRY]
+    # Planurile legacy nu mai sunt in `plans` dupa archive_stale_plans - au fost
+    # mutate pe disc, in fisiere separate per geometrie. `legacy` de aici prinde
+    # doar ce a ramas NEARHIVAT inca in acest apel (rar: chiar planurile pe care
+    # save_plans le arhiveaza data viitoare). Restul vine din indexul de arhiva.
     legacy = [p for p in all_closed if p.get("geometry", "v1") != GEOMETRY_VERSION]
     open_plans = [p for p in plans if p["state"] not in CLOSED_STATES]
+
+    archived_idx = load_json(ARCHIVE_INDEX_FILE, {})
+    archived_closed = sum(v.get("closed", 0) for v in archived_idx.values())
+    archived_r = sum(v.get("total_r", 0.0) for v in archived_idx.values())
 
     total_r = sum(p["realized_r"] for p in closed)
     wins = [p for p in closed if p["realized_r"] > 0]
@@ -690,8 +783,9 @@ def summarize(store):
     return {
         "no_entry": len(no_entry),
         "no_entry_pct": round(100 * len(no_entry) / len(current_geo), 1) if current_geo else None,
-        "legacy_closed": len(legacy),
-        "legacy_total_r": round(sum(p["realized_r"] for p in legacy), 2) if legacy else None,
+        "legacy_closed": len(legacy) + archived_closed,
+        "legacy_total_r": round(sum(p["realized_r"] for p in legacy) + archived_r, 2)
+                          if (legacy or archived_closed) else None,
         "geometry": GEOMETRY_VERSION,
         "total_plans": len(plans),
         "open": len(open_plans),
