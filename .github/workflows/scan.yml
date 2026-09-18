@@ -113,6 +113,17 @@ jobs:
           GITHUB_PAGES_URL: https://hdmihai.github.io/scanner/
         run: python send_email_digest.py
 
+      - name: Compacteaza plans.json inainte de commit
+        # ULTIMUL pas inainte de commit, si singurul care garanteaza dimensiunea.
+        # Garda din plan_tracker.save_plans e ocolita de orice modul care scrie
+        # plans.json direct - backtest.py a facut exact asta si a produs 100.98 MB,
+        # respins de GitHub de doua ori. Un pas separat nu poate fi ocolit,
+        # indiferent ce versiune are fiecare fisier .py.
+        if: always()
+        env:
+          SCAN_TIMEFRAME: ${{ inputs.timeframe || '4h' }}
+        run: python compact_plans.py
+
       - name: Salveaza memoria (data/) si pagina (docs/) inapoi in repo
         # if: always() - ruleaza chiar daca un pas anterior a esuat. Altfel, o
         # eroare in metadata/email (ex: rate limit CoinGecko) ar omori job-ul
