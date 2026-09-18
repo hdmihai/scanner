@@ -574,7 +574,14 @@ def main():
         live["next_id"] = offset + len(all_plans)
         live["calibration"] = plan_tracker.build_calibration(live)
         live["summary"] = plan_tracker.summarize(live)
-        save_json(PLANS_FILE, live)
+        # BUG CRITIC: aici se scria cu save_json direct, ocolind COMPLET garda
+        # de dimensiune din plan_tracker.save_plans - exact motivul pentru care
+        # plans.json a ajuns la 100.83 MB si push-ul a fost respins de GitHub.
+        # save_plans() e singura functie care: (1) scrie compact, fara indent,
+        # (2) pastreaza lista de evidente doar pe ultimele KEEP_EVIDENCE_ON
+        # planuri, (3) taie automat cele mai vechi planuri daca tot depaseste
+        # SIZE_FAIL_MB. backtest.py trebuia sa treaca prin ea de la inceput.
+        plan_tracker.save_plans(live)
         print(f"\nAdaugate {len(all_plans)} planuri in {PLANS_FILE} (marcate source=backtest).")
         print("Ruleaza acum `python3 ai_agent.py` ca agentul sa invete din ele.")
     else:
