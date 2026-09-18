@@ -161,6 +161,60 @@ def check_timeframe_consistency():
             notes.append(f"scan.yml ruleaza implicit pe timeframe {s_def.group(1)}")
 
 
+def check_no_direct_plan_writes():
+    """Niciun modul nu are voie sa scrie plans.json altfel decat prin save_plans.
+
+    DE CE: garda de dimensiune si arhivarea traiesc in plan_tracker.save_plans().
+    Orice modul care scrie fisierul direct le ocoleste pe amandoua. backtest.py
+    a facut exact asta si a produs un plans.json de 100.98 MB, respins de GitHub
+    de doua ori - desi plan_tracker.py continea garda si `check_integrity` o
+    testa cu succes. Verificarea trecea, pentru ca testa functia, nu CINE o
+    apeleaza.
+    """
+    for name in sorted(os.listdir(ROOT)):
+        if not name.endswith(".py") or name in ("plan_tracker.py", "compact_plans.py",
+                                                "check_integrity.py"):
+            continue
+        src = read(name) or ""
+        for i, line in enumerate(src.split("\n"), 1):
+            stripped = line.strip()
+            if stripped.startswith("#"):
+                continue
+            if re.search(r"\bsave_json\s*\(\s*PLANS_FILE", stripped):
+                problems.append(
+                    f"{name}:{i} scrie plans.json direct cu save_json, ocolind "
+                    f"plan_tracker.save_plans() - deci ocolind arhivarea si garda "
+                    f"de dimensiune. Exact asta a produs 100.98 MB si push respins. "
+                    f"Foloseste plan_tracker.save_plans(store).")
+
+
+def check_compaction_step():
+    """Pasul de compactare trebuie sa existe si sa ruleze INAINTE de commit."""
+    wf_dir = os.path.join(ROOT, ".github", "workflows")
+    if not os.path.isdir(wf_dir):
+        return
+    if not os.path.exists(os.path.join(ROOT, "compact_plans.py")):
+        problems.append(
+            "compact_plans.py lipseste. E singurul mecanism care garanteaza "
+            "dimensiunea lui plans.json indiferent ce modul l-a scris.")
+        return
+    for name in sorted(os.listdir(wf_dir)):
+        if not name.endswith((".yml", ".yaml")):
+            continue
+        content = read(os.path.join(".github", "workflows", name)) or ""
+        if "git commit" not in content:
+            continue
+        if "compact_plans.py" not in content:
+            problems.append(
+                f"{name} face commit dar nu ruleaza compact_plans.py inainte. "
+                f"Fara el, un plans.json prea mare ajunge la push si e respins.")
+            continue
+        if content.index("compact_plans.py") > content.index("git commit"):
+            problems.append(
+                f"{name} ruleaza compact_plans.py DUPA git commit - prea tarziu. "
+                f"Trebuie sa fie inainte, altfel se comite fisierul necompactat.")
+
+
 def check_archival_behavior():
     """Verifica COMPORTAMENTAL ca arhivarea per geometrie chiar functioneaza -
     nu doar ca textul 'archive' apare undeva in sursa.
@@ -284,6 +338,8 @@ def main():
     check_agent_source_follows_geometry()
     check_decision_gate()
     check_archival_behavior()
+    check_no_direct_plan_writes()
+    check_compaction_step()
     check_timeframe_consistency()
     check_data_geometry_match()
 
