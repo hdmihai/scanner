@@ -149,6 +149,17 @@ jobs:
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Compacteaza plans.json inainte de commit
+        # ULTIMUL pas inainte de commit, si singurul care garanteaza dimensiunea.
+        # Garda din plan_tracker.save_plans e ocolita de orice modul care scrie
+        # plans.json direct - backtest.py a facut exact asta si a produs 100.98 MB,
+        # respins de GitHub de doua ori. Un pas separat nu poate fi ocolit,
+        # indiferent ce versiune are fiecare fisier .py.
+        if: always()
+        env:
+          SCAN_TIMEFRAME: ${{ inputs.timeframe || '4h' }}
+        run: python compact_plans.py
+
       - name: Salveaza rezultatele in repo
         # Doar la succes: daca backtest-ul a crapat la jumatate, nu vreau sa
         # comit un fisier scris partial peste datele bune.
