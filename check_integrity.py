@@ -161,6 +161,84 @@ def check_timeframe_consistency():
             notes.append(f"scan.yml ruleaza implicit pe timeframe {s_def.group(1)}")
 
 
+def check_archival_behavior():
+    """Verifica COMPORTAMENTAL ca arhivarea per geometrie chiar functioneaza -
+    nu doar ca textul 'archive' apare undeva in sursa.
+
+    DE CE COMPORTAMENTAL: verificarile pe text (cauta un nume de functie, un
+    cuvant cheie) au dat deja fals pozitiv o data in acest proiect - un
+    GEOMETRY_VERSION mutat intr-o functie tot trecea testul pe text, desi
+    comportamentul se schimbase. Aici construiesc un store mic cu planuri din
+    doua geometrii, rulez save_plans, si verific ce a ramas cu adevarat.
+
+    Motivul pentru care asta conteaza specific: plans.json a ajuns la 100.83 MB
+    si a fost respins de GitHub, in ciuda faptului ca o garda de dimensiune
+    exista in cod. check_integrity.py nu verifica pana acum daca acea garda
+    arhiveaza sau doar taie oarba - iar taierea oarba poate elimina planuri din
+    geometria ACTIVA daca se ruleaza backtest de mai multe ori pe rand.
+    """
+    import tempfile
+    sys.path.insert(0, ROOT)
+    for m in ("plan_tracker",):
+        globals().pop(m, None)
+    try:
+        import importlib
+        if "plan_tracker" in sys.modules:
+            importlib.reload(sys.modules["plan_tracker"])
+        import plan_tracker as pt
+    except Exception as exc:
+        problems.append(f"nu pot importa plan_tracker pentru testul de arhivare: {exc}")
+        return
+
+    if not hasattr(pt, "archive_stale_plans"):
+        problems.append(
+            "plan_tracker.py nu are archive_stale_plans(). Fara arhivare per "
+            "geometrie, planurile din geometrii vechi se acumuleaza la nesfarsit "
+            "in plans.json si il pot duce peste limita de 100 MB a GitHub - "
+            "exact ce s-a intamplat (86.097 planuri, 100.83 MB, push respins).")
+        return
+
+    with tempfile.TemporaryDirectory() as tmp:
+        orig_plans, orig_dir, orig_idx = pt.PLANS_FILE, pt.ARCHIVE_DIR, pt.ARCHIVE_INDEX_FILE
+        pt.PLANS_FILE = os.path.join(tmp, "plans.json")
+        pt.ARCHIVE_DIR = os.path.join(tmp, "archive")
+        pt.ARCHIVE_INDEX_FILE = os.path.join(pt.ARCHIVE_DIR, "_index.json")
+        try:
+            old_geo = "test-old-geometry"
+            store = {"next_id": 21, "plans": [
+                {"id": i, "symbol": "X", "direction": "LONG", "state": pt.STATE_SL,
+                 "realized_r": 0.5, "geometry": old_geo, "created_ts": i,
+                 "closed_ts": i + 1} for i in range(1, 11)
+            ] + [
+                {"id": i, "symbol": "X", "direction": "LONG", "state": pt.STATE_SL,
+                 "realized_r": 0.5, "geometry": pt.GEOMETRY_VERSION, "created_ts": i,
+                 "closed_ts": i + 1} for i in range(11, 21)
+            ]}
+            pt.save_plans(store)
+            remaining_geos = {p["geometry"] for p in store["plans"]}
+            if old_geo in remaining_geos:
+                problems.append(
+                    f"archive_stale_plans nu a mutat planurile din geometria veche "
+                    f"'{old_geo}' - au ramas in plans.json in loc sa fie arhivate.")
+            if pt.GEOMETRY_VERSION not in remaining_geos:
+                problems.append(
+                    "archive_stale_plans a eliminat din greseala planuri din "
+                    "GEOMETRY_VERSION curenta - ar trebui sa ramana toate.")
+            arch_path = pt._archive_filename(old_geo)
+            if not os.path.exists(arch_path):
+                problems.append(
+                    f"planurile din '{old_geo}' au disparut fara sa ajunga intr-un "
+                    f"fisier de arhiva - date pierdute, nu doar mutate.")
+            else:
+                arch = pt.load_json(arch_path, {"plans": []})
+                if len(arch.get("plans", [])) != 10:
+                    problems.append(
+                        f"arhiva pentru '{old_geo}' are {len(arch.get('plans', []))} "
+                        f"planuri, asteptam 10 - date pierdute la arhivare.")
+        finally:
+            pt.PLANS_FILE, pt.ARCHIVE_DIR, pt.ARCHIVE_INDEX_FILE = orig_plans, orig_dir, orig_idx
+
+
 def check_data_geometry_match():
     """Avertizez daca toate planurile salvate sunt din alta geometrie - atunci
     calibrarea porneste goala si agentul nu are din ce invata."""
@@ -205,6 +283,7 @@ def main():
     check_geometry_versioning()
     check_agent_source_follows_geometry()
     check_decision_gate()
+    check_archival_behavior()
     check_timeframe_consistency()
     check_data_geometry_match()
 
