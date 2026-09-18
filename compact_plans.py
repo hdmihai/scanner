@@ -114,13 +114,30 @@ def main():
     plans = store["plans"]
     geo = current_geometry()
 
+    # BUG FIX CRITIC: pastrez toata FAMILIA versiune+timeframe, nu doar
+    # semnatura exacta de capabilitati.
+    #
+    # Scanarea live detecteaza capabilitati reale (order book, trades) si produce
+    # geometria "v6-4h-obf". Backtest-ul, care nu are acces la ele, produce
+    # "v6-4h-o". compact_plans ruleaza fara SCAN_CAPS setat, deci calcula
+    # "v6-4h-o" si considera TOATE planurile live drept vechi - le arhiva si le
+    # stergea la fiecare rulare. Masurat in productie: "v6-4h-obf 47 planuri ->
+    # 0 planuri raman". Pierdere completa de date live, la fiecare ora.
+    #
+    # Familia = acelasi numar de versiune si acelasi timeframe. Calibrarea si
+    # agentul filtreaza in continuare pe semnatura EXACTA, deci separarea
+    # capabilitatilor ramane intacta - doar ca datele nu mai sunt sterse.
+    parts = geo.split("-")
+    family = "-".join(parts[:2]) + "-" if len(parts) >= 2 else geo
+
     keep, stale = [], {}
     for p in plans:
         g = p.get("geometry", "v1")
-        (keep if g == geo else stale.setdefault(g, [])).append(p)
+        (keep if g.startswith(family) else stale.setdefault(g, [])).append(p)
 
     print(f"plans.json: {before_mb:.2f} MB, {len(plans):,} planuri")
-    print(f"geometria curenta: {geo} -> {len(keep):,} planuri raman")
+    print(f"familia curenta: {family}* (geometria activa: {geo})")
+    print(f"  raman {len(keep):,} planuri")
     if stale:
         print(f"geometrii vechi de arhivat: {len(stale)}")
         for g in sorted(stale):
