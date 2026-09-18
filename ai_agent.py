@@ -612,7 +612,12 @@ def main():
         return
 
     new_samples = train_from_plans(plans, model, state)
-    save_json(PLANS_FILE, plans_store)  # persist marcajele agent_trained
+    # Prin plan_tracker.save_plans, nu save_json direct: aceeasi garda de
+    # dimensiune si aceeasi compactare ca peste tot unde se scrie plans.json.
+    # Nu adauga planuri noi aici, deci riscul e mai mic decat la merge, dar
+    # consecventa conteaza - un singur punct de adevar pentru "cum se scrie
+    # plans.json", nu patru variante care pot diverge.
+    plan_tracker.save_plans(plans_store)
 
     state["model"] = model.to_dict()
     active, reason = agent_is_active(state, plans)
