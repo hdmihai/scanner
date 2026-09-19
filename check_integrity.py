@@ -293,6 +293,67 @@ def check_archival_behavior():
             pt.PLANS_FILE, pt.ARCHIVE_DIR, pt.ARCHIVE_INDEX_FILE = orig_plans, orig_dir, orig_idx
 
 
+def check_family_preservation():
+    """Un proces care nu stie ce capabilitati a detectat alt proces nu are voie
+    sa-i stearga datele.
+
+    DE CE: scanarea live fixeaza geometria la v6-4h-obf dupa ce sondeaza bursa.
+    ai_agent.py si compact_plans.py ruleaza ca procese SEPARATE, fara SCAN_CAPS
+    in mediu, deci calculeaza v6-4h-o. Daca arhivarea compara semnatura EXACTA,
+    al doilea proces sterge tot ce a scris primul. Masurat: scanerul crea 7
+    planuri, ai_agent le arhiva pe toate, plans.json ramanea gol - tacut, la
+    fiecare rulare.
+
+    Testez COMPORTAMENTAL: planuri din doua semnaturi ale aceleiasi familii
+    trebuie sa supravietuiasca amandoua.
+    """
+    import tempfile, importlib
+    sys.path.insert(0, ROOT)
+    try:
+        if "plan_tracker" in sys.modules:
+            importlib.reload(sys.modules["plan_tracker"])
+        import plan_tracker as pt
+    except Exception as exc:
+        problems.append(f"nu pot importa plan_tracker: {exc}")
+        return
+
+    parts = pt.GEOMETRY_VERSION.split("-")
+    if len(parts) < 3:
+        notes.append(f"geometria {pt.GEOMETRY_VERSION} nu are forma vN-tf-caps")
+        return
+    sibling = "-".join(parts[:2]) + "-" + parts[2] + "bf"   # alta semnatura, aceeasi familie
+
+    with tempfile.TemporaryDirectory() as tmp:
+        orig = (pt.PLANS_FILE, pt.ARCHIVE_DIR, pt.ARCHIVE_INDEX_FILE)
+        pt.PLANS_FILE = os.path.join(tmp, "plans.json")
+        pt.ARCHIVE_DIR = os.path.join(tmp, "archive")
+        pt.ARCHIVE_INDEX_FILE = os.path.join(pt.ARCHIVE_DIR, "_index.json")
+        try:
+            store = {"next_id": 21, "plans": [
+                {"id": i, "symbol": "X", "direction": "LONG", "state": pt.STATE_SL,
+                 "realized_r": 0.5, "geometry": sibling, "created_ts": i,
+                 "closed_ts": i + 1} for i in range(1, 6)
+            ] + [
+                {"id": i, "symbol": "X", "direction": "LONG", "state": pt.STATE_SL,
+                 "realized_r": 0.5, "geometry": pt.GEOMETRY_VERSION, "created_ts": i,
+                 "closed_ts": i + 1} for i in range(6, 11)
+            ]}
+            pt.save_plans(store)
+            left = {p["geometry"] for p in store["plans"]}
+            if sibling not in left:
+                problems.append(
+                    f"save_plans a sters planurile cu geometria '{sibling}' desi e "
+                    f"din aceeasi familie ca '{pt.GEOMETRY_VERSION}'. Un proces "
+                    f"care ruleaza fara SCAN_CAPS ar distruge datele scrise de "
+                    f"scanarea live, tacut, la fiecare rulare.")
+            if len(store["plans"]) != 10:
+                problems.append(
+                    f"save_plans a pastrat {len(store['plans'])} din 10 planuri "
+                    f"ale familiei curente - pierdere de date.")
+        finally:
+            pt.PLANS_FILE, pt.ARCHIVE_DIR, pt.ARCHIVE_INDEX_FILE = orig
+
+
 def check_data_geometry_match():
     """Avertizez daca toate planurile salvate sunt din alta geometrie - atunci
     calibrarea porneste goala si agentul nu are din ce invata."""
@@ -338,6 +399,7 @@ def main():
     check_agent_source_follows_geometry()
     check_decision_gate()
     check_archival_behavior()
+    check_family_preservation()
     check_no_direct_plan_writes()
     check_compaction_step()
     check_timeframe_consistency()
