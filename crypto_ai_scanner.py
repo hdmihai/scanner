@@ -33,6 +33,7 @@ import plan_tracker
 import indicators
 import evidence as ev_mod
 import exchanges as ex_mod
+import liquidation as liq_mod
 import ai_agent
 import json
 import os
@@ -866,6 +867,13 @@ def main():
             "fibonacci": d_fib,
             "plan": compute_trade_plan(r["direction"], r["price"], r["atr"], d_struct, d_fib),
             "sparkline": [round_price(c) for c in d_closes[-SPARKLINE_BARS:]],
+            # harta de lichidari si pentru simbolurile din detalii, nu doar
+            # pentru cel mai bun candidat - dashboard-ul le arata pe toate
+            "liquidation": (lambda mp, bs: {"above": mp.get("above"),
+                                            "below": mp.get("below"), "bias": bs,
+                                            "oi_scaled": mp.get("oi_scaled")})(
+                *(lambda mp: (mp, liq_mod.magnet_bias(mp, r["price"], r["direction"])))(
+                    liq_mod.build_map(candles, r["price"]))),
         }
     save_json(DETAILS_FILE, {"scan_time": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
                              "exchange": exchange_id, "symbols": details})
@@ -996,6 +1004,14 @@ def main():
             },
             "current": best_plan,
             "locked": locked,
+            # Clusterele de lichidare pentru graficul principal: se deseneaza ca
+            # benzi orizontale cu intensitate, echivalentul vizual al heatmap-ului.
+            "liquidation": (lambda mp: {
+                "clusters": mp.get("clusters", [])[:16],
+                "above": mp.get("above"), "below": mp.get("below"),
+                "bias": liq_mod.magnet_bias(mp, best["price"], best["direction"]),
+                "oi_scaled": mp.get("oi_scaled")})(
+                    liq_mod.build_map(best_ohlcv, best["price"])),
             "structure": best_struct,
             "timeframe": CONFIG["timeframe"],
         })
@@ -1058,14 +1074,25 @@ def main():
         if liquidity and liquidity.get("bids") and liquidity.get("asks"):
             sig_book = {"bid_volume": sum(b["amount"] for b in liquidity["bids"]),
                         "ask_volume": sum(a["amount"] for a in liquidity["asks"])}
+        # HARTA DE LICHIDARI: construita din OHLCV, deci exista si in backtest.
+        # Open interest o scaleaza daca bursa il ofera, dar nu e obligatoriu -
+        # deciziile se iau pe densitate relativa, nu absoluta.
+        sig_oi = ex_mod.open_interest(exchange, sig["symbol"], active_caps)
+        sig_liq = liq_mod.build_map(candles, sig["price"], oi_weight=sig_oi)
+        sig_liq_bias = liq_mod.magnet_bias(sig_liq, sig["price"], sig["direction"])
         sig_evidence = ev_mod.build_evidence(sig_ind, sig["price"], sig["atr"],
                                              sig_rsi, sig.get("components"),
                                              flow=sig_flow, book=sig_book,
-                                             caps=active_caps)
+                                             caps=active_caps,
+                                             liq=sig_liq, liq_bias=sig_liq_bias)
         sig = {**sig,
                "evidence": sig_evidence,
                "fusion": ev_mod.fusion(sig_evidence, sig["direction"]),
                "indicators": sig_ind,
+               "liquidation": {"above": sig_liq.get("above"),
+                               "below": sig_liq.get("below"),
+                               "bias": sig_liq_bias,
+                               "oi_scaled": sig_liq.get("oi_scaled")},
                "components": {**(sig.get("components") or {}),
                               **ev_mod.evidence_features(sig_evidence, sig["direction"])}}
         if not levels:
