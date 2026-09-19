@@ -1,114 +1,47 @@
 {
-  "text": "Din 34 planuri inchise, rata de succes e 0.0%, cu -33.63R cumulat (-1.051R in medie pe plan) si profit factor 0.0. 13 planuri sunt inca deschise. Ultimele inchise: #73040 ETH/USDT -1.06R, #73043 XRP/USDT -1.03R, #73051 EGLD/USDT -1.04R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 0)).",
+  "text": "Niciun plan deschis inca. Agentul deschide planuri la primele semnale si incepe sa invete dupa ce acestea se inchid.",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-18 19:20 UTC",
+    "scan_time": "2026-09-19 00:28 UTC",
     "universe_size": 28,
-    "plans_total": 47,
-    "plans_open": 13,
-    "plans_closed": 34,
+    "plans_total": 0,
+    "plans_open": 0,
+    "plans_closed": 0,
     "legacy_closed": 0,
     "legacy_total_r": null,
-    "win_rate": 0.0,
-    "total_r": -33.63,
-    "avg_r": -1.051,
-    "profit_factor": 0.0,
-    "recent_closed": [
-      {
-        "id": 73040,
-        "symbol": "ETH/USDT",
-        "direction": "SHORT",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.057
-      },
-      {
-        "id": 73043,
-        "symbol": "XRP/USDT",
-        "direction": "SHORT",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.033
-      },
-      {
-        "id": 73051,
-        "symbol": "EGLD/USDT",
-        "direction": "SHORT",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.042
-      },
-      {
-        "id": 73052,
-        "symbol": "TRX/USDT",
-        "direction": "SHORT",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.249
-      },
-      {
-        "id": 73045,
-        "symbol": "ALGO/USDT",
-        "direction": "SHORT",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.038
-      }
-    ],
-    "open_now": [
-      {
-        "id": 73057,
-        "symbol": "SUI/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 73056,
-        "symbol": "THETA/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 73055,
-        "symbol": "FET/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 73054,
-        "symbol": "MANA/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 73053,
-        "symbol": "ZEC/USDT",
-        "direction": "LONG",
-        "state": "INTRARE ATINSA - pozitie activa"
-      }
-    ],
+    "win_rate": null,
+    "total_r": 0,
+    "avg_r": null,
+    "profit_factor": null,
+    "recent_closed": [],
+    "open_now": [],
     "best_bucket": null,
     "worst_bucket": null,
     "agent_status": "SHADOW",
-    "agent_reason": "are nevoie de 300 exemple (are 0)",
-    "agent_samples": 0,
-    "agent_balanced": null,
-    "baseline_balanced": null,
+    "agent_reason": "acuratetea 69.7% nu bate regula triviala 'prezice mereu clasa majoritara' (73.0%)",
+    "agent_samples": 9864,
+    "agent_balanced": 69.78895452085774,
+    "baseline_balanced": 32.39030491883304,
     "agent_weights": {
-      "trend": 0.0,
-      "momentum": 0.0,
-      "volatility": 0.0,
-      "volume": 0.0,
+      "trend": -0.082152,
+      "momentum": -0.016414,
+      "volatility": -0.279138,
+      "volume": -0.364943,
       "persistence_n": 0.0,
-      "ev_ema_fast": 0.0,
-      "ev_ema_stack": 0.0,
-      "ev_supertrend": 0.0,
-      "ev_macd": 0.0,
-      "ev_vwap": 0.0,
-      "ev_poc": 0.0,
-      "ev_value_area": 0.0,
-      "ev_rsi": 0.0,
+      "ev_ema_fast": -0.088387,
+      "ev_ema_stack": 0.764118,
+      "ev_supertrend": -0.058491,
+      "ev_macd": 0.419864,
+      "ev_vwap": 0.221528,
+      "ev_poc": 0.293786,
+      "ev_value_area": -0.044659,
+      "ev_rsi": -0.124638,
       "ev_volume": 0.0,
       "ev_volatility": 0.0,
       "ev_order_flow": 0.0,
       "ev_book_imbalance": 0.0,
-      "ev_liq_magnet": 0.0,
-      "ev_fusion": 0.0
+      "ev_liq_magnet": 0.079863,
+      "ev_fusion": -0.304856
     }
   }
 }
