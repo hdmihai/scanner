@@ -1,20 +1,40 @@
 {
-  "text": "14 planuri sunt deschise, niciunul inchis inca. Pana la primele inchideri nu pot spune nimic despre performanta - orice cifra ar fi speculatie. Separat, 13086 planuri inchise (+656.95R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (acuratetea 69.8% nu bate regula triviala 'prezice mereu clasa majoritara' (73.2%)).",
+  "text": "Din 1 planuri inchise, rata de succes e 0.0%, cu -1.07R cumulat (-1.069R in medie pe plan) si profit factor 0.0. 15 planuri sunt inca deschise. Separat, 13086 planuri inchise (+656.95R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #99320 GRAM/USDT -1.07R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (acuratetea 69.8% nu bate regula triviala 'prezice mereu clasa majoritara' (73.2%)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-19 15:20 UTC",
+    "scan_time": "2026-09-19 16:21 UTC",
     "universe_size": 28,
-    "plans_total": 13100,
-    "plans_open": 14,
-    "plans_closed": 0,
+    "plans_total": 13102,
+    "plans_open": 15,
+    "plans_closed": 1,
     "legacy_closed": 13086,
     "legacy_total_r": 656.95,
-    "win_rate": null,
-    "total_r": 0,
-    "avg_r": null,
-    "profit_factor": null,
-    "recent_closed": [],
+    "win_rate": 0.0,
+    "total_r": -1.07,
+    "avg_r": -1.069,
+    "profit_factor": 0.0,
+    "recent_closed": [
+      {
+        "id": 99320,
+        "symbol": "GRAM/USDT",
+        "direction": "SHORT",
+        "state": "SL HIT - INVALIDATED",
+        "r": -1.069
+      }
+    ],
     "open_now": [
+      {
+        "id": 99326,
+        "symbol": "CHZ/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 99325,
+        "symbol": "DOGE/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
       {
         "id": 99324,
         "symbol": "ETH/USDT",
@@ -31,18 +51,6 @@
         "id": 99322,
         "symbol": "LINK/USDT",
         "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 99321,
-        "symbol": "SEI/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 99320,
-        "symbol": "GRAM/USDT",
-        "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       }
     ],
