@@ -1,47 +1,78 @@
 {
-  "text": "Niciun plan deschis inca. Agentul deschide planuri la primele semnale si incepe sa invete dupa ce acestea se inchid.",
+  "text": "10 planuri sunt deschise, niciunul inchis inca. Pana la primele inchideri nu pot spune nimic despre performanta - orice cifra ar fi speculatie. Separat, 13086 planuri inchise (+656.95R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (acuratetea 69.8% nu bate regula triviala 'prezice mereu clasa majoritara' (73.2%)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-19 08:22 UTC",
+    "scan_time": "2026-09-19 10:21 UTC",
     "universe_size": 28,
-    "plans_total": 0,
-    "plans_open": 0,
+    "plans_total": 13096,
+    "plans_open": 10,
     "plans_closed": 0,
-    "legacy_closed": 0,
-    "legacy_total_r": null,
+    "legacy_closed": 13086,
+    "legacy_total_r": 656.95,
     "win_rate": null,
     "total_r": 0,
     "avg_r": null,
     "profit_factor": null,
     "recent_closed": [],
-    "open_now": [],
+    "open_now": [
+      {
+        "id": 99320,
+        "symbol": "GRAM/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 99319,
+        "symbol": "EGLD/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 99318,
+        "symbol": "GRT/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 99317,
+        "symbol": "AXS/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 99316,
+        "symbol": "FLOW/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      }
+    ],
     "best_bucket": null,
     "worst_bucket": null,
     "agent_status": "SHADOW",
-    "agent_reason": "acuratetea 69.7% nu bate regula triviala 'prezice mereu clasa majoritara' (73.0%)",
-    "agent_samples": 9864,
-    "agent_balanced": 69.78895452085774,
-    "baseline_balanced": 32.39030491883304,
+    "agent_reason": "acuratetea 69.8% nu bate regula triviala 'prezice mereu clasa majoritara' (73.2%)",
+    "agent_samples": 19728,
+    "agent_balanced": 69.88007232213674,
+    "baseline_balanced": 32.39976030141787,
     "agent_weights": {
-      "trend": -0.082152,
-      "momentum": -0.016414,
-      "volatility": -0.279138,
-      "volume": -0.364943,
+      "trend": -0.044071,
+      "momentum": -0.000212,
+      "volatility": -0.232086,
+      "volume": -0.303607,
       "persistence_n": 0.0,
-      "ev_ema_fast": -0.088387,
-      "ev_ema_stack": 0.764118,
-      "ev_supertrend": -0.058491,
-      "ev_macd": 0.419864,
-      "ev_vwap": 0.221528,
-      "ev_poc": 0.293786,
-      "ev_value_area": -0.044659,
-      "ev_rsi": -0.124638,
+      "ev_ema_fast": -0.100301,
+      "ev_ema_stack": 0.820768,
+      "ev_supertrend": 0.015732,
+      "ev_macd": 0.449853,
+      "ev_vwap": 0.309775,
+      "ev_poc": 0.334416,
+      "ev_value_area": -0.0222,
+      "ev_rsi": -0.112291,
       "ev_volume": 0.0,
       "ev_volatility": 0.0,
       "ev_order_flow": 0.0,
       "ev_book_imbalance": 0.0,
-      "ev_liq_magnet": 0.079863,
-      "ev_fusion": -0.304856
+      "ev_liq_magnet": 0.112803,
+      "ev_fusion": -0.4736
     }
   }
 }
