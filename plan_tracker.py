@@ -93,11 +93,27 @@ def archive_stale_plans(store):
     Un index mic (_index.json) tine count si R total per geometrie arhivata,
     ca summarize() sa poata raporta legacy_total_r fara sa recitesca totul.
     """
+    # BUG FIX CRITIC: pastrez toata FAMILIA versiune+timeframe, nu semnatura exacta.
+    #
+    # Scanarea live sondeaza bursa, detecteaza capabilitati si fixeaza geometria
+    # la v6-4h-obf prin set_capabilities(). Dar ai_agent.py ruleaza ca proces
+    # SEPARAT, fara SCAN_CAPS in mediu, deci GEOMETRY_VERSION e v6-4h-o acolo.
+    # Rezultatul masurat: scanerul crea 7 planuri, ai_agent le arhiva pe toate,
+    # si plans.json ramanea gol dupa fiecare rulare. Pierdere totala de date
+    # live, tacuta, la fiecare ora.
+    #
+    # Familia = acelasi numar de versiune si acelasi timeframe. Calibrarea si
+    # agentul filtreaza in continuare pe semnatura EXACTA, deci separarea pe
+    # capabilitati ramane intacta - doar ca datele nu mai sunt distruse de un
+    # proces care nu stie ce capabilitati a detectat alt proces.
+    parts = GEOMETRY_VERSION.split("-")
+    family = "-".join(parts[:2]) + "-" if len(parts) >= 2 else GEOMETRY_VERSION
+
     plans = store.get("plans") or []
     keep, by_geo = [], {}
     for p in plans:
         geo = p.get("geometry", "v1")
-        (keep if geo == GEOMETRY_VERSION else by_geo.setdefault(geo, [])).append(p)
+        (keep if geo.startswith(family) else by_geo.setdefault(geo, [])).append(p)
 
     if not by_geo:
         return 0
