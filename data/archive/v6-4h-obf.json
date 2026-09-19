@@ -7437,6 +7437,1351 @@
       },
       "geometry": "v6-4h-obf",
       "bar_seconds": 14400
+    },
+    {
+      "id": 86197,
+      "symbol": "AXS/USDT",
+      "direction": "LONG",
+      "created_ts": 1789799154.7904756,
+      "created_time": "2026-09-19 06:25 UTC",
+      "entry": 1.00595,
+      "signal_price": 1.0175,
+      "sl": 0.98285,
+      "tp1": 1.1275,
+      "tp2": 1.1704984,
+      "risk": 0.0231,
+      "planned_r_tp2": 7.12,
+      "state": "PENDING",
+      "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
+      "realized_r": null,
+      "closed_ts": null,
+      "bars_checked": 0,
+      "score_at_entry": 83,
+      "components": {
+        "trend": 0.424,
+        "momentum": 0.959,
+        "volatility": 0.865,
+        "volume": 1.0,
+        "ev_ema_fast": 0.5589,
+        "ev_ema_stack": 1.0,
+        "ev_supertrend": 0.7436,
+        "ev_macd": 0.8077,
+        "ev_vwap": 1.0,
+        "ev_poc": 0.9628,
+        "ev_value_area": 0.7,
+        "ev_rsi": -0.1889,
+        "ev_volume": 0.0,
+        "ev_volatility": 0.0,
+        "ev_order_flow": -0.27,
+        "ev_book_imbalance": -0.0559,
+        "ev_liq_magnet": 0.0,
+        "ev_fusion": 0.836
+      },
+      "persistence_at_entry": 2,
+      "decision": {
+        "action": "ISSUE",
+        "mode": "POARTA_DEZACTIVATA",
+        "reason": "poarta dezactivata: pe walk-forward a inrautatit rezultatul in 2 din 3 rulari",
+        "expected_value_r": null,
+        "calibrated_prob": null,
+        "agent_prob": 0.3505,
+        "agent_used": false
+      },
+      "evidence": [
+        {
+          "key": "ema_fast",
+          "label": "EMA 9 este peste EMA 20",
+          "direction": "LONG",
+          "strength": 0.5589,
+          "value": 1.118
+        },
+        {
+          "key": "ema_stack",
+          "label": "Structura EMA medie/lunga e ascendenta",
+          "direction": "LONG",
+          "strength": 1.0,
+          "value": "2/2"
+        },
+        {
+          "key": "supertrend",
+          "label": "SuperTrend confirma structura ascendenta",
+          "direction": "LONG",
+          "strength": 0.7436,
+          "value": 0.96596896
+        },
+        {
+          "key": "macd",
+          "label": "Histograma MACD e pozitiva",
+          "direction": "LONG",
+          "strength": 0.8077,
+          "value": 0.00932936
+        },
+        {
+          "key": "vwap",
+          "label": "Pretul e peste VWAP",
+          "direction": "LONG",
+          "strength": 1.0,
+          "value": 0.95152629
+        },
+        {
+          "key": "poc",
+          "label": "Pretul e peste POC",
+          "direction": "LONG",
+          "strength": 0.9628,
+          "value": 0.95078125
+        },
+        {
+          "key": "value_area",
+          "label": "Pretul e acceptat peste value area",
+          "direction": "LONG",
+          "strength": 0.7,
+          "value": "PESTE VAH"
+        },
+        {
+          "key": "rsi",
+          "label": "RSI supracumparat (74)",
+          "direction": "SHORT",
+          "strength": 0.1889,
+          "value": 73.8
+        },
+        {
+          "key": "order_flow",
+          "label": "Fluxul recent favorizeaza vanzatorii (58.1%)",
+          "direction": "SHORT",
+          "strength": 0.27,
+          "value": 58.1
+        },
+        {
+          "key": "book_imbalance",
+          "label": "Cartea de ordine e mai grea pe vanzare (51.4%)",
+          "direction": "SHORT",
+          "strength": 0.0559,
+          "value": 48.6
+        },
+        {
+          "key": "volume",
+          "label": "Volumul e peste media recenta",
+          "direction": "NEUTRU",
+          "strength": 1.0,
+          "value": 1.0
+        },
+        {
+          "key": "volatility",
+          "label": "Volatilitatea e in intervalul favorabil",
+          "direction": "NEUTRU",
+          "strength": 0.73,
+          "value": 0.865
+        }
+      ],
+      "fusion": {
+        "support": 7,
+        "oppose": 3,
+        "neutral": 2,
+        "support_weight": 5.773,
+        "oppose_weight": 0.515,
+        "score": 91.8
+      },
+      "neighbors": {
+        "n": 0,
+        "verdict": null,
+        "reason": "doar 0 intrari comparabile (prag 20)"
+      },
+      "geometry": "v6-4h-obf",
+      "bar_seconds": 14400
+    },
+    {
+      "id": 86198,
+      "symbol": "FLOW/USDT",
+      "direction": "LONG",
+      "created_ts": 1789799154.9751437,
+      "created_time": "2026-09-19 06:25 UTC",
+      "entry": 0.030231071,
+      "signal_price": 0.03063,
+      "sl": 0.029433214,
+      "tp1": 0.03121,
+      "tp2": 0.033821429,
+      "risk": 0.00079786,
+      "planned_r_tp2": 4.5,
+      "state": "PENDING",
+      "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
+      "realized_r": null,
+      "closed_ts": null,
+      "bars_checked": 0,
+      "score_at_entry": 78,
+      "components": {
+        "trend": 0.329,
+        "momentum": 0.969,
+        "volatility": 0.698,
+        "volume": 1.0,
+        "ev_ema_fast": 0.5313,
+        "ev_ema_stack": 0.0,
+        "ev_supertrend": 1.0,
+        "ev_macd": 0.9026,
+        "ev_vwap": 1.0,
+        "ev_poc": 0.833,
+        "ev_value_area": 0.7,
+        "ev_rsi": -0.2042,
+        "ev_volume": 0.0,
+        "ev_volatility": 0.0,
+        "ev_order_flow": -0.1833,
+        "ev_book_imbalance": -0.0559,
+        "ev_liq_magnet": 0.0,
+        "ev_fusion": 0.836
+      },
+      "persistence_at_entry": 14,
+      "decision": {
+        "action": "ISSUE",
+        "mode": "POARTA_DEZACTIVATA",
+        "reason": "poarta dezactivata: pe walk-forward a inrautatit rezultatul in 2 din 3 rulari",
+        "expected_value_r": null,
+        "calibrated_prob": null,
+        "agent_prob": 0.2082,
+        "agent_used": false
+      },
+      "evidence": [
+        {
+          "key": "ema_fast",
+          "label": "EMA 9 este peste EMA 20",
+          "direction": "LONG",
+          "strength": 0.5313,
+          "value": 1.063
+        },
+        {
+          "key": "supertrend",
+          "label": "SuperTrend confirma structura ascendenta",
+          "direction": "LONG",
+          "strength": 1.0,
+          "value": 0.02810442
+        },
+        {
+          "key": "macd",
+          "label": "Histograma MACD e pozitiva",
+          "direction": "LONG",
+          "strength": 0.9026,
+          "value": 0.00036009
+        },
+        {
+          "key": "vwap",
+          "label": "Pretul e peste VWAP",
+          "direction": "LONG",
+          "strength": 1.0,
+          "value": 0.02857684
+        },
+        {
+          "key": "poc",
+          "label": "Pretul e peste POC",
+          "direction": "LONG",
+          "strength": 0.833,
+          "value": 0.02863625
+        },
+        {
+          "key": "value_area",
+          "label": "Pretul e acceptat peste value area",
+          "direction": "LONG",
+          "strength": 0.7,
+          "value": "PESTE VAH"
+        },
+        {
+          "key": "rsi",
+          "label": "RSI supracumparat (74)",
+          "direction": "SHORT",
+          "strength": 0.2042,
+          "value": 74.1
+        },
+        {
+          "key": "order_flow",
+          "label": "Fluxul recent favorizeaza vanzatorii (55.5%)",
+          "direction": "SHORT",
+          "strength": 0.1833,
+          "value": 55.5
+        },
+        {
+          "key": "book_imbalance",
+          "label": "Cartea de ordine e mai grea pe vanzare (51.4%)",
+          "direction": "SHORT",
+          "strength": 0.0559,
+          "value": 48.6
+        },
+        {
+          "key": "volume",
+          "label": "Volumul e peste media recenta",
+          "direction": "NEUTRU",
+          "strength": 1.0,
+          "value": 1.0
+        },
+        {
+          "key": "volatility",
+          "label": "Volatilitatea e in intervalul favorabil",
+          "direction": "NEUTRU",
+          "strength": 0.396,
+          "value": 0.698
+        }
+      ],
+      "fusion": {
+        "support": 6,
+        "oppose": 3,
+        "neutral": 2,
+        "support_weight": 4.967,
+        "oppose_weight": 0.443,
+        "score": 91.8
+      },
+      "neighbors": {
+        "n": 0,
+        "verdict": null,
+        "reason": "doar 0 intrari comparabile (prag 20)"
+      },
+      "geometry": "v6-4h-obf",
+      "bar_seconds": 14400
+    },
+    {
+      "id": 86199,
+      "symbol": "POL/USDT",
+      "direction": "LONG",
+      "created_ts": 1789799155.1578636,
+      "created_time": "2026-09-19 06:25 UTC",
+      "entry": 0.10556107,
+      "signal_price": 0.10724,
+      "sl": 0.10220321,
+      "tp1": 0.12133,
+      "tp2": 0.12300893,
+      "risk": 0.00335786,
+      "planned_r_tp2": 5.2,
+      "state": "PENDING",
+      "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
+      "realized_r": null,
+      "closed_ts": null,
+      "bars_checked": 0,
+      "score_at_entry": 70,
+      "components": {
+        "trend": 0.442,
+        "momentum": 0.842,
+        "volatility": 0.434,
+        "volume": 1.0,
+        "ev_ema_fast": 0.4538,
+        "ev_ema_stack": 1.0,
+        "ev_supertrend": 0.9456,
+        "ev_macd": 0.7443,
+        "ev_vwap": 1.0,
+        "ev_poc": 1.0,
+        "ev_value_area": 0.0,
+        "ev_rsi": -0.0136,
+        "ev_volume": 0.0,
+        "ev_volatility": 0.0,
+        "ev_order_flow": 0.4933,
+        "ev_book_imbalance": -0.0559,
+        "ev_liq_magnet": 0.0,
+        "ev_fusion": 0.976
+      },
+      "persistence_at_entry": 22,
+      "decision": {
+        "action": "ISSUE",
+        "mode": "POARTA_DEZACTIVATA",
+        "reason": "poarta dezactivata: pe walk-forward a inrautatit rezultatul in 2 din 3 rulari",
+        "expected_value_r": null,
+        "calibrated_prob": null,
+        "agent_prob": 0.3664,
+        "agent_used": false
+      },
+      "evidence": [
+        {
+          "key": "ema_fast",
+          "label": "EMA 9 este peste EMA 20",
+          "direction": "LONG",
+          "strength": 0.4538,
+          "value": 0.908
+        },
+        {
+          "key": "ema_stack",
+          "label": "Structura EMA medie/lunga e ascendenta",
+          "direction": "LONG",
+          "strength": 1.0,
+          "value": "2/2"
+        },
+        {
+          "key": "supertrend",
+          "label": "SuperTrend confirma structura ascendenta",
+          "direction": "LONG",
+          "strength": 0.9456,
+          "value": 0.09771468
+        },
+        {
+          "key": "macd",
+          "label": "Histograma MACD e pozitiva",
+          "direction": "LONG",
+          "strength": 0.7443,
+          "value": 0.00124962
+        },
+        {
+          "key": "vwap",
+          "label": "Pretul e peste VWAP",
+          "direction": "LONG",
+          "strength": 1.0,
+          "value": 0.09657576
+        },
+        {
+          "key": "poc",
+          "label": "Pretul e peste POC",
+          "direction": "LONG",
+          "strength": 1.0,
+          "value": 0.09585646
+        },
+        {
+          "key": "value_area",
+          "label": "Pretul e in interiorul value area",
+          "direction": "NEUTRU",
+          "strength": 0.3,
+          "value": "IN VALUE AREA"
+        },
+        {
+          "key": "rsi",
+          "label": "RSI supracumparat (70)",
+          "direction": "SHORT",
+          "strength": 0.0136,
+          "value": 70.3
+        },
+        {
+          "key": "order_flow",
+          "label": "Fluxul recent favorizeaza cumparatorii (64.8%)",
+          "direction": "LONG",
+          "strength": 0.4933,
+          "value": 35.2
+        },
+        {
+          "key": "book_imbalance",
+          "label": "Cartea de ordine e mai grea pe vanzare (51.4%)",
+          "direction": "SHORT",
+          "strength": 0.0559,
+          "value": 48.6
+        },
+        {
+          "key": "volume",
+          "label": "Volumul e peste media recenta",
+          "direction": "NEUTRU",
+          "strength": 1.0,
+          "value": 1.0
+        },
+        {
+          "key": "volatility",
+          "label": "Volatilitatea e in afara intervalului favorabil",
+          "direction": "NEUTRU",
+          "strength": 0.132,
+          "value": 0.434
+        }
+      ],
+      "fusion": {
+        "support": 7,
+        "oppose": 2,
+        "neutral": 3,
+        "support_weight": 5.637,
+        "oppose_weight": 0.069,
+        "score": 98.8
+      },
+      "neighbors": {
+        "n": 0,
+        "verdict": null,
+        "reason": "doar 0 intrari comparabile (prag 20)"
+      },
+      "geometry": "v6-4h-obf",
+      "bar_seconds": 14400
+    },
+    {
+      "id": 86200,
+      "symbol": "DOGE/USDT",
+      "direction": "LONG",
+      "created_ts": 1789799155.3473928,
+      "created_time": "2026-09-19 06:25 UTC",
+      "entry": 0.087267143,
+      "signal_price": 0.08805,
+      "sl": 0.085701429,
+      "tp1": 0.0945,
+      "tp2": 0.1054924,
+      "risk": 0.00156571,
+      "planned_r_tp2": 11.64,
+      "state": "PENDING",
+      "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
+      "realized_r": null,
+      "closed_ts": null,
+      "bars_checked": 0,
+      "score_at_entry": 67,
+      "components": {
+        "trend": 0.049,
+        "momentum": 0.906,
+        "volatility": 0.889,
+        "volume": 0.68,
+        "ev_ema_fast": 0.5192,
+        "ev_ema_stack": 0.0,
+        "ev_supertrend": 1.0,
+        "ev_macd": 1.0,
+        "ev_vwap": 0.6431,
+        "ev_poc": 0.7484,
+        "ev_value_area": 0.0,
+        "ev_rsi": -0.1086,
+        "ev_volume": 0.0,
+        "ev_volatility": 0.0,
+        "ev_order_flow": -1.0,
+        "ev_book_imbalance": -0.0559,
+        "ev_liq_magnet": 0.0,
+        "ev_fusion": 0.5419999999999999
+      },
+      "persistence_at_entry": 2,
+      "decision": {
+        "action": "ISSUE",
+        "mode": "POARTA_DEZACTIVATA",
+        "reason": "poarta dezactivata: pe walk-forward a inrautatit rezultatul in 2 din 3 rulari",
+        "expected_value_r": null,
+        "calibrated_prob": null,
+        "agent_prob": 0.2313,
+        "agent_used": false
+      },
+      "evidence": [
+        {
+          "key": "ema_fast",
+          "label": "EMA 9 este peste EMA 20",
+          "direction": "LONG",
+          "strength": 0.5192,
+          "value": 1.038
+        },
+        {
+          "key": "supertrend",
+          "label": "SuperTrend confirma structura ascendenta",
+          "direction": "LONG",
+          "strength": 1.0,
+          "value": 0.0831068
+        },
+        {
+          "key": "macd",
+          "label": "Histograma MACD e pozitiva",
+          "direction": "LONG",
+          "strength": 1.0,
+          "value": 0.00087029
+        },
+        {
+          "key": "vwap",
+          "label": "Pretul e peste VWAP",
+          "direction": "LONG",
+          "strength": 0.6431,
+          "value": 0.08603607
+        },
+        {
+          "key": "poc",
+          "label": "Pretul e peste POC",
+          "direction": "LONG",
+          "strength": 0.7484,
+          "value": 0.08453458
+        },
+        {
+          "key": "value_area",
+          "label": "Pretul e in interiorul value area",
+          "direction": "NEUTRU",
+          "strength": 0.3,
+          "value": "IN VALUE AREA"
+        },
+        {
+          "key": "rsi",
+          "label": "RSI supracumparat (72)",
+          "direction": "SHORT",
+          "strength": 0.1086,
+          "value": 72.2
+        },
+        {
+          "key": "order_flow",
+          "label": "Fluxul recent favorizeaza vanzatorii (81.2%)",
+          "direction": "SHORT",
+          "strength": 1.0,
+          "value": 81.2
+        },
+        {
+          "key": "book_imbalance",
+          "label": "Cartea de ordine e mai grea pe vanzare (51.4%)",
+          "direction": "SHORT",
+          "strength": 0.0559,
+          "value": 48.6
+        },
+        {
+          "key": "volume",
+          "label": "Volumul e peste media recenta",
+          "direction": "NEUTRU",
+          "strength": 0.36,
+          "value": 0.68
+        },
+        {
+          "key": "volatility",
+          "label": "Volatilitatea e in intervalul favorabil",
+          "direction": "NEUTRU",
+          "strength": 0.778,
+          "value": 0.889
+        }
+      ],
+      "fusion": {
+        "support": 5,
+        "oppose": 3,
+        "neutral": 3,
+        "support_weight": 3.911,
+        "oppose_weight": 1.165,
+        "score": 77.1
+      },
+      "neighbors": {
+        "n": 0,
+        "verdict": null,
+        "reason": "doar 0 intrari comparabile (prag 20)"
+      },
+      "geometry": "v6-4h-obf",
+      "bar_seconds": 14400
+    },
+    {
+      "id": 86201,
+      "symbol": "LINK/USDT",
+      "direction": "LONG",
+      "created_ts": 1789799155.5225623,
+      "created_time": "2026-09-19 06:25 UTC",
+      "entry": 12.274643,
+      "signal_price": 12.401,
+      "sl": 12.021929,
+      "tp1": 12.614,
+      "tp2": 13.411857,
+      "risk": 0.252714,
+      "planned_r_tp2": 4.5,
+      "state": "PENDING",
+      "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
+      "realized_r": null,
+      "closed_ts": null,
+      "bars_checked": 0,
+      "score_at_entry": 67,
+      "components": {
+        "trend": 0.174,
+        "momentum": 0.897,
+        "volatility": 0.981,
+        "volume": 0.492,
+        "ev_ema_fast": 0.6072,
+        "ev_ema_stack": 1.0,
+        "ev_supertrend": 1.0,
+        "ev_macd": 1.0,
+        "ev_vwap": 1.0,
+        "ev_poc": 1.0,
+        "ev_value_area": 0.7,
+        "ev_rsi": -0.0951,
+        "ev_volume": 0.0,
+        "ev_volatility": 0.0,
+        "ev_order_flow": -1.0,
+        "ev_book_imbalance": -0.0559,
+        "ev_liq_magnet": 0.0,
+        "ev_fusion": 0.6919999999999998
+      },
+      "persistence_at_entry": 6,
+      "decision": {
+        "action": "ISSUE",
+        "mode": "POARTA_DEZACTIVATA",
+        "reason": "poarta dezactivata: pe walk-forward a inrautatit rezultatul in 2 din 3 rulari",
+        "expected_value_r": null,
+        "calibrated_prob": null,
+        "agent_prob": 0.4164,
+        "agent_used": false
+      },
+      "evidence": [
+        {
+          "key": "ema_fast",
+          "label": "EMA 9 este peste EMA 20",
+          "direction": "LONG",
+          "strength": 0.6072,
+          "value": 1.214
+        },
+        {
+          "key": "ema_stack",
+          "label": "Structura EMA medie/lunga e ascendenta",
+          "direction": "LONG",
+          "strength": 1.0,
+          "value": "2/2"
+        },
+        {
+          "key": "supertrend",
+          "label": "SuperTrend confirma structura ascendenta",
+          "direction": "LONG",
+          "strength": 1.0,
+          "value": 11.55324326
+        },
+        {
+          "key": "macd",
+          "label": "Histograma MACD e pozitiva",
+          "direction": "LONG",
+          "strength": 1.0,
+          "value": 0.14433161
+        },
+        {
+          "key": "vwap",
+          "label": "Pretul e peste VWAP",
+          "direction": "LONG",
+          "strength": 1.0,
+          "value": 11.87142752
+        },
+        {
+          "key": "poc",
+          "label": "Pretul e peste POC",
+          "direction": "LONG",
+          "strength": 1.0,
+          "value": 11.4188125
+        },
+        {
+          "key": "value_area",
+          "label": "Pretul e acceptat peste value area",
+          "direction": "LONG",
+          "strength": 0.7,
+          "value": "PESTE VAH"
+        },
+        {
+          "key": "rsi",
+          "label": "RSI supracumparat (72)",
+          "direction": "SHORT",
+          "strength": 0.0951,
+          "value": 71.9
+        },
+        {
+          "key": "order_flow",
+          "label": "Fluxul recent favorizeaza vanzatorii (81.2%)",
+          "direction": "SHORT",
+          "strength": 1.0,
+          "value": 81.2
+        },
+        {
+          "key": "book_imbalance",
+          "label": "Cartea de ordine e mai grea pe vanzare (51.4%)",
+          "direction": "SHORT",
+          "strength": 0.0559,
+          "value": 48.6
+        },
+        {
+          "key": "volume",
+          "label": "Volumul e sub media recenta",
+          "direction": "NEUTRU",
+          "strength": 0.016,
+          "value": 0.492
+        },
+        {
+          "key": "volatility",
+          "label": "Volatilitatea e in intervalul favorabil",
+          "direction": "NEUTRU",
+          "strength": 0.962,
+          "value": 0.981
+        }
+      ],
+      "fusion": {
+        "support": 7,
+        "oppose": 3,
+        "neutral": 2,
+        "support_weight": 6.307,
+        "oppose_weight": 1.151,
+        "score": 84.6
+      },
+      "neighbors": {
+        "n": 0,
+        "verdict": null,
+        "reason": "doar 0 intrari comparabile (prag 20)"
+      },
+      "geometry": "v6-4h-obf",
+      "bar_seconds": 14400
+    },
+    {
+      "id": 86202,
+      "symbol": "ZEN/USDT",
+      "direction": "LONG",
+      "created_ts": 1789799155.7266464,
+      "created_time": "2026-09-19 06:25 UTC",
+      "entry": 7.9531786,
+      "signal_price": 8.15,
+      "sl": 7.5595357,
+      "tp1": 8.3468214,
+      "tp2": 9.7245714,
+      "risk": 0.3936429,
+      "planned_r_tp2": 4.5,
+      "state": "PENDING",
+      "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
+      "realized_r": null,
+      "closed_ts": null,
+      "bars_checked": 0,
+      "score_at_entry": 66,
+      "components": {
+        "trend": 1.0,
+        "momentum": 0.921,
+        "volatility": 0.0,
+        "volume": 0.563,
+        "ev_ema_fast": 0.5194,
+        "ev_ema_stack": 1.0,
+        "ev_supertrend": 0.8787,
+        "ev_macd": 0.6615,
+        "ev_vwap": 1.0,
+        "ev_poc": 0.8965,
+        "ev_value_area": 0.7,
+        "ev_rsi": -0.131,
+        "ev_volume": 0.0,
+        "ev_volatility": 0.0,
+        "ev_order_flow": -0.4767,
+        "ev_book_imbalance": -0.0559,
+        "ev_liq_magnet": 0.0,
+        "ev_fusion": 0.79
+      },
+      "persistence_at_entry": 2,
+      "decision": {
+        "action": "ISSUE",
+        "mode": "POARTA_DEZACTIVATA",
+        "reason": "poarta dezactivata: pe walk-forward a inrautatit rezultatul in 2 din 3 rulari",
+        "expected_value_r": null,
+        "calibrated_prob": null,
+        "agent_prob": 0.4156,
+        "agent_used": false
+      },
+      "evidence": [
+        {
+          "key": "ema_fast",
+          "label": "EMA 9 este peste EMA 20",
+          "direction": "LONG",
+          "strength": 0.5194,
+          "value": 1.039
+        },
+        {
+          "key": "ema_stack",
+          "label": "Structura EMA medie/lunga e ascendenta",
+          "direction": "LONG",
+          "strength": 1.0,
+          "value": "2/2"
+        },
+        {
+          "key": "supertrend",
+          "label": "SuperTrend confirma structura ascendenta",
+          "direction": "LONG",
+          "strength": 0.8787,
+          "value": 7.11231335
+        },
+        {
+          "key": "macd",
+          "label": "Histograma MACD e pozitiva",
+          "direction": "LONG",
+          "strength": 0.6615,
+          "value": 0.13018969
+        },
+        {
+          "key": "vwap",
+          "label": "Pretul e peste VWAP",
+          "direction": "LONG",
+          "strength": 1.0,
+          "value": 7.04202966
+        },
+        {
+          "key": "poc",
+          "label": "Pretul e peste POC",
+          "direction": "LONG",
+          "strength": 0.8965,
+          "value": 7.09125
+        },
+        {
+          "key": "value_area",
+          "label": "Pretul e acceptat peste value area",
+          "direction": "LONG",
+          "strength": 0.7,
+          "value": "PESTE VAH"
+        },
+        {
+          "key": "rsi",
+          "label": "RSI supracumparat (73)",
+          "direction": "SHORT",
+          "strength": 0.131,
+          "value": 72.6
+        },
+        {
+          "key": "order_flow",
+          "label": "Fluxul recent favorizeaza vanzatorii (64.3%)",
+          "direction": "SHORT",
+          "strength": 0.4767,
+          "value": 64.3
+        },
+        {
+          "key": "book_imbalance",
+          "label": "Cartea de ordine e mai grea pe vanzare (51.4%)",
+          "direction": "SHORT",
+          "strength": 0.0559,
+          "value": 48.6
+        },
+        {
+          "key": "volume",
+          "label": "Volumul e peste media recenta",
+          "direction": "NEUTRU",
+          "strength": 0.126,
+          "value": 0.563
+        },
+        {
+          "key": "volatility",
+          "label": "Volatilitatea e in afara intervalului favorabil",
+          "direction": "NEUTRU",
+          "strength": 1.0,
+          "value": 0.0
+        }
+      ],
+      "fusion": {
+        "support": 7,
+        "oppose": 3,
+        "neutral": 2,
+        "support_weight": 5.656,
+        "oppose_weight": 0.664,
+        "score": 89.5
+      },
+      "neighbors": {
+        "n": 0,
+        "verdict": null,
+        "reason": "doar 0 intrari comparabile (prag 20)"
+      },
+      "geometry": "v6-4h-obf",
+      "bar_seconds": 14400
+    },
+    {
+      "id": 86203,
+      "symbol": "DOT/USDT",
+      "direction": "LONG",
+      "created_ts": 1789799155.9109743,
+      "created_time": "2026-09-19 06:25 UTC",
+      "entry": 1.13085,
+      "signal_price": 1.1491,
+      "sl": 1.09435,
+      "tp1": 1.2839,
+      "tp2": 1.5595898,
+      "risk": 0.0365,
+      "planned_r_tp2": 11.75,
+      "state": "PENDING",
+      "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
+      "realized_r": null,
+      "closed_ts": null,
+      "bars_checked": 0,
+      "score_at_entry": 65,
+      "components": {
+        "trend": 0.615,
+        "momentum": 0.905,
+        "volatility": 0.412,
+        "volume": 0.509,
+        "ev_ema_fast": 0.5335,
+        "ev_ema_stack": 1.0,
+        "ev_supertrend": 1.0,
+        "ev_macd": 0.676,
+        "ev_vwap": 1.0,
+        "ev_poc": 1.0,
+        "ev_value_area": 0.7,
+        "ev_rsi": -0.1068,
+        "ev_volume": 0.0,
+        "ev_volatility": 0.0,
+        "ev_order_flow": -0.75,
+        "ev_book_imbalance": -0.0559,
+        "ev_liq_magnet": 0.0,
+        "ev_fusion": 0.7319999999999999
+      },
+      "persistence_at_entry": 14,
+      "decision": {
+        "action": "ISSUE",
+        "mode": "POARTA_DEZACTIVATA",
+        "reason": "poarta dezactivata: pe walk-forward a inrautatit rezultatul in 2 din 3 rulari",
+        "expected_value_r": null,
+        "calibrated_prob": null,
+        "agent_prob": 0.4106,
+        "agent_used": false
+      },
+      "evidence": [
+        {
+          "key": "ema_fast",
+          "label": "EMA 9 este peste EMA 20",
+          "direction": "LONG",
+          "strength": 0.5335,
+          "value": 1.067
+        },
+        {
+          "key": "ema_stack",
+          "label": "Structura EMA medie/lunga e ascendenta",
+          "direction": "LONG",
+          "strength": 1.0,
+          "value": "2/2"
+        },
+        {
+          "key": "supertrend",
+          "label": "SuperTrend confirma structura ascendenta",
+          "direction": "LONG",
+          "strength": 1.0,
+          "value": 1.03891833
+        },
+        {
+          "key": "macd",
+          "label": "Histograma MACD e pozitiva",
+          "direction": "LONG",
+          "strength": 0.676,
+          "value": 0.01233727
+        },
+        {
+          "key": "vwap",
+          "label": "Pretul e peste VWAP",
+          "direction": "LONG",
+          "strength": 1.0,
+          "value": 1.05128406
+        },
+        {
+          "key": "poc",
+          "label": "Pretul e peste POC",
+          "direction": "LONG",
+          "strength": 1.0,
+          "value": 0.87476458
+        },
+        {
+          "key": "value_area",
+          "label": "Pretul e acceptat peste value area",
+          "direction": "LONG",
+          "strength": 0.7,
+          "value": "PESTE VAH"
+        },
+        {
+          "key": "rsi",
+          "label": "RSI supracumparat (72)",
+          "direction": "SHORT",
+          "strength": 0.1068,
+          "value": 72.1
+        },
+        {
+          "key": "order_flow",
+          "label": "Fluxul recent favorizeaza vanzatorii (72.5%)",
+          "direction": "SHORT",
+          "strength": 0.75,
+          "value": 72.5
+        },
+        {
+          "key": "book_imbalance",
+          "label": "Cartea de ordine e mai grea pe vanzare (51.4%)",
+          "direction": "SHORT",
+          "strength": 0.0559,
+          "value": 48.6
+        },
+        {
+          "key": "volume",
+          "label": "Volumul e peste media recenta",
+          "direction": "NEUTRU",
+          "strength": 0.018,
+          "value": 0.509
+        },
+        {
+          "key": "volatility",
+          "label": "Volatilitatea e in afara intervalului favorabil",
+          "direction": "NEUTRU",
+          "strength": 0.176,
+          "value": 0.412
+        }
+      ],
+      "fusion": {
+        "support": 7,
+        "oppose": 3,
+        "neutral": 2,
+        "support_weight": 5.91,
+        "oppose_weight": 0.913,
+        "score": 86.6
+      },
+      "neighbors": {
+        "n": 0,
+        "verdict": null,
+        "reason": "doar 0 intrari comparabile (prag 20)"
+      },
+      "geometry": "v6-4h-obf",
+      "bar_seconds": 14400
+    },
+    {
+      "id": 86204,
+      "symbol": "ZEC/USDT",
+      "direction": "LONG",
+      "created_ts": 1789799156.1038978,
+      "created_time": "2026-09-19 06:25 UTC",
+      "entry": 1497.2496,
+      "signal_price": 1533.24,
+      "sl": 1425.2689,
+      "tp1": 1569.2304,
+      "tp2": 1821.1629,
+      "risk": 71.9807,
+      "planned_r_tp2": 4.5,
+      "state": "PENDING",
+      "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
+      "realized_r": null,
+      "closed_ts": null,
+      "bars_checked": 0,
+      "score_at_entry": 58,
+      "components": {
+        "trend": 1.0,
+        "momentum": 0.837,
+        "volatility": 0.0,
+        "volume": 0.339,
+        "ev_ema_fast": 0.5692,
+        "ev_ema_stack": 1.0,
+        "ev_supertrend": 0.8649,
+        "ev_macd": 0.2403,
+        "ev_vwap": 1.0,
+        "ev_poc": 1.0,
+        "ev_value_area": 0.7,
+        "ev_rsi": -0.0057,
+        "ev_volume": 0.0,
+        "ev_volatility": 0.0,
+        "ev_order_flow": -0.44,
+        "ev_book_imbalance": -0.0559,
+        "ev_liq_magnet": 0.0,
+        "ev_fusion": 0.83
+      },
+      "persistence_at_entry": 18,
+      "decision": {
+        "action": "ISSUE",
+        "mode": "POARTA_DEZACTIVATA",
+        "reason": "poarta dezactivata: pe walk-forward a inrautatit rezultatul in 2 din 3 rulari",
+        "expected_value_r": null,
+        "calibrated_prob": null,
+        "agent_prob": 0.3928,
+        "agent_used": false
+      },
+      "evidence": [
+        {
+          "key": "ema_fast",
+          "label": "EMA 9 este peste EMA 20",
+          "direction": "LONG",
+          "strength": 0.5692,
+          "value": 1.138
+        },
+        {
+          "key": "ema_stack",
+          "label": "Structura EMA medie/lunga e ascendenta",
+          "direction": "LONG",
+          "strength": 1.0,
+          "value": "2/2"
+        },
+        {
+          "key": "supertrend",
+          "label": "SuperTrend confirma structura ascendenta",
+          "direction": "LONG",
+          "strength": 0.8649,
+          "value": 1346.4654012
+        },
+        {
+          "key": "macd",
+          "label": "Histograma MACD e pozitiva",
+          "direction": "LONG",
+          "strength": 0.2403,
+          "value": 8.64790893
+        },
+        {
+          "key": "vwap",
+          "label": "Pretul e peste VWAP",
+          "direction": "LONG",
+          "strength": 1.0,
+          "value": 1183.28924622
+        },
+        {
+          "key": "poc",
+          "label": "Pretul e peste POC",
+          "direction": "LONG",
+          "strength": 1.0,
+          "value": 830.00625
+        },
+        {
+          "key": "value_area",
+          "label": "Pretul e acceptat peste value area",
+          "direction": "LONG",
+          "strength": 0.7,
+          "value": "PESTE VAH"
+        },
+        {
+          "key": "rsi",
+          "label": "RSI supracumparat (70)",
+          "direction": "SHORT",
+          "strength": 0.0057,
+          "value": 70.1
+        },
+        {
+          "key": "order_flow",
+          "label": "Fluxul recent favorizeaza vanzatorii (63.2%)",
+          "direction": "SHORT",
+          "strength": 0.44,
+          "value": 63.2
+        },
+        {
+          "key": "book_imbalance",
+          "label": "Cartea de ordine e mai grea pe vanzare (51.4%)",
+          "direction": "SHORT",
+          "strength": 0.0559,
+          "value": 48.6
+        },
+        {
+          "key": "volume",
+          "label": "Volumul e sub media recenta",
+          "direction": "NEUTRU",
+          "strength": 0.322,
+          "value": 0.339
+        },
+        {
+          "key": "volatility",
+          "label": "Volatilitatea e in afara intervalului favorabil",
+          "direction": "NEUTRU",
+          "strength": 1.0,
+          "value": 0.0
+        }
+      ],
+      "fusion": {
+        "support": 7,
+        "oppose": 3,
+        "neutral": 2,
+        "support_weight": 5.374,
+        "oppose_weight": 0.502,
+        "score": 91.5
+      },
+      "neighbors": {
+        "n": 0,
+        "verdict": null,
+        "reason": "doar 0 intrari comparabile (prag 20)"
+      },
+      "geometry": "v6-4h-obf",
+      "bar_seconds": 14400
+    },
+    {
+      "id": 86205,
+      "symbol": "EGLD/USDT",
+      "direction": "SHORT",
+      "created_ts": 1789799156.2940288,
+      "created_time": "2026-09-19 06:25 UTC",
+      "entry": 4.1597143,
+      "signal_price": 4.111,
+      "sl": 4.2571429,
+      "tp1": 3.334,
+      "tp2": 3.2852857,
+      "risk": 0.0974286,
+      "planned_r_tp2": 8.98,
+      "state": "PENDING",
+      "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
+      "realized_r": null,
+      "closed_ts": null,
+      "bars_checked": 0,
+      "score_at_entry": 43,
+      "components": {
+        "trend": 0.566,
+        "momentum": 0.035,
+        "volatility": 0.815,
+        "volume": 0.524,
+        "ev_ema_fast": -0.1935,
+        "ev_ema_stack": 1.0,
+        "ev_supertrend": -0.8833,
+        "ev_macd": -1.0,
+        "ev_vwap": 1.0,
+        "ev_poc": 1.0,
+        "ev_value_area": 0.0,
+        "ev_rsi": -0.1969,
+        "ev_volume": 0.0,
+        "ev_volatility": 0.0,
+        "ev_order_flow": -0.4133,
+        "ev_book_imbalance": 0.0559,
+        "ev_liq_magnet": 0.0,
+        "ev_fusion": 0.06400000000000006
+      },
+      "persistence_at_entry": 2,
+      "decision": {
+        "action": "ISSUE",
+        "mode": "POARTA_DEZACTIVATA",
+        "reason": "poarta dezactivata: pe walk-forward a inrautatit rezultatul in 2 din 3 rulari",
+        "expected_value_r": null,
+        "calibrated_prob": null,
+        "agent_prob": 0.322,
+        "agent_used": false
+      },
+      "evidence": [
+        {
+          "key": "ema_fast",
+          "label": "EMA 9 este peste EMA 20",
+          "direction": "LONG",
+          "strength": 0.1935,
+          "value": 0.387
+        },
+        {
+          "key": "ema_stack",
+          "label": "Structura EMA medie/lunga e descendenta",
+          "direction": "SHORT",
+          "strength": 1.0,
+          "value": "2/2"
+        },
+        {
+          "key": "supertrend",
+          "label": "SuperTrend confirma structura ascendenta",
+          "direction": "LONG",
+          "strength": 0.8833,
+          "value": 3.85281964
+        },
+        {
+          "key": "macd",
+          "label": "Histograma MACD e pozitiva",
+          "direction": "LONG",
+          "strength": 1.0,
+          "value": 0.04981334
+        },
+        {
+          "key": "vwap",
+          "label": "Pretul e sub VWAP",
+          "direction": "SHORT",
+          "strength": 1.0,
+          "value": 4.70712442
+        },
+        {
+          "key": "poc",
+          "label": "Pretul e sub POC",
+          "direction": "SHORT",
+          "strength": 1.0,
+          "value": 4.668625
+        },
+        {
+          "key": "value_area",
+          "label": "Pretul e in interiorul value area",
+          "direction": "NEUTRU",
+          "strength": 0.3,
+          "value": "IN VALUE AREA"
+        },
+        {
+          "key": "rsi",
+          "label": "RSI in zona neutra, inclinat in sus (54)",
+          "direction": "LONG",
+          "strength": 0.1969,
+          "value": 53.9
+        },
+        {
+          "key": "order_flow",
+          "label": "Fluxul recent favorizeaza cumparatorii (62.4%)",
+          "direction": "LONG",
+          "strength": 0.4133,
+          "value": 37.6
+        },
+        {
+          "key": "book_imbalance",
+          "label": "Cartea de ordine e mai grea pe vanzare (51.4%)",
+          "direction": "SHORT",
+          "strength": 0.0559,
+          "value": 48.6
+        },
+        {
+          "key": "volume",
+          "label": "Volumul e peste media recenta",
+          "direction": "NEUTRU",
+          "strength": 0.048,
+          "value": 0.524
+        },
+        {
+          "key": "volatility",
+          "label": "Volatilitatea e in intervalul favorabil",
+          "direction": "NEUTRU",
+          "strength": 0.63,
+          "value": 0.815
+        }
+      ],
+      "fusion": {
+        "support": 4,
+        "oppose": 5,
+        "neutral": 3,
+        "support_weight": 3.056,
+        "oppose_weight": 2.687,
+        "score": 53.2
+      },
+      "neighbors": {
+        "n": 0,
+        "verdict": null,
+        "reason": "doar 0 intrari comparabile (prag 20)"
+      },
+      "geometry": "v6-4h-obf",
+      "bar_seconds": 14400
     }
   ]
 }
