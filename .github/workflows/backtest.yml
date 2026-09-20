@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
     inputs:
       days:
-        description: "Zile de istoric: 180=6 luni, 730=2 ani, 1825=5 ani"
+        description: "Zile de istoric cerute: 730=2 ani, 1825=5 ani, 3650=tot ce are bursa. Bursa da cat are; raportul de acoperire arata exact cat a primit fiecare simbol."
         required: true
-        default: "1825"
+        default: "3650"
       mode:
         description: "walk_forward = validare pe ferestre nevazute | sweep = compara variante | single = raport simplu | merge_only = integreaza un backtest DEJA rulat, fara redescarcare (~10 secunde)"
         required: true
