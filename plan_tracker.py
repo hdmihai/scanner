@@ -171,6 +171,10 @@ USE_DECISION_GATE = os.environ.get("USE_DECISION_GATE", "false").lower() == "tru
 # cost de tranzactie). Amestecarea lor in calibrare ar media doua sisteme
 # diferite - aceeasi eroare pe care am evitat-o la schimbarile de geometrie.
 # Asa, trecerea de la 1h la 4h separa automat datele, fara interventie manuala.
+# v7: STRUCTURA DE PIATA. S-au adaugat ichimoku, ma_cross, regime si mtf_align,
+# deci vectorul de caracteristici a crescut cu 4. Planurile v6 nu le au, deci
+# un model antrenat pe ele nu e comparabil - resetul e obligatoriu.
+#
 # v6: HARTA DE LICHIDARI. S-a adaugat evidenta `liq_magnet`, deci vectorul de
 # caracteristici a trecut de la 16 la 17. Planurile v5 nu o au, deci un model
 # antrenat pe ele nu e comparabil - resetul e obligatoriu.
@@ -185,8 +189,28 @@ USE_DECISION_GATE = os.environ.get("USE_DECISION_GATE", "false").lower() == "tru
 # din amandoua ca si cum ar fi acelasi sistem - aceeasi eroare pe care
 # versionarea o previne la schimbarile de timeframe si de geometrie.
 # Backtest-ul ruleaza mereu cu "o" (doar OHLCV); scanarea live poate avea "obf".
+# DOUA VERSIUNI SEPARATE, pentru doua lucruri diferite
+# ----------------------------------------------------
+# GEOMETRY_VERSION descrie REGULILE care determina REZULTATUL unui plan: entry
+# pe pullback, SL la 1.5 ATR, costuri incluse, bara neinchisa eliminata. Cand
+# acestea se schimba, acelasi setup produce alt R - datele vechi sunt genuin
+# incomparabile si resetul agentului e obligatoriu.
+#
+# FEATURE_VERSION descrie doar ce CARACTERISTICI vede modelul. Cand adaug o
+# evidenta noua, rezultatul planului ramane EXACT acelasi; se schimba doar
+# vectorul de intrare.
+#
+# Le-am tratat la fel pana acum, si asta a costat: masurat pe istoricul real,
+# 72.837 de planuri aruncate la resetari, din care ~40.000 pentru schimbari de
+# tip "am adaugat un indicator". Agentul repornea de la zero exact cand se
+# apropia de pragul de activare. De asta nu-l trecea niciodata.
+FEATURE_VERSION = "f5"      # f5 = + Elliott cu numaratori concurente
+
+
 def _build_geometry(caps_sig=None):
-    return ("v6-" + os.environ.get("SCAN_TIMEFRAME", "1h")
+    # Semnatura de capabilitati ramane in geometrie: ea schimba ce EXISTA in
+    # date, nu doar cum e privit. Un plan fara order flow chiar are alt continut.
+    return ("v7-" + os.environ.get("SCAN_TIMEFRAME", "1h")
             + "-" + (caps_sig or os.environ.get("SCAN_CAPS", "o")))
 
 
