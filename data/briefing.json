@@ -1,19 +1,26 @@
 {
-  "text": "Din 8 planuri inchise, rata de succes e 12.5%, cu -6.90R cumulat (-0.862R in medie pe plan) si profit factor 0.06. 15 planuri sunt inca deschise. Separat, 13086 planuri inchise (+656.95R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #99311 THETA/USDT +0.47R, #99312 SOL/USDT -1.05R, #99321 SEI/USDT -1.05R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (acuratetea 69.8% nu bate regula triviala 'prezice mereu clasa majoritara' (73.2%)).",
+  "text": "Din 9 planuri inchise, rata de succes e 11.1%, cu -7.95R cumulat (-0.884R in medie pe plan) si profit factor 0.06. 17 planuri sunt inca deschise. Separat, 13086 planuri inchise (+656.95R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #99326 CHZ/USDT -1.06R, #99311 THETA/USDT +0.47R, #99312 SOL/USDT -1.05R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (acuratetea 69.8% nu bate regula triviala 'prezice mereu clasa majoritara' (73.2%)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-20 11:20 UTC",
+    "scan_time": "2026-09-20 12:25 UTC",
     "universe_size": 28,
-    "plans_total": 13109,
-    "plans_open": 15,
-    "plans_closed": 8,
+    "plans_total": 13112,
+    "plans_open": 17,
+    "plans_closed": 9,
     "legacy_closed": 13086,
     "legacy_total_r": 656.95,
-    "win_rate": 12.5,
-    "total_r": -6.9,
-    "avg_r": -0.862,
+    "win_rate": 11.1,
+    "total_r": -7.95,
+    "avg_r": -0.884,
     "profit_factor": 0.06,
     "recent_closed": [
+      {
+        "id": 99326,
+        "symbol": "CHZ/USDT",
+        "direction": "LONG",
+        "state": "SL HIT - INVALIDATED",
+        "r": -1.056
+      },
       {
         "id": 99311,
         "symbol": "THETA/USDT",
@@ -41,16 +48,27 @@
         "direction": "LONG",
         "state": "SL HIT - INVALIDATED",
         "r": -1.048
-      },
-      {
-        "id": 99323,
-        "symbol": "ATOM/USDT",
-        "direction": "LONG",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.036
       }
     ],
     "open_now": [
+      {
+        "id": 99336,
+        "symbol": "LINK/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 99335,
+        "symbol": "NEAR/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 99334,
+        "symbol": "ZEC/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
       {
         "id": 99333,
         "symbol": "ETH/USDT",
@@ -60,24 +78,6 @@
       {
         "id": 99332,
         "symbol": "TRX/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 99331,
-        "symbol": "SOL/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 99330,
-        "symbol": "SEI/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 99329,
-        "symbol": "AVAX/USDT",
         "direction": "LONG",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       }
