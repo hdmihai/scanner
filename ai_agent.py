@@ -67,6 +67,10 @@ PLANS_FILE = os.path.join(DATA_DIR, "plans.json")
 def current_source():
     """Sursa se calculeaza la APEL, nu la import: geometria se stabileste abia
     dupa sondarea bursei, iar o valoare fixata la import ar fi ramas in urma."""
+    # DOAR geometria, NU si versiunea de caracteristici. Adaugarea unei
+    # evidente noi nu schimba rezultatul planurilor deja inchise, deci nu e
+    # motiv sa arunc ce a invatat modelul. Caracteristicile noi se adauga cu
+    # greutate zero si se invata din planurile urmatoare.
     return "plans-" + plan_tracker.GEOMETRY_VERSION
 
 
@@ -585,6 +589,32 @@ def main():
     # Daca starea salvata provine din alta sursa/geometrie de semnal (campul `outcome`),
     # o resetez: etichetele masurau altceva. Vezi nota din train_from_plans.
     source = current_source()
+
+    # EXTINDEREA SETULUI DE CARACTERISTICI, fara reset.
+    # Cand apar caracteristici noi (ex. ichimoku, mtf_align), le adaug in model
+    # cu greutate 0 si pastrez tot ce s-a invatat pana acum. Greutatea 0
+    # inseamna "nu stiu inca nimic despre asta" - exact starea corecta - si se
+    # invata din planurile urmatoare. Alternativa pe care o foloseam, resetul
+    # complet, arunca zeci de mii de exemple pentru o schimbare care nu afecta
+    # deloc rezultatele.
+    fv = getattr(plan_tracker, "FEATURE_VERSION", "f1")
+    if state is not None and state.get("source") == source:
+        # BUG FIX: operez pe state["model"]["weights"], NU pe `model` - obiectul
+        # `model` se construieste mai jos, din aceasta stare. Varianta initiala
+        # scria intr-un obiect care nu exista inca in acest punct, deci
+        # extinderea nu se aplica niciodata: modelul ramanea cu setul vechi de
+        # greutati si caracteristicile noi erau ignorate tacut.
+        mw = (state.get("model") or {}).get("weights")
+        if isinstance(mw, dict):
+            fresh = [f for f in FEATURES if f not in mw]
+            if fresh:
+                for f in fresh:
+                    mw[f] = 0.0
+                print(f"[i] Caracteristici noi adaugate fara reset: {', '.join(fresh)}")
+                print(f"    Pastrez cele {state.get('samples', 0)} exemple invatate; "
+                      f"cele noi pornesc de la greutate 0.")
+                state["feature_version"] = fv
+
     if state is None or state.get("source") != source:
         if state is not None:
             print(f"[i] Resetez agentul: sursa de invatare s-a schimbat "
@@ -603,6 +633,7 @@ def main():
                       f"pentru reinvatare.")
         state = default_state()
         state["source"] = source
+        state["feature_version"] = fv
     model = OnlineLogisticRegression.from_dict(state.get("model", {}))
 
     if not plans:
