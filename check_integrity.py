@@ -293,6 +293,67 @@ def check_archival_behavior():
             pt.PLANS_FILE, pt.ARCHIVE_DIR, pt.ARCHIVE_INDEX_FILE = orig_plans, orig_dir, orig_idx
 
 
+def check_feature_extension():
+    """Adaugarea unei caracteristici NU are voie sa reseteze invatarea.
+
+    DE CE: proiectul a trecut prin 7 versiuni de geometrie, iar la fiecare
+    agentul repornea de la zero. Masurat pe istoricul real: 72.837 de planuri
+    aruncate, din care ~40.000 pentru schimbari care adaugau doar indicatori.
+    Rezultatul planurilor deja inchise nu se schimba cand adaug o evidenta -
+    se schimba doar vectorul de intrare. Resetul era pur si simplu gresit, si
+    e motivul pentru care agentul nu trecea niciodata pragul de activare:
+    ajungea aproape, apoi reincepea.
+
+    Testez COMPORTAMENTAL: un model existent plus caracteristici noi trebuie
+    sa pastreze exemplele si greutatile invatate.
+    """
+    import importlib
+    sys.path.insert(0, ROOT)
+    try:
+        for m in ("plan_tracker", "ai_agent"):
+            if m in sys.modules:
+                importlib.reload(sys.modules[m])
+        import plan_tracker as pt
+        import ai_agent as ag
+    except Exception as exc:
+        problems.append(f"nu pot importa pentru testul de caracteristici: {exc}")
+        return
+
+    if not hasattr(pt, "FEATURE_VERSION"):
+        problems.append(
+            "plan_tracker.py nu are FEATURE_VERSION separat de GEOMETRY_VERSION. "
+            "Fara separare, orice caracteristica noua reseteaza agentul si arunca "
+            "toate exemplele invatate - desi rezultatele planurilor nu s-au schimbat.")
+        return
+
+    src = ag.current_source()
+    if pt.FEATURE_VERSION in src:
+        problems.append(
+            f"sursa agentului ({src}) include versiunea de caracteristici. "
+            f"Asta forteaza reset la fiecare indicator adaugat - exact ce trebuia "
+            f"evitat. Sursa trebuie sa depinda DOAR de GEOMETRY_VERSION.")
+
+    # Verific COMPORTAMENTAL ca extinderea chiar se aplica. Prima varianta a
+    # acestui mecanism scria in `model.weights`, un obiect construit mai jos in
+    # main() - deci extinderea nu se aplica NICIODATA, iar caracteristicile noi
+    # erau ignorate tacut. Codul parea corect si testul pe logica izolata trecea.
+    src_txt = read("ai_agent.py") or ""
+    if "Caracteristici noi adaugate fara reset" in src_txt:
+        if "state.get(\"model\")" not in src_txt and "state[\"model\"]" not in src_txt:
+            problems.append(
+                "extinderea setului de caracteristici nu opereaza pe state[\"model\"] "
+                "[\"weights\"]. Daca scrie intr-un obiect construit ulterior, "
+                "caracteristicile noi sunt ignorate tacut si modelul ramane cu "
+                "setul vechi de greutati.")
+
+    # geometria trebuie sa ramana in sursa: acolo resetul chiar e necesar
+    if pt.GEOMETRY_VERSION not in src:
+        problems.append(
+            f"sursa agentului ({src}) nu include GEOMETRY_VERSION. La schimbarea "
+            f"regulilor planului agentul NU s-ar reseta, si ar prezice folosind "
+            f"greutati invatate pe rezultate care nu mai sunt comparabile.")
+
+
 def check_family_preservation():
     """Un proces care nu stie ce capabilitati a detectat alt proces nu are voie
     sa-i stearga datele.
@@ -400,6 +461,7 @@ def main():
     check_decision_gate()
     check_archival_behavior()
     check_family_preservation()
+    check_feature_extension()
     check_no_direct_plan_writes()
     check_compaction_step()
     check_timeframe_consistency()
