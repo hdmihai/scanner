@@ -60,7 +60,8 @@ def _item(key, label, direction, strength, value=None):
 
 
 def build_evidence(ind, price, atr, rsi=None, components=None,
-                   flow=None, book=None, caps=None, liq=None, liq_bias=None):
+                   flow=None, book=None, caps=None, liq=None, liq_bias=None,
+                   struct=None, ew=None, ew_bias=None):
     """Construieste lista de evidente dintr-un set de indicatori.
 
     `ind` e iesirea lui indicators.compute_all(). Orice lipseste se sare -
@@ -188,6 +189,51 @@ def build_evidence(ind, price, atr, rsi=None, components=None,
                             _clip(abs(liq_bias), 0, 1),
                             round(target["price"], 8)))
 
+    # STRUCTURA DE PIATA. `mtf_align` e singura de aici care aduce informatie
+    # INDEPENDENTA: celelalte evidente sunt toate transformari ale aceleiasi
+    # serii de lumanari, deci se suprapun. Un trend pe alt timeframe nu e.
+    if struct:
+        ich = struct.get("ichimoku")
+        if ich and ich.get("vote"):
+            ev.append(_item("ichimoku", f"Pretul e {ich['position']} Ichimoku",
+                            DIR_LONG if ich["vote"] > 0 else DIR_SHORT,
+                            _clip(ich.get("strength", 0.5), 0, 1),
+                            round(ich.get("kijun") or 0, 8)))
+        cr = struct.get("cross")
+        if cr:
+            ev.append(_item("ma_cross", cr["type"],
+                            DIR_LONG if cr["bullish"] else DIR_SHORT,
+                            _clip(cr.get("strength", 0.5), 0, 1),
+                            round(cr.get("fast") or 0, 8)))
+        rg = struct.get("regime")
+        if rg and rg.get("vote"):
+            ev.append(_item("regime", f"{rg['label']} (putere {rg['strength']})",
+                            DIR_LONG if rg["vote"] > 0 else DIR_SHORT,
+                            _clip(abs(rg["vote"]) * rg["strength"] / 100.0, 0, 1),
+                            rg["strength"]))
+        mtf = struct.get("mtf") or {}
+        if mtf.get("alignment") is not None and mtf.get("counted"):
+            a = mtf["alignment"]
+            ev.append(_item("mtf_align",
+                            f"Aliniere multi-timeframe: {mtf['bullish']} sus / "
+                            f"{mtf['bearish']} jos din {mtf['counted']}",
+                            DIR_LONG if a > 0 else (DIR_SHORT if a < 0 else DIR_NEUTRAL),
+                            _clip(abs(a), 0, 1), round(a, 3)))
+
+    # ELLIOTT. Folosesc doar ipotezele INCA VALIDE - o numaratoare invalidata
+    # de pret nu are voie sa contribuie, oricat de mare i-ar fi fost increderea.
+    # `ew_bias` e deja calculat pe ele.
+    if ew and ew_bias is not None:
+        pr = ew.get("primary")
+        if pr:
+            ev.append(_item("elliott",
+                            f"{pr['pattern']} {pr['direction']} "
+                            f"({pr['confidence']*100:.0f}%, {ew.get('alive',0)} din "
+                            f"{ew.get('total',0)} valide)",
+                            DIR_LONG if ew_bias > 0 else (DIR_SHORT if ew_bias < 0 else DIR_NEUTRAL),
+                            _clip(abs(ew_bias), 0, 1),
+                            round(pr.get("invalidation") or 0, 8)))
+
     comp = components or {}
     if comp.get("volume") is not None:
         v = comp["volume"]
@@ -221,7 +267,8 @@ def fusion(evidence, direction):
 # forma, altfel greutatile invatate nu mai corespund aceleiasi evidente.
 EVIDENCE_KEYS = ["ema_fast", "ema_stack", "supertrend", "macd", "vwap",
                  "poc", "value_area", "rsi", "volume", "volatility",
-                 "order_flow", "book_imbalance", "liq_magnet"]
+                 "order_flow", "book_imbalance", "liq_magnet",
+                 "ichimoku", "ma_cross", "regime", "mtf_align", "elliott"]
 
 
 def evidence_features(evidence, direction):
