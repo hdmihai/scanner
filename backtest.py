@@ -59,6 +59,8 @@ import ccxt
 import crypto_ai_scanner as scanner
 import evidence as ev_mod
 import liquidation as liq_mod
+import market_structure as struct_mod
+import elliott as ew_mod
 import plan_tracker
 
 DATA_DIR = "data"
@@ -216,9 +218,23 @@ def replay_symbol(symbol, candles, weights, start_id):
         # lipseste, iar deciziile nu depind de ea.
         bt_liq = liq_mod.build_map(window, scored["price"])
         bt_bias = liq_mod.magnet_bias(bt_liq, scored["price"], scored["direction"])
+        # Fara multi-timeframe si fara order book: backtest-ul are o singura
+        # serie de lumanari. Evidentele care depind de ele LIPSESC, nu sunt
+        # inlocuite cu valori neutre - un zero inventat ar minti modelul
+        # despre ce a vazut.
+        bt_struct = struct_mod.build(
+            [c[4] for c in window], [c[2] for c in window], [c[3] for c in window],
+            scored["atr"], base_tf=CONFIG["timeframe"])
+        # Elliott se calculeaza din aceleasi lumanari, deci exista identic in
+        # backtest - spre deosebire de order flow.
+        bt_ew = ew_mod.analyze([c[2] for c in window], [c[3] for c in window],
+                               [c[4] for c in window], scored["price"])
+        bt_ew_bias = ew_mod.bias(bt_ew, scored["direction"])
         bt_ev = ev_mod.build_evidence(bt_ind, scored["price"], scored["atr"],
                                       bt_rsi, scored.get("components"),
-                                      liq=bt_liq, liq_bias=bt_bias)
+                                      liq=bt_liq, liq_bias=bt_bias,
+                                      struct=bt_struct,
+                                      ew=bt_ew, ew_bias=bt_ew_bias)
         levels = scanner.compute_trade_plan(
             scored["direction"], scored["price"], scored["atr"], structure, fib)
         if not levels:
@@ -463,6 +479,14 @@ def walk_forward(plans, n_windows=6, min_train=400, mode="anchored"):
     return {"mean": m, "ci": ci, "n": len(all_issued)}
 
 
+# Backtest-ul cere `days` de zile, dar bursa da cat are. Raportul de acoperire
+# arata exact cat a primit fiecare simbol, ca sa nu existe iluzia ca toate au
+# istoric egal. Cu 3650 de zile cerute, simbolurile vechi dau tot ce au (OKX
+# limiteaza la ~5 ani pe 4h), iar cele noi dau cat exista de la listare -
+# adica exact "toata durata de viata" pentru fiecare.
+DEPTH_NOTE = True
+
+
 def main():
     days = DEFAULT_DAYS
     if "--days" in sys.argv:
@@ -567,11 +591,34 @@ def main():
 
     if merge:
         live = load_json(PLANS_FILE, {"next_id": 1, "plans": []})
+
+        # DEDUPLICARE, dupa identitatea stabila a planului.
+        # merge_backtest.py avea aceasta verificare; backtest.py --merge NU o
+        # avea, desi workflow-ul foloseste exact aceasta cale. O a doua rulare
+        # de backtest pe aceeasi perioada ar fi introdus fiecare plan de doua
+        # ori, iar agentul ar fi invatat fiecare exemplu dublu - crescandu-i
+        # artificial increderea pe date care nu sunt noi. Cheia nu include
+        # `id`, fiindca id-ul se reatribuie la fiecare integrare.
+        def plan_key(p):
+            return (p.get("symbol"), p.get("direction"), p.get("created_ts"),
+                    p.get("geometry"), round(p.get("entry") or 0, 10))
+
+        existing = {plan_key(p) for p in live["plans"] if p.get("source") == "backtest"}
+        fresh = [p for p in all_plans if plan_key(p) not in existing]
+        skipped = len(all_plans) - len(fresh)
+        if skipped:
+            print(f"  {skipped} planuri erau deja integrate - le sar.")
+        if not fresh:
+            print("  Nimic nou de integrat; plans.json ramane neschimbat.")
+            plan_tracker.save_plans(live)
+            return
+
         offset = live.get("next_id", 1)
-        for p in all_plans:
-            p["id"] = p["id"] + offset - 1
-        live["plans"].extend(all_plans)
-        live["next_id"] = offset + len(all_plans)
+        for i, p in enumerate(fresh):
+            p["id"] = offset + i
+        live["plans"].extend(fresh)
+        live["next_id"] = offset + len(fresh)
+        all_plans = fresh
         live["calibration"] = plan_tracker.build_calibration(live)
         live["summary"] = plan_tracker.summarize(live)
         # BUG CRITIC: aici se scria cu save_json direct, ocolind COMPLET garda
