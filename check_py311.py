@@ -36,6 +36,8 @@ RULARE
 Cod de iesire 1 daca gaseste probleme, ca sa poata fi folosit intr-un workflow.
 """
 
+import ast
+import builtins
 import io
 import sys
 import tokenize
@@ -87,6 +89,90 @@ def check_source(path):
     return problems
 
 
+# ============================================================================
+# NUME NEDEFINITE
+# ============================================================================
+# py_compile verifica doar SINTAXA. Un nume folosit dar nedefinit compileaza
+# perfect si crapa abia la rulare: in productie, `CONFIG["timeframe"]` intr-un
+# fisier care nu defineste CONFIG a oprit backtest-ul dupa ce descarcase deja
+# date, iar ambele garzi existente au trecut. Verificarea urmareste lantul
+# complet de domenii, ca functiile imbricate care folosesc variabile din
+# exterior sa nu dea fals pozitiv.
+BUILTIN_NAMES = set(dir(builtins)) | {"__file__", "__name__", "__doc__"}
+
+
+def _collect_bindings(node):
+    """Numele legate intr-un domeniu, fara a cobori in domenii imbricate."""
+    out = set()
+
+    def walk(n):
+        for child in ast.iter_child_nodes(n):
+            if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                out.add(child.name)
+                continue
+            if isinstance(child, ast.Lambda):
+                continue
+            if isinstance(child, (ast.Import, ast.ImportFrom)):
+                for a in child.names:
+                    out.add((a.asname or a.name).split(".")[0])
+            elif isinstance(child, ast.Name) and isinstance(child.ctx, (ast.Store, ast.Del)):
+                out.add(child.id)
+            elif isinstance(child, ast.ExceptHandler) and child.name:
+                out.add(child.name)
+            elif isinstance(child, ast.Global):
+                out.update(child.names)
+            walk(child)
+
+    walk(node)
+    return out
+
+
+def _scope_params(fn):
+    out = set()
+    a = fn.args
+    for x in list(a.args) + list(a.kwonlyargs) + list(getattr(a, "posonlyargs", [])):
+        out.add(x.arg)
+    if a.vararg:
+        out.add(a.vararg.arg)
+    if a.kwarg:
+        out.add(a.kwarg.arg)
+    return out
+
+
+def _undefined_in(path):
+    tree = ast.parse(open(path).read())
+    problems = []
+
+    def visit(node, chain):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            chain = chain + [_scope_params(node) | _collect_bindings(node)]
+        elif isinstance(node, ast.Lambda):
+            chain = chain + [_scope_params(node)]
+        elif isinstance(node, ast.ClassDef):
+            chain = chain + [_collect_bindings(node)]
+        for child in ast.iter_child_nodes(node):
+            if isinstance(child, ast.Name) and isinstance(child.ctx, ast.Load):
+                if not any(child.id in sc for sc in chain) and child.id not in BUILTIN_NAMES:
+                    problems.append((child.lineno, child.id))
+            visit(child, chain)
+
+    visit(tree, [_collect_bindings(tree)])
+    return sorted(set(problems))
+
+
+def check_undefined_names(files):
+    out = []
+    for f in files:
+        try:
+            for ln, name in _undefined_in(f):
+                out.append(f"{f}:{ln} foloseste `{name}`, care nu e definit nicaieri "
+                           f"in lantul de domenii. Compileaza, dar crapa la rulare.")
+        except SyntaxError:
+            pass
+    return out
+
+
+
 def main():
     targets = sys.argv[1:]
     if not targets:
@@ -110,7 +196,17 @@ def main():
         print("Workflow-ul ruleaza pe 3.11 - reparai inainte de a urca.")
         return 1
 
-    print(f"OK: toate cele {len(targets)} fisiere sunt valide si pe Python 3.11.")
+    undef = check_undefined_names(targets)
+    if undef:
+        print(f"NUME NEDEFINITE: {len(undef)} problema(e).")
+        for msg in undef:
+            print(f"  [!] {msg}")
+        print()
+        print("Astea compileaza dar crapa la rulare. Repara-le inainte de a urca.")
+        return 1
+
+    print(f"OK: toate cele {len(targets)} fisiere sunt valide pe Python 3.11 "
+          f"si nu contin nume nedefinite.")
     return 0
 
 
