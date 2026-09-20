@@ -622,6 +622,125 @@ def render_rich_chart(chart, fullscreen_id=None):
     return out
 
 
+def render_elliott(ew):
+    """Ipotezele Elliott concurente, in forma din capturi: Primary /
+    Alternative / Secondary, fiecare cu increderea si nivelul de invalidare.
+
+    Ipotezele deja invalidate de pret sunt ARATATE, dar taiate - a le ascunde
+    ar face sistemul sa para mai sigur decat e, iar a le lasa neschimbate ar
+    sugera ca inca sunt in joc.
+    """
+    if not ew or not ew.get("counts"):
+        return '<div class="tk-na">N/A</div>'
+    pr = ew.get("primary")
+    head = ""
+    if pr:
+        cls = "nb-ok" if pr["direction"] == "LONG" else "nb-bad"
+        head = ('<div class="ev-neighbors {}"><strong>{}</strong> &middot; {} '
+                '&middot; incredere {:.0f}% &middot; {} din {} inca valide</div>').format(
+                    cls, pr["pattern"], pr["direction"], pr["confidence"] * 100,
+                    ew.get("alive", 0), ew.get("total", 0))
+    else:
+        head = ('<div class="ev-neighbors nb-neu">Toate numaratorile au fost '
+                'invalidate de pret - nicio structura in joc.</div>')
+
+    rows = []
+    for c in ew["counts"]:
+        dead = c.get("invalidated")
+        tone = "tag-info" if dead else ("tag-bull" if c["direction"] == "LONG" else "tag-bear")
+        rows.append(
+            '<div class="ew-row{}"><span class="ew-rank">{}</span>'
+            '<span>{}</span><span class="tag {}">{}</span>'
+            '<span>{:.0f}%</span><span class="dim">INV {}</span></div>'.format(
+                " ew-dead" if dead else "", c["rank"], c["pattern"], tone,
+                c["direction"], c["confidence"] * 100, fmt_price(c["invalidation"])))
+
+    tgt = ""
+    if pr and pr.get("targets"):
+        parts = " &middot; ".join(f"{k.upper()} {fmt_price(v)}"
+                                  for k, v in pr["targets"].items())
+        tgt = f'<div class="ew-targets">Tinte Elliott: {parts}</div>'
+    if pr and pr.get("prz"):
+        tgt += ('<div class="ew-targets">PRZ: {} - {}</div>'.format(
+            fmt_price(pr["prz"]["low"]), fmt_price(pr["prz"]["high"])))
+
+    return head + '<div class="ew-list">' + "".join(rows) + "</div>" + tgt
+
+
+def render_structure_panel(st):
+    """Panoul de structura de piata, in forma din capturile de referinta:
+    regim, cross, Ichimoku, aliniere multi-timeframe si zidurile de lichiditate.
+    """
+    if not st:
+        return '<div class="tk-na">N/A</div>'
+    out = []
+
+    rg, cr = st.get("regime"), st.get("cross")
+    if rg or cr:
+        cells = []
+        if rg:
+            cls = "nb-ok" if rg["vote"] > 0 else ("nb-bad" if rg["vote"] < 0 else "nb-neu")
+            cells.append('<div class="ms-cell {}"><span class="ms-lbl">REGIM</span>'
+                         '<strong>{}</strong><span class="dim">putere {}{}</span></div>'.format(
+                             cls, rg["label"], rg["strength"],
+                             f' &middot; ATR {rg["atr_pct"]}%' if rg.get("atr_pct") else ""))
+        if cr:
+            cls = "nb-ok" if cr["bullish"] else "nb-bad"
+            cells.append('<div class="ms-cell {}"><span class="ms-lbl">CROSS EMA 50/200</span>'
+                         '<strong>{}</strong><span class="dim">{} vs {}</span></div>'.format(
+                             cls, cr["type"], fmt_price(cr["fast"]), fmt_price(cr["slow"])))
+        out.append('<div class="ms-grid">' + "".join(cells) + "</div>")
+
+    ich = st.get("ichimoku")
+    if ich:
+        cls = "nb-ok" if ich["vote"] > 0 else ("nb-bad" if ich["vote"] < 0 else "nb-neu")
+        out.append('<div class="ms-cell {} ms-wide"><span class="ms-lbl">ICHIMOKU 9/26/52</span>'
+                   '<strong>{}</strong><span class="dim">Tenkan {} &middot; Kijun {} '
+                   '&middot; vot {:+.2f}</span></div>'.format(
+                       cls, ich["position"], fmt_price(ich["tenkan"]),
+                       fmt_price(ich["kijun"]), ich["vote"]))
+
+    mtf = st.get("mtf") or {}
+    if mtf.get("rows"):
+        rows = []
+        for r in mtf["rows"]:
+            if r["score"] is None:
+                rows.append('<div class="mtf-row"><span>{}</span>'
+                            '<span class="dim">N/A</span><span class="dim">-</span></div>'.format(
+                                r["timeframe"]))
+                continue
+            tone = "tag-bull" if r["score"] > 0 else ("tag-bear" if r["score"] < 0 else "tag-info")
+            rows.append('<div class="mtf-row"><span>{}</span>'
+                        '<span class="tag {}">{}</span><span>{:+d}</span></div>'.format(
+                            r["timeframe"], tone, r["trend"], r["score"]))
+        head = ""
+        if mtf.get("alignment") is not None:
+            a = mtf["alignment"]
+            cls = "nb-ok" if a > 0.3 else ("nb-bad" if a < -0.3 else "nb-neu")
+            head = ('<div class="ev-neighbors {}">Aliniere <strong>{:+.0f}%</strong> '
+                    '&middot; {} sus / {} jos din {} timeframe-uri</div>').format(
+                        cls, a * 100, mtf["bullish"], mtf["bearish"], mtf["counted"])
+        out.append('<h4 class="scan-h">Trend multi-timeframe</h4>' + head
+                   + '<div class="mtf-list">' + "".join(rows) + "</div>")
+
+    lq = st.get("liquidity")
+    if lq and lq.get("walls"):
+        rows = []
+        for w in lq["walls"]:
+            tone = "tag-bull" if w["side"] == "BID" else "tag-bear"
+            rows.append('<div class="liq-row"><span class="tag {}">{} WALL</span>'
+                        '<span>{} &middot; {:+.2f}%</span>'
+                        '<span class="liq-bar"><i style="width:{}%"></i></span></div>'.format(
+                            tone, w["side"], fmt_price(w["price"]),
+                            w["distance_pct"] or 0, w["strength"]))
+        out.append('<h4 class="scan-h">Zone de lichiditate &middot; order book</h4>'
+                   '<div class="ev-neighbors nb-neu">bid {}% / ask {}%</div>'
+                   '<div class="liq-list">{}</div>'.format(
+                       lq.get("bid_pct"), lq.get("ask_pct"), "".join(rows)))
+
+    return "".join(out) or '<div class="tk-na">N/A</div>'
+
+
 def render_liquidation(liq, price=None):
     """Zonele magnet, in cuvinte.
 
@@ -873,6 +992,8 @@ def render_token_details(details, plans_store, watchlist=None):
         prob_txt, prob_note = honest_probability(d.get("score"), plans_store)
         chart_html = render_token_chart(sym, d, by_symbol)
         liq_html = render_liquidation(d.get("liquidation"), d.get("price"))
+        struct_html = render_structure_panel(d.get("structure_panel"))
+        ew_html = render_elliott(d.get("elliott"))
 
         rows = []
         if st:
@@ -956,6 +1077,8 @@ def render_token_details(details, plans_store, watchlist=None):
           <div><span class="dim">PROBABILITATE</span><br>{prob_txt}<br><span class="dim" style="font-size:10px;">{prob_note}</span></div>
         </div>
         <h4>Grafic</h4>{chart_html}
+        <h4>Elliott Wave</h4>{ew_html}
+        <h4>Structura de piata</h4>{struct_html}
         <h4>Zone de lichidare</h4>{liq_html}
         <h4>Plan propus</h4>{plan_html}
         <h4>Indicatori</h4>{ind_html}
@@ -1310,6 +1433,41 @@ header{{display:flex;justify-content:space-between;align-items:baseline;
   padding:7px 14px;border-radius:6px;background:var(--panel-2);
   color:var(--amber);text-decoration:none;border:1px solid var(--border);
   margin-bottom:8px;}}
+.ew-list{{display:flex;flex-direction:column;gap:3px;margin-top:6px;}}
+.ew-row{{display:grid;grid-template-columns:70px 1fr 54px 40px 92px;gap:6px;
+  align-items:center;font-size:10.5px;font-family:var(--font-mono);
+  padding:4px 0;border-bottom:1px solid var(--border);}}
+.ew-row span:last-child{{text-align:right;font-size:9px;}}
+.ew-dead{{opacity:.42;text-decoration:line-through;}}
+.ew-rank{{font-weight:700;color:var(--amber);}}
+.ew-targets{{font-family:var(--font-mono);font-size:10px;color:var(--text-dim);
+  margin-top:5px;padding:5px 8px;background:var(--panel-2);border-radius:5px;}}
+@media(max-width:560px){{.ew-row{{grid-template-columns:62px 1fr 46px 36px;}}
+  .ew-row span:last-child{{display:none;}}}}
+.ms-grid{{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0;}}
+@media(max-width:560px){{.ew-list{{display:flex;flex-direction:column;gap:3px;margin-top:6px;}}
+.ew-row{{display:grid;grid-template-columns:70px 1fr 54px 40px 92px;gap:6px;
+  align-items:center;font-size:10.5px;font-family:var(--font-mono);
+  padding:4px 0;border-bottom:1px solid var(--border);}}
+.ew-row span:last-child{{text-align:right;font-size:9px;}}
+.ew-dead{{opacity:.42;text-decoration:line-through;}}
+.ew-rank{{font-weight:700;color:var(--amber);}}
+.ew-targets{{font-family:var(--font-mono);font-size:10px;color:var(--text-dim);
+  margin-top:5px;padding:5px 8px;background:var(--panel-2);border-radius:5px;}}
+@media(max-width:560px){{.ew-row{{grid-template-columns:62px 1fr 46px 36px;}}
+  .ew-row span:last-child{{display:none;}}}}
+.ms-grid{{grid-template-columns:1fr;}}}}
+.ms-cell{{padding:9px 11px;border-radius:7px;background:var(--panel-2);
+  display:flex;flex-direction:column;gap:2px;border-left:3px solid var(--border);}}
+.ms-cell strong{{font-size:14px;letter-spacing:.01em;}}
+.ms-cell .dim{{font-size:10px;font-family:var(--font-mono);}}
+.ms-lbl{{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-dim);}}
+.ms-wide{{margin:6px 0;}}
+.mtf-list{{display:flex;flex-direction:column;gap:3px;margin-top:6px;}}
+.mtf-row{{display:grid;grid-template-columns:44px 1fr 52px;gap:8px;align-items:center;
+  font-size:11px;font-family:var(--font-mono);padding:4px 0;
+  border-bottom:1px solid var(--border);}}
+.mtf-row span:last-child{{text-align:right;}}
 .liq-short{{fill:var(--bear);}}
 .liq-long{{fill:var(--bull);}}
 .liq-list{{display:flex;flex-direction:column;gap:4px;margin-top:6px;}}
