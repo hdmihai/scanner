@@ -129,7 +129,13 @@ def fetch_history(exchange, symbol, timeframe, days):
         since = next_since
         if batch[-1][0] >= exchange.milliseconds() - ms_per_bar:
             break
-        time.sleep(exchange.rateLimit / 1000)
+        # FARA sleep manual: ccxt are enableRateLimit=True implicit si asteapta
+        # deja `rateLimit` ms intre apeluri. Sleep-ul de aici se ADAUGA peste,
+        # deci plateam intarzierea de doua ori - masurat pe log-ul real, 216 ms
+        # per pagina in loc de 110. Pe 3650 de zile asta inseamna 8 minute in
+        # plus, degeaba. Daca bursa nu declara rate limit, il pun eu.
+        if not getattr(exchange, "enableRateLimit", False):
+            time.sleep(exchange.rateLimit / 1000)
 
     # deduplic dupa timestamp si sortez, ca paginarea poate suprapune batch-uri
     seen = {}
@@ -224,7 +230,7 @@ def replay_symbol(symbol, candles, weights, start_id):
         # despre ce a vazut.
         bt_struct = struct_mod.build(
             [c[4] for c in window], [c[2] for c in window], [c[3] for c in window],
-            scored["atr"], base_tf=CONFIG["timeframe"])
+            scored["atr"], base_tf=scanner.CONFIG["timeframe"])
         # Elliott se calculeaza din aceleasi lumanari, deci exista identic in
         # backtest - spre deosebire de order flow.
         bt_ew = ew_mod.analyze([c[2] for c in window], [c[3] for c in window],
