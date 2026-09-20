@@ -34,6 +34,8 @@ import indicators
 import evidence as ev_mod
 import exchanges as ex_mod
 import liquidation as liq_mod
+import market_structure as struct_mod
+import elliott as ew_mod
 import ai_agent
 import json
 import os
@@ -94,7 +96,11 @@ CONFIG = {
     # editezi codul. Backtest-ul citeste acelasi CONFIG, deci scanarea si
     # backtest-ul raman mereu pe acelasi timeframe.
     "timeframe": os.environ.get("SCAN_TIMEFRAME", "1h"),
-    "candles": 200,
+    # 260, nu 200: EMA 200 are nevoie de 200 de bare, iar bara neinchisa se
+    # elimina - la 200 ramaneau 199 si Golden/Death Cross ar fi lipsit MEREU,
+    # tacut. Prins la verificarea panoului de structura, unde cross-ul aparea
+    # gol in productie desi codul era corect.
+    "candles": 260,
     "lookahead_hours": 24,     # dupa cate ore evaluam daca un semnal a "nimerit"
     "hit_threshold_atr": 0.5,  # miscare minima (in ATR-uri) ca sa conteze "hit"
     # Plafonul REAL de volum: se deschid planuri doar pentru top N pe directie,
@@ -867,6 +873,15 @@ def main():
             "fibonacci": d_fib,
             "plan": compute_trade_plan(r["direction"], r["price"], r["atr"], d_struct, d_fib),
             "sparkline": [round_price(c) for c in d_closes[-SPARKLINE_BARS:]],
+            # Structura de piata per simbol. FARA multi-timeframe: ar insemna
+            # 28 x 3 apeluri in plus la fiecare scanare. Timeframe-urile de
+            # confirmare se descarca doar pentru simbolul afisat pe graficul
+            # principal, unde chiar sunt privite.
+            "elliott": ew_mod.analyze([c[2] for c in candles],
+                                      [c[3] for c in candles], d_closes, r["price"]),
+            "structure_panel": struct_mod.build(
+                d_closes, [c[2] for c in candles], [c[3] for c in candles],
+                r["atr"], base_tf=CONFIG["timeframe"], price=r["price"]),
             # harta de lichidari si pentru simbolurile din detalii, nu doar
             # pentru cel mai bun candidat - dashboard-ul le arata pe toate
             "liquidation": (lambda mp, bs: {"above": mp.get("above"),
@@ -1080,15 +1095,43 @@ def main():
         sig_oi = ex_mod.open_interest(exchange, sig["symbol"], active_caps)
         sig_liq = liq_mod.build_map(candles, sig["price"], oi_weight=sig_oi)
         sig_liq_bias = liq_mod.magnet_bias(sig_liq, sig["price"], sig["direction"])
+        # STRUCTURA DE PIATA. Timeframe-urile de confirmare se descarca o
+        # singura data pentru simbolul afisat, nu pentru toate - altfel ar
+        # insemna 28 x 3 apeluri in plus la fiecare scanare.
+        def _confirm_closes(tf):
+            if tf == CONFIG["timeframe"]:
+                return closes
+            try:
+                o = exchange.fetch_ohlcv(sig["symbol"], timeframe=tf, limit=120)
+            except Exception:
+                return None
+            if not o or len(o) < 60:
+                return None
+            return [c[4] for c in o[:-1]]
+
+        sig_struct = struct_mod.build(
+            closes, [c[2] for c in candles], [c[3] for c in candles],
+            sig["atr"], base_tf=CONFIG["timeframe"],
+            fetch_closes=_confirm_closes, order_book=liquidity,
+            price=sig["price"])
+
+        sig_ew = ew_mod.analyze([c[2] for c in candles], [c[3] for c in candles],
+                                closes, sig["price"])
+        sig_ew_bias = ew_mod.bias(sig_ew, sig["direction"])
+
         sig_evidence = ev_mod.build_evidence(sig_ind, sig["price"], sig["atr"],
                                              sig_rsi, sig.get("components"),
                                              flow=sig_flow, book=sig_book,
                                              caps=active_caps,
-                                             liq=sig_liq, liq_bias=sig_liq_bias)
+                                             liq=sig_liq, liq_bias=sig_liq_bias,
+                                             struct=sig_struct,
+                                             ew=sig_ew, ew_bias=sig_ew_bias)
         sig = {**sig,
                "evidence": sig_evidence,
                "fusion": ev_mod.fusion(sig_evidence, sig["direction"]),
                "indicators": sig_ind,
+               "structure_panel": sig_struct,
+               "elliott": sig_ew,
                "liquidation": {"above": sig_liq.get("above"),
                                "below": sig_liq.get("below"),
                                "bias": sig_liq_bias,
