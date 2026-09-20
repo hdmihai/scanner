@@ -1,19 +1,26 @@
 {
-  "text": "Din 9 planuri inchise, rata de succes e 11.1%, cu -7.95R cumulat (-0.884R in medie pe plan) si profit factor 0.06. 17 planuri sunt inca deschise. Separat, 13086 planuri inchise (+656.95R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #99326 CHZ/USDT -1.06R, #99311 THETA/USDT +0.47R, #99312 SOL/USDT -1.05R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (acuratetea 69.8% nu bate regula triviala 'prezice mereu clasa majoritara' (73.2%)).",
+  "text": "Din 10 planuri inchise, rata de succes e 10.0%, cu -8.97R cumulat (-0.897R in medie pe plan) si profit factor 0.05. 16 planuri sunt inca deschise. Separat, 13086 planuri inchise (+656.95R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #99314 ZEN/USDT -1.02R, #99326 CHZ/USDT -1.06R, #99311 THETA/USDT +0.47R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (acuratetea 69.8% nu bate regula triviala 'prezice mereu clasa majoritara' (73.2%)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-20 15:20 UTC",
+    "scan_time": "2026-09-20 16:21 UTC",
     "universe_size": 28,
     "plans_total": 13112,
-    "plans_open": 17,
-    "plans_closed": 9,
+    "plans_open": 16,
+    "plans_closed": 10,
     "legacy_closed": 13086,
     "legacy_total_r": 656.95,
-    "win_rate": 11.1,
-    "total_r": -7.95,
-    "avg_r": -0.884,
-    "profit_factor": 0.06,
+    "win_rate": 10.0,
+    "total_r": -8.97,
+    "avg_r": -0.897,
+    "profit_factor": 0.05,
     "recent_closed": [
+      {
+        "id": 99314,
+        "symbol": "ZEN/USDT",
+        "direction": "LONG",
+        "state": "SL HIT - INVALIDATED",
+        "r": -1.019
+      },
       {
         "id": 99326,
         "symbol": "CHZ/USDT",
@@ -41,13 +48,6 @@
         "direction": "LONG",
         "state": "SL HIT - INVALIDATED",
         "r": -1.05
-      },
-      {
-        "id": 99322,
-        "symbol": "LINK/USDT",
-        "direction": "LONG",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.048
       }
     ],
     "open_now": [
