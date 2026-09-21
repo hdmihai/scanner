@@ -1,11 +1,11 @@
 {
-  "text": "Din 2 planuri inchise, rata de succes e 0.0%, cu -2.05R cumulat (-1.024R in medie pe plan) si profit factor 0.0. 23 planuri sunt inca deschise. Separat, 237 planuri inchise (-57.64R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #99594 EGLD/USDT -1.02R, #99582 EGLD/USDT -1.03R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 179)).",
+  "text": "Din 2 planuri inchise, rata de succes e 0.0%, cu -2.05R cumulat (-1.024R in medie pe plan) si profit factor 0.0. 24 planuri sunt inca deschise. Separat, 237 planuri inchise (-57.64R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #99594 EGLD/USDT -1.02R, #99582 EGLD/USDT -1.03R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 179)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-21 19:20 UTC",
+    "scan_time": "2026-09-21 20:22 UTC",
     "universe_size": 28,
-    "plans_total": 262,
-    "plans_open": 23,
+    "plans_total": 263,
+    "plans_open": 24,
     "plans_closed": 2,
     "legacy_closed": 237,
     "legacy_total_r": -57.64,
@@ -31,6 +31,12 @@
     ],
     "open_now": [
       {
+        "id": 99599,
+        "symbol": "FET/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
         "id": 99598,
         "symbol": "MANA/USDT",
         "direction": "LONG",
@@ -46,19 +52,13 @@
         "id": 99596,
         "symbol": "THETA/USDT",
         "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
+        "state": "INTRARE ATINSA - pozitie activa"
       },
       {
         "id": 99595,
         "symbol": "AXS/USDT",
         "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 99593,
-        "symbol": "XRP/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
+        "state": "TP1 HIT - RULEAZA SPRE TP2"
       }
     ],
     "best_bucket": null,
