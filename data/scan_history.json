@@ -21245,134 +21245,7 @@
     "scan_id_ts": 1788816039.7635794,
     "scan_time": "2026-09-07 21:20 UTC",
     "universe_size": 7,
-    "results": [
-      {
-        "symbol": "LINK/USDT",
-        "persistence": 0,
-        "age_minutes": 0,
-        "direction": "LONG",
-        "risk_adjusted": 28,
-        "probability": 59.8,
-        "expected_r": 2.62,
-        "components": {
-          "trend": 0.381,
-          "momentum": 0.021,
-          "volatility": 0.67,
-          "volume": 0.052
-        },
-        "price": 12.788,
-        "atr": 0.17135714,
-        "outcome": "miss"
-      },
-      {
-        "symbol": "NEAR/USDT",
-        "persistence": 2,
-        "age_minutes": 121,
-        "direction": "LONG",
-        "risk_adjusted": 30,
-        "probability": 60.5,
-        "expected_r": 2.7,
-        "components": {
-          "trend": 0.217,
-          "momentum": 0.074,
-          "volatility": 0.797,
-          "volume": 0.101
-        },
-        "price": 2.327,
-        "atr": 0.037071429,
-        "outcome": "miss"
-      },
-      {
-        "symbol": "ADA/USDT",
-        "persistence": 6,
-        "age_minutes": 535,
-        "direction": "LONG",
-        "risk_adjusted": 29,
-        "probability": 60.1,
-        "expected_r": 2.66,
-        "components": {
-          "trend": 0.094,
-          "momentum": 0.305,
-          "volatility": 0.681,
-          "volume": 0.103
-        },
-        "price": 0.2217,
-        "atr": 0.0030214286,
-        "outcome": "miss"
-      },
-      {
-        "symbol": "AVAX/USDT",
-        "persistence": 8,
-        "age_minutes": 1021,
-        "direction": "LONG",
-        "risk_adjusted": 54,
-        "probability": 68.9,
-        "expected_r": 3.66,
-        "components": {
-          "trend": 0.415,
-          "momentum": 0.922,
-          "volatility": 0.605,
-          "volume": 0.248
-        },
-        "price": 8.183,
-        "atr": 0.099,
-        "outcome": "miss"
-      },
-      {
-        "symbol": "GRAM/USDT",
-        "persistence": 5,
-        "age_minutes": 302,
-        "direction": "SHORT",
-        "risk_adjusted": 20,
-        "probability": 57.0,
-        "expected_r": 2.3,
-        "components": {
-          "trend": 0.034,
-          "momentum": 0.419,
-          "volatility": 0.346,
-          "volume": 0.017
-        },
-        "price": 1.404,
-        "atr": 0.0097142857,
-        "outcome": "hit"
-      },
-      {
-        "symbol": "FET/USDT",
-        "persistence": 20,
-        "age_minutes": 3903,
-        "direction": "LONG",
-        "risk_adjusted": 69,
-        "probability": 74.2,
-        "expected_r": 4.26,
-        "components": {
-          "trend": 0.628,
-          "momentum": 0.758,
-          "volatility": 0.994,
-          "volume": 0.395
-        },
-        "price": 0.1856,
-        "atr": 0.0037357143,
-        "outcome": "miss"
-      },
-      {
-        "symbol": "POL/USDT",
-        "persistence": 2,
-        "age_minutes": 121,
-        "direction": "SHORT",
-        "risk_adjusted": 22,
-        "probability": 57.7,
-        "expected_r": 2.38,
-        "components": {
-          "trend": 0.011,
-          "momentum": 0.348,
-          "volatility": 0.432,
-          "volume": 0.082
-        },
-        "price": 0.09601,
-        "atr": 0.00082928571,
-        "outcome": "miss"
-      }
-    ],
+    "results": [],
     "top_long": [
       {
         "symbol": "FET/USDT",
@@ -21609,7 +21482,13 @@
         "price_vs_value_area": "PESTE VAH"
       }
     },
-    "evaluated": true
+    "evaluated": true,
+    "outcome_summary": {
+      "hits": 1,
+      "misses": 6,
+      "signals": 7
+    },
+    "compacted": true
   },
   {
     "scan_id_ts": 1788819633.8913956,
@@ -272920,7 +272799,8 @@
           "volume": 0.525
         },
         "price": 81186.7,
-        "atr": 822.57857
+        "atr": 822.57857,
+        "outcome": "hit"
       },
       {
         "symbol": "ETH/USDT",
@@ -272937,7 +272817,8 @@
           "volume": 0.583
         },
         "price": 2633.26,
-        "atr": 41.024286
+        "atr": 41.024286,
+        "outcome": "hit"
       },
       {
         "symbol": "ZEC/USDT",
@@ -272954,7 +272835,8 @@
           "volume": 0.73
         },
         "price": 1516.03,
-        "atr": 54.575
+        "atr": 54.575,
+        "outcome": "miss"
       },
       {
         "symbol": "SOL/USDT",
@@ -272971,7 +272853,8 @@
           "volume": 0.529
         },
         "price": 110.47,
-        "atr": 2.1128571
+        "atr": 2.1128571,
+        "outcome": "hit"
       },
       {
         "symbol": "XRP/USDT",
@@ -272988,7 +272871,8 @@
           "volume": 0.534
         },
         "price": 1.4093,
-        "atr": 0.031707143
+        "atr": 0.031707143,
+        "outcome": "hit"
       },
       {
         "symbol": "SUI/USDT",
@@ -273005,7 +272889,8 @@
           "volume": 1.0
         },
         "price": 0.8807,
-        "atr": 0.035007143
+        "atr": 0.035007143,
+        "outcome": "hit"
       },
       {
         "symbol": "DOGE/USDT",
@@ -273022,7 +272907,8 @@
           "volume": 0.685
         },
         "price": 0.08738,
-        "atr": 0.0019242857
+        "atr": 0.0019242857,
+        "outcome": "hit"
       },
       {
         "symbol": "LINK/USDT",
@@ -273039,7 +272925,8 @@
           "volume": 1.0
         },
         "price": 12.534,
-        "atr": 0.28414286
+        "atr": 0.28414286,
+        "outcome": "hit"
       },
       {
         "symbol": "ADA/USDT",
@@ -273056,7 +272943,8 @@
           "volume": 0.789
         },
         "price": 0.2276,
-        "atr": 0.0068357143
+        "atr": 0.0068357143,
+        "outcome": "hit"
       },
       {
         "symbol": "TRX/USDT",
@@ -273073,7 +272961,8 @@
           "volume": 0.434
         },
         "price": 0.34306,
-        "atr": 0.0018471429
+        "atr": 0.0018471429,
+        "outcome": "miss"
       },
       {
         "symbol": "DOT/USDT",
@@ -273090,7 +272979,8 @@
           "volume": 0.842
         },
         "price": 1.1651,
-        "atr": 0.035392857
+        "atr": 0.035392857,
+        "outcome": "hit"
       },
       {
         "symbol": "GRAM/USDT",
@@ -273107,7 +272997,8 @@
           "volume": 0.919
         },
         "price": 1.385,
-        "atr": 0.020857143
+        "atr": 0.020857143,
+        "outcome": "hit"
       },
       {
         "symbol": "ALGO/USDT",
@@ -273124,7 +273015,8 @@
           "volume": 1.0
         },
         "price": 0.10986,
-        "atr": 0.0041764286
+        "atr": 0.0041764286,
+        "outcome": "miss"
       },
       {
         "symbol": "FET/USDT",
@@ -273141,7 +273033,8 @@
           "volume": 0.994
         },
         "price": 0.1764,
-        "atr": 0.0053428571
+        "atr": 0.0053428571,
+        "outcome": "hit"
       },
       {
         "symbol": "DASH/USDT",
@@ -273158,7 +273051,8 @@
           "volume": 0.587
         },
         "price": 57.74,
-        "atr": 2.3585714
+        "atr": 2.3585714,
+        "outcome": "miss"
       },
       {
         "symbol": "SEI/USDT",
@@ -273175,7 +273069,8 @@
           "volume": 1.0
         },
         "price": 0.05102,
-        "atr": 0.0013121429
+        "atr": 0.0013121429,
+        "outcome": "hit"
       },
       {
         "symbol": "POL/USDT",
@@ -273192,7 +273087,8 @@
           "volume": 0.967
         },
         "price": 0.10703,
-        "atr": 0.0035764286
+        "atr": 0.0035764286,
+        "outcome": "hit"
       },
       {
         "symbol": "ZEN/USDT",
@@ -273209,7 +273105,8 @@
           "volume": 1.0
         },
         "price": 8.123,
-        "atr": 0.43621429
+        "atr": 0.43621429,
+        "outcome": "miss"
       },
       {
         "symbol": "ATOM/USDT",
@@ -273226,7 +273123,8 @@
           "volume": 0.952
         },
         "price": 1.783,
-        "atr": 0.054857143
+        "atr": 0.054857143,
+        "outcome": "miss"
       },
       {
         "symbol": "MANA/USDT",
@@ -273243,7 +273141,8 @@
           "volume": 0.503
         },
         "price": 0.08279,
-        "atr": 0.0023614286
+        "atr": 0.0023614286,
+        "outcome": "hit"
       },
       {
         "symbol": "CHZ/USDT",
@@ -273260,7 +273159,8 @@
           "volume": 0.206
         },
         "price": 0.01501,
-        "atr": 0.00032
+        "atr": 0.00032,
+        "outcome": "hit"
       },
       {
         "symbol": "THETA/USDT",
@@ -273277,7 +273177,8 @@
           "volume": 0.243
         },
         "price": 0.2155,
-        "atr": 0.0076857143
+        "atr": 0.0076857143,
+        "outcome": "hit"
       },
       {
         "symbol": "AXS/USDT",
@@ -273294,7 +273195,8 @@
           "volume": 0.49
         },
         "price": 1.0094,
-        "atr": 0.024121429
+        "atr": 0.024121429,
+        "outcome": "hit"
       },
       {
         "symbol": "FLOW/USDT",
@@ -273311,7 +273213,8 @@
           "volume": 0.677
         },
         "price": 0.03037,
-        "atr": 0.00093428571
+        "atr": 0.00093428571,
+        "outcome": "hit"
       },
       {
         "symbol": "EGLD/USDT",
@@ -273328,7 +273231,8 @@
           "volume": 0.379
         },
         "price": 3.832,
-        "atr": 0.14657143
+        "atr": 0.14657143,
+        "outcome": "miss"
       }
     ],
     "top_long": [
@@ -273601,7 +273505,7 @@
         "price_vs_value_area": "PESTE VAH"
       }
     },
-    "evaluated": false
+    "evaluated": true
   },
   {
     "scan_id_ts": 1789942794.7733614,
@@ -288739,6 +288643,606 @@
           {
             "price": 1.5197,
             "amount": 32099.5
+          }
+        ]
+      },
+      "indicators": {
+        "emas": {
+          "ema9": 1.4531207102952266,
+          "ema20": 1.4203023393208287,
+          "ema50": 1.3898504683950086,
+          "ema100": 1.374029622564348,
+          "ema200": 1.3229513314065362
+        },
+        "vwap": 1.3817966798285073,
+        "volume_profile": {
+          "poc": 1.41785,
+          "vah": 1.50695,
+          "val": 1.32875,
+          "value_area_pct": 71.2
+        },
+        "supertrend": {
+          "direction": "BULLISH",
+          "level": 1.39871517
+        },
+        "macd": {
+          "macd": 0.03211883,
+          "signal": 0.02219146,
+          "histogram": 0.00992738,
+          "bullish": true
+        },
+        "price": 1.5076,
+        "price_vs_value_area": "PESTE VAH"
+      }
+    },
+    "evaluated": false
+  },
+  {
+    "scan_id_ts": 1790025624.56465,
+    "scan_time": "2026-09-21 21:21 UTC",
+    "universe_size": 28,
+    "results": [
+      {
+        "symbol": "XRP/USDT",
+        "persistence": 56,
+        "age_minutes": 3415,
+        "direction": "LONG",
+        "risk_adjusted": 82,
+        "probability": 78.7,
+        "expected_r": 4.78,
+        "components": {
+          "trend": 0.438,
+          "momentum": 0.995,
+          "volatility": 0.983,
+          "volume": 0.842
+        },
+        "price": 1.5076,
+        "atr": 0.030678571
+      },
+      {
+        "symbol": "ZEC/USDT",
+        "persistence": 79,
+        "age_minutes": 5098,
+        "direction": "LONG",
+        "risk_adjusted": 49,
+        "probability": 67.2,
+        "expected_r": 3.46,
+        "components": {
+          "trend": 1.0,
+          "momentum": 0.237,
+          "volatility": 0.335,
+          "volume": 0.379
+        },
+        "price": 1472.03,
+        "atr": 49.008571
+      },
+      {
+        "symbol": "NEAR/USDT",
+        "persistence": 9,
+        "age_minutes": 535,
+        "direction": "LONG",
+        "risk_adjusted": 58,
+        "probability": 70.3,
+        "expected_r": 3.82,
+        "components": {
+          "trend": 1.0,
+          "momentum": 0.77,
+          "volatility": 0.0,
+          "volume": 0.657
+        },
+        "price": 4.161,
+        "atr": 0.23407143
+      },
+      {
+        "symbol": "AVAX/USDT",
+        "persistence": 5,
+        "age_minutes": 298,
+        "direction": "LONG",
+        "risk_adjusted": 55,
+        "probability": 69.2,
+        "expected_r": 3.7,
+        "components": {
+          "trend": 1.0,
+          "momentum": 0.864,
+          "volatility": 0.0,
+          "volume": 0.447
+        },
+        "price": 11.094,
+        "atr": 0.65778571
+      },
+      {
+        "symbol": "ADA/USDT",
+        "persistence": 59,
+        "age_minutes": 3658,
+        "direction": "LONG",
+        "risk_adjusted": 72,
+        "probability": 75.2,
+        "expected_r": 4.38,
+        "components": {
+          "trend": 0.853,
+          "momentum": 0.983,
+          "volatility": 0.634,
+          "volume": 0.456
+        },
+        "price": 0.2448,
+        "atr": 0.0066857143
+      },
+      {
+        "symbol": "LINK/USDT",
+        "persistence": 67,
+        "age_minutes": 4133,
+        "direction": "LONG",
+        "risk_adjusted": 80,
+        "probability": 78.0,
+        "expected_r": 4.7,
+        "components": {
+          "trend": 0.653,
+          "momentum": 0.829,
+          "volatility": 0.84,
+          "volume": 0.857
+        },
+        "price": 13.031,
+        "atr": 0.30228571
+      },
+      {
+        "symbol": "DOT/USDT",
+        "persistence": 75,
+        "age_minutes": 4855,
+        "direction": "LONG",
+        "risk_adjusted": 68,
+        "probability": 73.8,
+        "expected_r": 4.22,
+        "components": {
+          "trend": 0.801,
+          "momentum": 0.597,
+          "volatility": 0.496,
+          "volume": 0.843
+        },
+        "price": 1.1814,
+        "atr": 0.035542857
+      },
+      {
+        "symbol": "FET/USDT",
+        "persistence": 32,
+        "age_minutes": 1976,
+        "direction": "LONG",
+        "risk_adjusted": 68,
+        "probability": 73.8,
+        "expected_r": 4.22,
+        "components": {
+          "trend": 0.844,
+          "momentum": 0.943,
+          "volatility": 0.028,
+          "volume": 1.0
+        },
+        "price": 0.2023,
+        "atr": 0.0079785714
+      },
+      {
+        "symbol": "TRX/USDT",
+        "persistence": 25,
+        "age_minutes": 1501,
+        "direction": "LONG",
+        "risk_adjusted": 41,
+        "probability": 64.3,
+        "expected_r": 3.14,
+        "components": {
+          "trend": 0.123,
+          "momentum": 0.719,
+          "volatility": 0.27,
+          "volume": 0.569
+        },
+        "price": 0.34441,
+        "atr": 0.0018592857
+      },
+      {
+        "symbol": "DASH/USDT",
+        "persistence": 25,
+        "age_minutes": 1501,
+        "direction": "LONG",
+        "risk_adjusted": 32,
+        "probability": 61.2,
+        "expected_r": 2.78,
+        "components": {
+          "trend": 0.241,
+          "momentum": 0.374,
+          "volatility": 0.321,
+          "volume": 0.357
+        },
+        "price": 59.76,
+        "atr": 2.0071429
+      },
+      {
+        "symbol": "POL/USDT",
+        "persistence": 83,
+        "age_minutes": 5339,
+        "direction": "LONG",
+        "risk_adjusted": 67,
+        "probability": 73.5,
+        "expected_r": 4.18,
+        "components": {
+          "trend": 0.834,
+          "momentum": 0.706,
+          "volatility": 0.492,
+          "volume": 0.668
+        },
+        "price": 0.11186,
+        "atr": 0.0033742857
+      },
+      {
+        "symbol": "ALGO/USDT",
+        "persistence": 25,
+        "age_minutes": 1501,
+        "direction": "LONG",
+        "risk_adjusted": 51,
+        "probability": 67.8,
+        "expected_r": 3.54,
+        "components": {
+          "trend": 1.0,
+          "momentum": 0.721,
+          "volatility": 0.0,
+          "volume": 0.427
+        },
+        "price": 0.11186,
+        "atr": 0.0047457143
+      },
+      {
+        "symbol": "ATOM/USDT",
+        "persistence": 59,
+        "age_minutes": 3658,
+        "direction": "LONG",
+        "risk_adjusted": 62,
+        "probability": 71.7,
+        "expected_r": 3.98,
+        "components": {
+          "trend": 0.647,
+          "momentum": 0.686,
+          "volatility": 0.698,
+          "volume": 0.438
+        },
+        "price": 1.796,
+        "atr": 0.046785714
+      },
+      {
+        "symbol": "ZEN/USDT",
+        "persistence": 63,
+        "age_minutes": 3899,
+        "direction": "LONG",
+        "risk_adjusted": 38,
+        "probability": 63.3,
+        "expected_r": 3.02,
+        "components": {
+          "trend": 1.0,
+          "momentum": 0.215,
+          "volatility": 0.0,
+          "volume": 0.362
+        },
+        "price": 7.657,
+        "atr": 0.33414286
+      },
+      {
+        "symbol": "CHZ/USDT",
+        "persistence": 83,
+        "age_minutes": 5339,
+        "direction": "LONG",
+        "risk_adjusted": 66,
+        "probability": 73.1,
+        "expected_r": 4.14,
+        "components": {
+          "trend": 0.544,
+          "momentum": 0.791,
+          "volatility": 0.838,
+          "volume": 0.474
+        },
+        "price": 0.01583,
+        "atr": 0.00036785714
+      },
+      {
+        "symbol": "THETA/USDT",
+        "persistence": 59,
+        "age_minutes": 3658,
+        "direction": "LONG",
+        "risk_adjusted": 63,
+        "probability": 72.0,
+        "expected_r": 4.02,
+        "components": {
+          "trend": 1.0,
+          "momentum": 0.645,
+          "volatility": 0.467,
+          "volume": 0.462
+        },
+        "price": 0.223,
+        "atr": 0.0068357143
+      },
+      {
+        "symbol": "AXS/USDT",
+        "persistence": 63,
+        "age_minutes": 3899,
+        "direction": "LONG",
+        "risk_adjusted": 73,
+        "probability": 75.5,
+        "expected_r": 4.42,
+        "components": {
+          "trend": 0.654,
+          "momentum": 0.836,
+          "volatility": 0.798,
+          "volume": 0.624
+        },
+        "price": 1.0627,
+        "atr": 0.02555
+      },
+      {
+        "symbol": "MANA/USDT",
+        "persistence": 44,
+        "age_minutes": 2691,
+        "direction": "LONG",
+        "risk_adjusted": 61,
+        "probability": 71.3,
+        "expected_r": 3.94,
+        "components": {
+          "trend": 0.808,
+          "momentum": 0.722,
+          "volatility": 0.671,
+          "volume": 0.28
+        },
+        "price": 0.08536,
+        "atr": 0.0022685714
+      },
+      {
+        "symbol": "GRT/USDT",
+        "persistence": 13,
+        "age_minutes": 776,
+        "direction": "LONG",
+        "risk_adjusted": 69,
+        "probability": 74.2,
+        "expected_r": 4.26,
+        "components": {
+          "trend": 1.0,
+          "momentum": 0.943,
+          "volatility": 0.283,
+          "volume": 0.628
+        },
+        "price": 0.02332,
+        "atr": 0.00080071429
+      },
+      {
+        "symbol": "FLOW/USDT",
+        "persistence": 75,
+        "age_minutes": 4855,
+        "direction": "LONG",
+        "risk_adjusted": 53,
+        "probability": 68.5,
+        "expected_r": 3.62,
+        "components": {
+          "trend": 0.844,
+          "momentum": 0.611,
+          "volatility": 0.067,
+          "volume": 0.66
+        },
+        "price": 0.03245,
+        "atr": 0.0012542857
+      }
+    ],
+    "top_long": [
+      {
+        "symbol": "XRP/USDT",
+        "persistence": 56,
+        "age_minutes": 3415,
+        "direction": "LONG",
+        "risk_adjusted": 82,
+        "probability": 78.7,
+        "expected_r": 4.78,
+        "components": {
+          "trend": 0.438,
+          "momentum": 0.995,
+          "volatility": 0.983,
+          "volume": 0.842
+        },
+        "price": 1.5076,
+        "atr": 0.030678571
+      },
+      {
+        "symbol": "LINK/USDT",
+        "persistence": 67,
+        "age_minutes": 4133,
+        "direction": "LONG",
+        "risk_adjusted": 80,
+        "probability": 78.0,
+        "expected_r": 4.7,
+        "components": {
+          "trend": 0.653,
+          "momentum": 0.829,
+          "volatility": 0.84,
+          "volume": 0.857
+        },
+        "price": 13.031,
+        "atr": 0.30228571
+      },
+      {
+        "symbol": "AXS/USDT",
+        "persistence": 63,
+        "age_minutes": 3899,
+        "direction": "LONG",
+        "risk_adjusted": 73,
+        "probability": 75.5,
+        "expected_r": 4.42,
+        "components": {
+          "trend": 0.654,
+          "momentum": 0.836,
+          "volatility": 0.798,
+          "volume": 0.624
+        },
+        "price": 1.0627,
+        "atr": 0.02555
+      },
+      {
+        "symbol": "ADA/USDT",
+        "persistence": 59,
+        "age_minutes": 3658,
+        "direction": "LONG",
+        "risk_adjusted": 72,
+        "probability": 75.2,
+        "expected_r": 4.38,
+        "components": {
+          "trend": 0.853,
+          "momentum": 0.983,
+          "volatility": 0.634,
+          "volume": 0.456
+        },
+        "price": 0.2448,
+        "atr": 0.0066857143
+      },
+      {
+        "symbol": "GRT/USDT",
+        "persistence": 13,
+        "age_minutes": 776,
+        "direction": "LONG",
+        "risk_adjusted": 69,
+        "probability": 74.2,
+        "expected_r": 4.26,
+        "components": {
+          "trend": 1.0,
+          "momentum": 0.943,
+          "volatility": 0.283,
+          "volume": 0.628
+        },
+        "price": 0.02332,
+        "atr": 0.00080071429
+      },
+      {
+        "symbol": "DOT/USDT",
+        "persistence": 75,
+        "age_minutes": 4855,
+        "direction": "LONG",
+        "risk_adjusted": 68,
+        "probability": 73.8,
+        "expected_r": 4.22,
+        "components": {
+          "trend": 0.801,
+          "momentum": 0.597,
+          "volatility": 0.496,
+          "volume": 0.843
+        },
+        "price": 1.1814,
+        "atr": 0.035542857
+      },
+      {
+        "symbol": "FET/USDT",
+        "persistence": 32,
+        "age_minutes": 1976,
+        "direction": "LONG",
+        "risk_adjusted": 68,
+        "probability": 73.8,
+        "expected_r": 4.22,
+        "components": {
+          "trend": 0.844,
+          "momentum": 0.943,
+          "volatility": 0.028,
+          "volume": 1.0
+        },
+        "price": 0.2023,
+        "atr": 0.0079785714
+      },
+      {
+        "symbol": "POL/USDT",
+        "persistence": 83,
+        "age_minutes": 5339,
+        "direction": "LONG",
+        "risk_adjusted": 67,
+        "probability": 73.5,
+        "expected_r": 4.18,
+        "components": {
+          "trend": 0.834,
+          "momentum": 0.706,
+          "volatility": 0.492,
+          "volume": 0.668
+        },
+        "price": 0.11186,
+        "atr": 0.0033742857
+      }
+    ],
+    "top_short": [],
+    "best_candidate": {
+      "symbol": "XRP/USDT",
+      "persistence": 56,
+      "age_minutes": 3415,
+      "direction": "LONG",
+      "risk_adjusted": 82,
+      "probability": 78.7,
+      "expected_r": 4.78,
+      "components": {
+        "trend": 0.438,
+        "momentum": 0.995,
+        "volatility": 0.983,
+        "volume": 0.842
+      },
+      "price": 1.5076,
+      "atr": 0.030678571
+    },
+    "deep_analysis": {
+      "structure": {
+        "resistance": [
+          1.7,
+          1.551,
+          1.5509
+        ],
+        "support": [
+          1.3099,
+          1.2877,
+          1.248
+        ]
+      },
+      "fibonacci": {
+        "swing_high": 1.5149,
+        "swing_low": 1.248,
+        "retracement": {
+          "0.236": 1.4519116,
+          "0.382": 1.4129442,
+          "0.5": 1.38145,
+          "0.618": 1.3499558,
+          "0.786": 1.3051166
+        },
+        "extension": {
+          "1.272": 1.5874968,
+          "1.618": 1.6798442,
+          "2.0": 1.7818
+        }
+      },
+      "plan": {
+        "entry": 1.4922607,
+        "sl": 1.4615821,
+        "signal_price": 1.5076,
+        "tp1": 1.5509,
+        "tp2": 1.6303143,
+        "expected_r": 4.5
+      },
+      "liquidity": {
+        "bids": [
+          {
+            "price": 1.5177,
+            "amount": 155883.0
+          },
+          {
+            "price": 1.52,
+            "amount": 24208.3
+          },
+          {
+            "price": 1.5187,
+            "amount": 20994.7
+          }
+        ],
+        "asks": [
+          {
+            "price": 1.5275,
+            "amount": 159694.0
+          },
+          {
+            "price": 1.524,
+            "amount": 39147.9
+          },
+          {
+            "price": 1.5244,
+            "amount": 29975.7
           }
         ]
       },
