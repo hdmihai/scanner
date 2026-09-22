@@ -171,9 +171,9 @@ USE_DECISION_GATE = os.environ.get("USE_DECISION_GATE", "false").lower() == "tru
 # cost de tranzactie). Amestecarea lor in calibrare ar media doua sisteme
 # diferite - aceeasi eroare pe care am evitat-o la schimbarile de geometrie.
 # Asa, trecerea de la 1h la 4h separa automat datele, fara interventie manuala.
-# v7: STRUCTURA DE PIATA. S-au adaugat ichimoku, ma_cross, regime si mtf_align,
-# deci vectorul de caracteristici a crescut cu 4. Planurile v6 nu le au, deci
-# un model antrenat pe ele nu e comparabil - resetul e obligatoriu.
+# Structura de piata si Elliott au adaugat CARACTERISTICI, nu reguli noi de
+# plan. Sunt urmarite de FEATURE_VERSION - planurile raman comparabile si
+# agentul nu se reseteaza.
 #
 # v6: HARTA DE LICHIDARI. S-a adaugat evidenta `liq_magnet`, deci vectorul de
 # caracteristici a trecut de la 16 la 17. Planurile v5 nu o au, deci un model
@@ -210,7 +210,12 @@ FEATURE_VERSION = "f5"      # f5 = + Elliott cu numaratori concurente
 def _build_geometry(caps_sig=None):
     # Semnatura de capabilitati ramane in geometrie: ea schimba ce EXISTA in
     # date, nu doar cum e privit. Un plan fara order flow chiar are alt continut.
-    return ("v7-" + os.environ.get("SCAN_TIMEFRAME", "1h")
+    # REVENIT la v6, intentionat. Urcasem la v7 cand am adaugat
+    # market_structure - adica o schimbare de CARACTERISTICI, exact situatia in
+    # care tocmai demonstrasem ca geometria NU trebuie urcata. Rezultatele
+    # planurilor v6 nu s-au schimbat: aceleasi reguli de entry, SL, TP, costuri.
+    # Urcarea ar fi aruncat cele 13.086 de planuri deja masurate.
+    return ("v6-" + os.environ.get("SCAN_TIMEFRAME", "1h")
             + "-" + (caps_sig or os.environ.get("SCAN_CAPS", "o")))
 
 
