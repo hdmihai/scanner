@@ -1,119 +1,83 @@
 {
-  "text": "Din 14 planuri inchise, rata de succes e 60.0%, cu -0.65R cumulat (-0.130R in medie pe plan) si profit factor 0.68. 18 planuri sunt inca deschise. Separat, 237 planuri inchise (-57.64R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #99586 DOGE/USDT +0.00R, #99588 ADA/USDT +0.00R, #99590 BTC/USDT +0.00R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 179)).",
+  "text": "8 planuri sunt deschise, niciunul inchis inca. Pana la primele inchideri nu pot spune nimic despre performanta - orice cifra ar fi speculatie. Separat, 21415 planuri inchise (+1389.72R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 69.6% fata de 33.2% baseline, pe 16233 planuri invatate.",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-22 20:20 UTC",
-    "universe_size": 28,
-    "plans_total": 269,
-    "plans_open": 18,
-    "plans_closed": 14,
-    "legacy_closed": 237,
-    "legacy_total_r": -57.64,
-    "win_rate": 60.0,
-    "total_r": -0.65,
-    "avg_r": -0.13,
-    "profit_factor": 0.68,
-    "recent_closed": [
-      {
-        "id": 99586,
-        "symbol": "DOGE/USDT",
-        "direction": "LONG",
-        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
-        "r": 0.0
-      },
-      {
-        "id": 99588,
-        "symbol": "ADA/USDT",
-        "direction": "LONG",
-        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
-        "r": 0.0
-      },
-      {
-        "id": 99590,
-        "symbol": "BTC/USDT",
-        "direction": "LONG",
-        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
-        "r": 0.0
-      },
-      {
-        "id": 99583,
-        "symbol": "GRT/USDT",
-        "direction": "LONG",
-        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
-        "r": 0.0
-      },
-      {
-        "id": 99584,
-        "symbol": "ETH/USDT",
-        "direction": "LONG",
-        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
-        "r": 0.0
-      }
-    ],
+    "scan_time": "2026-09-22 22:21 UTC",
+    "universe_size": 30,
+    "plans_total": 21423,
+    "plans_open": 8,
+    "plans_closed": 0,
+    "legacy_closed": 21415,
+    "legacy_total_r": 1389.72,
+    "win_rate": null,
+    "total_r": 0,
+    "avg_r": null,
+    "profit_factor": null,
+    "recent_closed": [],
     "open_now": [
       {
-        "id": 99605,
+        "id": 121028,
+        "symbol": "LINK/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 121027,
         "symbol": "BTC/USDT",
         "direction": "LONG",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       },
       {
-        "id": 99604,
+        "id": 121026,
+        "symbol": "ETH/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 121025,
         "symbol": "THETA/USDT",
         "direction": "LONG",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       },
       {
-        "id": 99603,
-        "symbol": "ETH/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 99602,
-        "symbol": "AXS/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 99601,
-        "symbol": "LINK/USDT",
+        "id": 121024,
+        "symbol": "GRAM/USDT",
         "direction": "LONG",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       }
     ],
     "best_bucket": null,
     "worst_bucket": null,
-    "agent_status": "SHADOW",
-    "agent_reason": "are nevoie de 300 exemple (are 179)",
-    "agent_samples": 179,
-    "agent_balanced": 76.76923076923077,
-    "baseline_balanced": 22.083333333333332,
+    "agent_status": "ACTIVE",
+    "agent_reason": "acuratete echilibrata 69.6% vs euristica 33.2%",
+    "agent_samples": 16233,
+    "agent_balanced": 69.64182054910654,
+    "baseline_balanced": 33.2435196102064,
     "agent_weights": {
-      "trend": -0.124067,
-      "momentum": -0.009831,
-      "volatility": -0.360587,
-      "volume": -0.08533,
+      "trend": -0.027802,
+      "momentum": -0.009724,
+      "volatility": 0.024243,
+      "volume": -0.062622,
       "persistence_n": 0.0,
-      "ev_ema_fast": 0.001187,
-      "ev_ema_stack": 0.327705,
-      "ev_supertrend": -0.065291,
-      "ev_macd": 0.322226,
-      "ev_vwap": -0.204625,
-      "ev_poc": 0.413225,
-      "ev_value_area": 0.080136,
-      "ev_rsi": -0.140322,
+      "ev_ema_fast": -0.033365,
+      "ev_ema_stack": 0.793212,
+      "ev_supertrend": 0.12975,
+      "ev_macd": 0.938651,
+      "ev_vwap": 0.220394,
+      "ev_poc": -0.18988,
+      "ev_value_area": 0.010232,
+      "ev_rsi": -0.174311,
       "ev_volume": 0.0,
       "ev_volatility": 0.0,
       "ev_order_flow": 0.0,
       "ev_book_imbalance": 0.0,
-      "ev_liq_magnet": 0.165692,
-      "ev_ichimoku": -0.039057,
-      "ev_ma_cross": 0.3259,
-      "ev_regime": 0.039508,
+      "ev_liq_magnet": -0.124528,
+      "ev_ichimoku": 0.133721,
+      "ev_ma_cross": 0.536592,
+      "ev_regime": 0.427517,
       "ev_mtf_align": 0.0,
-      "ev_elliott": -0.097412,
-      "ev_fusion": 0.14204
+      "ev_elliott": 0.169189,
+      "ev_fusion": 0.04511
     }
   }
 }
