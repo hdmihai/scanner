@@ -88,6 +88,18 @@ CONFIG = {
         "GRAM", "LINK", "NEAR", "POL", "SEI", "SUI", "TRX", "ZEC", "ZEN",
         # adaugati pe rezultate masurate
         "BTC", "ETH", "SOL", "XRP", "DOGE", "ATOM", "THETA", "GRT", "MANA", "FLOW",
+        # Doi din top 100 cu cel mai mare multiplu pana la ATH: ambii ~99.7%
+        # sub maxim, deci peste 300x pe criteriul cerut. I-am ales dintre cei
+        # profund scazuti pentru ca se disting de proiectele moarte - ICP are a
+        # treia cea mai mare activitate de dezvoltare din crypto, iar Filecoin
+        # conduce industria la commit-uri zilnice pe GitHub.
+        #
+        # CAVEAT, pentru ca nu vreau sa para altceva decat e: distanta fata de
+        # ATH NU e o masura a valorii. Maximul a fost un pret care a existat o
+        # clipa in conditii specifice, nu o valoare la care activul are dreptul
+        # sa revina. Backtest-ul va spune daca produc planuri bune; criteriul
+        # ATH spune doar ca au spatiu, nu ca il vor parcurge.
+        "ICP", "FIL",
     ],
     # Redenumiri de care sunt sigur. Backtest-ul alege aliasul cu istoricul
     # cel mai adanc, nu pe cel cu volumul mai mare.
