@@ -91,53 +91,114 @@ def load_json(path, default):
 
 # ========================== DESCARCARE ISTORIC ==============================
 
+def find_listing_ts(exchange, symbol, timeframe, max_days, probes=14):
+    """Cauta binar momentul in care simbolul a INCEPUT sa aiba date.
+
+    DE CE E NEVOIE
+    --------------
+    Bursele nu returneaza "ce au" cand `since` e anterior listarii perechii -
+    returneaza GOL. Varianta anterioara trata golul cerand fara `since`, ceea ce
+    da cele mai RECENTE bare, nu cele mai vechi; apoi paginarea pornea din
+    prezent si se oprea imediat. Masurat in productie: la 3650 de zile cerute,
+    toate cele 28 de simboluri au primit 50 de zile, desi la 1825 primeau
+    istoric complet. A cere mai mult returna mai putin.
+
+    Cautarea binara gaseste cea mai veche data pentru care bursa raspunde cu
+    date, deci fiecare simbol da exact cat exista: cele vechi dau ani, cele
+    listate recent dau de la listare. Asta e "durata de viata" reala.
+
+    Costa ~14 apeluri per simbol, o data - neglijabil fata de sutele de pagini
+    de descarcare care urmeaza.
+    """
+    now = exchange.milliseconds()
+    oldest = now - max_days * 86400 * 1000
+
+    def has_data(ts):
+        try:
+            b = exchange.fetch_ohlcv(symbol, timeframe=timeframe, since=ts, limit=5)
+            return bool(b)
+        except Exception:
+            return False
+
+    # Daca cea mai veche data ceruta raspunde, nu mai caut: luam tot.
+    if has_data(oldest):
+        return oldest
+
+    # Capatul "cu date" trebuie sa fie suficient de aproape de prezent ca sa
+    # prinda si simbolurile listate foarte recent. Sondez mai multe distante:
+    # un singur prag de 30 de zile rata tokenii de 20 de zile, care exista si
+    # au date perfect utilizabile.
+    probe_recent = None
+    for d in (30, 7, 2, 1):
+        cand = now - d * 86400 * 1000
+        if has_data(cand):
+            probe_recent = cand
+            break
+    if probe_recent is None:
+        return None
+
+    lo, hi = oldest, probe_recent      # lo=fara date, hi=cu date
+    for _ in range(probes):
+        mid = (lo + hi) // 2
+        if hi - lo < 86400 * 1000:     # sub o zi diferenta: suficient de precis
+            break
+        if has_data(mid):
+            hi = mid
+        else:
+            lo = mid
+    return hi
+
+
 def fetch_history(exchange, symbol, timeframe, days):
-    """Descarca istoricul paginat. Un singur apel ccxt intoarce cel mult
-    ~500-1500 de lumanari, deci pentru luni intregi trebuie paginat cu `since`."""
+    """Descarca istoricul paginat, pornind de la momentul REAL al listarii.
+
+    Un apel ccxt intoarce cel mult ~100-1500 de lumanari, deci paginez cu
+    `since`. Punctul de start vine din find_listing_ts, nu din `now - days`:
+    altfel simbolurile listate recent primesc gol si cad pe o rezerva care
+    intoarce doar barele recente.
+    """
     ms_per_bar = exchange.parse_timeframe(timeframe) * 1000
-    since = exchange.milliseconds() - days * 86400 * 1000
+    since = find_listing_ts(exchange, symbol, timeframe, days)
+    if since is None:
+        print(f"  [!] {symbol}: bursa nu raspunde cu date pe {timeframe}.")
+        return []
+
+    requested = exchange.milliseconds() - days * 86400 * 1000
+    if since > requested + 86400 * 1000:
+        age_days = (exchange.milliseconds() - since) / 86400 / 1000
+        print(f"  (listat acum ~{age_days:.0f} zile) ", end="")
+
     out = []
-    # Unele burse returneaza GOL daca `since` e anterior listarii perechii, in
-    # loc sa dea ce au. Pe rularea de 5 ani, 6 din 20 de simboluri au primit 0
-    # bare exact asa (POL, FET, GRAM, BNB, ARB, OP) si au fost sarite complet.
-    # Daca prima cerere vine goala, reincerc fara `since`, ca sa iau ce exista.
-    first_empty = False
+    stall = 0
     while True:
         try:
-            batch = exchange.fetch_ohlcv(symbol, timeframe=timeframe, since=since, limit=1000)
+            batch = exchange.fetch_ohlcv(symbol, timeframe=timeframe,
+                                         since=since, limit=1000)
         except Exception as e:
             print(f"  [!] {symbol}: {e}")
             break
         if not batch:
-            if not out and not first_empty:
-                first_empty = True
-                try:
-                    batch = exchange.fetch_ohlcv(symbol, timeframe=timeframe, limit=1000)
-                except Exception:
-                    batch = None
-                if batch:
-                    out.extend(batch)
-                    since = batch[-1][0] + ms_per_bar
-                    continue
             break
         out.extend(batch)
         if len(batch) < 2:
             break
         next_since = batch[-1][0] + ms_per_bar
         if next_since <= since:
-            break
+            stall += 1
+            if stall > 2:
+                break
+            next_since = since + ms_per_bar * len(batch)
+        else:
+            stall = 0
         since = next_since
         if batch[-1][0] >= exchange.milliseconds() - ms_per_bar:
             break
         # FARA sleep manual: ccxt are enableRateLimit=True implicit si asteapta
-        # deja `rateLimit` ms intre apeluri. Sleep-ul de aici se ADAUGA peste,
-        # deci plateam intarzierea de doua ori - masurat pe log-ul real, 216 ms
-        # per pagina in loc de 110. Pe 3650 de zile asta inseamna 8 minute in
-        # plus, degeaba. Daca bursa nu declara rate limit, il pun eu.
+        # deja `rateLimit` ms. Sleep-ul de aici se adauga peste, deci plateam
+        # intarzierea de doua ori - masurat, 216 ms/pagina in loc de 110.
         if not getattr(exchange, "enableRateLimit", False):
             time.sleep(exchange.rateLimit / 1000)
 
-    # deduplic dupa timestamp si sortez, ca paginarea poate suprapune batch-uri
     seen = {}
     for c in out:
         seen[c[0]] = c
