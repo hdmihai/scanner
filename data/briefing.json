@@ -1,19 +1,40 @@
 {
-  "text": "Din 8 planuri inchise, rata de succes e 50.0%, cu -1.12R cumulat (-0.280R in medie pe plan) si profit factor 0.45. 21 planuri sunt inca deschise. Separat, 237 planuri inchise (-57.64R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #99574 SEI/USDT +0.00R, #99575 LINK/USDT +0.00R, #99576 SUI/USDT +0.00R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 179)).",
+  "text": "Din 11 planuri inchise, rata de succes e 60.0%, cu -0.65R cumulat (-0.130R in medie pe plan) si profit factor 0.68. 20 planuri sunt inca deschise. Separat, 237 planuri inchise (-57.64R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #99583 GRT/USDT +0.00R, #99584 ETH/USDT +0.00R, #99587 FLOW/USDT +0.47R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (are nevoie de 300 exemple (are 179)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-22 15:22 UTC",
+    "scan_time": "2026-09-22 16:22 UTC",
     "universe_size": 28,
-    "plans_total": 266,
-    "plans_open": 21,
-    "plans_closed": 8,
+    "plans_total": 268,
+    "plans_open": 20,
+    "plans_closed": 11,
     "legacy_closed": 237,
     "legacy_total_r": -57.64,
-    "win_rate": 50.0,
-    "total_r": -1.12,
-    "avg_r": -0.28,
-    "profit_factor": 0.45,
+    "win_rate": 60.0,
+    "total_r": -0.65,
+    "avg_r": -0.13,
+    "profit_factor": 0.68,
     "recent_closed": [
+      {
+        "id": 99583,
+        "symbol": "GRT/USDT",
+        "direction": "LONG",
+        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
+        "r": 0.0
+      },
+      {
+        "id": 99584,
+        "symbol": "ETH/USDT",
+        "direction": "LONG",
+        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
+        "r": 0.0
+      },
+      {
+        "id": 99587,
+        "symbol": "FLOW/USDT",
+        "direction": "LONG",
+        "state": "TP1 HIT - SL LA BREAKEVEN",
+        "r": 0.47
+      },
       {
         "id": 99574,
         "symbol": "SEI/USDT",
@@ -27,30 +48,21 @@
         "direction": "LONG",
         "state": "PRETUL NU A REVENIT in 8 bare - anulat",
         "r": 0.0
-      },
-      {
-        "id": 99576,
-        "symbol": "SUI/USDT",
-        "direction": "LONG",
-        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
-        "r": 0.0
-      },
-      {
-        "id": 99578,
-        "symbol": "SOL/USDT",
-        "direction": "LONG",
-        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
-        "r": 0.0
-      },
-      {
-        "id": 99595,
-        "symbol": "AXS/USDT",
-        "direction": "LONG",
-        "state": "TP1 HIT - SL LA BREAKEVEN",
-        "r": 0.458
       }
     ],
     "open_now": [
+      {
+        "id": 99604,
+        "symbol": "THETA/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 99603,
+        "symbol": "ETH/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
       {
         "id": 99602,
         "symbol": "AXS/USDT",
@@ -66,18 +78,6 @@
       {
         "id": 99600,
         "symbol": "SOL/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 99599,
-        "symbol": "FET/USDT",
-        "direction": "LONG",
-        "state": "TP1 HIT - RULEAZA SPRE TP2"
-      },
-      {
-        "id": 99598,
-        "symbol": "MANA/USDT",
         "direction": "LONG",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       }
