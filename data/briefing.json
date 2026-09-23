@@ -1,19 +1,26 @@
 {
-  "text": "Din 13 planuri inchise, rata de succes e 7.7%, cu -12.06R cumulat (-0.928R in medie pe plan) si profit factor 0.04. 9 planuri sunt inca deschise. Separat, 21415 planuri inchise (+1389.72R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #121021 SOL/USDT -1.05R, #121022 CHZ/USDT -1.04R, #121023 AXS/USDT -1.04R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 69.6% fata de 33.2% baseline, pe 16233 planuri invatate.",
+  "text": "Din 14 planuri inchise, rata de succes e 7.1%, cu -13.09R cumulat (-0.935R in medie pe plan) si profit factor 0.03. 8 planuri sunt inca deschise. Separat, 21415 planuri inchise (+1389.72R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #121034 ICP/USDT -1.03R, #121021 SOL/USDT -1.05R, #121022 CHZ/USDT -1.04R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 69.6% fata de 33.2% baseline, pe 16233 planuri invatate.",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-23 19:21 UTC",
+    "scan_time": "2026-09-23 20:23 UTC",
     "universe_size": 30,
     "plans_total": 21437,
-    "plans_open": 9,
-    "plans_closed": 13,
+    "plans_open": 8,
+    "plans_closed": 14,
     "legacy_closed": 21415,
     "legacy_total_r": 1389.72,
-    "win_rate": 7.7,
-    "total_r": -12.06,
-    "avg_r": -0.928,
-    "profit_factor": 0.04,
+    "win_rate": 7.1,
+    "total_r": -13.09,
+    "avg_r": -0.935,
+    "profit_factor": 0.03,
     "recent_closed": [
+      {
+        "id": 121034,
+        "symbol": "ICP/USDT",
+        "direction": "LONG",
+        "state": "SL HIT - INVALIDATED",
+        "r": -1.032
+      },
       {
         "id": 121021,
         "symbol": "SOL/USDT",
@@ -41,13 +48,6 @@
         "direction": "LONG",
         "state": "SL HIT - INVALIDATED",
         "r": -1.052
-      },
-      {
-        "id": 121025,
-        "symbol": "THETA/USDT",
-        "direction": "LONG",
-        "state": "TP1 HIT - SL LA BREAKEVEN",
-        "r": 0.466
       }
     ],
     "open_now": [
