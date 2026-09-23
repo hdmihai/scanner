@@ -1,5 +1,5 @@
 {
-  "scan_time": "2026-09-23 10:21 UTC",
+  "scan_time": "2026-09-23 11:21 UTC",
   "exchange": "okx",
   "symbols": {
     "BTC/USDT": {
@@ -14,8 +14,8 @@
       },
       "price": 86133.3,
       "atr": 1212.0857,
-      "persistence": 2,
-      "age_minutes": 119,
+      "persistence": 3,
+      "age_minutes": 179,
       "indicators": {
         "emas": {
           "ema9": 85852.1855292847,
@@ -434,8 +434,8 @@
     },
     "ETH/USDT": {
       "direction": "LONG",
-      "score": 70,
-      "probability": 74.5,
+      "score": 69,
+      "probability": 74.2,
       "components": {
         "trend": 0.619,
         "momentum": 0.614,
@@ -444,8 +444,8 @@
       },
       "price": 2743.31,
       "atr": 46.521429,
-      "persistence": 29,
-      "age_minutes": 1800,
+      "persistence": 30,
+      "age_minutes": 1860,
       "indicators": {
         "emas": {
           "ema9": 2743.216250450374,
@@ -800,8 +800,8 @@
       },
       "price": 117.9,
       "atr": 2.3657143,
-      "persistence": 29,
-      "age_minutes": 1800,
+      "persistence": 30,
+      "age_minutes": 1860,
       "indicators": {
         "emas": {
           "ema9": 117.53740077458548,
@@ -1156,8 +1156,8 @@
       },
       "price": 0.1009,
       "atr": 0.0038742857,
-      "persistence": 2,
-      "age_minutes": 119,
+      "persistence": 3,
+      "age_minutes": 179,
       "indicators": {
         "emas": {
           "ema9": 0.09967698829772197,
@@ -1578,8 +1578,8 @@
       },
       "price": 1627.5,
       "atr": 61.084286,
-      "persistence": 115,
-      "age_minutes": 7319,
+      "persistence": 116,
+      "age_minutes": 7379,
       "indicators": {
         "emas": {
           "ema9": 1564.4033255106742,
@@ -1955,10 +1955,358 @@
         "oi_scaled": false
       }
     },
+    "SUI/USDT": {
+      "direction": "LONG",
+      "score": 42,
+      "probability": 64.7,
+      "components": {
+        "trend": 1.0,
+        "momentum": 0.942,
+        "volatility": 0.0,
+        "volume": 0.391
+      },
+      "price": 1.0255,
+      "atr": 0.042571429,
+      "persistence": 26,
+      "age_minutes": 1619,
+      "indicators": {
+        "emas": {
+          "ema9": 1.012003065709984,
+          "ema20": 0.9689285513002511,
+          "ema50": 0.8825551165987098,
+          "ema100": 0.8272749561235342,
+          "ema200": 0.7869766497535203
+        },
+        "vwap": 0.8215970854536313,
+        "volume_profile": {
+          "poc": 0.81120625,
+          "vah": 0.82994375,
+          "val": 0.69878125,
+          "value_area_pct": 75.4
+        },
+        "supertrend": {
+          "direction": "BULLISH",
+          "level": 0.92272184
+        },
+        "macd": {
+          "macd": 0.05563167,
+          "signal": 0.05884148,
+          "histogram": -0.00320981,
+          "bullish": false
+        },
+        "price": 1.0255,
+        "price_vs_value_area": "PESTE VAH"
+      },
+      "structure": {
+        "resistance": [
+          1.0829,
+          0.8874,
+          0.8578
+        ],
+        "support": [
+          0.6968,
+          0.6926,
+          0.6726
+        ]
+      },
+      "fibonacci": {
+        "swing_high": 1.0829,
+        "swing_low": 0.6726,
+        "retracement": {
+          "0.236": 0.9860692,
+          "0.382": 0.9261654,
+          "0.5": 0.87775,
+          "0.618": 0.8293346,
+          "0.786": 0.7604042
+        },
+        "extension": {
+          "1.272": 1.1945016,
+          "1.618": 1.3364654,
+          "2.0": 1.4932
+        }
+      },
+      "plan": {
+        "entry": 1.0042143,
+        "sl": 0.96164286,
+        "signal_price": 1.0255,
+        "tp1": 1.0829,
+        "tp2": 1.1957857,
+        "expected_r": 4.5
+      },
+      "sparkline": [
+        0.7079,
+        0.7135,
+        0.7208,
+        0.7227,
+        0.722,
+        0.7336,
+        0.7324,
+        0.7414,
+        0.788,
+        0.7826,
+        0.7921,
+        0.8036,
+        0.8135,
+        0.8142,
+        0.8296,
+        0.8088,
+        0.8633,
+        0.8435,
+        0.8751,
+        0.8575,
+        0.8262,
+        0.8158,
+        0.8225,
+        0.8458,
+        0.8807,
+        0.8974,
+        0.9497,
+        0.9667,
+        1.0157,
+        1.0181,
+        1.0367,
+        1.0426,
+        1.0373,
+        1.0134,
+        1.0146,
+        1.007,
+        1.005,
+        1.024,
+        1.0247,
+        1.0255
+      ],
+      "elliott": {
+        "counts": [
+          {
+            "pattern": "CORECTIE A-B-C",
+            "direction": "LONG",
+            "confidence": 0.6225,
+            "invalidation": 0.6997,
+            "points": [
+              {
+                "label": "START",
+                "price": 0.6997,
+                "idx": 5
+              },
+              {
+                "label": "A",
+                "price": 0.6743,
+                "idx": 10
+              },
+              {
+                "label": "B",
+                "price": 0.6948,
+                "idx": 14
+              },
+              {
+                "label": "C",
+                "price": 0.6718,
+                "idx": 20
+              }
+            ],
+            "targets": {
+              "tp1": 0.6874971999999999,
+              "tp2": 0.6971999999999999
+            },
+            "start_idx": 5,
+            "rank": "Primary",
+            "invalidated": false
+          },
+          {
+            "pattern": "ARMONICA AB=CD",
+            "direction": "LONG",
+            "confidence": 0.5665,
+            "invalidation": 0.6997,
+            "prz": {
+              "low": 0.6624912000000001,
+              "high": 0.6694
+            },
+            "points": [
+              {
+                "label": "A",
+                "price": 0.6997,
+                "idx": 5
+              },
+              {
+                "label": "B",
+                "price": 0.6743,
+                "idx": 10
+              },
+              {
+                "label": "C",
+                "price": 0.6948,
+                "idx": 14
+              },
+              {
+                "label": "D",
+                "price": 0.6718,
+                "idx": 20
+              }
+            ],
+            "targets": {
+              "tp1": 0.6948,
+              "tp2": 0.6997
+            },
+            "start_idx": 5,
+            "rank": "Alternative",
+            "invalidated": false
+          },
+          {
+            "pattern": "CORECTIE A-B-C",
+            "direction": "LONG",
+            "confidence": 0.5055,
+            "invalidation": 0.6887,
+            "points": [
+              {
+                "label": "START",
+                "price": 0.6887,
+                "idx": 23
+              },
+              {
+                "label": "A",
+                "price": 0.6728,
+                "idx": 30
+              },
+              {
+                "label": "B",
+                "price": 0.682,
+                "idx": 33
+              },
+              {
+                "label": "C",
+                "price": 0.6332,
+                "idx": 41
+              }
+            ],
+            "targets": {
+              "tp1": 0.6430262,
+              "tp2": 0.6491
+            },
+            "start_idx": 23,
+            "rank": "Secondary",
+            "invalidated": false
+          },
+          {
+            "pattern": "CORECTIE A-B-C",
+            "direction": "LONG",
+            "confidence": 0.5054,
+            "invalidation": 0.6948,
+            "points": [
+              {
+                "label": "START",
+                "price": 0.6948,
+                "idx": 14
+              },
+              {
+                "label": "A",
+                "price": 0.6718,
+                "idx": 20
+              },
+              {
+                "label": "B",
+                "price": 0.6887,
+                "idx": 23
+              },
+              {
+                "label": "C",
+                "price": 0.6728,
+                "idx": 30
+              }
+            ],
+            "targets": {
+              "tp1": 0.687014,
+              "tp2": 0.6958
+            },
+            "start_idx": 14,
+            "rank": "Family",
+            "invalidated": false
+          }
+        ],
+        "primary": {
+          "pattern": "CORECTIE A-B-C",
+          "direction": "LONG",
+          "confidence": 0.6225,
+          "invalidation": 0.6997,
+          "points": [
+            {
+              "label": "START",
+              "price": 0.6997,
+              "idx": 5
+            },
+            {
+              "label": "A",
+              "price": 0.6743,
+              "idx": 10
+            },
+            {
+              "label": "B",
+              "price": 0.6948,
+              "idx": 14
+            },
+            {
+              "label": "C",
+              "price": 0.6718,
+              "idx": 20
+            }
+          ],
+          "targets": {
+            "tp1": 0.6874971999999999,
+            "tp2": 0.6971999999999999
+          },
+          "start_idx": 5,
+          "rank": "Primary",
+          "invalidated": false
+        },
+        "alive": 4,
+        "total": 6
+      },
+      "structure_panel": {
+        "regime": {
+          "label": "TREND PUTERNIC SUS",
+          "strength": 95,
+          "vote": 1.0,
+          "atr_pct": 4.15
+        },
+        "cross": {
+          "type": "GOLDEN CROSS",
+          "fast": 0.8825551165987098,
+          "slow": 0.7869766497535203,
+          "bullish": true,
+          "strength": 1.0
+        },
+        "ichimoku": {
+          "position": "PESTE NOR",
+          "vote": 1.0,
+          "tenkan": 1.0349,
+          "kijun": 0.94455,
+          "span_a": 0.989725,
+          "span_b": 0.87775,
+          "strength": 0.1597
+        }
+      },
+      "liquidation": {
+        "above": {
+          "price": 1.04392095,
+          "density": 0.014111,
+          "side": "SHORT",
+          "distance_pct": 1.8,
+          "intensity": 0.1441
+        },
+        "below": {
+          "price": 0.8289848499999999,
+          "density": 0.097922,
+          "side": "SHORT",
+          "distance_pct": -19.16,
+          "intensity": 1.0
+        },
+        "bias": -0.3228,
+        "oi_scaled": false
+      }
+    },
     "NEAR/USDT": {
       "direction": "LONG",
-      "score": 39,
-      "probability": 63.6,
+      "score": 40,
+      "probability": 64.0,
       "components": {
         "trend": 1.0,
         "momentum": 0.694,
@@ -1967,8 +2315,8 @@
       },
       "price": 4.408,
       "atr": 0.26278571,
-      "persistence": 17,
-      "age_minutes": 1080,
+      "persistence": 18,
+      "age_minutes": 1139,
       "indicators": {
         "emas": {
           "ema9": 4.357641319679608,
@@ -2311,354 +2659,6 @@
         "oi_scaled": false
       }
     },
-    "SUI/USDT": {
-      "direction": "LONG",
-      "score": 41,
-      "probability": 64.3,
-      "components": {
-        "trend": 1.0,
-        "momentum": 0.942,
-        "volatility": 0.0,
-        "volume": 0.391
-      },
-      "price": 1.0255,
-      "atr": 0.042571429,
-      "persistence": 25,
-      "age_minutes": 1559,
-      "indicators": {
-        "emas": {
-          "ema9": 1.012003065709984,
-          "ema20": 0.9689285513002511,
-          "ema50": 0.8825551165987098,
-          "ema100": 0.8272749561235342,
-          "ema200": 0.7869766497535203
-        },
-        "vwap": 0.8215970854536313,
-        "volume_profile": {
-          "poc": 0.81120625,
-          "vah": 0.82994375,
-          "val": 0.69878125,
-          "value_area_pct": 75.4
-        },
-        "supertrend": {
-          "direction": "BULLISH",
-          "level": 0.92272184
-        },
-        "macd": {
-          "macd": 0.05563167,
-          "signal": 0.05884148,
-          "histogram": -0.00320981,
-          "bullish": false
-        },
-        "price": 1.0255,
-        "price_vs_value_area": "PESTE VAH"
-      },
-      "structure": {
-        "resistance": [
-          1.0829,
-          0.8874,
-          0.8578
-        ],
-        "support": [
-          0.6968,
-          0.6926,
-          0.6726
-        ]
-      },
-      "fibonacci": {
-        "swing_high": 1.0829,
-        "swing_low": 0.6726,
-        "retracement": {
-          "0.236": 0.9860692,
-          "0.382": 0.9261654,
-          "0.5": 0.87775,
-          "0.618": 0.8293346,
-          "0.786": 0.7604042
-        },
-        "extension": {
-          "1.272": 1.1945016,
-          "1.618": 1.3364654,
-          "2.0": 1.4932
-        }
-      },
-      "plan": {
-        "entry": 1.0042143,
-        "sl": 0.96164286,
-        "signal_price": 1.0255,
-        "tp1": 1.0829,
-        "tp2": 1.1957857,
-        "expected_r": 4.5
-      },
-      "sparkline": [
-        0.7079,
-        0.7135,
-        0.7208,
-        0.7227,
-        0.722,
-        0.7336,
-        0.7324,
-        0.7414,
-        0.788,
-        0.7826,
-        0.7921,
-        0.8036,
-        0.8135,
-        0.8142,
-        0.8296,
-        0.8088,
-        0.8633,
-        0.8435,
-        0.8751,
-        0.8575,
-        0.8262,
-        0.8158,
-        0.8225,
-        0.8458,
-        0.8807,
-        0.8974,
-        0.9497,
-        0.9667,
-        1.0157,
-        1.0181,
-        1.0367,
-        1.0426,
-        1.0373,
-        1.0134,
-        1.0146,
-        1.007,
-        1.005,
-        1.024,
-        1.0247,
-        1.0255
-      ],
-      "elliott": {
-        "counts": [
-          {
-            "pattern": "CORECTIE A-B-C",
-            "direction": "LONG",
-            "confidence": 0.6225,
-            "invalidation": 0.6997,
-            "points": [
-              {
-                "label": "START",
-                "price": 0.6997,
-                "idx": 5
-              },
-              {
-                "label": "A",
-                "price": 0.6743,
-                "idx": 10
-              },
-              {
-                "label": "B",
-                "price": 0.6948,
-                "idx": 14
-              },
-              {
-                "label": "C",
-                "price": 0.6718,
-                "idx": 20
-              }
-            ],
-            "targets": {
-              "tp1": 0.6874971999999999,
-              "tp2": 0.6971999999999999
-            },
-            "start_idx": 5,
-            "rank": "Primary",
-            "invalidated": false
-          },
-          {
-            "pattern": "ARMONICA AB=CD",
-            "direction": "LONG",
-            "confidence": 0.5665,
-            "invalidation": 0.6997,
-            "prz": {
-              "low": 0.6624912000000001,
-              "high": 0.6694
-            },
-            "points": [
-              {
-                "label": "A",
-                "price": 0.6997,
-                "idx": 5
-              },
-              {
-                "label": "B",
-                "price": 0.6743,
-                "idx": 10
-              },
-              {
-                "label": "C",
-                "price": 0.6948,
-                "idx": 14
-              },
-              {
-                "label": "D",
-                "price": 0.6718,
-                "idx": 20
-              }
-            ],
-            "targets": {
-              "tp1": 0.6948,
-              "tp2": 0.6997
-            },
-            "start_idx": 5,
-            "rank": "Alternative",
-            "invalidated": false
-          },
-          {
-            "pattern": "CORECTIE A-B-C",
-            "direction": "LONG",
-            "confidence": 0.5055,
-            "invalidation": 0.6887,
-            "points": [
-              {
-                "label": "START",
-                "price": 0.6887,
-                "idx": 23
-              },
-              {
-                "label": "A",
-                "price": 0.6728,
-                "idx": 30
-              },
-              {
-                "label": "B",
-                "price": 0.682,
-                "idx": 33
-              },
-              {
-                "label": "C",
-                "price": 0.6332,
-                "idx": 41
-              }
-            ],
-            "targets": {
-              "tp1": 0.6430262,
-              "tp2": 0.6491
-            },
-            "start_idx": 23,
-            "rank": "Secondary",
-            "invalidated": false
-          },
-          {
-            "pattern": "CORECTIE A-B-C",
-            "direction": "LONG",
-            "confidence": 0.5054,
-            "invalidation": 0.6948,
-            "points": [
-              {
-                "label": "START",
-                "price": 0.6948,
-                "idx": 14
-              },
-              {
-                "label": "A",
-                "price": 0.6718,
-                "idx": 20
-              },
-              {
-                "label": "B",
-                "price": 0.6887,
-                "idx": 23
-              },
-              {
-                "label": "C",
-                "price": 0.6728,
-                "idx": 30
-              }
-            ],
-            "targets": {
-              "tp1": 0.687014,
-              "tp2": 0.6958
-            },
-            "start_idx": 14,
-            "rank": "Family",
-            "invalidated": false
-          }
-        ],
-        "primary": {
-          "pattern": "CORECTIE A-B-C",
-          "direction": "LONG",
-          "confidence": 0.6225,
-          "invalidation": 0.6997,
-          "points": [
-            {
-              "label": "START",
-              "price": 0.6997,
-              "idx": 5
-            },
-            {
-              "label": "A",
-              "price": 0.6743,
-              "idx": 10
-            },
-            {
-              "label": "B",
-              "price": 0.6948,
-              "idx": 14
-            },
-            {
-              "label": "C",
-              "price": 0.6718,
-              "idx": 20
-            }
-          ],
-          "targets": {
-            "tp1": 0.6874971999999999,
-            "tp2": 0.6971999999999999
-          },
-          "start_idx": 5,
-          "rank": "Primary",
-          "invalidated": false
-        },
-        "alive": 4,
-        "total": 6
-      },
-      "structure_panel": {
-        "regime": {
-          "label": "TREND PUTERNIC SUS",
-          "strength": 95,
-          "vote": 1.0,
-          "atr_pct": 4.15
-        },
-        "cross": {
-          "type": "GOLDEN CROSS",
-          "fast": 0.8825551165987098,
-          "slow": 0.7869766497535203,
-          "bullish": true,
-          "strength": 1.0
-        },
-        "ichimoku": {
-          "position": "PESTE NOR",
-          "vote": 1.0,
-          "tenkan": 1.0349,
-          "kijun": 0.94455,
-          "span_a": 0.989725,
-          "span_b": 0.87775,
-          "strength": 0.1597
-        }
-      },
-      "liquidation": {
-        "above": {
-          "price": 1.04392095,
-          "density": 0.014111,
-          "side": "SHORT",
-          "distance_pct": 1.8,
-          "intensity": 0.1441
-        },
-        "below": {
-          "price": 0.8289848499999999,
-          "density": 0.097922,
-          "side": "SHORT",
-          "distance_pct": -19.16,
-          "intensity": 1.0
-        },
-        "bias": -0.3228,
-        "oi_scaled": false
-      }
-    },
     "ADA/USDT": {
       "direction": "LONG",
       "score": 72,
@@ -2671,8 +2671,8 @@
       },
       "price": 0.2561,
       "atr": 0.0079571429,
-      "persistence": 2,
-      "age_minutes": 119,
+      "persistence": 3,
+      "age_minutes": 179,
       "indicators": {
         "emas": {
           "ema9": 0.251121279125125,
@@ -3023,8 +3023,8 @@
       },
       "price": 1.0323,
       "atr": 0.035828571,
-      "persistence": 12,
-      "age_minutes": 722,
+      "persistence": 13,
+      "age_minutes": 782,
       "indicators": {
         "emas": {
           "ema9": 1.016381569571796,
@@ -3383,8 +3383,8 @@
       },
       "price": 11.137,
       "atr": 0.44664286,
-      "persistence": 41,
-      "age_minutes": 2520,
+      "persistence": 42,
+      "age_minutes": 2579,
       "indicators": {
         "emas": {
           "ema9": 11.079841493975543,
@@ -3739,8 +3739,8 @@
       },
       "price": 12.934,
       "atr": 0.33185714,
-      "persistence": 103,
-      "age_minutes": 6354,
+      "persistence": 104,
+      "age_minutes": 6414,
       "indicators": {
         "emas": {
           "ema9": 12.981039503991394,
@@ -4157,8 +4157,8 @@
       },
       "price": 0.34405,
       "atr": 0.0021757143,
-      "persistence": 21,
-      "age_minutes": 1316,
+      "persistence": 22,
+      "age_minutes": 1375,
       "indicators": {
         "emas": {
           "ema9": 0.34382314711302475,
@@ -4478,8 +4478,8 @@
       },
       "price": 61.96,
       "atr": 2.5185714,
-      "persistence": 61,
-      "age_minutes": 3722,
+      "persistence": 62,
+      "age_minutes": 3782,
       "indicators": {
         "emas": {
           "ema9": 61.521939952132456,
@@ -4838,8 +4838,8 @@
       },
       "price": 1.1708,
       "atr": 0.038435714,
-      "persistence": 111,
-      "age_minutes": 7077,
+      "persistence": 112,
+      "age_minutes": 7136,
       "indicators": {
         "emas": {
           "ema9": 1.184671905969167,
@@ -5194,8 +5194,8 @@
       },
       "price": 1.457,
       "atr": 0.029642857,
-      "persistence": 33,
-      "age_minutes": 2034,
+      "persistence": 34,
+      "age_minutes": 2094,
       "indicators": {
         "emas": {
           "ema9": 1.4480374499958262,
@@ -5540,8 +5540,8 @@
     },
     "FET/USDT": {
       "direction": "LONG",
-      "score": 39,
-      "probability": 63.6,
+      "score": 40,
+      "probability": 64.0,
       "components": {
         "trend": 1.0,
         "momentum": 0.751,
@@ -5550,8 +5550,8 @@
       },
       "price": 0.2088,
       "atr": 0.0095785714,
-      "persistence": 68,
-      "age_minutes": 4197,
+      "persistence": 69,
+      "age_minutes": 4257,
       "indicators": {
         "emas": {
           "ema9": 0.20551260150603007,
@@ -5904,8 +5904,8 @@
     },
     "ICP/USDT": {
       "direction": "LONG",
-      "score": 52,
-      "probability": 68.2,
+      "score": 53,
+      "probability": 68.5,
       "components": {
         "trend": 0.675,
         "momentum": 0.574,
@@ -5914,8 +5914,8 @@
       },
       "price": 3.028,
       "atr": 0.095,
-      "persistence": 12,
-      "age_minutes": 722,
+      "persistence": 13,
+      "age_minutes": 782,
       "indicators": {
         "emas": {
           "ema9": 2.9951722818803725,
@@ -6262,8 +6262,8 @@
       },
       "price": 0.11235,
       "atr": 0.0033607143,
-      "persistence": 119,
-      "age_minutes": 7560,
+      "persistence": 120,
+      "age_minutes": 7620,
       "indicators": {
         "emas": {
           "ema9": 0.1101144439214568,
@@ -6680,8 +6680,8 @@
       },
       "price": 0.06087,
       "atr": 0.0029442857,
-      "persistence": 13,
-      "age_minutes": 842,
+      "persistence": 14,
+      "age_minutes": 901,
       "indicators": {
         "emas": {
           "ema9": 0.06053291971548745,
@@ -7026,8 +7026,8 @@
     },
     "ZEN/USDT": {
       "direction": "LONG",
-      "score": 50,
-      "probability": 67.5,
+      "score": 51,
+      "probability": 67.8,
       "components": {
         "trend": 0.921,
         "momentum": 0.446,
@@ -7036,8 +7036,8 @@
       },
       "price": 8.046,
       "atr": 0.2925,
-      "persistence": 99,
-      "age_minutes": 6121,
+      "persistence": 100,
+      "age_minutes": 6180,
       "indicators": {
         "emas": {
           "ema9": 7.962141485022231,
@@ -7392,8 +7392,8 @@
       },
       "price": 0.01692,
       "atr": 0.00047071429,
-      "persistence": 2,
-      "age_minutes": 119,
+      "persistence": 3,
+      "age_minutes": 179,
       "indicators": {
         "emas": {
           "ema9": 0.01651069506981647,
@@ -7742,8 +7742,8 @@
     },
     "ATOM/USDT": {
       "direction": "LONG",
-      "score": 54,
-      "probability": 68.9,
+      "score": 53,
+      "probability": 68.5,
       "components": {
         "trend": 0.701,
         "momentum": 0.46,
@@ -7752,8 +7752,8 @@
       },
       "price": 1.812,
       "atr": 0.051,
-      "persistence": 95,
-      "age_minutes": 5880,
+      "persistence": 96,
+      "age_minutes": 5940,
       "indicators": {
         "emas": {
           "ema9": 1.8043517825115274,
@@ -8170,8 +8170,8 @@
       },
       "price": 0.11099,
       "atr": 0.0036835714,
-      "persistence": 61,
-      "age_minutes": 3722,
+      "persistence": 62,
+      "age_minutes": 3782,
       "indicators": {
         "emas": {
           "ema9": 0.11148913824996462,
@@ -8522,8 +8522,8 @@
       },
       "price": 0.2286,
       "atr": 0.0073428571,
-      "persistence": 95,
-      "age_minutes": 5880,
+      "persistence": 96,
+      "age_minutes": 5940,
       "indicators": {
         "emas": {
           "ema9": 0.22807127317556267,
@@ -8930,8 +8930,8 @@
     },
     "FLOW/USDT": {
       "direction": "LONG",
-      "score": 49,
-      "probability": 67.2,
+      "score": 50,
+      "probability": 67.5,
       "components": {
         "trend": 0.929,
         "momentum": 0.804,
@@ -8940,8 +8940,8 @@
       },
       "price": 0.03449,
       "atr": 0.0014585714,
-      "persistence": 111,
-      "age_minutes": 7077,
+      "persistence": 112,
+      "age_minutes": 7136,
       "indicators": {
         "emas": {
           "ema9": 0.03264783092802758,
@@ -9292,8 +9292,8 @@
       },
       "price": 0.08863,
       "atr": 0.0021507143,
-      "persistence": 80,
-      "age_minutes": 4913,
+      "persistence": 81,
+      "age_minutes": 4972,
       "indicators": {
         "emas": {
           "ema9": 0.08711343806296042,
@@ -9652,8 +9652,8 @@
       },
       "price": 4.344,
       "atr": 0.21614286,
-      "persistence": 25,
-      "age_minutes": 1559,
+      "persistence": 26,
+      "age_minutes": 1619,
       "indicators": {
         "emas": {
           "ema9": 4.356914446460373,
