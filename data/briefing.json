@@ -1,19 +1,40 @@
 {
-  "text": "Din 14 planuri inchise, rata de succes e 7.1%, cu -13.09R cumulat (-0.935R in medie pe plan) si profit factor 0.03. 13 planuri sunt inca deschise. Separat, 21415 planuri inchise (+1389.72R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #121034 ICP/USDT -1.03R, #121021 SOL/USDT -1.05R, #121022 CHZ/USDT -1.04R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 69.6% fata de 33.2% baseline, pe 16233 planuri invatate.",
+  "text": "Din 17 planuri inchise, rata de succes e 17.6%, cu -13.23R cumulat (-0.778R in medie pe plan) si profit factor 0.1. 14 planuri sunt inca deschise. Separat, 21415 planuri inchise (+1389.72R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #121039 MANA/USDT +0.53R, #121041 GRT/USDT +0.47R, #121045 TRX/USDT -1.14R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 69.6% fata de 33.2% baseline, pe 16233 planuri invatate.",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-24 11:22 UTC",
+    "scan_time": "2026-09-24 12:27 UTC",
     "universe_size": 30,
-    "plans_total": 21442,
-    "plans_open": 13,
-    "plans_closed": 14,
+    "plans_total": 21446,
+    "plans_open": 14,
+    "plans_closed": 17,
     "legacy_closed": 21415,
     "legacy_total_r": 1389.72,
-    "win_rate": 7.1,
-    "total_r": -13.09,
-    "avg_r": -0.935,
-    "profit_factor": 0.03,
+    "win_rate": 17.6,
+    "total_r": -13.23,
+    "avg_r": -0.778,
+    "profit_factor": 0.1,
     "recent_closed": [
+      {
+        "id": 121039,
+        "symbol": "MANA/USDT",
+        "direction": "LONG",
+        "state": "TP1 HIT - SL LA BREAKEVEN",
+        "r": 0.532
+      },
+      {
+        "id": 121041,
+        "symbol": "GRT/USDT",
+        "direction": "LONG",
+        "state": "TP1 HIT - SL LA BREAKEVEN",
+        "r": 0.475
+      },
+      {
+        "id": 121045,
+        "symbol": "TRX/USDT",
+        "direction": "LONG",
+        "state": "SL HIT - INVALIDATED",
+        "r": -1.139
+      },
       {
         "id": 121034,
         "symbol": "ICP/USDT",
@@ -27,57 +48,36 @@
         "direction": "LONG",
         "state": "SL HIT - INVALIDATED",
         "r": -1.05
-      },
-      {
-        "id": 121022,
-        "symbol": "CHZ/USDT",
-        "direction": "LONG",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.039
-      },
-      {
-        "id": 121023,
-        "symbol": "AXS/USDT",
-        "direction": "LONG",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.038
-      },
-      {
-        "id": 121024,
-        "symbol": "GRAM/USDT",
-        "direction": "LONG",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.052
       }
     ],
     "open_now": [
       {
+        "id": 121051,
+        "symbol": "SEI/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 121050,
+        "symbol": "MANA/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 121049,
+        "symbol": "SUI/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 121048,
+        "symbol": "GRT/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
         "id": 121047,
         "symbol": "ALGO/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 121046,
-        "symbol": "LINK/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 121045,
-        "symbol": "TRX/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 121044,
-        "symbol": "ZEC/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 121043,
-        "symbol": "ADA/USDT",
         "direction": "LONG",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       }
