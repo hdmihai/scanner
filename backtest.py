@@ -61,6 +61,7 @@ import evidence as ev_mod
 import liquidation as liq_mod
 import market_structure as struct_mod
 import elliott as ew_mod
+import liquidity_structure as ls_mod
 import plan_tracker
 
 DATA_DIR = "data"
@@ -297,11 +298,16 @@ def replay_symbol(symbol, candles, weights, start_id):
         bt_ew = ew_mod.analyze([c[2] for c in window], [c[3] for c in window],
                                [c[4] for c in window], scored["price"])
         bt_ew_bias = ew_mod.bias(bt_ew, scored["direction"])
+        bt_liqs = ls_mod.build([c[2] for c in window], [c[3] for c in window],
+                               [c[4] for c in window], scored["atr"],
+                               scored["price"], scanner.CONFIG["timeframe"])
+        bt_liqs_bias = ls_mod.bias(bt_liqs, scored["direction"])
         bt_ev = ev_mod.build_evidence(bt_ind, scored["price"], scored["atr"],
                                       bt_rsi, scored.get("components"),
                                       liq=bt_liq, liq_bias=bt_bias,
                                       struct=bt_struct,
-                                      ew=bt_ew, ew_bias=bt_ew_bias)
+                                      ew=bt_ew, ew_bias=bt_ew_bias,
+                                      liqs=bt_liqs, liqs_bias=bt_liqs_bias)
         levels = scanner.compute_trade_plan(
             scored["direction"], scored["price"], scored["atr"], structure, fib)
         if not levels:
