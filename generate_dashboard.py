@@ -492,6 +492,29 @@ def render_rich_chart(chart, fullscreen_id=None):
                           ("vah", "VAH", "lv-va"), ("val", "VAL", "lv-va")):
         if ind.get(key):
             levels.append((ind[key], lbl, cls, "2 3"))
+    # NIVELURI ELLIOTT: tintele numaratorii principale si invalidarile fiecarei
+    # ipoteze, ca in capturile de referinta (ELLIOTT TP1/TP2/TP3 si
+    # PRIMARY / ALTERNATIVE / SECONDARY E INV).
+    ew = chart.get("elliott") or {}
+    ew_primary = ew.get("primary")
+    if ew_primary:
+        for _k, _lbl in (("tp3", "ELLIOTT TP3"), ("tp2", "ELLIOTT TP2"),
+                         ("tp1", "ELLIOTT TP1")):
+            _v = (ew_primary.get("targets") or {}).get(_k)
+            if _v:
+                levels.append((_v, _lbl, "lv-ew", "1 4"))
+    for _c in (ew.get("counts") or []):
+        if _c.get("invalidation"):
+            levels.append((_c["invalidation"],
+                           str(_c.get("rank", "?")).upper() + " E INV", "lv-sl", "1 4"))
+
+    # LICHIDITATE STRUCTURALA, ca in capturi: STRUCT BUY-SIDE LIQ - 4h -
+    # EQUAL HIGHS - TARGET si asa mai departe. Nivelurile deja maturate apar
+    # ca ENTRY, cele neatinse ca TARGET.
+    for _l in ((chart.get("liq_structure") or {}).get("levels") or [])[:6]:
+        levels.append((_l["price"], _l["label"],
+                       "lv-liqb" if _l["side"] == "BUY" else "lv-liqs", "5 2"))
+
     st = ind.get("supertrend") or {}
     if st.get("level"):
         levels.append((st["level"], f"SuperTrend {st.get('direction','')}",
@@ -516,6 +539,12 @@ def render_rich_chart(chart, fullscreen_id=None):
 
     cw = max(1.5, plot_w / n * 0.62)
     body = []
+    # Lumanarile se deseneaza ca DOUA trasee (unul urcator, unul coborator),
+    # nu ca doua elemente per lumanare. La 90 de bare asta inseamna 4 elemente
+    # in loc de 360, si taie dimensiunea paginii de cateva ori - conteaza,
+    # fiindca pagina are un grafic pentru fiecare token cu semnal.
+    _wick = {"up": [], "dn": []}
+    _bodyp = {"up": [], "dn": []}
 
     # BENZI DE LICHIDARE, desenate INAINTE de lumanari ca sa ramana in fundal.
     # Echivalentul vizual al heatmap-ului: cu cat banda e mai intensa, cu atat
@@ -530,22 +559,54 @@ def render_rich_chart(chart, fullscreen_id=None):
                     f'width="{plot_w:.1f}" height="5" opacity="{op:.3f}"/>')
     for i, c in enumerate(candles):
         o, h, l, cl = c[1], c[2], c[3], c[4]
-        up = cl >= o
-        cls = "cnd-up" if up else "cnd-dn"
+        k = "up" if cl >= o else "dn"
         cx = x(i)
-        body.append(f'<line class="{cls}" x1="{cx:.1f}" y1="{y(h):.1f}" '
-                    f'x2="{cx:.1f}" y2="{y(l):.1f}" stroke-width="1"/>')
+        _wick[k].append(f"M{cx:.0f} {y(h):.0f}V{y(l):.0f}")
         top, bot = y(max(o, cl)), y(min(o, cl))
-        body.append(f'<rect class="{cls}-f" x="{cx - cw/2:.1f}" y="{top:.1f}" '
-                    f'width="{cw:.1f}" height="{max(bot - top, 1):.1f}"/>')
+        _bodyp[k].append(f"M{cx - cw/2:.0f} {top:.0f}h{cw:.0f}"
+                         f"v{max(bot - top, 1):.0f}h{-cw:.0f}z")
+    for k, cls in (("up", "cnd-up"), ("dn", "cnd-dn")):
+        if _wick[k]:
+            body.append(f'<path class="{cls}" d="{"".join(_wick[k])}" '
+                        f'fill="none" stroke-width="1"/>')
+        if _bodyp[k]:
+            body.append(f'<path class="{cls}-f" d="{"".join(_bodyp[k])}"/>')
 
     for key, cls in (("ema9", "ema9"), ("ema20", "ema20"),
                      ("ema50", "ema50"), ("ema200", "ema200")):
         series = chart.get(key) or []
-        pts = " ".join(f"{x(i):.1f},{y(v):.1f}"
+        pts = " ".join(f"{x(i):.0f},{y(v):.0f}"
                        for i, v in enumerate(series) if v is not None)
         if pts:
             body.append(f'<polyline class="{cls}" points="{pts}" fill="none"/>')
+
+    # PUNCTELE UNDELOR ELLIOTT, desenate peste lumanari.
+    # Fiecare numaratoare primeste propria linie frânta care uneste punctele,
+    # plus etichete la fiecare varf - forma din capturi: MAJOR START, W1, W2,
+    # W3, W4, W5 pentru impuls; A, B, C pentru corectie.
+    # Numaratorile INVALIDATE de pret se deseneaza estompat si punctat: le arat
+    # pentru ca au fost in joc, dar nu trebuie sa para active.
+    ew_off = ew.get("offset", 0)
+    for ci, count in enumerate(ew.get("counts") or []):
+        pts = [pt for pt in (count.get("points") or [])
+               if pt.get("idx") is not None and 0 <= pt["idx"] - ew_off < n]
+        if len(pts) < 2:
+            continue
+        dead = count.get("invalidated")
+        cls = "ew-dead-line" if dead else f"ew-line-{ci % 3}"
+        coords = [(x(pt["idx"] - ew_off), y(pt["price"])) for pt in pts]
+        poly = " ".join(f"{cx:.1f},{cy:.1f}" for cx, cy in coords)
+        body.append(f'<polyline class="{cls}" points="{poly}" fill="none"/>')
+        for (cx, cy), pt in zip(coords, pts):
+            body.append(f'<circle class="{cls}-dot" cx="{cx:.1f}" cy="{cy:.1f}" r="3"/>')
+            above = pt["label"] in ("W1", "W3", "W5", "B")
+            body.append(f'<text class="ew-pt {cls}-t" x="{cx:.1f}" '
+                        f'y="{cy + (-7 if above else 13):.1f}" '
+                        f'text-anchor="middle">{pt.get("display", pt["label"])}</text>')
+        # eticheta numaratorii, la ultimul punct
+        lx, ly = coords[-1]
+        body.append(f'<text class="ew-tag {cls}-t" x="{lx + 6:.1f}" y="{ly:.1f}">'
+                    f'{count.get("headline") or count.get("rank","")}</text>')
 
     # etichetele se impraștie vertical ca sa nu se suprapuna
     levels.sort(key=lambda t: t[0], reverse=True)
@@ -990,7 +1051,33 @@ def render_token_details(details, plans_store, watchlist=None):
         macd = ind.get("macd") or {}
         plan = d.get("plan") or {}
         prob_txt, prob_note = honest_probability(d.get("score"), plans_store)
-        chart_html = render_token_chart(sym, d, by_symbol)
+        # Grafic BOGAT pentru fiecare token cu semnal, nu doar pentru cel mai
+        # bun candidat: aceleasi lumanari, niveluri, unde Elliott si lichiditate.
+        # Cade inapoi pe graficul mic din sparkline daca lumanarile lipsesc -
+        # de exemplu pentru un token adus de pe o bursa secundara.
+        if d.get("candles"):
+            _tc = {"symbol": sym, "direction": d.get("direction", ""),
+                   "timeframe": (details or {}).get("timeframe", ""),
+                   "candles": d["candles"], "ema20": d.get("ema20"),
+                   "ema50": d.get("ema50"),
+                   "indicators": {
+                       "vwap": (d.get("indicators") or {}).get("vwap"),
+                       "poc": ((d.get("indicators") or {}).get("volume_profile") or {}).get("poc"),
+                       "vah": ((d.get("indicators") or {}).get("volume_profile") or {}).get("vah"),
+                       "val": ((d.get("indicators") or {}).get("volume_profile") or {}).get("val"),
+                       "supertrend": (d.get("indicators") or {}).get("supertrend")},
+                   "current": d.get("plan"),
+                   "macd": (d.get("indicators") or {}).get("macd"),
+                   "elliott": d.get("elliott"),
+                   "liq_structure": d.get("liq_structure")}
+            # FARA maximizare pe graficele per token: suprapunerea duplica
+            # intregul SVG, iar la 30 de tokenuri asta inseamna ~2.4 MB de
+            # pagina, descarcati chiar daca panourile sunt pliate. Graficul
+            # principal pastreaza maximizarea; astea sunt oricum in panouri
+            # care se deschid la cerere.
+            chart_html = render_rich_chart(_tc)
+        else:
+            chart_html = render_token_chart(sym, d, by_symbol)
         liq_html = render_liquidation(d.get("liquidation"), d.get("price"))
         struct_html = render_structure_panel(d.get("structure_panel"))
         ew_html = render_elliott(d.get("elliott"))
@@ -1313,6 +1400,9 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
   --bull:#34D399; --bear:#FB7A6C; --amber:#E6B450;
   --ema20:#6FB7FF;
       --ema9: #7ec8e3;
+      --ew0: #a855f7;
+      --ew1: #38bdf8;
+      --ew2: #fb923c;
       --ema200: #9b8ec4;
       --info: #4ea3d1; --ema50:#C792EA;
   --font-sans:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
@@ -1433,6 +1523,21 @@ header{{display:flex;justify-content:space-between;align-items:baseline;
   padding:7px 14px;border-radius:6px;background:var(--panel-2);
   color:var(--amber);text-decoration:none;border:1px solid var(--border);
   margin-bottom:8px;}}
+.lv-liqb{{stroke:var(--amber);stroke-width:1.1;}}
+.lv-liqs{{stroke:var(--amber);stroke-width:1.1;opacity:.8;}}
+.lv-liqb-t,.lv-liqs-t{{fill:var(--amber);font-size:6.5px;}}
+.lv-ew{{stroke:var(--ew0);stroke-width:1;}}
+.lv-ew-t{{fill:var(--ew0);}}
+.ew-line-0{{stroke:var(--ew0);stroke-width:1.6;}}
+.ew-line-1{{stroke:var(--ew1);stroke-width:1.3;stroke-dasharray:4 3;}}
+.ew-line-2{{stroke:var(--ew2);stroke-width:1.1;stroke-dasharray:2 4;}}
+.ew-dead-line{{stroke:var(--text-dim);stroke-width:.9;stroke-dasharray:1 5;opacity:.45;}}
+.ew-line-0-dot{{fill:var(--ew0);}} .ew-line-1-dot{{fill:var(--ew1);}}
+.ew-line-2-dot{{fill:var(--ew2);}} .ew-dead-line-dot{{fill:var(--text-dim);opacity:.45;}}
+.ew-line-0-t{{fill:var(--ew0);}} .ew-line-1-t{{fill:var(--ew1);}}
+.ew-line-2-t{{fill:var(--ew2);}} .ew-dead-line-t{{fill:var(--text-dim);opacity:.5;}}
+.ew-pt{{font-family:var(--font-mono);font-size:7.5px;font-weight:700;}}
+.ew-tag{{font-family:var(--font-mono);font-size:7px;}}
 .ew-list{{display:flex;flex-direction:column;gap:3px;margin-top:6px;}}
 .ew-row{{display:grid;grid-template-columns:70px 1fr 54px 40px 92px;gap:6px;
   align-items:center;font-size:10.5px;font-family:var(--font-mono);
@@ -1445,7 +1550,22 @@ header{{display:flex;justify-content:space-between;align-items:baseline;
 @media(max-width:560px){{.ew-row{{grid-template-columns:62px 1fr 46px 36px;}}
   .ew-row span:last-child{{display:none;}}}}
 .ms-grid{{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0;}}
-@media(max-width:560px){{.ew-list{{display:flex;flex-direction:column;gap:3px;margin-top:6px;}}
+@media(max-width:560px){{.lv-liqb{{stroke:var(--amber);stroke-width:1.1;}}
+.lv-liqs{{stroke:var(--amber);stroke-width:1.1;opacity:.8;}}
+.lv-liqb-t,.lv-liqs-t{{fill:var(--amber);font-size:6.5px;}}
+.lv-ew{{stroke:var(--ew0);stroke-width:1;}}
+.lv-ew-t{{fill:var(--ew0);}}
+.ew-line-0{{stroke:var(--ew0);stroke-width:1.6;}}
+.ew-line-1{{stroke:var(--ew1);stroke-width:1.3;stroke-dasharray:4 3;}}
+.ew-line-2{{stroke:var(--ew2);stroke-width:1.1;stroke-dasharray:2 4;}}
+.ew-dead-line{{stroke:var(--text-dim);stroke-width:.9;stroke-dasharray:1 5;opacity:.45;}}
+.ew-line-0-dot{{fill:var(--ew0);}} .ew-line-1-dot{{fill:var(--ew1);}}
+.ew-line-2-dot{{fill:var(--ew2);}} .ew-dead-line-dot{{fill:var(--text-dim);opacity:.45;}}
+.ew-line-0-t{{fill:var(--ew0);}} .ew-line-1-t{{fill:var(--ew1);}}
+.ew-line-2-t{{fill:var(--ew2);}} .ew-dead-line-t{{fill:var(--text-dim);opacity:.5;}}
+.ew-pt{{font-family:var(--font-mono);font-size:7.5px;font-weight:700;}}
+.ew-tag{{font-family:var(--font-mono);font-size:7px;}}
+.ew-list{{display:flex;flex-direction:column;gap:3px;margin-top:6px;}}
 .ew-row{{display:grid;grid-template-columns:70px 1fr 54px 40px 92px;gap:6px;
   align-items:center;font-size:10.5px;font-family:var(--font-mono);
   padding:4px 0;border-bottom:1px solid var(--border);}}
