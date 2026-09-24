@@ -87,6 +87,35 @@ def find_pivots(highs, lows, left=3, right=3):
     return clean
 
 
+def _label_points(pivots, labels, prices, confirm_bars=3):
+    """Eticheteaza punctele undelor si marcheaza care sunt CONFIRMATE.
+
+    Distinctia din capturile de referinta - "W1 CONFIRMED" fata de "W3 FORMING"
+    - nu e cosmetica. Un pivot e confirmat abia dupa ce urmeaza destule bare
+    care nu l-au depasit; pana atunci pretul inca poate merge mai departe si
+    varful se muta. A eticheta un varf neconfirmat drept unda incheiata
+    inseamna a pretinde certitudine care nu exista inca.
+
+    Ultimul punct al unei structuri e aproape mereu neconfirmat, fiindca e cel
+    mai recent - de asta in capturi ultima unda apare ca FORMING.
+    """
+    if not pivots:
+        return []
+    last_idx = max(p["idx"] for p in pivots)
+    out = []
+    for i, (lbl, price) in enumerate(zip(labels, prices)):
+        if i >= len(pivots):
+            break
+        idx = pivots[i]["idx"]
+        confirmed = (last_idx - idx) >= confirm_bars
+        out.append({"label": lbl, "price": price, "idx": idx,
+                    "confirmed": confirmed,
+                    "display": lbl if lbl == "MAJOR START"
+                               else f"{lbl} CONFIRMED" if confirmed
+                               else f"{lbl} FORMING"})
+    return out
+
+
 def _fib_score(ratio, targets, tol=TOLERANCE):
     """Cat de aproape e un raport de cea mai apropiata proportie tipica."""
     if ratio is None or ratio <= 0:
@@ -141,10 +170,9 @@ def _impulse(points):
         "invalidation": p1,
         "labels": [("MAJOR START", p0), ("W1", p1), ("W2", p2),
                    ("W3", p3), ("W4", p4), ("W5", p5)],
-        "points": [{"label": l, "price": v, "idx": points[i]["idx"]}
-                   for i, (l, v) in enumerate(
-                       [("START", p0), ("W1", p1), ("W2", p2),
-                        ("W3", p3), ("W4", p4), ("W5", p5)])],
+        "points": _label_points(points[:6],
+                                ["MAJOR START", "W1", "W2", "W3", "W4", "W5"],
+                                [p0, p1, p2, p3, p4, p5]),
         "targets": _impulse_targets(p0, p1, p2, p3, p4, up),
     }
 
@@ -181,9 +209,8 @@ def _zigzag(points):
         "direction": "LONG" if down else "SHORT",
         "confidence": round(min(conf, 0.92), 4),
         "invalidation": p0,
-        "points": [{"label": l, "price": v, "idx": points[i]["idx"]}
-                   for i, (l, v) in enumerate(
-                       [("START", p0), ("A", pa), ("B", pb), ("C", pc)])],
+        "points": _label_points(points[:4], ["MAJOR START", "A", "B", "C"],
+                                [p0, pa, pb, pc]),
         "targets": {"tp1": pc + (1 if down else -1) * a * 0.618,
                     "tp2": pc + (1 if down else -1) * a * 1.0},
     }
@@ -211,9 +238,8 @@ def _abcd(points):
         "confidence": round(0.40 + 0.45 * score, 4),
         "invalidation": pa,
         "prz": {"low": lo, "high": hi},
-        "points": [{"label": l, "price": v, "idx": points[i]["idx"]}
-                   for i, (l, v) in enumerate(
-                       [("A", pa), ("B", pb), ("C", pc), ("D", pd)])],
+        "points": _label_points(points[:4], ["A", "B", "C", "D"],
+                                [pa, pb, pc, pd]),
         "targets": {"tp1": pc, "tp2": pa},
     }
 
@@ -264,6 +290,21 @@ def analyze(highs, lows, closes, price=None):
     unique.sort(key=lambda c: -c["confidence"])
     for i, c in enumerate(unique):
         c["rank"] = ["Primary", "Alternative", "Secondary", "Family"][i] if i < 4 else f"#{i+1}"
+        # Descrierea din capturi: "Primary Developing Motive W3 FORMING 48%"
+        # sau "Primary Zigzag C 68%" - numele numaratorii, tipul structurii,
+        # unda curenta si starea ei, apoi increderea.
+        pts = c.get("points") or []
+        forming = next((p for p in pts if not p.get("confirmed")), None)
+        kind = ("Motive" if c["pattern"].startswith("IMPULS")
+                else "Zigzag" if c["pattern"].startswith("CORECTIE") else "Harmonic")
+        if forming:
+            c["headline"] = (f"{c['rank']} Developing {kind} "
+                             f"{forming['label']} FORMING "
+                             f"{c['confidence'] * 100:.0f}%")
+        else:
+            tail = pts[-1]["label"] if pts else ""
+            c["headline"] = (f"{c['rank']} {kind} {tail} "
+                             f"{c['confidence'] * 100:.0f}%")
         # o ipoteza deja invalidata de pret e marcata, nu ascunsa
         inv = c["invalidation"]
         c["invalidated"] = (px < inv) if c["direction"] == "LONG" else (px > inv)
