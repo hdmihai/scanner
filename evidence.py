@@ -61,7 +61,8 @@ def _item(key, label, direction, strength, value=None):
 
 def build_evidence(ind, price, atr, rsi=None, components=None,
                    flow=None, book=None, caps=None, liq=None, liq_bias=None,
-                   struct=None, ew=None, ew_bias=None):
+                   struct=None, ew=None, ew_bias=None,
+                   liqs=None, liqs_bias=None):
     """Construieste lista de evidente dintr-un set de indicatori.
 
     `ind` e iesirea lui indicators.compute_all(). Orice lipseste se sare -
@@ -234,6 +235,21 @@ def build_evidence(ind, price, atr, rsi=None, components=None,
                             _clip(abs(ew_bias), 0, 1),
                             round(pr.get("invalidation") or 0, 8)))
 
+    # LICHIDITATE STRUCTURALA. Pretul e atras spre bazinele NEATINSE de stopuri;
+    # cele deja maturate nu mai trag, fiindca lichiditatea s-a consumat.
+    if liqs and liqs_bias is not None:
+        tgt = liqs.get("above") if liqs_bias > 0 else liqs.get("below")
+        if tgt:
+            ev.append(_item("liq_struct",
+                            f"{tgt['kind']} la {abs(tgt['distance_pct']):.1f}% "
+                            f"({tgt['role']}, {tgt['touches']} atingeri)",
+                            DIR_LONG if tgt["side"] == "BUY" else DIR_SHORT,
+                            _clip(abs(liqs_bias), 0, 1), round(tgt["price"], 8)))
+        if liqs.get("two_sided_sweep"):
+            ev.append(_item("liq_sweep",
+                            "Sweep bilateral - lichiditate luata sus SI jos",
+                            DIR_NEUTRAL, 0.5, 1))
+
     comp = components or {}
     if comp.get("volume") is not None:
         v = comp["volume"]
@@ -268,7 +284,8 @@ def fusion(evidence, direction):
 EVIDENCE_KEYS = ["ema_fast", "ema_stack", "supertrend", "macd", "vwap",
                  "poc", "value_area", "rsi", "volume", "volatility",
                  "order_flow", "book_imbalance", "liq_magnet",
-                 "ichimoku", "ma_cross", "regime", "mtf_align", "elliott"]
+                 "ichimoku", "ma_cross", "regime", "mtf_align", "elliott",
+                 "liq_struct", "liq_sweep"]
 
 
 def evidence_features(evidence, direction):
