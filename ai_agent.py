@@ -95,6 +95,9 @@ L2 = 1e-4
 MIN_SAMPLES_TO_ACTIVATE = 300   # sub atat, agentul ramane in mod shadow
 MIN_DAYS_TO_ACTIVATE = 21       # ...si trebuie sa acopere si destul timp calendaristic
 MIN_AUC = 0.55                  # sub atat, modelul nu ordoneaza mai bine decat hazardul
+# Cat de mult trebuie sa castige treimea de sus fata de toate semnalele, in R
+# per plan, ca filtrul sa merite. 0.05R e mic dar peste zgomot la sute de planuri.
+MIN_RANK_EDGE_R = 0.05
 AUC_WINDOW = 500                # cate perechi (predictie, rezultat) pastrez pentru AUC
 RECENT_WINDOW = 200             # fereastra pentru acuratetea "recenta"
 CURVE_EVERY = 25                # la cate exemple salvez un punct pe curba
@@ -239,8 +242,8 @@ def auc_score(pairs):
     caz, iar acuratetea lui (83.3%) era chiar SUB regula triviala. AUC masoara
     altceva - daca modelul ORDONEAZA corect: 0.5 = hazard, 1.0 = separare perfecta.
     """
-    pos = [p for p, y in pairs if y == 1.0]
-    neg = [p for p, y in pairs if y == 0.0]
+    pos = [p for p, y, *_ in pairs if y == 1.0]
+    neg = [p for p, y, *_ in pairs if y == 0.0]
     if not pos or not neg:
         return None
     concordant = 0.0
@@ -250,12 +253,39 @@ def auc_score(pairs):
     return concordant / (len(pos) * len(neg))
 
 
+def ranking_edge(pairs, frac=1/3, min_top=100):
+    """Cat castigi urmand agentul, fata de a lua toate semnalele.
+
+    Aceasta e intrebarea care conteaza pentru tranzactionare. Sortez exemplele
+    dupa probabilitatea agentului si compar R-ul mediu al treimii de sus cu
+    R-ul mediu al tuturor. Daca treimea de sus da mai mult, agentul ORDONEAZA
+    util - exact ce poate face un model antrenat pe date dezechilibrate.
+
+    Evaluarea e prequentiala: fiecare predictie a fost facuta INAINTE ca
+    modelul sa invete din acel exemplu, deci e in afara esantionului.
+
+    Returneaza (r_top, r_toate, n_top, prag) sau None fara date suficiente.
+    `prag` e probabilitatea agentului la limita treimii - folosita ca filtru.
+    """
+    rated = [pp for pp in pairs if len(pp) >= 3]
+    if len(rated) < min_top * 3:
+        return None
+    ordered = sorted(rated, key=lambda pp: -pp[0])
+    k = max(1, int(len(ordered) * frac))
+    top = ordered[:k]
+    r_top = sum(pp[2] for pp in top) / len(top)
+    r_all = sum(pp[2] for pp in rated) / len(rated)
+    # pragul de jos: sub el sunt cele mai slab ordonate semnale
+    bottom_cut = ordered[len(ordered) - k][0]
+    return round(r_top, 4), round(r_all, 4), len(top), round(bottom_cut, 5)
+
+
 def majority_class_accuracy(pairs):
     """Acuratetea pe care o obtii prezicand mereu clasa majoritara. E pragul REAL
     pe care un model trebuie sa-l depaseasca; formula veche nu era suficienta."""
     if not pairs:
         return None
-    ones = sum(1 for _, y in pairs if y == 1.0)
+    ones = sum(1 for _, y, *_ in pairs if y == 1.0)
     return 100 * max(ones, len(pairs) - ones) / len(pairs)
 
 
@@ -263,7 +293,7 @@ def predicted_positive_rate(pairs):
     """Cat de des prezice modelul 'castig'. Aproape de 0 sau 1 = model degenerat."""
     if not pairs:
         return None
-    return 100 * sum(1 for p, _ in pairs if p >= 0.5) / len(pairs)
+    return 100 * sum(1 for p, *_ in pairs if p >= 0.5) / len(pairs)
 
 
 def balanced_accuracy(by_direction, which, min_per_direction=30):
@@ -340,11 +370,29 @@ def agent_is_active(state, plans=None):
     # "pierde" pare excelent: la 13.3% rata de castig obtine 86.7% acuratete.
     # Exact asta se intampla - agentul nu prezicea castig in niciun caz.
     pairs = state.get("pairs") or []
-    maj = majority_class_accuracy(pairs)
-    acc = 100 * a["correct"] / a["total"]
-    if maj is not None and acc <= maj:
-        return False, (f"acuratetea {acc:.1f}% nu bate regula triviala "
-                       f"'prezice mereu clasa majoritara' ({maj:.1f}%)")
+    # CRITERIUL DE UTILITATE, inlocuind "acuratete peste clasa majoritara".
+    #
+    # DE CE AM SCHIMBAT: acuratetea la pragul 0.5 e metrica gresita pentru
+    # tranzactionare pe date dezechilibrate. Cu ~32% castiguri, regula "prezice
+    # mereu pierdere" nimereste ~68-73% - iar un model care ORDONEAZA bine
+    # semnalele aproape niciodata nu o bate la pragul 0.5, fiindca nu prezice
+    # "castig" decat rar. Masurat in productie: AUC 0.680, adica ordonare clar
+    # peste scorul brut (0.537), dar blocat de acuratete 72.1% vs 72.6%.
+    # Un filtru util era refuzat pentru o metrica irelevanta.
+    #
+    # Intrebarea care conteaza: daca iau doar semnalele pe care agentul le pune
+    # sus, castig mai mult decat daca le iau pe toate? Asta masoara direct
+    # ranking_edge, pe evaluare prequentiala (in afara esantionului).
+    edge = ranking_edge(pairs)
+    if edge is None:
+        rated = sum(1 for pp in pairs if len(pp) >= 3)
+        return False, (f"inca nu am destule exemple cu R masurat pentru a evalua "
+                       f"utilitatea filtrului ({rated}, necesare 300)")
+    r_top, r_all, n_top, _cut = edge
+    if r_top - r_all < MIN_RANK_EDGE_R:
+        return False, (f"treimea de sus a agentului da {r_top:+.3f}R vs {r_all:+.3f}R "
+                       f"pe toate - avantaj {r_top - r_all:+.3f}R, sub pragul de "
+                       f"{MIN_RANK_EDGE_R:+.2f}R. Filtrul nu adauga destula valoare.")
 
     ppr = predicted_positive_rate(pairs)
     if ppr is not None and (ppr < 5 or ppr > 95):
@@ -422,7 +470,11 @@ def train_from_plans(plans, model, state):
             state["by_direction"][d]["baseline"] += base_ok
             state["by_direction"][d]["total"] += 1
 
-        state["pairs"] = (state.get("pairs", []) + [[round(p_agent, 5), y]])[-AUC_WINDOW:]
+        # R-ul realizat intra in evaluare alaturi de eticheta. Eticheta binara
+        # (castig/pierdere) arunca marimea: un +24R si un +0.1R arata la fel.
+        # Pentru tranzactionare conteaza cat castigi, nu doar daca castigi.
+        state["pairs"] = (state.get("pairs", []) +
+                          [[round(p_agent, 5), y, round(p["realized_r"], 3)]])[-AUC_WINDOW:]
         # perechi paralele pentru SCORUL brut, ca sa pot compara ordonarea:
         # nu e de-ajuns ca agentul sa bata hazardul, trebuie sa bata euristica
         # pe care ar urma sa o inlocuiasca.
@@ -509,6 +561,9 @@ def predict_for_signal(model, state, signal):
         "active": state.get("status") == "ACTIVE",
         # Agentul influenteaza EV doar daca ordoneaza mai bine decat scorul brut.
         "superior": bool(state.get("agent_superior")),
+        # Pragul treimii de jos: semnalele sub el sunt cele mai slab ordonate.
+        # decide() il foloseste ca FILTRU, nu probabilitatea bruta.
+        "rank_cut": (ranking_edge(state.get("pairs") or []) or (None,) * 4)[3],
     }
 
 
