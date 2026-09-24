@@ -770,13 +770,29 @@ def decide(calibration, signal, agent_pred=None, bucket_size=20):
     # Probabilitatea vine acum mereu din calibrare, care e masurata direct din
     # rezultate. Agentul e inregistrat pe plan si va conta abia cand va dovedi
     # ordonare superioara - vezi `agent_superior` din ai_agent.
+    # BUG FIX LATENT: probabilitatea agentului NU mai intra in calculul EV.
+    # Comentariul de mai sus explica deja de ce - iesirea unei regresii
+    # logistice pe date dezechilibrate nu e calibrata (mediana 0.19-0.27 unde
+    # ratele reale erau 23-60%). Si totusi codul o substituia cand agentul era
+    # "superior", adica exact in situatia descrisa ca fiind gresita. Era
+    # inofensiv doar pentru ca poarta e dezactivata; activarea ei ar fi facut
+    # agentul sa refuze semnale profitabile.
+    #
+    # Agentul e bun la ORDONARE (AUC), nu la probabilitati absolute. Deci il
+    # folosesc ca FILTRU: EV-ul vine din calibrarea masurata, iar agentul
+    # elimina doar semnalele pe care le pune in treimea de jos.
     p = cal["win_rate"] / 100.0
     source = f"calibrare ({cal['win_rate']}%, n={cal['total']})"
     agent_used = False
-    if agent_active and agent_p is not None and (agent_pred or {}).get("superior"):
-        p = agent_p
-        source = f"agent AI ({100*agent_p:.0f}%, ordonare dovedita superioara)"
-        agent_used = True
+    rank_cut = (agent_pred or {}).get("rank_cut")
+    if (agent_active and agent_p is not None and rank_cut is not None
+            and (agent_pred or {}).get("superior") and agent_p < rank_cut):
+        return {"action": "SKIP", "mode": "EXPLOATARE",
+                "reason": (f"agentul pune semnalul in treimea de jos "
+                           f"({agent_p:.3f} < {rank_cut:.3f}); pe evaluare in afara "
+                           f"esantionului, acea treime castiga mai putin"),
+                "expected_value_r": None, "calibrated_prob": cal["win_rate"],
+                "agent_prob": agent_p, "agent_used": True}
 
     ev = p * avg_win - (1 - p) * avg_loss
     base = {"expected_value_r": round(ev, 3), "calibrated_prob": cal["win_rate"],
