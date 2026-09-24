@@ -36,6 +36,7 @@ import exchanges as ex_mod
 import liquidation as liq_mod
 import market_structure as struct_mod
 import elliott as ew_mod
+import liquidity_structure as ls_mod
 import ai_agent
 import json
 import os
@@ -142,6 +143,8 @@ EXCHANGE_SCANS_FILE = os.path.join(CONFIG["data_dir"], "exchange_scans.json")
 # vede fiecare acum; invatarea ramane unificata.
 SECONDARY_SCAN_LIMIT = 25      # cate simboluri scanez pe o bursa secundara
 SECONDARY_TIME_BUDGET = 120    # secunde totale pentru TOATE bursele secundare
+CHART_BARS = 90           # lumanari per token. 120 dadea ~2.4 MB de pagina
+                          # la 30 de tokenuri; 90 pastreaza structura vizibila.
 SPARKLINE_BARS = 40   # cate preturi de inchidere pastrez pentru graficul mic
 
 DEFAULT_WEIGHTS = {"trend": 1.0, "momentum": 1.0, "volatility": 1.0, "volume": 1.0}
@@ -885,10 +888,25 @@ def main():
             "fibonacci": d_fib,
             "plan": compute_trade_plan(r["direction"], r["price"], r["atr"], d_struct, d_fib),
             "sparkline": [round_price(c) for c in d_closes[-SPARKLINE_BARS:]],
+            # LUMANARI pentru graficul bogat al fiecarui token cu semnal.
+            # Pastrez CHART_BARS bare, rotunjite, doar OHLC + volum - suficient
+            # pentru lumanari, EMA si panourile de sub grafic. Fisierul se
+            # SUPRASCRIE la fiecare scanare, deci nu se acumuleaza; costa ~8 KB
+            # per token, adica sub 200 KB pentru intreaga lista.
+            "candles": [[c[0], round_price(c[1]), round_price(c[2]),
+                         round_price(c[3]), round_price(c[4]), round(c[5] or 0, 2)]
+                        for c in candles[-CHART_BARS:]],
+            "ema20": [None if v is None else round_price(v)
+                      for v in ema_series_full(d_closes, 20)[-CHART_BARS:]],
+            "ema50": [None if v is None else round_price(v)
+                      for v in ema_series_full(d_closes, 50)[-CHART_BARS:]],
             # Structura de piata per simbol. FARA multi-timeframe: ar insemna
             # 28 x 3 apeluri in plus la fiecare scanare. Timeframe-urile de
             # confirmare se descarca doar pentru simbolul afisat pe graficul
             # principal, unde chiar sunt privite.
+            "liq_structure": ls_mod.build([c[2] for c in candles],
+                                          [c[3] for c in candles], d_closes,
+                                          r["atr"], r["price"], CONFIG["timeframe"]),
             "elliott": ew_mod.analyze([c[2] for c in candles],
                                       [c[3] for c in candles], d_closes, r["price"]),
             "structure_panel": struct_mod.build(
@@ -1012,6 +1030,17 @@ def main():
         for i in range(len(closes)):
             rsi_series.append(rsi(closes[:i + 1], 14) if i >= 14 else None)
 
+        # Largesc fereastra pana la primul punct al numaratorii principale,
+        # plus o marja, marginit la cate bare exista si la un maxim rezonabil.
+        _ew_full = ew_mod.analyze([c[2] for c in best_ohlcv],
+                                  [c[3] for c in best_ohlcv], closes, best["price"])
+        _pri = _ew_full.get("primary") or {}
+        _idxs = [pt.get("idx") for pt in (_pri.get("points") or [])
+                 if pt.get("idx") is not None]
+        if _idxs:
+            _need = len(best_ohlcv) - min(_idxs) + 12
+            n = max(n, min(_need, len(best_ohlcv), 260))
+
         save_json(CHART_FILE, {
             "symbol": best["symbol"],
             "direction": best["direction"],
@@ -1031,6 +1060,19 @@ def main():
             },
             "current": best_plan,
             "locked": locked,
+            # ELLIOTT pentru grafic: punctele undelor cu indicii lor de bara,
+            # ca sa poata fi desenate exact peste lumanarile corespunzatoare.
+            # `idx` e pozitia in seria COMPLETA, iar graficul afiseaza doar
+            # ultimele n bare - deci offset-ul se aplica la desenare.
+            # Fereastra graficului se LARGESTE ca sa cuprinda structura Elliott
+            # principala. Altfel primele unde (MAJOR START, W1, W2) cad in afara
+            # ferestrei si se vad doar ultimele doua puncte - inutil, fiindca
+            # tocmai relatia dintre unde e informatia.
+            "elliott": (lambda r: {
+                "counts": r.get("counts", [])[:3],
+                "primary": r.get("primary"),
+                "alive": r.get("alive"), "total": r.get("total"),
+                "offset": max(0, len(best_ohlcv) - n)})(_ew_full),
             # Clusterele de lichidare pentru graficul principal: se deseneaza ca
             # benzi orizontale cu intensitate, echivalentul vizual al heatmap-ului.
             "liquidation": (lambda mp: {
@@ -1131,19 +1173,25 @@ def main():
                                 closes, sig["price"])
         sig_ew_bias = ew_mod.bias(sig_ew, sig["direction"])
 
+        sig_liqs = ls_mod.build([c[2] for c in candles], [c[3] for c in candles],
+                                closes, sig["atr"], sig["price"], CONFIG["timeframe"])
+        sig_liqs_bias = ls_mod.bias(sig_liqs, sig["direction"])
+
         sig_evidence = ev_mod.build_evidence(sig_ind, sig["price"], sig["atr"],
                                              sig_rsi, sig.get("components"),
                                              flow=sig_flow, book=sig_book,
                                              caps=active_caps,
                                              liq=sig_liq, liq_bias=sig_liq_bias,
                                              struct=sig_struct,
-                                             ew=sig_ew, ew_bias=sig_ew_bias)
+                                             ew=sig_ew, ew_bias=sig_ew_bias,
+                                             liqs=sig_liqs, liqs_bias=sig_liqs_bias)
         sig = {**sig,
                "evidence": sig_evidence,
                "fusion": ev_mod.fusion(sig_evidence, sig["direction"]),
                "indicators": sig_ind,
                "structure_panel": sig_struct,
                "elliott": sig_ew,
+               "liq_structure": sig_liqs,
                "liquidation": {"above": sig_liq.get("above"),
                                "below": sig_liq.get("below"),
                                "bias": sig_liq_bias,
