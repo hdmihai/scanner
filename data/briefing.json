@@ -1,12 +1,12 @@
 {
-  "text": "Din 17 planuri inchise, rata de succes e 17.6%, cu -13.23R cumulat (-0.778R in medie pe plan) si profit factor 0.1. 17 planuri sunt inca deschise. Separat, 21445 planuri inchise (+1398.68R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #121039 MANA/USDT +0.53R, #121041 GRT/USDT +0.47R, #121045 TRX/USDT -1.14R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (inca nu am destule exemple cu R masurat pentru a evalua utilitatea filtrului (25, necesare 300)).",
+  "text": "Din 18 planuri inchise, rata de succes e 17.6%, cu -13.23R cumulat (-0.778R in medie pe plan) si profit factor 0.1. 16 planuri sunt inca deschise. Separat, 21445 planuri inchise (+1398.68R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #121038 GRAM/USDT +0.00R, #121039 MANA/USDT +0.53R, #121041 GRT/USDT +0.47R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (inca nu am destule exemple cu R masurat pentru a evalua utilitatea filtrului (25, necesare 300)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-25 07:23 UTC",
+    "scan_time": "2026-09-25 08:24 UTC",
     "universe_size": 30,
     "plans_total": 21479,
-    "plans_open": 17,
-    "plans_closed": 17,
+    "plans_open": 16,
+    "plans_closed": 18,
     "legacy_closed": 21445,
     "legacy_total_r": 1398.68,
     "win_rate": 17.6,
@@ -14,6 +14,13 @@
     "avg_r": -0.778,
     "profit_factor": 0.1,
     "recent_closed": [
+      {
+        "id": 121038,
+        "symbol": "GRAM/USDT",
+        "direction": "LONG",
+        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
+        "r": 0.0
+      },
       {
         "id": 121039,
         "symbol": "MANA/USDT",
@@ -41,13 +48,6 @@
         "direction": "LONG",
         "state": "SL HIT - INVALIDATED",
         "r": -1.032
-      },
-      {
-        "id": 121021,
-        "symbol": "SOL/USDT",
-        "direction": "LONG",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.05
       }
     ],
     "open_now": [
