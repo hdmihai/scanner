@@ -347,7 +347,10 @@ def check_feature_extension():
                 "setul vechi de greutati.")
 
     # geometria trebuie sa ramana in sursa: acolo resetul chiar e necesar
-    if pt.GEOMETRY_VERSION not in src:
+    # Sursa trebuie sa urmeze FAMILIA de geometrie (versiune + timeframe): la
+    # schimbarea regulilor planului agentul se reseteaza, dar nu la simpla
+    # diferenta de capabilitati dintre scanarea live si agent.
+    if getattr(pt, "GEOMETRY_FAMILY", pt.GEOMETRY_VERSION) not in src:
         problems.append(
             f"sursa agentului ({src}) nu include GEOMETRY_VERSION. La schimbarea "
             f"regulilor planului agentul NU s-ar reseta, si ar prezice folosind "
