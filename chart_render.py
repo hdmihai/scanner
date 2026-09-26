@@ -95,10 +95,15 @@ def _collect_levels(chart, layers):
                 lv.append((lock[k], f"PLAN #{pid} {lbl} · LOCKED", "locked", 8))
 
     if "ew_levels" in layers and pr:
+        hit = pr.get("targets_hit") or {}
         for k, lbl in (("tp3", "ELLIOTT TP3"), ("tp2", "ELLIOTT TP2"), ("tp1", "ELLIOTT TP1")):
             v = (pr.get("targets") or {}).get(k)
             if v:
-                lv.append((v, lbl, "ew", 7))
+                # o tinta deja depasita nu mai e tinta: marcata ATINS, in gri
+                if hit.get(k):
+                    lv.append((v, f"{lbl} · ATINS", "hit", 3))
+                else:
+                    lv.append((v, lbl, "ew", 7))
     if "ew_levels" in layers:
         for c in (ew.get("counts") or []):
             if c.get("invalidation") and not c.get("invalidated"):
@@ -512,9 +517,10 @@ CSS = """
 .pill-t{font:600 8.5px var(--font-mono);fill:#FFFFFF;}
 .pill-tp,.pill-stb{fill:#089981;} .pill-sl,.pill-inv,.pill-sts{fill:#F23645;}
 .pill-entry,.pill-vwap,.pill-val{fill:#0288D1;} .pill-locked{fill:#455A64;}
-.pill-ew,.pill-ewh{fill:#7E57C2;} .pill-ewa{fill:#1E88E5;}
+.pill-ew,.pill-ewh{fill:#7E57C2;} .pill-hit{fill:#94A3B8;} .lvl-hit{stroke:#94A3B8;} .pill-ewa{fill:#1E88E5;}
 .pill-vah,.pill-poc,.pill-liqb{fill:#E67E22;} .pill-liqs{fill:#C0651A;}
 .ew0-l{stroke:#7E57C2;stroke-width:2;} .ew0-d{fill:#7E57C2;}
+.ew0-t,.proj-t,.ewx-t{paint-order:stroke;stroke:#FFFFFF;stroke-width:3px;stroke-linejoin:round;}
 .ew0-t{font:700 8.5px var(--font-mono);fill:#5E35B1;}
 .ew1-l{stroke:#1E88E5;stroke-width:1.4;stroke-dasharray:5 3;} .ew1-d{fill:#1E88E5;}
 .ew2-l{stroke:#FB8C00;stroke-width:1.2;stroke-dasharray:2 3;} .ew2-d{fill:#FB8C00;}
