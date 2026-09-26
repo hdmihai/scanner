@@ -895,3 +895,4 @@ def print_summary(store):
             print(f"  Profit factor: {s['profit_factor']}")
         print(f"  Cel mai bun: {s['best']:+.2f}R  |  cel mai slab: {s['worst']:+.2f}R")
     print(f"  Stari: {s['by_state']}")
+
