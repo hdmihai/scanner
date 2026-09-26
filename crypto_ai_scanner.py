@@ -141,7 +141,8 @@ EXCHANGE_SCANS_FILE = os.path.join(CONFIG["data_dir"], "exchange_scans.json")
 # memoria agentului in cinci si ar invata de cinci ori acelasi lucru, mai prost,
 # exact cand tocmai a atins pragul de activare. Afisarea per bursa iti arata ce
 # vede fiecare acum; invatarea ramane unificata.
-SECONDARY_SCAN_LIMIT = 25      # cate simboluri scanez pe o bursa secundara
+SECONDARY_SCAN_LIMIT = 30      # = marimea watchlist-ului. La 25, cu 30 de tokeni,
+                               # bursele secundare taiau TACUT 5 simboluri.
 SECONDARY_TIME_BUDGET = 120    # secunde totale pentru TOATE bursele secundare
 CHART_BARS_MAX = 170      # plafonul ferestrei adaptive per token
 CHART_BARS = 90           # lumanari per token. 120 dadea ~2.4 MB de pagina
@@ -1140,7 +1141,7 @@ def main():
     agent_model, agent_state = ai_agent.load_agent()
     closed_for_neighbors = [p for p in plan_store["plans"]
                             if p.get("realized_r") is not None
-                            and p.get("geometry") == plan_tracker.GEOMETRY_VERSION
+                            and plan_tracker.same_family(p.get("geometry"))
                             and p.get("state") != plan_tracker.STATE_NO_ENTRY]
     issued, skipped = [], []
     for sig in (longs[: CONFIG["top_n_per_direction"]] + shorts[: CONFIG["top_n_per_direction"]]):
@@ -1287,4 +1288,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
