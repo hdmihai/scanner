@@ -244,6 +244,102 @@ def _abcd(points):
     }
 
 
+def projection(count, price):
+    """Traiectoria urmatoarelor unde, proiectata din numaratoarea curenta.
+
+    CE ESTE, SI CE NU ESTE
+    ----------------------
+    Un SCENARIU conditionat: "DACA numaratoarea e corecta, pretul ar trebui sa
+    urmeze aproximativ acest drum". Nu e o predictie in sensul statistic - nu
+    are o probabilitate masurata in spate, doar increderea numaratoarii. De
+    asta se deseneaza punctat, pleaca de la nivelul de invalidare, si dispare
+    in momentul in care pretul il atinge.
+
+    CUM SE CONSTRUIESTE
+    -------------------
+    Ritmul undelor viitoare vine din ritmul celor CONFIRMATE ale aceleiasi
+    numaratori (durata medie in bare), iar amplitudinile din proportiile
+    Fibonacci deja folosite pentru tinte. Asta leaga proiectia de structura
+    observata, nu de parametri alesi arbitrar.
+      - IMPULS: unda 5 se incheie la prima tinta neatinsa, urmata de o
+        corectie A-B-C (A = 38.2% din impuls, B = 50% din A, C = A).
+      - CORECTIE A-B-C: C se incheie, apoi trendul reia spre tintele
+        numaratorii, cu o retragere de 38.2% intre ele.
+      - AB=CD: D se incheie in zona PRZ.
+    Etichetele sunt intre paranteze - (W5), (A) - conventia Elliott pentru
+    unde proiectate, spre deosebire de cele confirmate.
+    """
+    if not count or count.get("invalidated"):
+        return None
+    pts = count.get("points") or []
+    if len(pts) < 3:
+        return None
+    last = pts[-1]
+    confirmed = [p for p in pts if p.get("confirmed")]
+    durs = [b["idx"] - a["idx"] for a, b in zip(pts, pts[1:])
+            if b.get("idx") is not None and a.get("idx") is not None]
+    step = max(4, int(sum(durs) / len(durs))) if durs else 12
+    up = count["direction"] == "LONG"
+    sign = 1 if up else -1
+    tg = count.get("targets") or {}
+    out = [{"label": last.get("label", ""), "price": last["price"],
+            "idx": last["idx"], "projected": False}]
+
+    now_idx = count.get("_now_idx", last["idx"])
+
+    def add(label, price):
+        # primul punct proiectat vine DUPA bara curenta, nu dupa ultimul pivot:
+        # intre pivot si acum au trecut cateva bare, iar un punct proiectat nu
+        # are voie sa cada in trecut, peste pretul real.
+        base = max(out[-1]["idx"], now_idx) if len(out) == 1 else out[-1]["idx"]
+        out.append({"label": f"({label})", "price": price,
+                    "idx": base + step, "projected": True})
+
+    if count["pattern"].startswith("IMPULS"):
+        # unda 5 spre prima tinta inca neatinsa in directia trendului
+        ahead = sorted((v for v in tg.values() if v and (v - price) * sign > 0),
+                       key=lambda v: abs(v - price))
+        # Daca pretul a depasit deja toate tintele, unda 5 e practic incheiata:
+        # nu mai proiectez un (W5) pe acelasi pret - ar fi un segment de
+        # lungime zero - ci trec direct la corectia A-B-C.
+        if ahead:
+            w5 = ahead[0]
+            add("W5", w5)
+        else:
+            w5 = last["price"]
+        span = abs(w5 - pts[0]["price"])
+        a = w5 - sign * span * 0.382
+        add("A", a)
+        add("B", a + sign * abs(w5 - a) * 0.5)
+        add("C", a - sign * abs(w5 - a) * 0.5)
+    elif count["pattern"].startswith("CORECTIE"):
+        levels = [tg[k] for k in ("tp1", "tp2") if tg.get(k)]
+        prev = last["price"]
+        for i, lvl in enumerate(levels):
+            add("1" if i == 0 else "3", lvl)
+            if i < len(levels) - 1:
+                add("2", lvl - (lvl - prev) * 0.382)
+            prev = lvl
+    else:
+        # ARMONICA: D se incheie in PRZ, apoi pretul se intoarce spre tinte
+        # (C, apoi A) - logica standard de tranzactionare a unui AB=CD. Doar D
+        # in PRZ dadea un segment aproape nul, fara informatie.
+        prz = count.get("prz") or {}
+        if prz:
+            d_end = (prz["low"] + prz["high"]) / 2.0
+            if abs(d_end - last["price"]) / (abs(last["price"]) or 1) > 0.003:
+                add("D", d_end)
+            for lbl, key in (("1", "tp1"), ("2", "tp2")):
+                if tg.get(key):
+                    add(lbl, tg[key])
+
+    if len(out) < 2:
+        return None
+    return {"path": out, "step_bars": step,
+            "invalidation": count.get("invalidation"),
+            "confidence": count.get("confidence")}
+
+
 def analyze(highs, lows, closes, price=None):
     """Toate ipotezele plauzibile, ordonate dupa incredere.
 
@@ -261,19 +357,65 @@ def analyze(highs, lows, closes, price=None):
     piv = find_pivots(highs, lows)
     if len(piv) < 6:
         piv = find_pivots(highs, lows, left=2, right=2) or piv
+
+    # UNDA IN FORMARE. Un pivot se confirma abia dupa cateva bare la dreapta,
+    # deci unda care se desfasoara ACUM nu avea niciodata un punct terminal -
+    # un impuls cu unda 5 in curs arata doar 5 pivoti si nu putea fi recunoscut.
+    # Capturile de referinta arata exact aceasta unda ("W3 FORMING"), la pretul
+    # curent. Adaug extremul atins de la ultimul pivot ca punct PROVIZORIU, doar
+    # daca miscarea e semnificativa (peste 30% din unda anterioara) - altfel
+    # orice fluctuatie de o bara ar deveni o "unda".
+    if len(piv) >= 2:
+        lastp, prevp = piv[-1], piv[-2]
+        a, b0 = lastp["idx"] + 1, len(highs)
+        if a < b0:
+            leg = abs(lastp["price"] - prevp["price"]) or 1e-12
+            if lastp["type"] == "L":
+                m = max(highs[a:b0]); i = a + highs[a:b0].index(m)
+                if m - lastp["price"] >= 0.3 * leg:
+                    piv.append({"idx": i, "price": m, "type": "H", "provisional": True})
+            else:
+                m = min(lows[a:b0]); i = a + lows[a:b0].index(m)
+                if lastp["price"] - m >= 0.3 * leg:
+                    piv.append({"idx": i, "price": m, "type": "L", "provisional": True})
     if len(piv) < 4:
         return {"counts": [], "primary": None}
 
     counts = []
-    # incerc etichetari pornind de la mai multe puncte de start: o numaratoare
-    # buna nu depinde de unde se intampla sa inceapa fereastra
-    for start in range(0, min(len(piv) - 3, 6)):
-        seq = piv[start:]
-        for fn in (_impulse, _zigzag, _abcd):
+    # BUG FIX FUNDAMENTAL: structurile se ANCOREAZA la pivotii RECENTI.
+    #
+    # Varianta anterioara incerca doar primii 6 pivoti ca punct de start, iar
+    # fiecare tipar lua primii N pivoti de acolo - deci structurile veneau
+    # MEREU din partea cea mai veche a seriei. Masurat pe scanare: punctele
+    # principalei la indicii 6-31 dintr-o serie de 259 de bare, adica piata de
+    # acum ~40 de zile pe 4h. Undele din dashboard nu erau cele curente,
+    # caracteristica `ev_elliott` a agentului descria trecutul, iar proiectia
+    # pleca dintr-un punct vechi.
+    #
+    # Acum fiecare tipar se termina la unul dintre ultimii 4 pivoti. Increderea
+    # scade usor cu fiecare pivot "in urma": o structura incheiata mai demult
+    # e mai putin relevanta pentru ce face pretul acum.
+    for fn, need in ((_impulse, 6), (_zigzag, 4), (_abcd, 4)):
+        for back in range(0, 4):
+            end = len(piv) - back
+            start = end - need
+            if start < 0:
+                continue
+            seq = piv[start:end]
             res = fn(seq)
             if res:
                 res["start_idx"] = seq[0]["idx"]
+                res["end_idx"] = seq[-1]["idx"]
+                res["confidence"] = round(res["confidence"] * (1 - 0.08 * back), 4)
                 counts.append(res)
+
+    # STRUCTURI EXPIRATE. O numaratoare care s-a incheiat demult nu descrie
+    # piata de acum: pretul s-a miscat de atunci, iar o proiectie pornita din
+    # ea s-ar desena peste pretul real, in trecut. Cand actiunea recenta nu
+    # formeaza nicio structura valida, e onest sa arat "nicio structura
+    # curenta", nu una expirata. Fereastra: ultimele 20% din bare, minim 25.
+    fresh_from = len(closes) - max(25, int(0.2 * len(closes)))
+    counts = [c for c in counts if c.get("end_idx", 0) >= fresh_from]
 
     if not counts:
         return {"counts": [], "primary": None}
@@ -287,9 +429,26 @@ def analyze(highs, lows, closes, price=None):
         seen.add(key)
         unique.append(c)
 
-    unique.sort(key=lambda c: -c["confidence"])
-    for i, c in enumerate(unique):
-        c["rank"] = ["Primary", "Alternative", "Secondary", "Family"][i] if i < 4 else f"#{i+1}"
+    # Invalidarea se calculeaza INAINTE de rang: Primary / Alternative /
+    # Secondary numesc scenariile inca VII, ca in capturile de referinta. O
+    # ipoteza deja anulata de pret nu are voie sa ocupe locul de Primary doar
+    # pentru ca avea incredere mare inainte.
+    for c in unique:
+        inv = c["invalidation"]
+        c["invalidated"] = (px < inv) if c["direction"] == "LONG" else (px > inv)
+    unique.sort(key=lambda c: (c["invalidated"], -c["confidence"]))
+    # Rangurile Primary / Alternative / Secondary se dau DOAR scenariilor vii,
+    # ca in capturile de referinta. Cand toate au fost anulate de pret, niciunul
+    # nu e "Primary" - altfel dashboard-ul ar eticheta drept principal un
+    # scenariu mort.
+    _ranks = ["Primary", "Alternative", "Secondary", "Family"]
+    _alive_i = 0
+    for c in unique:
+        if c["invalidated"]:
+            c["rank"] = "Invalidat"
+        else:
+            c["rank"] = _ranks[_alive_i] if _alive_i < 4 else f"#{_alive_i + 1}"
+            _alive_i += 1
         # Descrierea din capturi: "Primary Developing Motive W3 FORMING 48%"
         # sau "Primary Zigzag C 68%" - numele numaratorii, tipul structurii,
         # unda curenta si starea ei, apoi increderea.
@@ -305,12 +464,16 @@ def analyze(highs, lows, closes, price=None):
             tail = pts[-1]["label"] if pts else ""
             c["headline"] = (f"{c['rank']} {kind} {tail} "
                              f"{c['confidence'] * 100:.0f}%")
-        # o ipoteza deja invalidata de pret e marcata, nu ascunsa
-        inv = c["invalidation"]
-        c["invalidated"] = (px < inv) if c["direction"] == "LONG" else (px > inv)
+        # invalidarea e deja calculata mai sus, inainte de rang
 
     alive = [c for c in unique if not c["invalidated"]]
     primary = alive[0] if alive else None
+    # Proiectia doar pentru numaratoarea principala VALIDA - o proiectie pentru
+    # fiecare ipoteza ar umple graficul de drumuri contradictorii.
+    if primary:
+        primary["_now_idx"] = len(closes) - 1
+        primary["projection"] = projection(primary, px)
+        primary.pop("_now_idx", None)
     return {"counts": unique[:4], "primary": primary,
             "alive": len(alive), "total": len(unique)}
 
