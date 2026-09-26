@@ -495,3 +495,4 @@ def bias(result, direction):
         return None
     agree = sum(c["confidence"] for c in alive if c["direction"] == direction)
     return round((2.0 * agree / total) - 1.0, 4)
+
