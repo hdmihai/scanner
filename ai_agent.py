@@ -98,7 +98,9 @@ MIN_AUC = 0.55                  # sub atat, modelul nu ordoneaza mai bine decat 
 # Cat de mult trebuie sa castige treimea de sus fata de toate semnalele, in R
 # per plan, ca filtrul sa merite. 0.05R e mic dar peste zgomot la sute de planuri.
 MIN_RANK_EDGE_R = 0.05
-AUC_WINDOW = 500                # cate perechi (predictie, rezultat) pastrez pentru AUC
+AUC_WINDOW = 3000               # perechi (predictie, rezultat, R) pastrate pentru evaluare.
+                                # 500 era prea putin pentru a compara treimi de semnale:
+                                # ~167 pe treime, cu zgomot mare pe media R.
 RECENT_WINDOW = 200             # fereastra pentru acuratetea "recenta"
 CURVE_EVERY = 25                # la cate exemple salvez un punct pe curba
 
@@ -669,6 +671,21 @@ def main():
                 print(f"    Pastrez cele {state.get('samples', 0)} exemple invatate; "
                       f"cele noi pornesc de la greutate 0.")
                 state["feature_version"] = fv
+
+    # RECONSTRUIRE UNICA A EVALUARII. Starea scrisa de versiunea anterioara are
+    # perechi (predictie, rezultat) FARA R, iar criteriul de activare masoara
+    # acum castigul in R al treimii de sus. Toate planurile sunt deja marcate
+    # `agent_trained`, deci perechi noi cu R ar aparea doar din planuri LIVE
+    # noi - saptamani intregi in care agentul ar sta blocat in SHADOW desi are
+    # 16.000+ de exemple. Reconstruiesc o singura data: reantrenez cronologic
+    # (train_from_plans sorteaza dupa closed_ts), predictie INAINTE de invatare,
+    # deci evaluarea ramane in afara esantionului.
+    legacy_eval = (state is not None and state.get("source") == source
+                   and (state.get("pairs") or [])
+                   and not any(len(pp) >= 3 for pp in state.get("pairs") or []))
+    if legacy_eval:
+        print("[i] Evaluarea salvata nu contine R - o reconstruiesc cronologic, o singura data.")
+        state["source"] = "legacy-eval-rebuild"
 
     if state is None or state.get("source") != source:
         if state is not None:
