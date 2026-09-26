@@ -39,6 +39,7 @@ efectiv, cu interval de incredere Wilson, si spun explicit cand nu am destule
 date ca sa pronunt un numar.
 """
 
+import hashlib
 import json
 import math
 import os
@@ -171,6 +172,8 @@ USE_DECISION_GATE = os.environ.get("USE_DECISION_GATE", "false").lower() == "tru
 # Activarea ramane conditionata de starea ACTIVE si de ranking_edge peste prag,
 # deci se opreste singur daca avantajul dispare.
 USE_AGENT_FILTER = os.environ.get("USE_AGENT_FILTER", "true").lower() == "true"
+# Fractiunea semnalelor filtrate care se emit totusi, pentru explorare.
+AGENT_EXPLORE_RATE = float(os.environ.get("AGENT_EXPLORE_RATE", "0.15"))
 
 # Versiunea geometriei planului. Cand regulile de plasare a TP1/TP2 se schimba,
 # rezultatele vechi devin necomparabile: descriu o structura care nu mai exista.
@@ -233,6 +236,34 @@ def _build_geometry(caps_sig=None):
 GEOMETRY_VERSION = _build_geometry()
 
 
+def _family_of(geo):
+    parts = (geo or "").split("-")
+    return "-".join(parts[:2]) if len(parts) >= 2 else (geo or "")
+
+
+# FAMILIA DE GEOMETRIE: versiunea + timeframe, FARA semnatura de capabilitati.
+#
+# DEFECT DE ARHITECTURA, reparat aici: calibrarea, agentul, vecinii comparabili
+# si migrarea comparau semnatura EXACTA. Scanarea live detecteaza order book si
+# trades si ruleaza ca "v6-4h-obf"; backtest-ul, fara ele, produce "v6-4h-o".
+# Masurat in productie: 21.445 de planuri de backtest IGNORATE de calibrarea
+# live (bucket-ul 40 avea 3 planuri - de aici "NECALIBRAT INCA (N=3)" pe
+# dashboard), vecinii comparabili cautati printre 46 de planuri, iar agentul -
+# care ruleaza ca proces separat, fara capabilitati - nu invata NICIODATA din
+# planurile live.
+#
+# Capabilitatile schimba ce CARACTERISTICI vede modelul, nu REZULTATUL unui
+# plan: aceleasi reguli de entry, SL, TP si costuri. Exact regula aplicata deja
+# la caracteristicile noi. Semnatura ramane pe plan, pentru audit; invatarea si
+# calibrarea folosesc familia.
+GEOMETRY_FAMILY = _family_of(GEOMETRY_VERSION)
+
+
+def same_family(geo):
+    """Planul apartine familiei curente (aceleasi reguli de rezultat)?"""
+    return _family_of(geo) == GEOMETRY_FAMILY
+
+
 def set_capabilities(caps_sig):
     """Fixeaza semnatura de capabilitati DUPA ce bursa a fost sondata.
 
@@ -243,8 +274,9 @@ def set_capabilities(caps_sig):
     care semnatura trebuia sa o previna.
     Se apeleaza o data, la inceputul scanarii, dupa sondare.
     """
-    global GEOMETRY_VERSION
+    global GEOMETRY_VERSION, GEOMETRY_FAMILY
     GEOMETRY_VERSION = _build_geometry(caps_sig)
+    GEOMETRY_FAMILY = _family_of(GEOMETRY_VERSION)
     os.environ["SCAN_CAPS"] = caps_sig or "o"
     return GEOMETRY_VERSION
 # v3 -> v4: doua schimbari care fac rezultatele necomparabile cu cele anterioare.
@@ -321,7 +353,7 @@ def auto_migrate_geometry(store):
     for p in store.get("plans", []):
         if p.get("state") in CLOSED_STATES:
             continue
-        if p.get("geometry", "v1") == GEOMETRY_VERSION:
+        if same_family(p.get("geometry", "v1")):
             continue
         prev = p.get("state")
         p["state"] = STATE_EXPIRED
@@ -671,7 +703,7 @@ def build_calibration(store, bucket_size=20):
     for p in store["plans"]:
         if p["state"] not in CLOSED_STATES or p.get("realized_r") is None:
             continue
-        if p.get("geometry", "v1") != GEOMETRY_VERSION:
+        if not same_family(p.get("geometry", "v1")):
             continue  # geometrie veche: rezultatele nu sunt comparabile
         if p.get("state") == STATE_NO_ENTRY:
             continue  # pretul nu a revenit la intrare: nicio tranzactie, deci
@@ -753,6 +785,24 @@ def decide(calibration, signal, agent_pred=None, bucket_size=20):
     if (USE_AGENT_FILTER and (agent_pred or {}).get("active")
             and (agent_pred or {}).get("superior")
             and agent_p0 is not None and cut0 is not None and agent_p0 < cut0):
+        # EXPLORARE: o parte din semnalele filtrate se EMIT totusi, marcate.
+        # Fara asta, semnalele refuzate nu se mai urmaresc pana la rezultat, iar
+        # agentul ar invata in timp doar din ce a aprobat el insusi - o bucla de
+        # selectie care i-ar deforma exact evaluarea pe care se bazeaza filtrul.
+        # Alegerea e determinista (hash simbol + moment), deci reproductibila.
+        # cheia include probabilitatea agentului: variaza la fiecare semnal, deci
+        # alegerea nu devine constanta cand simbolul sau pretul lipsesc (bug
+        # prins de test - cu cheie constanta, rata de explorare iesea 100%)
+        key = (f"{signal.get('symbol', '')}|{signal.get('direction', '')}|"
+               f"{signal.get('price')}|{agent_p0:.8f}")
+        if (int(hashlib.sha256(key.encode()).hexdigest(), 16) % 1000) < AGENT_EXPLORE_RATE * 1000:
+            return {"action": "ISSUE", "mode": "EXPLORARE_FILTRU",
+                    "reason": (f"semnal din treimea de jos ({agent_p0:.3f} < {cut0:.3f}), "
+                               f"emis pentru explorare ({AGENT_EXPLORE_RATE:.0%} din cele "
+                               f"filtrate) - pastreaza evaluarea agentului nedeformata"),
+                    "expected_value_r": None,
+                    "calibrated_prob": cal["win_rate"] if cal else None,
+                    "agent_prob": agent_p0, "agent_used": True}
         return {"action": "SKIP", "mode": "FILTRU_AGENT",
                 "reason": (f"agentul pune semnalul in treimea de jos ({agent_p0:.3f} "
                            f"< {cut0:.3f}); masurat in afara esantionului, acea "
@@ -837,14 +887,14 @@ def decide(calibration, signal, agent_pred=None, bucket_size=20):
 def summarize(store):
     plans = store["plans"]
     all_closed = [p for p in plans if p["state"] in CLOSED_STATES and p.get("realized_r") is not None]
-    current_geo = [p for p in all_closed if p.get("geometry", "v1") == GEOMETRY_VERSION]
+    current_geo = [p for p in all_closed if same_family(p.get("geometry", "v1"))]
     no_entry = [p for p in current_geo if p.get("state") == STATE_NO_ENTRY]
     closed = [p for p in current_geo if p.get("state") != STATE_NO_ENTRY]
     # Planurile legacy nu mai sunt in `plans` dupa archive_stale_plans - au fost
     # mutate pe disc, in fisiere separate per geometrie. `legacy` de aici prinde
     # doar ce a ramas NEARHIVAT inca in acest apel (rar: chiar planurile pe care
     # save_plans le arhiveaza data viitoare). Restul vine din indexul de arhiva.
-    legacy = [p for p in all_closed if p.get("geometry", "v1") != GEOMETRY_VERSION]
+    legacy = [p for p in all_closed if not same_family(p.get("geometry", "v1"))]
     open_plans = [p for p in plans if p["state"] not in CLOSED_STATES]
 
     archived_idx = load_json(ARCHIVE_INDEX_FILE, {})
@@ -895,4 +945,3 @@ def print_summary(store):
             print(f"  Profit factor: {s['profit_factor']}")
         print(f"  Cel mai bun: {s['best']:+.2f}R  |  cel mai slab: {s['worst']:+.2f}R")
     print(f"  Stari: {s['by_state']}")
-
