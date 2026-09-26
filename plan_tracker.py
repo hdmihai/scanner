@@ -143,6 +143,35 @@ def archive_stale_plans(store):
     return moved
 
 
+def history_table(store, bucket_size=20):
+    """Istoricul masurat per (directie, interval de scor), din planurile inchise
+    ale familiei curente: numar, rata de castig si durata mediana in bare pana
+    la inchidere (pentru castiguri si in general). Folosit de prognoza de pe
+    grafic, ca durata si probabilitatea sa vina din trecut, nu din presupuneri."""
+    raw = {}
+    for p in store.get("plans") or []:
+        if p.get("realized_r") is None or p.get("state") == STATE_NO_ENTRY:
+            continue
+        if not same_family(p.get("geometry", "v1")):
+            continue
+        sc, d = p.get("score_at_entry"), p.get("direction")
+        if sc is None or d not in ("LONG", "SHORT") or not p.get("closed_ts"):
+            continue
+        bs = p.get("bar_seconds") or DEFAULT_BAR_SECONDS
+        bars = max(1, int((p["closed_ts"] - p.get("created_ts", p["closed_ts"])) / bs))
+        e = raw.setdefault(f"{d}:{int(sc // bucket_size) * bucket_size}",
+                           {"n": 0, "w": 0, "bw": [], "ba": []})
+        e["n"] += 1
+        e["ba"].append(bars)
+        if p["realized_r"] > 0:
+            e["w"] += 1
+            e["bw"].append(bars)
+    med = lambda v: sorted(v)[len(v) // 2] if v else None
+    return {k: {"n": e["n"], "win_rate": round(100 * e["w"] / e["n"], 1),
+                "median_bars_win": med(e["bw"]), "median_bars_all": med(e["ba"])}
+            for k, e in raw.items()}
+
+
 # POARTA DE DECIZIE: implicit DEZACTIVATA, pe baza de dovezi.
 #
 # A fost construita ca sa refuze intervalele de scor cu valoare asteptata
