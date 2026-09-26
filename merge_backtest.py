@@ -68,6 +68,22 @@ def main():
         return 1
 
     live = load_json(PLANS_FILE, {"next_id": 1, "plans": []})
+    # REGENERARE, identic cu backtest.py --merge: planurile de backtest ale
+    # familiei curente se INLOCUIESC cu cele din backtest_plans.json. Doar cu
+    # deduplicare, modul merge_only pastra caracteristicile calculate cu logica
+    # veche si nu reantrena agentul.
+    old_bt = {id(p) for p in live["plans"]
+              if p.get("source") == "backtest"
+              and plan_tracker.same_family(p.get("geometry", "v1"))}
+    if old_bt:
+        live["plans"] = [p for p in live["plans"] if id(p) not in old_bt]
+        print(f"  inlocuiesc {len(old_bt)} planuri de backtest ale familiei "
+              f"{plan_tracker.GEOMETRY_FAMILY}")
+        agent_file = os.path.join(os.path.dirname(PLANS_FILE), "agent_model.json")
+        if os.path.exists(agent_file):
+            os.remove(agent_file)
+            print("  modelul agentului sters - se reantreneaza de la zero")
+
     existing = {plan_key(p) for p in live["plans"] if p.get("source") == "backtest"}
 
     incoming = [p for p in bt["plans"] if plan_key(p) not in existing]
