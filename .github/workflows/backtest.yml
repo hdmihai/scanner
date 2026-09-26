@@ -104,7 +104,7 @@ jobs:
             *) echo "[EROARE] mod necunoscut: $BT_MODE"; exit 1 ;;
           esac
           [ "$BT_MERGE" = "true" ] && ARGS="$ARGS --merge"
-          echo "Timeframe: ${SCAN_TIMEFRAME}  (geometria devine v4-${SCAN_TIMEFRAME})"
+          echo "Timeframe: ${SCAN_TIMEFRAME}  (familia de geometrie: v6-${SCAN_TIMEFRAME})"
           echo "Rulez: python backtest.py $ARGS"
           # tee: iesirea ajunge si in log, si intr-un fisier pe care il pun in
           # rezumatul rularii, ca sa fie vizibila fara sa sapi prin log.
