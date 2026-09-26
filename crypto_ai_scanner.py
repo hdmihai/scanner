@@ -143,6 +143,7 @@ EXCHANGE_SCANS_FILE = os.path.join(CONFIG["data_dir"], "exchange_scans.json")
 # vede fiecare acum; invatarea ramane unificata.
 SECONDARY_SCAN_LIMIT = 25      # cate simboluri scanez pe o bursa secundara
 SECONDARY_TIME_BUDGET = 120    # secunde totale pentru TOATE bursele secundare
+CHART_BARS_MAX = 170      # plafonul ferestrei adaptive per token
 CHART_BARS = 90           # lumanari per token. 120 dadea ~2.4 MB de pagina
                           # la 30 de tokenuri; 90 pastreaza structura vizibila.
 SPARKLINE_BARS = 40   # cate preturi de inchidere pastrez pentru graficul mic
@@ -874,6 +875,21 @@ def main():
         d_closes = [c[4] for c in candles]
         d_struct = compute_structure_levels(d_highs, d_lows)
         d_fib = compute_fibonacci(d_highs, d_lows)
+        # Elliott calculat o singura data per token, refolosit mai jos.
+        _ew_tok = ew_mod.analyze([c[2] for c in candles], [c[3] for c in candles],
+                                 d_closes, r["price"])
+        # FEREASTRA ADAPTIVA: se largeste pana la primul punct al numaratorii
+        # principale. Cu 90 de bare fixe, structura putea cadea complet in afara
+        # graficului - masurat: 0 din 4 puncte vizibile, iar proiectia aparea
+        # fara undele din care provine. Plafonat la CHART_BARS_MAX ca pagina sa
+        # ramana usoara.
+        _pri_idx = [pt["idx"] for pt in ((_ew_tok.get("primary") or {}).get("points") or [])
+                    if pt.get("idx") is not None]
+        _nb = CHART_BARS
+        if _pri_idx:
+            _nb = max(CHART_BARS, min(len(candles) - min(_pri_idx) + 8, CHART_BARS_MAX))
+        _nb = min(_nb, len(candles))
+
         details[r["symbol"]] = {
             "direction": r["direction"],
             "score": r["risk_adjusted"],
@@ -895,11 +911,11 @@ def main():
             # per token, adica sub 200 KB pentru intreaga lista.
             "candles": [[c[0], round_price(c[1]), round_price(c[2]),
                          round_price(c[3]), round_price(c[4]), round(c[5] or 0, 2)]
-                        for c in candles[-CHART_BARS:]],
+                        for c in candles[-_nb:]],
             "ema20": [None if v is None else round_price(v)
-                      for v in ema_series_full(d_closes, 20)[-CHART_BARS:]],
+                      for v in ema_series_full(d_closes, 20)[-_nb:]],
             "ema50": [None if v is None else round_price(v)
-                      for v in ema_series_full(d_closes, 50)[-CHART_BARS:]],
+                      for v in ema_series_full(d_closes, 50)[-_nb:]],
             # Structura de piata per simbol. FARA multi-timeframe: ar insemna
             # 28 x 3 apeluri in plus la fiecare scanare. Timeframe-urile de
             # confirmare se descarca doar pentru simbolul afisat pe graficul
@@ -907,8 +923,10 @@ def main():
             "liq_structure": ls_mod.build([c[2] for c in candles],
                                           [c[3] for c in candles], d_closes,
                                           r["atr"], r["price"], CONFIG["timeframe"]),
-            "elliott": ew_mod.analyze([c[2] for c in candles],
-                                      [c[3] for c in candles], d_closes, r["price"]),
+            # `offset` aliniaza indicii punctelor (calculati pe seria completa)
+            # cu cele CHART_BARS lumanari pastrate pentru grafic. Fara el,
+            # punctele cele mai VECHI erau desenate peste barele cele mai NOI.
+            "elliott": {**_ew_tok, "offset": max(0, len(candles) - _nb)},
             "structure_panel": struct_mod.build(
                 d_closes, [c[2] for c in candles], [c[3] for c in candles],
                 r["atr"], base_tf=CONFIG["timeframe"], price=r["price"]),
@@ -921,6 +939,7 @@ def main():
                     liq_mod.build_map(candles, r["price"]))),
         }
     save_json(DETAILS_FILE, {"scan_time": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
+                              "timeframe": CONFIG["timeframe"],
                              "exchange": exchange_id, "symbols": details})
 
     # SCANARE PER BURSA, doar pentru afisare. Bursa activa refoloseste datele
@@ -1075,6 +1094,13 @@ def main():
                 "offset": max(0, len(best_ohlcv) - n)})(_ew_full),
             # Clusterele de lichidare pentru graficul principal: se deseneaza ca
             # benzi orizontale cu intensitate, echivalentul vizual al heatmap-ului.
+            # Lichiditatea structurala lipsea din graficul principal - ajungea
+            # doar in detaliile per token, deci componenta "Lichiditate" a
+            # graficului principal era mereu goala.
+            "liq_structure": ls_mod.build([c[2] for c in best_ohlcv],
+                                          [c[3] for c in best_ohlcv], closes,
+                                          best["atr"], best["price"],
+                                          CONFIG["timeframe"]),
             "liquidation": (lambda mp: {
                 "clusters": mp.get("clusters", [])[:16],
                 "above": mp.get("above"), "below": mp.get("below"),
