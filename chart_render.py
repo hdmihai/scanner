@@ -151,7 +151,14 @@ def render_chart(chart, layers=None, height=300, fullscreen_id=None, show_head=T
     off = ew.get("offset", 0)
     pr = ew.get("primary") or {}
 
-    proj = (pr.get("projection") or {}) if "projection" in layers else {}
+    # PROGNOZA (linie continua prin pretul real + punctata din prezent) are
+    # prioritate; proiectia veche ramane doar ca rezerva pentru date fara ea.
+    fc = (chart.get("forecast") or {}) if "projection" in layers else {}
+    solid = fc.get("solid") or []
+    if fc.get("path"):
+        proj = {"path": fc["path"], "confidence": fc.get("confidence")}
+    else:
+        proj = (pr.get("projection") or {}) if "projection" in layers else {}
     ppath = [p for p in (proj.get("path") or []) if p.get("projected")]
     ext = max(0, max(p["idx"] for p in ppath) - off - (n - 1)) if ppath else 0
 
@@ -183,8 +190,8 @@ def render_chart(chart, layers=None, height=300, fullscreen_id=None, show_head=T
     # departate (peste 60% de pret) nu intind axa - le-ar turti lumanarile.
     px = candles[-1][4]
     near = [l[0] for l in levels if abs(l[0] - px) / px < 0.6]
-    lo = min(lows + near + [p["price"] for p in ppath])
-    hi = max(highs + near + [p["price"] for p in ppath])
+    lo = min(lows + near + [p["price"] for p in ppath] + [p["price"] for p in solid])
+    hi = max(highs + near + [p["price"] for p in ppath] + [p["price"] for p in solid])
     rng = (hi - lo) or (abs(hi) or 1)
     lo -= rng * 0.05
     hi += rng * 0.05
@@ -279,6 +286,12 @@ def render_chart(chart, layers=None, height=300, fullscreen_id=None, show_head=T
             if not any(box[0] < p[2] and box[2] > p[0] and box[1] < p[3] and box[3] > p[1]
                        for p in placed):
                 placed.append(box)
+                # CONTUR ALB ca text separat, desenat DEDESUBT: lizibil peste
+                # lumanari si linii. Varianta cu `paint-order` depindea de suportul
+                # randatorului - unde lipsea, conturul acoperea textul si eticheta
+                # devenea invizibila (verificat la randare).
+                b.append(f'<text class="halo {cls}-h" x="{cx:.0f}" y="{ty:.0f}" '
+                         f'text-anchor="middle">{_esc(text)}</text>')
                 b.append(f'<text class="{cls}" x="{cx:.0f}" y="{ty:.0f}" '
                          f'text-anchor="middle">{_esc(text)}</text>')
                 return
@@ -314,6 +327,15 @@ def render_chart(chart, layers=None, height=300, fullscreen_id=None, show_head=T
     if ("ew_primary" in layers or "ew_all" in layers) and pr:
         draw_count(pr, 0, with_labels=True)
 
+    # LINIA CONTINUA: de la ultimul punct al structurii, prin pivotii formati de
+    # atunci, pana la lumanarea curenta - realitatea, nu prognoza.
+    if len(solid) >= 2 and ("ew_primary" in layers or "ew_all" in layers):
+        sc = [(x(p["idx"] - off), y(p["price"])) for p in solid if 0 <= p["idx"] - off < n]
+        if len(sc) >= 2:
+            b.append('<polyline class="live-l" points="'
+                     + " ".join(f"{a:.0f},{c:.0f}" for a, c in sc) + '" fill="none"/>')
+            b.append(f'<circle class="live-d" cx="{sc[-1][0]:.0f}" cy="{sc[-1][1]:.0f}" r="3.4"/>')
+
     # proiectia: dupa linia "acum", punctat, etichete intre paranteze
     if ppath:
         full = proj.get("path") or []
@@ -327,7 +349,11 @@ def render_chart(chart, layers=None, height=300, fullscreen_id=None, show_head=T
             b.append(f'<circle class="proj-d" cx="{cx:.0f}" cy="{cy:.0f}" r="3"/>')
             prev = coords[full.index(p) - 1][1]
             place_label(cx, cy, p["label"], cy <= prev, "proj-t")
-        b.append(f'<text class="proj-tag" x="{nx + 4:.0f}" y="{H - 5}">PROIECTIE · scenariu '
+        hist = fc.get("hist") or {}
+        src = {"elliott": "scenariu Elliott", "plan": "drumul planului"}.get(fc.get("source"), "scenariu")
+        htxt = (f" · istoric {hist['win_rate']}% din {hist['n']}" if hist.get("n") else "")
+        b.append(f'<text class="proj-tag" x="{nx + 4:.0f}" y="{H - 16}">PROGNOZA · {src}{htxt}</text>')
+        b.append(f'<text class="proj-tag" x="{nx + 4:.0f}" y="{H - 5}">structura '
                  f'{(proj.get("confidence") or 0) * 100:.0f}%</text>')
 
     # PASTILELE: scenariul Elliott + nivelurile, pe axa din dreapta, fara
@@ -520,12 +546,14 @@ CSS = """
 .pill-ew,.pill-ewh{fill:#7E57C2;} .pill-hit{fill:#94A3B8;} .lvl-hit{stroke:#94A3B8;} .pill-ewa{fill:#1E88E5;}
 .pill-vah,.pill-poc,.pill-liqb{fill:#E67E22;} .pill-liqs{fill:#C0651A;}
 .ew0-l{stroke:#7E57C2;stroke-width:2;} .ew0-d{fill:#7E57C2;}
-.ew0-t,.proj-t,.ewx-t{paint-order:stroke;stroke:#FFFFFF;stroke-width:3px;stroke-linejoin:round;}
-.ew0-t{font:700 8.5px var(--font-mono);fill:#5E35B1;}
+.halo{fill:#FFFFFF;stroke:#FFFFFF;stroke-width:3px;stroke-linejoin:round;}
+.ew0-t-h,.ew0-t{font:700 8.5px var(--font-mono);} .ew0-t{fill:#5E35B1;}
+.proj-t-h{font:700 8.5px var(--font-mono);} .ewx-t-h{font:600 8px var(--font-mono);}
 .ew1-l{stroke:#1E88E5;stroke-width:1.4;stroke-dasharray:5 3;} .ew1-d{fill:#1E88E5;}
 .ew2-l{stroke:#FB8C00;stroke-width:1.2;stroke-dasharray:2 3;} .ew2-d{fill:#FB8C00;}
 .ewx-l{stroke:#94A3B8;stroke-width:1;stroke-dasharray:1 4;} .ewx-d{fill:#CBD5E1;}
 .ewx-t{font:600 8px var(--font-mono);fill:#94A3B8;}
+.live-l{stroke:#7E57C2;stroke-width:1.8;} .live-d{fill:#7E57C2;stroke:#FFFFFF;stroke-width:1.2;}
 .proj-zone{fill:#7E57C2;opacity:.04;}
 .proj-now{stroke:#94A3B8;stroke-width:1;stroke-dasharray:3 3;}
 .proj-l{stroke:#7E57C2;stroke-width:1.6;stroke-dasharray:6 4;}
