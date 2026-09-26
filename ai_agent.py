@@ -71,7 +71,10 @@ def current_source():
     # evidente noi nu schimba rezultatul planurilor deja inchise, deci nu e
     # motiv sa arunc ce a invatat modelul. Caracteristicile noi se adauga cu
     # greutate zero si se invata din planurile urmatoare.
-    return "plans-" + plan_tracker.GEOMETRY_VERSION
+    # FAMILIA, nu semnatura exacta: scanerul (cu capabilitati) si agentul (proces
+    # separat, fara ele) calculau surse diferite - "v6-4h-obf" fata de
+    # "v6-4h-o" - deci nu vedeau aceleasi planuri.
+    return "plans-" + plan_tracker.GEOMETRY_FAMILY
 
 
 STATE_SOURCE = current_source()
@@ -443,7 +446,7 @@ def train_from_plans(plans, model, state):
     """
     closed = [p for p in plans
               if p.get("realized_r") is not None and not p.get("agent_trained")
-              and p.get("geometry", "v1") == plan_tracker.GEOMETRY_VERSION
+              and plan_tracker.same_family(p.get("geometry", "v1"))
               and p.get("state") != plan_tracker.STATE_NO_ENTRY]
     closed.sort(key=lambda p: p.get("closed_ts") or 0)
 
@@ -697,7 +700,7 @@ def main():
             # nu mai avea din ce sa invete pana la urmatoarele planuri noi.
             cleared = 0
             for p in plans:
-                if (p.get("geometry", "v1") == plan_tracker.GEOMETRY_VERSION
+                if (plan_tracker.same_family(p.get("geometry", "v1"))
                         and p.pop("agent_trained", None)):
                     cleared += 1
             if cleared:
@@ -775,4 +778,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
