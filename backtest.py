@@ -676,6 +676,25 @@ def main():
             return (p.get("symbol"), p.get("direction"), p.get("created_ts"),
                     p.get("geometry"), round(p.get("entry") or 0, 10))
 
+        # REGENERARE, nu doar adaugare. Un backtest reproduce TOATE planurile
+        # familiei curente cu logica de acum. Deduplicarea singura le sarea pe
+        # cele existente, deci caracteristicile calculate cu o logica veche
+        # (Elliott, lichidare) ramaneau vechi pentru totdeauna. Inlocuiesc
+        # planurile de backtest ale familiei; cele live raman neatinse.
+        old_bt = {id(p) for p in live["plans"]
+                  if p.get("source") == "backtest"
+                  and plan_tracker.same_family(p.get("geometry", "v1"))}
+        if old_bt:
+            live["plans"] = [p for p in live["plans"] if id(p) not in old_bt]
+            print(f"  Inlocuiesc {len(old_bt)} planuri de backtest ale familiei "
+                  f"{plan_tracker.GEOMETRY_FAMILY} cu cele regenerate acum.")
+            # Agentul invatase planurile vechi; le-ar invata din nou peste ele.
+            # Il reantrenez de la zero pe datele noi (pasul urmator din workflow).
+            agent_file = os.path.join(DATA_DIR, "agent_model.json")
+            if os.path.exists(agent_file):
+                os.remove(agent_file)
+                print("  Modelul agentului sters - se reantreneaza de la zero pe datele noi.")
+
         existing = {plan_key(p) for p in live["plans"] if p.get("source") == "backtest"}
         fresh = [p for p in all_plans if plan_key(p) not in existing]
         skipped = len(all_plans) - len(fresh)
