@@ -57,16 +57,27 @@ LEVERAGE_TIERS = ((10, 0.30), (25, 0.30), (50, 0.25), (100, 0.15))
 # Marja de mentinere tipica, care apropie pretul de lichidare fata de 1/L pur.
 MAINTENANCE_MARGIN = 0.005
 
+# Distanta maxima la care un cluster mai poate fi considerat magnet. Nivelurile
+# de levier uzuale (10x-100x) lichideaza intre ~0.5% si ~9.5% de intrare; 15%
+# lasa loc pentru varfurile de volatilitate, fara sa includa niveluri irelevante.
+MAX_MAGNET_PCT = 15.0
+
 
 def _volume_nodes(candles, bins=48):
     """Zonele cu volum mare: aproximarea pentru "unde s-au deschis pozitiile"."""
     if not candles:
         return []
+    # VOLUMUL RECENT cantareste mai mult. O pozitie deschisa acum cateva sute de
+    # bare a fost, cel mai probabil, deja inchisa sau lichidata - open interest
+    # se reinnoieste. Fara atenuare, volumul vechi dadea "magneti" la -37.8% de
+    # pret (masurat pe FET real) care dominau decizia.
     prices, vols = [], []
-    for c in candles:
+    nc = len(candles)
+    half_life = max(30, nc // 4)
+    for i, c in enumerate(candles):
         hi, lo, vol = c[2], c[3], (c[5] or 0)
         prices.append((hi + lo) / 2.0)
-        vols.append(vol)
+        vols.append(vol * 0.5 ** ((nc - 1 - i) / half_life))
     lo_p, hi_p = min(prices), max(prices)
     if hi_p <= lo_p:
         return []
@@ -137,10 +148,14 @@ def build_map(candles, price, bins=60, oi_weight=None):
     for c in clusters:
         c["intensity"] = round(c["density"] / peak, 4)
 
-    # Cel mai dens cluster de fiecare parte: magnetii candidati.
-    above = max((c for c in clusters if c["price"] > price),
+    # MAGNETII CANDIDATI doar in fereastra relevanta: pana la MAX_MAGNET_PCT de
+    # pret. Un cluster la 38% distanta nu e un magnet pentru o decizie pe 4h,
+    # chiar daca e dens - pretul nu il "simte". Harta completa ramane pentru
+    # afisare; doar alegerea magnetului dominant e limitata.
+    near = [c for c in clusters if abs(c["distance_pct"]) <= MAX_MAGNET_PCT]
+    above = max((c for c in near if c["price"] > price),
                 key=lambda c: c["density"], default=None)
-    below = max((c for c in clusters if c["price"] < price),
+    below = max((c for c in near if c["price"] < price),
                 key=lambda c: c["density"], default=None)
 
     clusters.sort(key=lambda c: -c["density"])
