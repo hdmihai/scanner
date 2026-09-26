@@ -1086,6 +1086,60 @@
     "tp2": 0.12855429,
     "state": "ASTEAPTA PULLBACK la zona de intrare"
   },
+  "forecast": {
+    "solid": [
+      {
+        "idx": 241,
+        "price": 0.09986
+      },
+      {
+        "idx": 244,
+        "price": 0.10394
+      },
+      {
+        "idx": 245,
+        "price": 0.09997
+      },
+      {
+        "idx": 258,
+        "price": 0.12017
+      }
+    ],
+    "path": [
+      {
+        "label": "ACUM",
+        "price": 0.12017,
+        "idx": 258,
+        "projected": false
+      },
+      {
+        "label": "(ENTRY)",
+        "price": 0.11850929,
+        "idx": 260,
+        "projected": true
+      },
+      {
+        "label": "(TP1)",
+        "price": 0.12827,
+        "idx": 262,
+        "projected": true
+      },
+      {
+        "label": "(TP2)",
+        "price": 0.13345571,
+        "idx": 265,
+        "projected": true
+      }
+    ],
+    "source": "plan",
+    "hist": {
+      "n": 253,
+      "win_rate": 54.2,
+      "median_bars_win": 7,
+      "median_bars_all": 6
+    },
+    "confidence": 0.749
+  },
   "elliott": {
     "counts": [
       {
@@ -1116,15 +1170,15 @@
             "label": "C",
             "price": 0.11345,
             "idx": 239,
-            "confirmed": false,
-            "display": "C FORMING"
+            "confirmed": true,
+            "display": "C CONFIRMED"
           },
           {
             "label": "D",
             "price": 0.09986,
             "idx": 241,
-            "confirmed": false,
-            "display": "D FORMING"
+            "confirmed": true,
+            "display": "D CONFIRMED"
           }
         ],
         "targets": {
@@ -1135,10 +1189,10 @@
         "end_idx": 241,
         "invalidated": false,
         "rank": "Primary",
-        "headline": "Primary Developing Harmonic C FORMING 75%",
-        "expected": "SHORT",
-        "expected_weight": 0.4,
-        "stage_text": "D inca nu a ajuns in zona PRZ",
+        "headline": "Primary Harmonic D 75%",
+        "expected": "LONG",
+        "expected_weight": 0.2,
+        "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
         "targets_hit": {
           "tp1": true,
           "tp2": true
@@ -1199,15 +1253,15 @@
             "label": "B",
             "price": 0.11345,
             "idx": 239,
-            "confirmed": false,
-            "display": "B FORMING"
+            "confirmed": true,
+            "display": "B CONFIRMED"
           },
           {
             "label": "C",
             "price": 0.09986,
             "idx": 241,
-            "confirmed": false,
-            "display": "C FORMING"
+            "confirmed": true,
+            "display": "C CONFIRMED"
           }
         ],
         "targets": {
@@ -1218,10 +1272,10 @@
         "end_idx": 241,
         "invalidated": false,
         "rank": "Alternative",
-        "headline": "Alternative Developing Zigzag B FORMING 60%",
-        "expected": "SHORT",
-        "expected_weight": 0.5,
-        "stage_text": "unda C inca in desfasurare, contra trendului",
+        "headline": "Alternative Zigzag C 60%",
+        "expected": "LONG",
+        "expected_weight": 0.2,
+        "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
         "targets_hit": {
           "tp1": true,
           "tp2": true
@@ -1276,9 +1330,9 @@
         "invalidated": false,
         "rank": "Secondary",
         "headline": "Secondary Developing Harmonic D FORMING 21%",
-        "expected": "SHORT",
-        "expected_weight": 0.4,
-        "stage_text": "D inca nu a ajuns in zona PRZ",
+        "expected": "LONG",
+        "expected_weight": 0.2,
+        "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
         "targets_hit": {
           "tp1": true,
           "tp2": true
@@ -1313,15 +1367,15 @@
           "label": "C",
           "price": 0.11345,
           "idx": 239,
-          "confirmed": false,
-          "display": "C FORMING"
+          "confirmed": true,
+          "display": "C CONFIRMED"
         },
         {
           "label": "D",
           "price": 0.09986,
           "idx": 241,
-          "confirmed": false,
-          "display": "D FORMING"
+          "confirmed": true,
+          "display": "D CONFIRMED"
         }
       ],
       "targets": {
@@ -1332,10 +1386,10 @@
       "end_idx": 241,
       "invalidated": false,
       "rank": "Primary",
-      "headline": "Primary Developing Harmonic C FORMING 75%",
-      "expected": "SHORT",
-      "expected_weight": 0.4,
-      "stage_text": "D inca nu a ajuns in zona PRZ",
+      "headline": "Primary Harmonic D 75%",
+      "expected": "LONG",
+      "expected_weight": 0.2,
+      "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
       "targets_hit": {
         "tp1": true,
         "tp2": true

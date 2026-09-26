@@ -1,5 +1,5 @@
 {
-  "scan_time": "2026-09-26 19:19 UTC",
+  "scan_time": "2026-09-26 19:53 UTC",
   "timeframe": "4h",
   "exchange": "okx",
   "symbols": {
@@ -15,8 +15,8 @@
       },
       "price": 84156.2,
       "atr": 827.35,
-      "persistence": 84,
-      "age_minutes": 4976,
+      "persistence": 85,
+      "age_minutes": 5011,
       "indicators": {
         "emas": {
           "ema9": 84150.43735423315,
@@ -80,6 +80,52 @@
         "tp1": 85258.8,
         "tp2": 87465.6,
         "expected_r": 4.5
+      },
+      "forecast": {
+        "solid": [
+          {
+            "idx": 251,
+            "price": 85258.8
+          },
+          {
+            "idx": 258,
+            "price": 84156.2
+          }
+        ],
+        "path": [
+          {
+            "label": "ACUM",
+            "price": 84156.2,
+            "idx": 258,
+            "projected": false
+          },
+          {
+            "label": "(ENTRY)",
+            "price": 83742.525,
+            "idx": 261,
+            "projected": true
+          },
+          {
+            "label": "(TP1)",
+            "price": 85258.8,
+            "idx": 269,
+            "projected": true
+          },
+          {
+            "label": "(TP2)",
+            "price": 87465.6,
+            "idx": 281,
+            "projected": true
+          }
+        ],
+        "source": "plan",
+        "hist": {
+          "n": 1647,
+          "win_rate": 24.3,
+          "median_bars_win": 23,
+          "median_bars_all": 9
+        },
+        "confidence": 0.5355
       },
       "sparkline": [
         80490.4,
@@ -1187,8 +1233,8 @@
                 "label": "W4",
                 "price": 85258.8,
                 "idx": 251,
-                "confirmed": false,
-                "display": "W4 FORMING"
+                "confirmed": true,
+                "display": "W4 CONFIRMED"
               }
             ],
             "targets": {
@@ -1201,7 +1247,7 @@
             "end_idx": 251,
             "invalidated": false,
             "rank": "Primary",
-            "headline": "Primary Developing Motive W4 FORMING 54%",
+            "headline": "Primary Motive W4 54%",
             "expected": "SHORT",
             "expected_weight": 0.4,
             "stage_text": "unda 4 corectiva - continuarea (W5) e asteptata dupa ea",
@@ -1265,8 +1311,8 @@
                 "label": "D",
                 "price": 85258.8,
                 "idx": 251,
-                "confirmed": false,
-                "display": "D FORMING"
+                "confirmed": true,
+                "display": "D CONFIRMED"
               }
             ],
             "targets": {
@@ -1277,10 +1323,10 @@
             "end_idx": 251,
             "invalidated": false,
             "rank": "Alternative",
-            "headline": "Alternative Developing Harmonic D FORMING 47%",
-            "expected": "LONG",
-            "expected_weight": 0.4,
-            "stage_text": "D inca nu a ajuns in zona PRZ",
+            "headline": "Alternative Harmonic D 47%",
+            "expected": "SHORT",
+            "expected_weight": 0.7,
+            "stage_text": "pretul e in zona PRZ - inversare asteptata",
             "targets_hit": {
               "tp1": false,
               "tp2": true
@@ -1310,15 +1356,15 @@
                 "label": "B",
                 "price": 85258.8,
                 "idx": 251,
-                "confirmed": false,
-                "display": "B FORMING"
+                "confirmed": true,
+                "display": "B CONFIRMED"
               },
               {
                 "label": "C",
                 "price": 83174.7,
                 "idx": 252,
-                "confirmed": false,
-                "display": "C FORMING"
+                "confirmed": true,
+                "display": "C CONFIRMED"
               }
             ],
             "targets": {
@@ -1329,10 +1375,10 @@
             "end_idx": 252,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Developing Zigzag B FORMING 43%",
-            "expected": "SHORT",
-            "expected_weight": 0.5,
-            "stage_text": "unda C inca in desfasurare, contra trendului",
+            "headline": "Invalidat Zigzag C 43%",
+            "expected": "LONG",
+            "expected_weight": 0.8,
+            "stage_text": "corectia e aproape incheiata - trendul e asteptat sa reia",
             "targets_hit": {
               "tp1": false,
               "tp2": false
@@ -1430,8 +1476,8 @@
               "label": "W4",
               "price": 85258.8,
               "idx": 251,
-              "confirmed": false,
-              "display": "W4 FORMING"
+              "confirmed": true,
+              "display": "W4 CONFIRMED"
             }
           ],
           "targets": {
@@ -1444,7 +1490,7 @@
           "end_idx": 251,
           "invalidated": false,
           "rank": "Primary",
-          "headline": "Primary Developing Motive W4 FORMING 54%",
+          "headline": "Primary Motive W4 54%",
           "expected": "SHORT",
           "expected_weight": 0.4,
           "stage_text": "unda 4 corectiva - continuarea (W5) e asteptata dupa ea",
@@ -1532,8 +1578,8 @@
       },
       "price": 2692.84,
       "atr": 33.036429,
-      "persistence": 52,
-      "age_minutes": 3056,
+      "persistence": 53,
+      "age_minutes": 3090,
       "indicators": {
         "emas": {
           "ema9": 2690.7613388189743,
@@ -1597,6 +1643,52 @@
         "tp1": 2742.69,
         "tp2": 2824.9857,
         "expected_r": 4.5
+      },
+      "forecast": {
+        "solid": [
+          {
+            "idx": 251,
+            "price": 2742.69
+          },
+          {
+            "idx": 258,
+            "price": 2692.84
+          }
+        ],
+        "path": [
+          {
+            "label": "ACUM",
+            "price": 2692.84,
+            "idx": 258,
+            "projected": false
+          },
+          {
+            "label": "(ENTRY)",
+            "price": 2676.3218,
+            "idx": 261,
+            "projected": true
+          },
+          {
+            "label": "(TP1)",
+            "price": 2742.69,
+            "idx": 269,
+            "projected": true
+          },
+          {
+            "label": "(TP2)",
+            "price": 2824.9857,
+            "idx": 281,
+            "projected": true
+          }
+        ],
+        "source": "plan",
+        "hist": {
+          "n": 1647,
+          "win_rate": 24.3,
+          "median_bars_win": 23,
+          "median_bars_all": 9
+        },
+        "confidence": 0.7394
       },
       "sparkline": [
         2588.02,
@@ -2704,8 +2796,8 @@
                 "label": "W4",
                 "price": 2742.69,
                 "idx": 251,
-                "confirmed": false,
-                "display": "W4 FORMING"
+                "confirmed": true,
+                "display": "W4 CONFIRMED"
               }
             ],
             "targets": {
@@ -2718,7 +2810,7 @@
             "end_idx": 251,
             "invalidated": false,
             "rank": "Primary",
-            "headline": "Primary Developing Motive W4 FORMING 74%",
+            "headline": "Primary Motive W4 74%",
             "expected": "SHORT",
             "expected_weight": 0.4,
             "stage_text": "unda 4 corectiva - continuarea (W5) e asteptata dupa ea",
@@ -2782,8 +2874,8 @@
                 "label": "D",
                 "price": 2742.69,
                 "idx": 251,
-                "confirmed": false,
-                "display": "D FORMING"
+                "confirmed": true,
+                "display": "D CONFIRMED"
               }
             ],
             "targets": {
@@ -2794,10 +2886,10 @@
             "end_idx": 251,
             "invalidated": false,
             "rank": "Alternative",
-            "headline": "Alternative Developing Harmonic D FORMING 71%",
-            "expected": "LONG",
-            "expected_weight": 0.4,
-            "stage_text": "D inca nu a ajuns in zona PRZ",
+            "headline": "Alternative Harmonic D 71%",
+            "expected": "SHORT",
+            "expected_weight": 0.7,
+            "stage_text": "pretul e in zona PRZ - inversare asteptata",
             "targets_hit": {
               "tp1": false,
               "tp2": true
@@ -2874,8 +2966,8 @@
                 "label": "W5",
                 "price": 2788.7,
                 "idx": 238,
-                "confirmed": false,
-                "display": "W5 FORMING"
+                "confirmed": true,
+                "display": "W5 CONFIRMED"
               }
             ],
             "targets": {
@@ -2887,10 +2979,10 @@
             "end_idx": 238,
             "invalidated": false,
             "rank": "Secondary",
-            "headline": "Secondary Developing Motive W5 FORMING 51%",
-            "expected": "LONG",
-            "expected_weight": 0.5,
-            "stage_text": "unda 5 are inca spatiu pana la prima tinta",
+            "headline": "Secondary Motive W5 51%",
+            "expected": "SHORT",
+            "expected_weight": 0.7,
+            "stage_text": "impulsul e complet sau dincolo de tinte - urmeaza corectia A-B-C",
             "targets_hit": {
               "tp1": false,
               "tp2": false,
@@ -2928,8 +3020,8 @@
                 "label": "C",
                 "price": 2628.18,
                 "idx": 245,
-                "confirmed": false,
-                "display": "C FORMING"
+                "confirmed": true,
+                "display": "C CONFIRMED"
               }
             ],
             "targets": {
@@ -2940,7 +3032,7 @@
             "end_idx": 245,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Developing Zigzag C FORMING 57%",
+            "headline": "Invalidat Zigzag C 57%",
             "expected": "LONG",
             "expected_weight": 0.8,
             "stage_text": "corectia e aproape incheiata - trendul e asteptat sa reia",
@@ -2989,8 +3081,8 @@
               "label": "W4",
               "price": 2742.69,
               "idx": 251,
-              "confirmed": false,
-              "display": "W4 FORMING"
+              "confirmed": true,
+              "display": "W4 CONFIRMED"
             }
           ],
           "targets": {
@@ -3003,7 +3095,7 @@
           "end_idx": 251,
           "invalidated": false,
           "rank": "Primary",
-          "headline": "Primary Developing Motive W4 FORMING 74%",
+          "headline": "Primary Motive W4 74%",
           "expected": "SHORT",
           "expected_weight": 0.4,
           "stage_text": "unda 4 corectiva - continuarea (W5) e asteptata dupa ea",
@@ -3081,8 +3173,8 @@
     },
     "SOL/USDT": {
       "direction": "LONG",
-      "score": 64,
-      "probability": 72.4,
+      "score": 63,
+      "probability": 72.0,
       "components": {
         "trend": 0.675,
         "momentum": 0.668,
@@ -3091,8 +3183,8 @@
       },
       "price": 121.89,
       "atr": 2.3914286,
-      "persistence": 111,
-      "age_minutes": 6658,
+      "persistence": 112,
+      "age_minutes": 6692,
       "indicators": {
         "emas": {
           "ema9": 120.469191838179,
@@ -3156,6 +3248,64 @@
         "tp1": 123.08571,
         "tp2": 131.45571,
         "expected_r": 4.5
+      },
+      "forecast": {
+        "solid": [
+          {
+            "idx": 245,
+            "price": 112.51
+          },
+          {
+            "idx": 249,
+            "price": 118.44
+          },
+          {
+            "idx": 250,
+            "price": 115.86
+          },
+          {
+            "idx": 254,
+            "price": 122.97
+          },
+          {
+            "idx": 258,
+            "price": 121.89
+          }
+        ],
+        "path": [
+          {
+            "label": "ACUM",
+            "price": 121.89,
+            "idx": 258,
+            "projected": false
+          },
+          {
+            "label": "(ENTRY)",
+            "price": 120.69429,
+            "idx": 260,
+            "projected": true
+          },
+          {
+            "label": "(TP1)",
+            "price": 123.08571,
+            "idx": 262,
+            "projected": true
+          },
+          {
+            "label": "(TP2)",
+            "price": 131.45571,
+            "idx": 267,
+            "projected": true
+          }
+        ],
+        "source": "plan",
+        "hist": {
+          "n": 2454,
+          "win_rate": 45.2,
+          "median_bars_win": 9,
+          "median_bars_all": 6
+        },
+        "confidence": 0.7619
       },
       "sparkline": [
         108.91,
@@ -4259,8 +4409,8 @@
                 "label": "D",
                 "price": 112.51,
                 "idx": 245,
-                "confirmed": false,
-                "display": "D FORMING"
+                "confirmed": true,
+                "display": "D CONFIRMED"
               }
             ],
             "targets": {
@@ -4271,10 +4421,10 @@
             "end_idx": 245,
             "invalidated": false,
             "rank": "Primary",
-            "headline": "Primary Developing Harmonic D FORMING 76%",
-            "expected": "SHORT",
-            "expected_weight": 0.4,
-            "stage_text": "D inca nu a ajuns in zona PRZ",
+            "headline": "Primary Harmonic D 76%",
+            "expected": "LONG",
+            "expected_weight": 0.2,
+            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
             "targets_hit": {
               "tp1": true,
               "tp2": true
@@ -4398,8 +4548,8 @@
                 "label": "C",
                 "price": 112.51,
                 "idx": 245,
-                "confirmed": false,
-                "display": "C FORMING"
+                "confirmed": true,
+                "display": "C CONFIRMED"
               }
             ],
             "targets": {
@@ -4410,10 +4560,10 @@
             "end_idx": 245,
             "invalidated": false,
             "rank": "Secondary",
-            "headline": "Secondary Developing Zigzag C FORMING 56%",
-            "expected": "SHORT",
-            "expected_weight": 0.5,
-            "stage_text": "unda C inca in desfasurare, contra trendului",
+            "headline": "Secondary Zigzag C 56%",
+            "expected": "LONG",
+            "expected_weight": 0.2,
+            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
             "targets_hit": {
               "tp1": true,
               "tp2": true
@@ -4550,8 +4700,8 @@
               "label": "D",
               "price": 112.51,
               "idx": 245,
-              "confirmed": false,
-              "display": "D FORMING"
+              "confirmed": true,
+              "display": "D CONFIRMED"
             }
           ],
           "targets": {
@@ -4562,10 +4712,10 @@
           "end_idx": 245,
           "invalidated": false,
           "rank": "Primary",
-          "headline": "Primary Developing Harmonic D FORMING 76%",
-          "expected": "SHORT",
-          "expected_weight": 0.4,
-          "stage_text": "D inca nu a ajuns in zona PRZ",
+          "headline": "Primary Harmonic D 76%",
+          "expected": "LONG",
+          "expected_weight": 0.2,
+          "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
           "targets_hit": {
             "tp1": true,
             "tp2": true
@@ -4651,8 +4801,8 @@
     },
     "XRP/USDT": {
       "direction": "LONG",
-      "score": 49,
-      "probability": 67.2,
+      "score": 48,
+      "probability": 66.8,
       "components": {
         "trend": 0.596,
         "momentum": 0.345,
@@ -4661,8 +4811,8 @@
       },
       "price": 1.5527,
       "atr": 0.03755,
-      "persistence": 80,
-      "age_minutes": 4732,
+      "persistence": 81,
+      "age_minutes": 4767,
       "indicators": {
         "emas": {
           "ema9": 1.5532040039895003,
@@ -4726,6 +4876,52 @@
         "tp1": 1.6303,
         "tp2": 1.7029,
         "expected_r": 4.5
+      },
+      "forecast": {
+        "solid": [
+          {
+            "idx": 245,
+            "price": 1.452
+          },
+          {
+            "idx": 249,
+            "price": 1.5609
+          },
+          {
+            "idx": 250,
+            "price": 1.519
+          },
+          {
+            "idx": 252,
+            "price": 1.6303
+          },
+          {
+            "idx": 258,
+            "price": 1.5527
+          }
+        ],
+        "path": [
+          {
+            "label": "ACUM",
+            "price": 1.5527,
+            "idx": 258,
+            "projected": false
+          },
+          {
+            "label": "(W5)",
+            "price": 1.7763216000000002,
+            "idx": 276,
+            "projected": true
+          }
+        ],
+        "source": "elliott",
+        "hist": {
+          "n": 3599,
+          "win_rate": 28.5,
+          "median_bars_win": 18,
+          "median_bars_all": 8
+        },
+        "confidence": 0.7046
       },
       "sparkline": [
         1.3827,
@@ -5833,8 +6029,8 @@
                 "label": "W4",
                 "price": 1.452,
                 "idx": 245,
-                "confirmed": false,
-                "display": "W4 FORMING"
+                "confirmed": true,
+                "display": "W4 CONFIRMED"
               }
             ],
             "targets": {
@@ -5847,7 +6043,7 @@
             "end_idx": 245,
             "invalidated": false,
             "rank": "Primary",
-            "headline": "Primary Developing Motive W4 FORMING 70%",
+            "headline": "Primary Motive W4 70%",
             "expected": "LONG",
             "expected_weight": 0.4,
             "stage_text": "unda 4 corectiva - continuarea (W5) e asteptata dupa ea",
@@ -5947,8 +6143,8 @@
                 "label": "W5",
                 "price": 1.6583,
                 "idx": 238,
-                "confirmed": false,
-                "display": "W5 FORMING"
+                "confirmed": true,
+                "display": "W5 CONFIRMED"
               }
             ],
             "targets": {
@@ -5960,10 +6156,10 @@
             "end_idx": 238,
             "invalidated": false,
             "rank": "Alternative",
-            "headline": "Alternative Developing Motive W5 FORMING 47%",
-            "expected": "SHORT",
-            "expected_weight": 0.7,
-            "stage_text": "impulsul e complet sau dincolo de tinte - urmeaza corectia A-B-C",
+            "headline": "Alternative Motive W5 47%",
+            "expected": "LONG",
+            "expected_weight": 0.2,
+            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
             "targets_hit": {
               "tp1": true,
               "tp2": true,
@@ -6001,8 +6197,8 @@
                 "label": "C",
                 "price": 1.6303,
                 "idx": 252,
-                "confirmed": false,
-                "display": "C FORMING"
+                "confirmed": true,
+                "display": "C CONFIRMED"
               }
             ],
             "targets": {
@@ -6013,10 +6209,10 @@
             "end_idx": 252,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Developing Zigzag C FORMING 60%",
-            "expected": "LONG",
-            "expected_weight": 0.5,
-            "stage_text": "unda C inca in desfasurare, contra trendului",
+            "headline": "Invalidat Zigzag C 60%",
+            "expected": "SHORT",
+            "expected_weight": 0.8,
+            "stage_text": "corectia e aproape incheiata - trendul e asteptat sa reia",
             "targets_hit": {
               "tp1": false,
               "tp2": false
@@ -6053,8 +6249,8 @@
                 "label": "C",
                 "price": 1.6583,
                 "idx": 238,
-                "confirmed": false,
-                "display": "C FORMING"
+                "confirmed": true,
+                "display": "C CONFIRMED"
               }
             ],
             "targets": {
@@ -6065,7 +6261,7 @@
             "end_idx": 238,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Developing Zigzag C FORMING 48%",
+            "headline": "Invalidat Zigzag C 48%",
             "expected": "SHORT",
             "expected_weight": 0.8,
             "stage_text": "corectia e aproape incheiata - trendul e asteptat sa reia",
@@ -6114,8 +6310,8 @@
               "label": "W4",
               "price": 1.452,
               "idx": 245,
-              "confirmed": false,
-              "display": "W4 FORMING"
+              "confirmed": true,
+              "display": "W4 CONFIRMED"
             }
           ],
           "targets": {
@@ -6128,7 +6324,7 @@
           "end_idx": 245,
           "invalidated": false,
           "rank": "Primary",
-          "headline": "Primary Developing Motive W4 FORMING 70%",
+          "headline": "Primary Motive W4 70%",
           "expected": "LONG",
           "expected_weight": 0.4,
           "stage_text": "unda 4 corectiva - continuarea (W5) e asteptata dupa ea",
@@ -6216,8 +6412,8 @@
       },
       "price": 0.09869,
       "atr": 0.0022942857,
-      "persistence": 84,
-      "age_minutes": 4976,
+      "persistence": 85,
+      "age_minutes": 5011,
       "indicators": {
         "emas": {
           "ema9": 0.0977025074309023,
@@ -6281,6 +6477,68 @@
         "tp1": 0.10092,
         "tp2": 0.10786714,
         "expected_r": 4.5
+      },
+      "forecast": {
+        "solid": [
+          {
+            "idx": 237,
+            "price": 0.10439
+          },
+          {
+            "idx": 241,
+            "price": 0.09115
+          },
+          {
+            "idx": 247,
+            "price": 0.09733
+          },
+          {
+            "idx": 249,
+            "price": 0.09452
+          },
+          {
+            "idx": 254,
+            "price": 0.09982
+          },
+          {
+            "idx": 258,
+            "price": 0.09869
+          }
+        ],
+        "path": [
+          {
+            "label": "ACUM",
+            "price": 0.09869,
+            "idx": 258,
+            "projected": false
+          },
+          {
+            "label": "(ENTRY)",
+            "price": 0.097542857,
+            "idx": 260,
+            "projected": true
+          },
+          {
+            "label": "(TP1)",
+            "price": 0.10092,
+            "idx": 267,
+            "projected": true
+          },
+          {
+            "label": "(TP2)",
+            "price": 0.10786714,
+            "idx": 276,
+            "projected": true
+          }
+        ],
+        "source": "plan",
+        "hist": {
+          "n": 3599,
+          "win_rate": 28.5,
+          "median_bars_win": 18,
+          "median_bars_all": 8
+        },
+        "confidence": 0.5614
       },
       "sparkline": [
         0.08578,
@@ -7420,8 +7678,8 @@
                 "label": "W5",
                 "price": 0.10439,
                 "idx": 237,
-                "confirmed": false,
-                "display": "W5 FORMING"
+                "confirmed": true,
+                "display": "W5 CONFIRMED"
               }
             ],
             "targets": {
@@ -7433,10 +7691,10 @@
             "end_idx": 237,
             "invalidated": false,
             "rank": "Primary",
-            "headline": "Primary Developing Motive W5 FORMING 56%",
-            "expected": "LONG",
-            "expected_weight": 0.5,
-            "stage_text": "unda 5 are inca spatiu pana la prima tinta",
+            "headline": "Primary Motive W5 56%",
+            "expected": "SHORT",
+            "expected_weight": 0.7,
+            "stage_text": "impulsul e complet sau dincolo de tinte - urmeaza corectia A-B-C",
             "targets_hit": {
               "tp1": false,
               "tp2": false,
@@ -7634,8 +7892,8 @@
                 "label": "D",
                 "price": 0.09115,
                 "idx": 241,
-                "confirmed": false,
-                "display": "D FORMING"
+                "confirmed": true,
+                "display": "D CONFIRMED"
               }
             ],
             "targets": {
@@ -7646,10 +7904,10 @@
             "end_idx": 241,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Developing Harmonic D FORMING 56%",
-            "expected": "SHORT",
-            "expected_weight": 0.4,
-            "stage_text": "D inca nu a ajuns in zona PRZ",
+            "headline": "Invalidat Harmonic D 56%",
+            "expected": "LONG",
+            "expected_weight": 0.7,
+            "stage_text": "pretul e in zona PRZ - inversare asteptata",
             "targets_hit": {
               "tp1": false,
               "tp2": false
@@ -7727,8 +7985,8 @@
               "label": "W5",
               "price": 0.10439,
               "idx": 237,
-              "confirmed": false,
-              "display": "W5 FORMING"
+              "confirmed": true,
+              "display": "W5 CONFIRMED"
             }
           ],
           "targets": {
@@ -7740,10 +7998,10 @@
           "end_idx": 237,
           "invalidated": false,
           "rank": "Primary",
-          "headline": "Primary Developing Motive W5 FORMING 56%",
-          "expected": "LONG",
-          "expected_weight": 0.5,
-          "stage_text": "unda 5 are inca spatiu pana la prima tinta",
+          "headline": "Primary Motive W5 56%",
+          "expected": "SHORT",
+          "expected_weight": 0.7,
+          "stage_text": "impulsul e complet sau dincolo de tinte - urmeaza corectia A-B-C",
           "targets_hit": {
             "tp1": false,
             "tp2": false,
@@ -7846,8 +8104,8 @@
       },
       "price": 1.184,
       "atr": 0.051085714,
-      "persistence": 16,
-      "age_minutes": 898,
+      "persistence": 17,
+      "age_minutes": 933,
       "indicators": {
         "emas": {
           "ema9": 1.1402767740566264,
@@ -7911,6 +8169,52 @@
         "tp1": 1.2095429,
         "tp2": 1.3883429,
         "expected_r": 4.5
+      },
+      "forecast": {
+        "solid": [
+          {
+            "idx": 254,
+            "price": 1.2172
+          },
+          {
+            "idx": 258,
+            "price": 1.184
+          }
+        ],
+        "path": [
+          {
+            "label": "ACUM",
+            "price": 1.184,
+            "idx": 258,
+            "projected": false
+          },
+          {
+            "label": "(W3)",
+            "price": 1.3711463999999998,
+            "idx": 267,
+            "projected": true
+          },
+          {
+            "label": "(W4)",
+            "price": 1.1563300751999999,
+            "idx": 287,
+            "projected": true
+          },
+          {
+            "label": "(W5)",
+            "price": 1.5880317503999997,
+            "idx": 307,
+            "projected": true
+          }
+        ],
+        "source": "elliott",
+        "hist": {
+          "n": 2454,
+          "win_rate": 45.2,
+          "median_bars_win": 9,
+          "median_bars_all": 6
+        },
+        "confidence": 0.6423
       },
       "sparkline": [
         0.8262,
@@ -9101,8 +9405,8 @@
                 "label": "D",
                 "price": 0.9337,
                 "idx": 241,
-                "confirmed": false,
-                "display": "D FORMING"
+                "confirmed": true,
+                "display": "D CONFIRMED"
               }
             ],
             "targets": {
@@ -9113,10 +9417,10 @@
             "end_idx": 241,
             "invalidated": false,
             "rank": "Alternative",
-            "headline": "Alternative Developing Harmonic D FORMING 55%",
-            "expected": "SHORT",
-            "expected_weight": 0.4,
-            "stage_text": "D inca nu a ajuns in zona PRZ",
+            "headline": "Alternative Harmonic D 55%",
+            "expected": "LONG",
+            "expected_weight": 0.2,
+            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
             "targets_hit": {
               "tp1": true,
               "tp2": true
@@ -9153,8 +9457,8 @@
                 "label": "C",
                 "price": 0.9337,
                 "idx": 241,
-                "confirmed": false,
-                "display": "C FORMING"
+                "confirmed": true,
+                "display": "C CONFIRMED"
               }
             ],
             "targets": {
@@ -9165,10 +9469,10 @@
             "end_idx": 241,
             "invalidated": false,
             "rank": "Secondary",
-            "headline": "Secondary Developing Zigzag C FORMING 53%",
-            "expected": "SHORT",
-            "expected_weight": 0.5,
-            "stage_text": "unda C inca in desfasurare, contra trendului",
+            "headline": "Secondary Zigzag C 53%",
+            "expected": "LONG",
+            "expected_weight": 0.2,
+            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
             "targets_hit": {
               "tp1": true,
               "tp2": true
@@ -9223,9 +9527,9 @@
             "invalidated": false,
             "rank": "Family",
             "headline": "Family Developing Harmonic D FORMING 25%",
-            "expected": "SHORT",
-            "expected_weight": 0.4,
-            "stage_text": "D inca nu a ajuns in zona PRZ",
+            "expected": "LONG",
+            "expected_weight": 0.2,
+            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
             "targets_hit": {
               "tp1": true,
               "tp2": true
@@ -9378,8 +9682,8 @@
       },
       "price": 1551.59,
       "atr": 44.668571,
-      "persistence": 197,
-      "age_minutes": 12177,
+      "persistence": 198,
+      "age_minutes": 12211,
       "indicators": {
         "emas": {
           "ema9": 1546.2325082935793,
@@ -9443,6 +9747,43 @@
         "tp1": 1595.0,
         "tp2": 1730.2643,
         "expected_r": 4.5
+      },
+      "forecast": {
+        "solid": [],
+        "path": [
+          {
+            "label": "ACUM",
+            "price": 1551.59,
+            "idx": 258,
+            "projected": false
+          },
+          {
+            "label": "(ENTRY)",
+            "price": 1529.2557,
+            "idx": 260,
+            "projected": true
+          },
+          {
+            "label": "(TP1)",
+            "price": 1595.0,
+            "idx": 267,
+            "projected": true
+          },
+          {
+            "label": "(TP2)",
+            "price": 1730.2643,
+            "idx": 276,
+            "projected": true
+          }
+        ],
+        "source": "plan",
+        "hist": {
+          "n": 3599,
+          "win_rate": 28.5,
+          "median_bars_win": 18,
+          "median_bars_all": 8
+        },
+        "confidence": null
       },
       "sparkline": [
         1456.8,
@@ -10550,8 +10891,8 @@
                 "label": "W4",
                 "price": 1456.85,
                 "idx": 245,
-                "confirmed": false,
-                "display": "W4 FORMING"
+                "confirmed": true,
+                "display": "W4 CONFIRMED"
               }
             ],
             "targets": {
@@ -10564,7 +10905,7 @@
             "end_idx": 245,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Developing Motive W4 FORMING 66%",
+            "headline": "Invalidat Motive W4 66%",
             "expected": "LONG",
             "expected_weight": 0.4,
             "stage_text": "unda 4 corectiva - continuarea (W5) e asteptata dupa ea",
@@ -10591,15 +10932,15 @@
                 "label": "A",
                 "price": 1625.0,
                 "idx": 252,
-                "confirmed": false,
-                "display": "A FORMING"
+                "confirmed": true,
+                "display": "A CONFIRMED"
               },
               {
                 "label": "B",
                 "price": 1514.93,
                 "idx": 253,
-                "confirmed": false,
-                "display": "B FORMING"
+                "confirmed": true,
+                "display": "B CONFIRMED"
               },
               {
                 "label": "C",
@@ -10617,7 +10958,7 @@
             "end_idx": 254,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Developing Zigzag A FORMING 51%",
+            "headline": "Invalidat Developing Zigzag C FORMING 51%",
             "expected": "LONG",
             "expected_weight": 0.5,
             "stage_text": "unda C inca in desfasurare, contra trendului",
@@ -10650,15 +10991,15 @@
                 "label": "B",
                 "price": 1625.0,
                 "idx": 252,
-                "confirmed": false,
-                "display": "B FORMING"
+                "confirmed": true,
+                "display": "B CONFIRMED"
               },
               {
                 "label": "C",
                 "price": 1514.93,
                 "idx": 253,
-                "confirmed": false,
-                "display": "C FORMING"
+                "confirmed": true,
+                "display": "C CONFIRMED"
               }
             ],
             "targets": {
@@ -10669,10 +11010,10 @@
             "end_idx": 253,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Developing Zigzag B FORMING 50%",
-            "expected": "SHORT",
-            "expected_weight": 0.5,
-            "stage_text": "unda C inca in desfasurare, contra trendului",
+            "headline": "Invalidat Zigzag C 50%",
+            "expected": "LONG",
+            "expected_weight": 0.8,
+            "stage_text": "corectia e aproape incheiata - trendul e asteptat sa reia",
             "targets_hit": {
               "tp1": false,
               "tp2": false
@@ -10713,8 +11054,8 @@
                 "label": "D",
                 "price": 1456.85,
                 "idx": 245,
-                "confirmed": false,
-                "display": "D FORMING"
+                "confirmed": true,
+                "display": "D CONFIRMED"
               }
             ],
             "targets": {
@@ -10725,7 +11066,7 @@
             "end_idx": 245,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Developing Harmonic D FORMING 47%",
+            "headline": "Invalidat Harmonic D 47%",
             "expected": "LONG",
             "expected_weight": 0.7,
             "stage_text": "pretul e in zona PRZ - inversare asteptata",
@@ -10785,8 +11126,8 @@
     },
     "NEAR/USDT": {
       "direction": "LONG",
-      "score": 53,
-      "probability": 68.5,
+      "score": 54,
+      "probability": 68.9,
       "components": {
         "trend": 1.0,
         "momentum": 0.47,
@@ -10795,8 +11136,8 @@
       },
       "price": 4.847,
       "atr": 0.26442857,
-      "persistence": 99,
-      "age_minutes": 5937,
+      "persistence": 100,
+      "age_minutes": 5972,
       "indicators": {
         "emas": {
           "ema9": 4.843841258661203,
@@ -10860,6 +11201,37 @@
         "tp1": 5.213,
         "tp2": 5.9047143,
         "expected_r": 4.5
+      },
+      "forecast": {
+        "solid": [],
+        "path": [
+          {
+            "label": "ACUM",
+            "price": 4.847,
+            "idx": 258,
+            "projected": false
+          },
+          {
+            "label": "(W4)",
+            "price": 4.717928,
+            "idx": 276,
+            "projected": true
+          },
+          {
+            "label": "(W5)",
+            "price": 5.836508,
+            "idx": 286,
+            "projected": true
+          }
+        ],
+        "source": "elliott",
+        "hist": {
+          "n": 3599,
+          "win_rate": 28.5,
+          "median_bars_win": 18,
+          "median_bars_all": 8
+        },
+        "confidence": 0.6299
       },
       "sparkline": [
         3.51,
@@ -12044,15 +12416,15 @@
                 "label": "C",
                 "price": 4.804,
                 "idx": 240,
-                "confirmed": false,
-                "display": "C FORMING"
+                "confirmed": true,
+                "display": "C CONFIRMED"
               },
               {
                 "label": "D",
                 "price": 4.029,
                 "idx": 241,
-                "confirmed": false,
-                "display": "D FORMING"
+                "confirmed": true,
+                "display": "D CONFIRMED"
               }
             ],
             "targets": {
@@ -12063,10 +12435,10 @@
             "end_idx": 241,
             "invalidated": false,
             "rank": "Alternative",
-            "headline": "Alternative Developing Harmonic C FORMING 48%",
-            "expected": "SHORT",
-            "expected_weight": 0.4,
-            "stage_text": "D inca nu a ajuns in zona PRZ",
+            "headline": "Alternative Harmonic D 48%",
+            "expected": "LONG",
+            "expected_weight": 0.2,
+            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
             "targets_hit": {
               "tp1": true,
               "tp2": true
@@ -12273,8 +12645,8 @@
       },
       "price": 14.25,
       "atr": 0.39828571,
-      "persistence": 52,
-      "age_minutes": 3056,
+      "persistence": 53,
+      "age_minutes": 3090,
       "indicators": {
         "emas": {
           "ema9": 13.926247601285121,
@@ -12338,6 +12710,64 @@
         "tp1": 14.449143,
         "tp2": 15.843143,
         "expected_r": 4.5
+      },
+      "forecast": {
+        "solid": [
+          {
+            "idx": 241,
+            "price": 12.05
+          },
+          {
+            "idx": 244,
+            "price": 12.496
+          },
+          {
+            "idx": 245,
+            "price": 12.094
+          },
+          {
+            "idx": 252,
+            "price": 14.217
+          },
+          {
+            "idx": 258,
+            "price": 14.25
+          }
+        ],
+        "path": [
+          {
+            "label": "ACUM",
+            "price": 14.25,
+            "idx": 258,
+            "projected": false
+          },
+          {
+            "label": "(ENTRY)",
+            "price": 14.050857,
+            "idx": 260,
+            "projected": true
+          },
+          {
+            "label": "(TP1)",
+            "price": 14.449143,
+            "idx": 262,
+            "projected": true
+          },
+          {
+            "label": "(TP2)",
+            "price": 15.843143,
+            "idx": 267,
+            "projected": true
+          }
+        ],
+        "source": "plan",
+        "hist": {
+          "n": 2454,
+          "win_rate": 45.2,
+          "median_bars_win": 9,
+          "median_bars_all": 6
+        },
+        "confidence": 0.7811
       },
       "sparkline": [
         12.083,
@@ -13431,8 +13861,8 @@
                 "label": "D",
                 "price": 12.05,
                 "idx": 241,
-                "confirmed": false,
-                "display": "D FORMING"
+                "confirmed": true,
+                "display": "D CONFIRMED"
               }
             ],
             "targets": {
@@ -13443,10 +13873,10 @@
             "end_idx": 241,
             "invalidated": false,
             "rank": "Primary",
-            "headline": "Primary Developing Harmonic D FORMING 78%",
-            "expected": "SHORT",
-            "expected_weight": 0.4,
-            "stage_text": "D inca nu a ajuns in zona PRZ",
+            "headline": "Primary Harmonic D 78%",
+            "expected": "LONG",
+            "expected_weight": 0.2,
+            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
             "targets_hit": {
               "tp1": true,
               "tp2": true
@@ -13683,8 +14113,8 @@
               "label": "D",
               "price": 12.05,
               "idx": 241,
-              "confirmed": false,
-              "display": "D FORMING"
+              "confirmed": true,
+              "display": "D CONFIRMED"
             }
           ],
           "targets": {
@@ -13695,10 +14125,10 @@
           "end_idx": 241,
           "invalidated": false,
           "rank": "Primary",
-          "headline": "Primary Developing Harmonic D FORMING 78%",
-          "expected": "SHORT",
-          "expected_weight": 0.4,
-          "stage_text": "D inca nu a ajuns in zona PRZ",
+          "headline": "Primary Harmonic D 78%",
+          "expected": "LONG",
+          "expected_weight": 0.2,
+          "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
           "targets_hit": {
             "tp1": true,
             "tp2": true
@@ -13784,8 +14214,8 @@
     },
     "AVAX/USDT": {
       "direction": "LONG",
-      "score": 70,
-      "probability": 74.5,
+      "score": 71,
+      "probability": 74.8,
       "components": {
         "trend": 0.925,
         "momentum": 0.545,
@@ -13794,8 +14224,8 @@
       },
       "price": 10.982,
       "atr": 0.37571429,
-      "persistence": 123,
-      "age_minutes": 7377,
+      "persistence": 124,
+      "age_minutes": 7412,
       "indicators": {
         "emas": {
           "ema9": 10.683420146147768,
@@ -13859,6 +14289,43 @@
         "tp1": 11.4,
         "tp2": 12.484857,
         "expected_r": 4.5
+      },
+      "forecast": {
+        "solid": [],
+        "path": [
+          {
+            "label": "ACUM",
+            "price": 10.982,
+            "idx": 258,
+            "projected": false
+          },
+          {
+            "label": "(W3)",
+            "price": 11.238106,
+            "idx": 267,
+            "projected": true
+          },
+          {
+            "label": "(W4)",
+            "price": 10.794945508,
+            "idx": 271,
+            "projected": true
+          },
+          {
+            "label": "(W5)",
+            "price": 11.573691016,
+            "idx": 275,
+            "projected": true
+          }
+        ],
+        "source": "elliott",
+        "hist": {
+          "n": 2454,
+          "win_rate": 45.2,
+          "median_bars_win": 9,
+          "median_bars_all": 6
+        },
+        "confidence": 0.6266
       },
       "sparkline": [
         9.562,
@@ -15094,15 +15561,15 @@
                 "label": "B",
                 "price": 10.695,
                 "idx": 248,
-                "confirmed": false,
-                "display": "B FORMING"
+                "confirmed": true,
+                "display": "B CONFIRMED"
               },
               {
                 "label": "C",
                 "price": 10.078,
                 "idx": 250,
-                "confirmed": false,
-                "display": "C FORMING"
+                "confirmed": true,
+                "display": "C CONFIRMED"
               }
             ],
             "targets": {
@@ -15113,10 +15580,10 @@
             "end_idx": 250,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Developing Zigzag B FORMING 56%",
-            "expected": "SHORT",
-            "expected_weight": 0.5,
-            "stage_text": "unda C inca in desfasurare, contra trendului",
+            "headline": "Invalidat Zigzag C 56%",
+            "expected": "LONG",
+            "expected_weight": 0.8,
+            "stage_text": "corectia e aproape incheiata - trendul e asteptat sa reia",
             "targets_hit": {
               "tp1": true,
               "tp2": false
@@ -15321,8 +15788,8 @@
       },
       "price": 0.2603,
       "atr": 0.0073285714,
-      "persistence": 84,
-      "age_minutes": 4976,
+      "persistence": 85,
+      "age_minutes": 5011,
       "indicators": {
         "emas": {
           "ema9": 0.25547495092846784,
@@ -15386,6 +15853,52 @@
         "tp1": 0.26396429,
         "tp2": 0.28961429,
         "expected_r": 4.5
+      },
+      "forecast": {
+        "solid": [
+          {
+            "idx": 255,
+            "price": 0.2654
+          },
+          {
+            "idx": 258,
+            "price": 0.2603
+          }
+        ],
+        "path": [
+          {
+            "label": "ACUM",
+            "price": 0.2603,
+            "idx": 258,
+            "projected": false
+          },
+          {
+            "label": "(W3)",
+            "price": 0.303992,
+            "idx": 267,
+            "projected": true
+          },
+          {
+            "label": "(W4)",
+            "price": 0.276796656,
+            "idx": 278,
+            "projected": true
+          },
+          {
+            "label": "(W5)",
+            "price": 0.32981611199999994,
+            "idx": 289,
+            "projected": true
+          }
+        ],
+        "source": "elliott",
+        "hist": {
+          "n": 2454,
+          "win_rate": 45.2,
+          "median_bars_win": 9,
+          "median_bars_all": 6
+        },
+        "confidence": 0.5485
       },
       "sparkline": [
         0.2223,
@@ -16576,8 +17089,8 @@
                 "label": "D",
                 "price": 0.2328,
                 "idx": 245,
-                "confirmed": false,
-                "display": "D FORMING"
+                "confirmed": true,
+                "display": "D CONFIRMED"
               }
             ],
             "targets": {
@@ -16588,10 +17101,10 @@
             "end_idx": 245,
             "invalidated": false,
             "rank": "Alternative",
-            "headline": "Alternative Developing Harmonic D FORMING 52%",
-            "expected": "SHORT",
-            "expected_weight": 0.4,
-            "stage_text": "D inca nu a ajuns in zona PRZ",
+            "headline": "Alternative Harmonic D 52%",
+            "expected": "LONG",
+            "expected_weight": 0.7,
+            "stage_text": "pretul e in zona PRZ - inversare asteptata",
             "targets_hit": {
               "tp1": false,
               "tp2": true
@@ -16852,8 +17365,8 @@
       },
       "price": 1.484,
       "atr": 0.026857143,
-      "persistence": 52,
-      "age_minutes": 3056,
+      "persistence": 53,
+      "age_minutes": 3090,
       "indicators": {
         "emas": {
           "ema9": 1.4503094966524548,
@@ -16917,6 +17430,72 @@
         "tp1": 1.4974286,
         "tp2": 1.5914286,
         "expected_r": 4.5
+      },
+      "forecast": {
+        "solid": [
+          {
+            "idx": 236,
+            "price": 1.487
+          },
+          {
+            "idx": 241,
+            "price": 1.389
+          },
+          {
+            "idx": 244,
+            "price": 1.434
+          },
+          {
+            "idx": 245,
+            "price": 1.391
+          },
+          {
+            "idx": 247,
+            "price": 1.445
+          },
+          {
+            "idx": 249,
+            "price": 1.403
+          },
+          {
+            "idx": 258,
+            "price": 1.484
+          }
+        ],
+        "path": [
+          {
+            "label": "ACUM",
+            "price": 1.484,
+            "idx": 258,
+            "projected": false
+          },
+          {
+            "label": "(W3)",
+            "price": 1.5494519999999998,
+            "idx": 267,
+            "projected": true
+          },
+          {
+            "label": "(W4)",
+            "price": 1.478991336,
+            "idx": 279,
+            "projected": true
+          },
+          {
+            "label": "(W5)",
+            "price": 1.641804672,
+            "idx": 291,
+            "projected": true
+          }
+        ],
+        "source": "elliott",
+        "hist": {
+          "n": 2454,
+          "win_rate": 45.2,
+          "median_bars_win": 9,
+          "median_bars_all": 6
+        },
+        "confidence": 0.5
       },
       "sparkline": [
         1.372,
@@ -18201,8 +18780,8 @@
                 "label": "D",
                 "price": 1.389,
                 "idx": 241,
-                "confirmed": false,
-                "display": "D FORMING"
+                "confirmed": true,
+                "display": "D CONFIRMED"
               }
             ],
             "targets": {
@@ -18213,10 +18792,10 @@
             "end_idx": 241,
             "invalidated": false,
             "rank": "Secondary",
-            "headline": "Secondary Developing Harmonic D FORMING 42%",
-            "expected": "SHORT",
-            "expected_weight": 0.4,
-            "stage_text": "D inca nu a ajuns in zona PRZ",
+            "headline": "Secondary Harmonic D 42%",
+            "expected": "LONG",
+            "expected_weight": 0.7,
+            "stage_text": "pretul e in zona PRZ - inversare asteptata",
             "targets_hit": {
               "tp1": false,
               "tp2": true
@@ -18411,8 +18990,8 @@
     },
     "DOT/USDT": {
       "direction": "LONG",
-      "score": 74,
-      "probability": 75.9,
+      "score": 75,
+      "probability": 76.2,
       "components": {
         "trend": 0.66,
         "momentum": 0.851,
@@ -18421,8 +19000,8 @@
       },
       "price": 1.2851,
       "atr": 0.040578571,
-      "persistence": 60,
-      "age_minutes": 3535,
+      "persistence": 61,
+      "age_minutes": 3570,
       "indicators": {
         "emas": {
           "ema9": 1.2167840884205892,
@@ -18486,6 +19065,44 @@
         "tp1": 1.3053893,
         "tp2": 1.4474143,
         "expected_r": 4.5
+      },
+      "forecast": {
+        "solid": [
+          {
+            "idx": 249,
+            "price": 1.1318
+          },
+          {
+            "idx": 255,
+            "price": 1.2545
+          },
+          {
+            "idx": 258,
+            "price": 1.2851
+          }
+        ],
+        "path": [
+          {
+            "label": "ACUM",
+            "price": 1.2851,
+            "idx": 258,
+            "projected": false
+          },
+          {
+            "label": "(3)",
+            "price": 1.2905,
+            "idx": 267,
+            "projected": true
+          }
+        ],
+        "source": "elliott",
+        "hist": {
+          "n": 2454,
+          "win_rate": 45.2,
+          "median_bars_win": 9,
+          "median_bars_all": 6
+        },
+        "confidence": 0.5385
       },
       "sparkline": [
         1.0874,
@@ -19575,8 +20192,8 @@
                 "label": "C",
                 "price": 1.1318,
                 "idx": 249,
-                "confirmed": false,
-                "display": "C FORMING"
+                "confirmed": true,
+                "display": "C CONFIRMED"
               }
             ],
             "targets": {
@@ -19587,10 +20204,10 @@
             "end_idx": 249,
             "invalidated": false,
             "rank": "Primary",
-            "headline": "Primary Developing Zigzag C FORMING 54%",
-            "expected": "SHORT",
-            "expected_weight": 0.5,
-            "stage_text": "unda C inca in desfasurare, contra trendului",
+            "headline": "Primary Zigzag C 54%",
+            "expected": "LONG",
+            "expected_weight": 0.8,
+            "stage_text": "corectia e aproape incheiata - trendul e asteptat sa reia",
             "targets_hit": {
               "tp1": true,
               "tp2": false
@@ -19707,8 +20324,8 @@
                 "label": "B",
                 "price": 1.1459,
                 "idx": 234,
-                "confirmed": false,
-                "display": "B FORMING"
+                "confirmed": true,
+                "display": "B CONFIRMED"
               },
               {
                 "label": "C",
@@ -19727,7 +20344,7 @@
             "stale": true,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Developing Zigzag B FORMING 27%",
+            "headline": "Invalidat Developing Zigzag C FORMING 27%",
             "expected": "LONG",
             "expected_weight": 0.5,
             "stage_text": "unda C inca in desfasurare, contra trendului",
@@ -19825,8 +20442,8 @@
               "label": "C",
               "price": 1.1318,
               "idx": 249,
-              "confirmed": false,
-              "display": "C FORMING"
+              "confirmed": true,
+              "display": "C CONFIRMED"
             }
           ],
           "targets": {
@@ -19837,10 +20454,10 @@
           "end_idx": 249,
           "invalidated": false,
           "rank": "Primary",
-          "headline": "Primary Developing Zigzag C FORMING 54%",
-          "expected": "SHORT",
-          "expected_weight": 0.5,
-          "stage_text": "unda C inca in desfasurare, contra trendului",
+          "headline": "Primary Zigzag C 54%",
+          "expected": "LONG",
+          "expected_weight": 0.8,
+          "stage_text": "corectia e aproape incheiata - trendul e asteptat sa reia",
           "targets_hit": {
             "tp1": true,
             "tp2": false
@@ -19926,8 +20543,8 @@
     },
     "DASH/USDT": {
       "direction": "LONG",
-      "score": 70,
-      "probability": 74.5,
+      "score": 71,
+      "probability": 74.8,
       "components": {
         "trend": 0.751,
         "momentum": 0.889,
@@ -19936,8 +20553,8 @@
       },
       "price": 71.41,
       "atr": 2.8821429,
-      "persistence": 64,
-      "age_minutes": 3777,
+      "persistence": 65,
+      "age_minutes": 3812,
       "indicators": {
         "emas": {
           "ema9": 65.37684703400924,
@@ -20001,6 +20618,43 @@
         "tp1": 73.82,
         "tp2": 82.938572,
         "expected_r": 4.5
+      },
+      "forecast": {
+        "solid": [],
+        "path": [
+          {
+            "label": "ACUM",
+            "price": 71.41,
+            "idx": 258,
+            "projected": false
+          },
+          {
+            "label": "(W3)",
+            "price": 74.54142,
+            "idx": 267,
+            "projected": true
+          },
+          {
+            "label": "(W4)",
+            "price": 69.47937756,
+            "idx": 272,
+            "projected": true
+          },
+          {
+            "label": "(W5)",
+            "price": 80.28907512,
+            "idx": 277,
+            "projected": true
+          }
+        ],
+        "source": "elliott",
+        "hist": {
+          "n": 2454,
+          "win_rate": 45.2,
+          "median_bars_win": 9,
+          "median_bars_all": 6
+        },
+        "confidence": 0.6841
       },
       "sparkline": [
         57.42,
@@ -21180,15 +21834,15 @@
                 "label": "B",
                 "price": 65.24,
                 "idx": 251,
-                "confirmed": false,
-                "display": "B FORMING"
+                "confirmed": true,
+                "display": "B CONFIRMED"
               },
               {
                 "label": "C",
                 "price": 61.29,
                 "idx": 252,
-                "confirmed": false,
-                "display": "C FORMING"
+                "confirmed": true,
+                "display": "C CONFIRMED"
               }
             ],
             "targets": {
@@ -21199,10 +21853,10 @@
             "end_idx": 252,
             "invalidated": false,
             "rank": "Alternative",
-            "headline": "Alternative Developing Zigzag B FORMING 37%",
-            "expected": "SHORT",
-            "expected_weight": 0.5,
-            "stage_text": "unda C inca in desfasurare, contra trendului",
+            "headline": "Alternative Zigzag C 37%",
+            "expected": "LONG",
+            "expected_weight": 0.2,
+            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
             "targets_hit": {
               "tp1": true,
               "tp2": true
@@ -21463,8 +22117,8 @@
       },
       "price": 0.12017,
       "atr": 0.0033214286,
-      "persistence": 52,
-      "age_minutes": 3056,
+      "persistence": 53,
+      "age_minutes": 3090,
       "indicators": {
         "emas": {
           "ema9": 0.11630186558881761,
@@ -21528,6 +22182,60 @@
         "tp1": 0.12827,
         "tp2": 0.13345571,
         "expected_r": 4.5
+      },
+      "forecast": {
+        "solid": [
+          {
+            "idx": 241,
+            "price": 0.09986
+          },
+          {
+            "idx": 244,
+            "price": 0.10394
+          },
+          {
+            "idx": 245,
+            "price": 0.09997
+          },
+          {
+            "idx": 258,
+            "price": 0.12017
+          }
+        ],
+        "path": [
+          {
+            "label": "ACUM",
+            "price": 0.12017,
+            "idx": 258,
+            "projected": false
+          },
+          {
+            "label": "(ENTRY)",
+            "price": 0.11850929,
+            "idx": 260,
+            "projected": true
+          },
+          {
+            "label": "(TP1)",
+            "price": 0.12827,
+            "idx": 262,
+            "projected": true
+          },
+          {
+            "label": "(TP2)",
+            "price": 0.13345571,
+            "idx": 265,
+            "projected": true
+          }
+        ],
+        "source": "plan",
+        "hist": {
+          "n": 253,
+          "win_rate": 54.2,
+          "median_bars_win": 7,
+          "median_bars_all": 6
+        },
+        "confidence": 0.749
       },
       "sparkline": [
         0.1042,
@@ -22624,15 +23332,15 @@
                 "label": "C",
                 "price": 0.11345,
                 "idx": 239,
-                "confirmed": false,
-                "display": "C FORMING"
+                "confirmed": true,
+                "display": "C CONFIRMED"
               },
               {
                 "label": "D",
                 "price": 0.09986,
                 "idx": 241,
-                "confirmed": false,
-                "display": "D FORMING"
+                "confirmed": true,
+                "display": "D CONFIRMED"
               }
             ],
             "targets": {
@@ -22643,10 +23351,10 @@
             "end_idx": 241,
             "invalidated": false,
             "rank": "Primary",
-            "headline": "Primary Developing Harmonic C FORMING 75%",
-            "expected": "SHORT",
-            "expected_weight": 0.4,
-            "stage_text": "D inca nu a ajuns in zona PRZ",
+            "headline": "Primary Harmonic D 75%",
+            "expected": "LONG",
+            "expected_weight": 0.2,
+            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
             "targets_hit": {
               "tp1": true,
               "tp2": true
@@ -22707,15 +23415,15 @@
                 "label": "B",
                 "price": 0.11345,
                 "idx": 239,
-                "confirmed": false,
-                "display": "B FORMING"
+                "confirmed": true,
+                "display": "B CONFIRMED"
               },
               {
                 "label": "C",
                 "price": 0.09986,
                 "idx": 241,
-                "confirmed": false,
-                "display": "C FORMING"
+                "confirmed": true,
+                "display": "C CONFIRMED"
               }
             ],
             "targets": {
@@ -22726,10 +23434,10 @@
             "end_idx": 241,
             "invalidated": false,
             "rank": "Alternative",
-            "headline": "Alternative Developing Zigzag B FORMING 60%",
-            "expected": "SHORT",
-            "expected_weight": 0.5,
-            "stage_text": "unda C inca in desfasurare, contra trendului",
+            "headline": "Alternative Zigzag C 60%",
+            "expected": "LONG",
+            "expected_weight": 0.2,
+            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
             "targets_hit": {
               "tp1": true,
               "tp2": true
@@ -22784,9 +23492,9 @@
             "invalidated": false,
             "rank": "Secondary",
             "headline": "Secondary Developing Harmonic D FORMING 21%",
-            "expected": "SHORT",
-            "expected_weight": 0.4,
-            "stage_text": "D inca nu a ajuns in zona PRZ",
+            "expected": "LONG",
+            "expected_weight": 0.2,
+            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
             "targets_hit": {
               "tp1": true,
               "tp2": true
@@ -22874,15 +23582,15 @@
               "label": "C",
               "price": 0.11345,
               "idx": 239,
-              "confirmed": false,
-              "display": "C FORMING"
+              "confirmed": true,
+              "display": "C CONFIRMED"
             },
             {
               "label": "D",
               "price": 0.09986,
               "idx": 241,
-              "confirmed": false,
-              "display": "D FORMING"
+              "confirmed": true,
+              "display": "D CONFIRMED"
             }
           ],
           "targets": {
@@ -22893,10 +23601,10 @@
           "end_idx": 241,
           "invalidated": false,
           "rank": "Primary",
-          "headline": "Primary Developing Harmonic C FORMING 75%",
-          "expected": "SHORT",
-          "expected_weight": 0.4,
-          "stage_text": "D inca nu a ajuns in zona PRZ",
+          "headline": "Primary Harmonic D 75%",
+          "expected": "LONG",
+          "expected_weight": 0.2,
+          "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
           "targets_hit": {
             "tp1": true,
             "tp2": true
@@ -22982,8 +23690,8 @@
     },
     "ICP/USDT": {
       "direction": "LONG",
-      "score": 65,
-      "probability": 72.8,
+      "score": 66,
+      "probability": 73.1,
       "components": {
         "trend": 0.826,
         "momentum": 0.666,
@@ -22992,8 +23700,8 @@
       },
       "price": 3.303,
       "atr": 0.12028571,
-      "persistence": 94,
-      "age_minutes": 5579,
+      "persistence": 95,
+      "age_minutes": 5614,
       "indicators": {
         "emas": {
           "ema9": 3.18709678250401,
@@ -23057,6 +23765,64 @@
         "tp1": 3.3631429,
         "tp2": 3.7841428,
         "expected_r": 4.5
+      },
+      "forecast": {
+        "solid": [
+          {
+            "idx": 241,
+            "price": 2.829
+          },
+          {
+            "idx": 246,
+            "price": 3.212
+          },
+          {
+            "idx": 249,
+            "price": 3.042
+          },
+          {
+            "idx": 251,
+            "price": 3.274
+          },
+          {
+            "idx": 258,
+            "price": 3.303
+          }
+        ],
+        "path": [
+          {
+            "label": "ACUM",
+            "price": 3.303,
+            "idx": 258,
+            "projected": false
+          },
+          {
+            "label": "(ENTRY)",
+            "price": 3.2428571,
+            "idx": 260,
+            "projected": true
+          },
+          {
+            "label": "(TP1)",
+            "price": 3.3631429,
+            "idx": 262,
+            "projected": true
+          },
+          {
+            "label": "(TP2)",
+            "price": 3.7841428,
+            "idx": 267,
+            "projected": true
+          }
+        ],
+        "source": "plan",
+        "hist": {
+          "n": 2454,
+          "win_rate": 45.2,
+          "median_bars_win": 9,
+          "median_bars_all": 6
+        },
+        "confidence": 0.4643
       },
       "sparkline": [
         2.781,
@@ -24143,15 +24909,15 @@
                 "label": "C",
                 "price": 3.174,
                 "idx": 239,
-                "confirmed": false,
-                "display": "C FORMING"
+                "confirmed": true,
+                "display": "C CONFIRMED"
               },
               {
                 "label": "D",
                 "price": 2.829,
                 "idx": 241,
-                "confirmed": false,
-                "display": "D FORMING"
+                "confirmed": true,
+                "display": "D CONFIRMED"
               }
             ],
             "targets": {
@@ -24162,10 +24928,10 @@
             "end_idx": 241,
             "invalidated": false,
             "rank": "Primary",
-            "headline": "Primary Developing Harmonic C FORMING 46%",
-            "expected": "SHORT",
-            "expected_weight": 0.4,
-            "stage_text": "D inca nu a ajuns in zona PRZ",
+            "headline": "Primary Harmonic D 46%",
+            "expected": "LONG",
+            "expected_weight": 0.2,
+            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
             "targets_hit": {
               "tp1": true,
               "tp2": true
@@ -24397,15 +25163,15 @@
               "label": "C",
               "price": 3.174,
               "idx": 239,
-              "confirmed": false,
-              "display": "C FORMING"
+              "confirmed": true,
+              "display": "C CONFIRMED"
             },
             {
               "label": "D",
               "price": 2.829,
               "idx": 241,
-              "confirmed": false,
-              "display": "D FORMING"
+              "confirmed": true,
+              "display": "D CONFIRMED"
             }
           ],
           "targets": {
@@ -24416,10 +25182,10 @@
           "end_idx": 241,
           "invalidated": false,
           "rank": "Primary",
-          "headline": "Primary Developing Harmonic C FORMING 46%",
-          "expected": "SHORT",
-          "expected_weight": 0.4,
-          "stage_text": "D inca nu a ajuns in zona PRZ",
+          "headline": "Primary Harmonic D 46%",
+          "expected": "LONG",
+          "expected_weight": 0.2,
+          "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
           "targets_hit": {
             "tp1": true,
             "tp2": true
@@ -24505,8 +25271,8 @@
     },
     "FET/USDT": {
       "direction": "LONG",
-      "score": 70,
-      "probability": 74.5,
+      "score": 71,
+      "probability": 74.8,
       "components": {
         "trend": 1.0,
         "momentum": 0.984,
@@ -24515,8 +25281,8 @@
       },
       "price": 0.2528,
       "atr": 0.012578571,
-      "persistence": 150,
-      "age_minutes": 9054,
+      "persistence": 151,
+      "age_minutes": 9089,
       "indicators": {
         "emas": {
           "ema9": 0.24060955587217348,
@@ -24580,6 +25346,43 @@
         "tp1": 0.25908929,
         "tp2": 0.30311428,
         "expected_r": 4.5
+      },
+      "forecast": {
+        "solid": [],
+        "path": [
+          {
+            "label": "ACUM",
+            "price": 0.2528,
+            "idx": 258,
+            "projected": false
+          },
+          {
+            "label": "(W3)",
+            "price": 0.2724436,
+            "idx": 267,
+            "projected": true
+          },
+          {
+            "label": "(W4)",
+            "price": 0.2322405448,
+            "idx": 286,
+            "projected": true
+          },
+          {
+            "label": "(W5)",
+            "price": 0.3088376896,
+            "idx": 305,
+            "projected": true
+          }
+        ],
+        "source": "elliott",
+        "hist": {
+          "n": 2454,
+          "win_rate": 45.2,
+          "median_bars_win": 9,
+          "median_bars_all": 6
+        },
+        "confidence": 0.642
       },
       "sparkline": [
         0.1729,
@@ -25998,8 +26801,8 @@
       },
       "price": 0.33675,
       "atr": 0.0017571429,
-      "persistence": 28,
-      "age_minutes": 1615,
+      "persistence": 29,
+      "age_minutes": 1650,
       "indicators": {
         "emas": {
           "ema9": 0.3376367695719471,
@@ -26063,6 +26866,52 @@
         "tp1": 0.33159,
         "tp2": 0.32972143,
         "expected_r": 4.5
+      },
+      "forecast": {
+        "solid": [
+          {
+            "idx": 253,
+            "price": 0.33584
+          },
+          {
+            "idx": 258,
+            "price": 0.33675
+          }
+        ],
+        "path": [
+          {
+            "label": "ACUM",
+            "price": 0.33675,
+            "idx": 258,
+            "projected": false
+          },
+          {
+            "label": "(W3)",
+            "price": 0.3265794199999999,
+            "idx": 285,
+            "projected": true
+          },
+          {
+            "label": "(W4)",
+            "price": 0.3332608215599999,
+            "idx": 291,
+            "projected": true
+          },
+          {
+            "label": "(W5)",
+            "price": 0.31920714311999987,
+            "idx": 297,
+            "projected": true
+          }
+        ],
+        "source": "elliott",
+        "hist": {
+          "n": 1673,
+          "win_rate": 26.0,
+          "median_bars_win": 27,
+          "median_bars_all": 9
+        },
+        "confidence": 0.6142
       },
       "sparkline": [
         0.34007,
@@ -27242,15 +28091,15 @@
                 "label": "B",
                 "price": 0.33851,
                 "idx": 241,
-                "confirmed": false,
-                "display": "B FORMING"
+                "confirmed": true,
+                "display": "B CONFIRMED"
               },
               {
                 "label": "C",
                 "price": 0.34407,
                 "idx": 243,
-                "confirmed": false,
-                "display": "C FORMING"
+                "confirmed": true,
+                "display": "C CONFIRMED"
               }
             ],
             "targets": {
@@ -27261,10 +28110,10 @@
             "end_idx": 243,
             "invalidated": false,
             "rank": "Alternative",
-            "headline": "Alternative Developing Zigzag B FORMING 34%",
-            "expected": "LONG",
-            "expected_weight": 0.5,
-            "stage_text": "unda C inca in desfasurare, contra trendului",
+            "headline": "Alternative Zigzag C 34%",
+            "expected": "SHORT",
+            "expected_weight": 0.8,
+            "stage_text": "corectia e aproape incheiata - trendul e asteptat sa reia",
             "targets_hit": {
               "tp1": false,
               "tp2": false
@@ -27459,8 +28308,8 @@
     },
     "ALGO/USDT": {
       "direction": "LONG",
-      "score": 82,
-      "probability": 78.7,
+      "score": 83,
+      "probability": 79.0,
       "components": {
         "trend": 0.948,
         "momentum": 0.842,
@@ -27469,8 +28318,8 @@
       },
       "price": 0.12218,
       "atr": 0.0040142857,
-      "persistence": 60,
-      "age_minutes": 3535,
+      "persistence": 61,
+      "age_minutes": 3570,
       "indicators": {
         "emas": {
           "ema9": 0.11683056307894231,
@@ -27534,6 +28383,64 @@
         "tp1": 0.12418714,
         "tp2": 0.13823714,
         "expected_r": 4.5
+      },
+      "forecast": {
+        "solid": [
+          {
+            "idx": 243,
+            "price": 0.10299
+          },
+          {
+            "idx": 251,
+            "price": 0.11854
+          },
+          {
+            "idx": 253,
+            "price": 0.11215
+          },
+          {
+            "idx": 255,
+            "price": 0.11912
+          },
+          {
+            "idx": 258,
+            "price": 0.12218
+          }
+        ],
+        "path": [
+          {
+            "label": "ACUM",
+            "price": 0.12218,
+            "idx": 258,
+            "projected": false
+          },
+          {
+            "label": "(ENTRY)",
+            "price": 0.12017286,
+            "idx": 260,
+            "projected": true
+          },
+          {
+            "label": "(TP1)",
+            "price": 0.12418714,
+            "idx": 262,
+            "projected": true
+          },
+          {
+            "label": "(TP2)",
+            "price": 0.13823714,
+            "idx": 265,
+            "projected": true
+          }
+        ],
+        "source": "plan",
+        "hist": {
+          "n": 253,
+          "win_rate": 54.2,
+          "median_bars_win": 7,
+          "median_bars_all": 6
+        },
+        "confidence": 0.5589
       },
       "sparkline": [
         0.1038,
@@ -28627,8 +29534,8 @@
                 "label": "D",
                 "price": 0.10299,
                 "idx": 243,
-                "confirmed": false,
-                "display": "D FORMING"
+                "confirmed": true,
+                "display": "D CONFIRMED"
               }
             ],
             "targets": {
@@ -28639,10 +29546,10 @@
             "end_idx": 243,
             "invalidated": false,
             "rank": "Primary",
-            "headline": "Primary Developing Harmonic D FORMING 56%",
-            "expected": "SHORT",
-            "expected_weight": 0.4,
-            "stage_text": "D inca nu a ajuns in zona PRZ",
+            "headline": "Primary Harmonic D 56%",
+            "expected": "LONG",
+            "expected_weight": 0.2,
+            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
             "targets_hit": {
               "tp1": true,
               "tp2": true
@@ -28710,8 +29617,8 @@
                 "label": "C",
                 "price": 0.10299,
                 "idx": 243,
-                "confirmed": false,
-                "display": "C FORMING"
+                "confirmed": true,
+                "display": "C CONFIRMED"
               }
             ],
             "targets": {
@@ -28722,10 +29629,10 @@
             "end_idx": 243,
             "invalidated": false,
             "rank": "Alternative",
-            "headline": "Alternative Developing Zigzag C FORMING 35%",
-            "expected": "SHORT",
-            "expected_weight": 0.5,
-            "stage_text": "unda C inca in desfasurare, contra trendului",
+            "headline": "Alternative Zigzag C 35%",
+            "expected": "LONG",
+            "expected_weight": 0.2,
+            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
             "targets_hit": {
               "tp1": true,
               "tp2": true
@@ -28820,8 +29727,8 @@
               "label": "D",
               "price": 0.10299,
               "idx": 243,
-              "confirmed": false,
-              "display": "D FORMING"
+              "confirmed": true,
+              "display": "D CONFIRMED"
             }
           ],
           "targets": {
@@ -28832,10 +29739,10 @@
           "end_idx": 243,
           "invalidated": false,
           "rank": "Primary",
-          "headline": "Primary Developing Harmonic D FORMING 56%",
-          "expected": "SHORT",
-          "expected_weight": 0.4,
-          "stage_text": "D inca nu a ajuns in zona PRZ",
+          "headline": "Primary Harmonic D 56%",
+          "expected": "LONG",
+          "expected_weight": 0.2,
+          "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
           "targets_hit": {
             "tp1": true,
             "tp2": true
@@ -28931,8 +29838,8 @@
       },
       "price": 1.881,
       "atr": 0.046571429,
-      "persistence": 60,
-      "age_minutes": 3535,
+      "persistence": 61,
+      "age_minutes": 3570,
       "indicators": {
         "emas": {
           "ema9": 1.8185749842901047,
@@ -28996,6 +29903,43 @@
         "tp1": 2.032,
         "tp2": 2.0672857,
         "expected_r": 4.5
+      },
+      "forecast": {
+        "solid": [],
+        "path": [
+          {
+            "label": "ACUM",
+            "price": 1.881,
+            "idx": 258,
+            "projected": false
+          },
+          {
+            "label": "(W3)",
+            "price": 2.02097,
+            "idx": 267,
+            "projected": true
+          },
+          {
+            "label": "(W4)",
+            "price": 1.91898746,
+            "idx": 271,
+            "projected": true
+          },
+          {
+            "label": "(W5)",
+            "price": 2.13650492,
+            "idx": 275,
+            "projected": true
+          }
+        ],
+        "source": "elliott",
+        "hist": {
+          "n": 2454,
+          "win_rate": 45.2,
+          "median_bars_win": 9,
+          "median_bars_all": 6
+        },
+        "confidence": 0.6121
       },
       "sparkline": [
         1.711,
@@ -30175,15 +31119,15 @@
                 "label": "B",
                 "price": 1.834,
                 "idx": 252,
-                "confirmed": false,
-                "display": "B FORMING"
+                "confirmed": true,
+                "display": "B CONFIRMED"
               },
               {
                 "label": "C",
                 "price": 1.754,
                 "idx": 253,
-                "confirmed": false,
-                "display": "C FORMING"
+                "confirmed": true,
+                "display": "C CONFIRMED"
               }
             ],
             "targets": {
@@ -30194,10 +31138,10 @@
             "end_idx": 253,
             "invalidated": false,
             "rank": "Alternative",
-            "headline": "Alternative Developing Zigzag B FORMING 45%",
-            "expected": "SHORT",
-            "expected_weight": 0.5,
-            "stage_text": "unda C inca in desfasurare, contra trendului",
+            "headline": "Alternative Zigzag C 45%",
+            "expected": "LONG",
+            "expected_weight": 0.8,
+            "stage_text": "corectia e aproape incheiata - trendul e asteptat sa reia",
             "targets_hit": {
               "tp1": true,
               "tp2": false
@@ -30459,8 +31403,8 @@
       },
       "price": 1.1991,
       "atr": 0.0474,
-      "persistence": 52,
-      "age_minutes": 3056,
+      "persistence": 53,
+      "age_minutes": 3090,
       "indicators": {
         "emas": {
           "ema9": 1.1747332918487075,
@@ -30524,6 +31468,43 @@
         "tp1": 1.2228,
         "tp2": 1.3887,
         "expected_r": 4.5
+      },
+      "forecast": {
+        "solid": [],
+        "path": [
+          {
+            "label": "ACUM",
+            "price": 1.1991,
+            "idx": 258,
+            "projected": false
+          },
+          {
+            "label": "(ENTRY)",
+            "price": 1.1754,
+            "idx": 260,
+            "projected": true
+          },
+          {
+            "label": "(TP1)",
+            "price": 1.2228,
+            "idx": 267,
+            "projected": true
+          },
+          {
+            "label": "(TP2)",
+            "price": 1.3887,
+            "idx": 276,
+            "projected": true
+          }
+        ],
+        "source": "plan",
+        "hist": {
+          "n": 3599,
+          "win_rate": 28.5,
+          "median_bars_win": 18,
+          "median_bars_all": 8
+        },
+        "confidence": null
       },
       "sparkline": [
         1.0065,
@@ -31752,8 +32733,8 @@
       },
       "price": 0.01699,
       "atr": 0.000425,
-      "persistence": 84,
-      "age_minutes": 4976,
+      "persistence": 85,
+      "age_minutes": 5011,
       "indicators": {
         "emas": {
           "ema9": 0.016648765432710756,
@@ -31817,6 +32798,68 @@
         "tp1": 0.0174,
         "tp2": 0.01869,
         "expected_r": 4.5
+      },
+      "forecast": {
+        "solid": [
+          {
+            "idx": 238,
+            "price": 0.0174
+          },
+          {
+            "idx": 243,
+            "price": 0.0153
+          },
+          {
+            "idx": 247,
+            "price": 0.01665
+          },
+          {
+            "idx": 249,
+            "price": 0.01609
+          },
+          {
+            "idx": 254,
+            "price": 0.01688
+          },
+          {
+            "idx": 258,
+            "price": 0.01699
+          }
+        ],
+        "path": [
+          {
+            "label": "ACUM",
+            "price": 0.01699,
+            "idx": 258,
+            "projected": false
+          },
+          {
+            "label": "(W3)",
+            "price": 0.018279040000000003,
+            "idx": 267,
+            "projected": true
+          },
+          {
+            "label": "(W4)",
+            "price": 0.01686982672,
+            "idx": 280,
+            "projected": true
+          },
+          {
+            "label": "(W5)",
+            "price": 0.019953053440000004,
+            "idx": 293,
+            "projected": true
+          }
+        ],
+        "source": "elliott",
+        "hist": {
+          "n": 2454,
+          "win_rate": 45.2,
+          "median_bars_win": 9,
+          "median_bars_all": 6
+        },
+        "confidence": 0.507
       },
       "sparkline": [
         0.01507,
@@ -33279,8 +34322,8 @@
       },
       "price": 7.999,
       "atr": 0.26871429,
-      "persistence": 36,
-      "age_minutes": 2095,
+      "persistence": 37,
+      "age_minutes": 2130,
       "indicators": {
         "emas": {
           "ema9": 7.693418096455121,
@@ -33344,6 +34387,43 @@
         "tp1": 8.25,
         "tp2": 9.0738572,
         "expected_r": 4.5
+      },
+      "forecast": {
+        "solid": [],
+        "path": [
+          {
+            "label": "ACUM",
+            "price": 7.999,
+            "idx": 258,
+            "projected": false
+          },
+          {
+            "label": "(ENTRY)",
+            "price": 7.8646429,
+            "idx": 260,
+            "projected": true
+          },
+          {
+            "label": "(TP1)",
+            "price": 8.25,
+            "idx": 267,
+            "projected": true
+          },
+          {
+            "label": "(TP2)",
+            "price": 9.0738572,
+            "idx": 276,
+            "projected": true
+          }
+        ],
+        "source": "plan",
+        "hist": {
+          "n": 3599,
+          "win_rate": 28.5,
+          "median_bars_win": 18,
+          "median_bars_all": 8
+        },
+        "confidence": null
       },
       "sparkline": [
         7.68,
@@ -34447,8 +35527,8 @@
                 "label": "D",
                 "price": 8.395,
                 "idx": 237,
-                "confirmed": false,
-                "display": "D FORMING"
+                "confirmed": true,
+                "display": "D CONFIRMED"
               }
             ],
             "targets": {
@@ -34459,10 +35539,10 @@
             "end_idx": 237,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Developing Harmonic D FORMING 63%",
-            "expected": "LONG",
-            "expected_weight": 0.4,
-            "stage_text": "D inca nu a ajuns in zona PRZ",
+            "headline": "Invalidat Harmonic D 63%",
+            "expected": "SHORT",
+            "expected_weight": 0.7,
+            "stage_text": "pretul e in zona PRZ - inversare asteptata",
             "targets_hit": {
               "tp1": false,
               "tp2": false
@@ -34607,8 +35687,8 @@
                 "label": "C",
                 "price": 8.395,
                 "idx": 237,
-                "confirmed": false,
-                "display": "C FORMING"
+                "confirmed": true,
+                "display": "C CONFIRMED"
               }
             ],
             "targets": {
@@ -34619,10 +35699,10 @@
             "end_idx": 237,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Developing Zigzag C FORMING 53%",
-            "expected": "LONG",
-            "expected_weight": 0.5,
-            "stage_text": "unda C inca in desfasurare, contra trendului",
+            "headline": "Invalidat Zigzag C 53%",
+            "expected": "SHORT",
+            "expected_weight": 0.8,
+            "stage_text": "corectia e aproape incheiata - trendul e asteptat sa reia",
             "targets_hit": {
               "tp1": false,
               "tp2": false
@@ -34679,8 +35759,8 @@
     },
     "GRT/USDT": {
       "direction": "LONG",
-      "score": 64,
-      "probability": 72.4,
+      "score": 65,
+      "probability": 72.8,
       "components": {
         "trend": 1.0,
         "momentum": 0.675,
@@ -34689,8 +35769,8 @@
       },
       "price": 0.02816,
       "atr": 0.0010814286,
-      "persistence": 76,
-      "age_minutes": 4496,
+      "persistence": 77,
+      "age_minutes": 4530,
       "indicators": {
         "emas": {
           "ema9": 0.02753107806809802,
@@ -34754,6 +35834,52 @@
         "tp1": 0.028700714,
         "tp2": 0.032485714,
         "expected_r": 4.5
+      },
+      "forecast": {
+        "solid": [
+          {
+            "idx": 254,
+            "price": 0.02889
+          },
+          {
+            "idx": 258,
+            "price": 0.02816
+          }
+        ],
+        "path": [
+          {
+            "label": "ACUM",
+            "price": 0.02816,
+            "idx": 258,
+            "projected": false
+          },
+          {
+            "label": "(A)",
+            "price": 0.0252385,
+            "idx": 267,
+            "projected": true
+          },
+          {
+            "label": "(B)",
+            "price": 0.026814249999999998,
+            "idx": 274,
+            "projected": true
+          },
+          {
+            "label": "(C)",
+            "price": 0.023662750000000003,
+            "idx": 281,
+            "projected": true
+          }
+        ],
+        "source": "elliott",
+        "hist": {
+          "n": 2454,
+          "win_rate": 45.2,
+          "median_bars_win": 9,
+          "median_bars_all": 6
+        },
+        "confidence": 0.6
       },
       "sparkline": [
         0.02066,
@@ -35988,8 +37114,8 @@
                 "label": "D",
                 "price": 0.02306,
                 "idx": 232,
-                "confirmed": false,
-                "display": "D FORMING"
+                "confirmed": true,
+                "display": "D CONFIRMED"
               }
             ],
             "targets": {
@@ -36000,10 +37126,10 @@
             "end_idx": 232,
             "invalidated": false,
             "rank": "Alternative",
-            "headline": "Alternative Developing Harmonic D FORMING 57%",
-            "expected": "SHORT",
-            "expected_weight": 0.4,
-            "stage_text": "D inca nu a ajuns in zona PRZ",
+            "headline": "Alternative Harmonic D 57%",
+            "expected": "LONG",
+            "expected_weight": 0.2,
+            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
             "targets_hit": {
               "tp1": true,
               "tp2": true
@@ -36150,9 +37276,9 @@
             "invalidated": false,
             "rank": "Family",
             "headline": "Family Developing Motive W5 FORMING 46%",
-            "expected": "SHORT",
-            "expected_weight": 0.7,
-            "stage_text": "impulsul e complet sau dincolo de tinte - urmeaza corectia A-B-C",
+            "expected": "LONG",
+            "expected_weight": 0.2,
+            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
             "targets_hit": {
               "tp1": true,
               "tp2": true,
@@ -36350,8 +37476,8 @@
       },
       "price": 0.03297,
       "atr": 0.0011542857,
-      "persistence": 193,
-      "age_minutes": 11934,
+      "persistence": 194,
+      "age_minutes": 11969,
       "indicators": {
         "emas": {
           "ema9": 0.03199397411775516,
@@ -36415,6 +37541,43 @@
         "tp1": 0.03392,
         "tp2": 0.037587143,
         "expected_r": 4.5
+      },
+      "forecast": {
+        "solid": [],
+        "path": [
+          {
+            "label": "ACUM",
+            "price": 0.03297,
+            "idx": 258,
+            "projected": false
+          },
+          {
+            "label": "(W3)",
+            "price": 0.035623440000000006,
+            "idx": 276,
+            "projected": true
+          },
+          {
+            "label": "(W4)",
+            "price": 0.033719765920000005,
+            "idx": 282,
+            "projected": true
+          },
+          {
+            "label": "(W5)",
+            "price": 0.03708999184000001,
+            "idx": 288,
+            "projected": true
+          }
+        ],
+        "source": "elliott",
+        "hist": {
+          "n": 3599,
+          "win_rate": 28.5,
+          "median_bars_win": 18,
+          "median_bars_all": 8
+        },
+        "confidence": 0.5523
       },
       "sparkline": [
         0.03033,
@@ -37709,8 +38872,8 @@
                 "label": "C",
                 "price": 0.03064,
                 "idx": 255,
-                "confirmed": false,
-                "display": "C FORMING"
+                "confirmed": true,
+                "display": "C CONFIRMED"
               }
             ],
             "targets": {
@@ -37721,10 +38884,10 @@
             "end_idx": 255,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Developing Zigzag C FORMING 40%",
-            "expected": "SHORT",
-            "expected_weight": 0.5,
-            "stage_text": "unda C inca in desfasurare, contra trendului",
+            "headline": "Invalidat Zigzag C 40%",
+            "expected": "LONG",
+            "expected_weight": 0.8,
+            "stage_text": "corectia e aproape incheiata - trendul e asteptat sa reia",
             "targets_hit": {
               "tp1": false,
               "tp2": false
@@ -37877,8 +39040,8 @@
       },
       "price": 0.2377,
       "atr": 0.0066571429,
-      "persistence": 52,
-      "age_minutes": 3056,
+      "persistence": 53,
+      "age_minutes": 3090,
       "indicators": {
         "emas": {
           "ema9": 0.23167086032136663,
@@ -37942,6 +39105,43 @@
         "tp1": 0.24102857,
         "tp2": 0.26432857,
         "expected_r": 4.5
+      },
+      "forecast": {
+        "solid": [],
+        "path": [
+          {
+            "label": "ACUM",
+            "price": 0.2377,
+            "idx": 258,
+            "projected": false
+          },
+          {
+            "label": "(ENTRY)",
+            "price": 0.23437143,
+            "idx": 260,
+            "projected": true
+          },
+          {
+            "label": "(TP1)",
+            "price": 0.24102857,
+            "idx": 262,
+            "projected": true
+          },
+          {
+            "label": "(TP2)",
+            "price": 0.26432857,
+            "idx": 267,
+            "projected": true
+          }
+        ],
+        "source": "plan",
+        "hist": {
+          "n": 2454,
+          "win_rate": 45.2,
+          "median_bars_win": 9,
+          "median_bars_all": 6
+        },
+        "confidence": null
       },
       "sparkline": [
         0.2182,
@@ -39179,8 +40379,8 @@
       },
       "price": 0.09285,
       "atr": 0.0024578571,
-      "persistence": 64,
-      "age_minutes": 3777,
+      "persistence": 65,
+      "age_minutes": 3812,
       "indicators": {
         "emas": {
           "ema9": 0.09140931351469449,
@@ -39244,6 +40444,52 @@
         "tp1": 0.094078929,
         "tp2": 0.10268143,
         "expected_r": 4.5
+      },
+      "forecast": {
+        "solid": [
+          {
+            "idx": 255,
+            "price": 0.09346
+          },
+          {
+            "idx": 258,
+            "price": 0.09285
+          }
+        ],
+        "path": [
+          {
+            "label": "ACUM",
+            "price": 0.09285,
+            "idx": 258,
+            "projected": false
+          },
+          {
+            "label": "(W3)",
+            "price": 0.10346314,
+            "idx": 267,
+            "projected": true
+          },
+          {
+            "label": "(W4)",
+            "price": 0.09435888052,
+            "idx": 287,
+            "projected": true
+          },
+          {
+            "label": "(W5)",
+            "price": 0.11498966104,
+            "idx": 307,
+            "projected": true
+          }
+        ],
+        "source": "elliott",
+        "hist": {
+          "n": 2454,
+          "win_rate": 45.2,
+          "median_bars_win": 9,
+          "median_bars_all": 6
+        },
+        "confidence": 0.5507
       },
       "sparkline": [
         0.08378,
@@ -40599,8 +41845,8 @@
       },
       "price": 4.753,
       "atr": 0.14842857,
-      "persistence": 107,
-      "age_minutes": 6416,
+      "persistence": 108,
+      "age_minutes": 6451,
       "indicators": {
         "emas": {
           "ema9": 4.591275091315367,
@@ -40664,6 +41910,43 @@
         "tp1": 4.941,
         "tp2": 5.3467143,
         "expected_r": 4.5
+      },
+      "forecast": {
+        "solid": [],
+        "path": [
+          {
+            "label": "ACUM",
+            "price": 4.753,
+            "idx": 258,
+            "projected": false
+          },
+          {
+            "label": "(W3)",
+            "price": 5.434181999999999,
+            "idx": 276,
+            "projected": true
+          },
+          {
+            "label": "(W4)",
+            "price": 5.063954475999999,
+            "idx": 281,
+            "projected": true
+          },
+          {
+            "label": "(W5)",
+            "price": 5.907018951999999,
+            "idx": 286,
+            "projected": true
+          }
+        ],
+        "source": "elliott",
+        "hist": {
+          "n": 3599,
+          "win_rate": 28.5,
+          "median_bars_win": 18,
+          "median_bars_all": 8
+        },
+        "confidence": 0.5144
       },
       "sparkline": [
         3.789,
@@ -41854,8 +43137,8 @@
                 "label": "D",
                 "price": 4.07,
                 "idx": 243,
-                "confirmed": false,
-                "display": "D FORMING"
+                "confirmed": true,
+                "display": "D CONFIRMED"
               }
             ],
             "targets": {
@@ -41866,10 +43149,10 @@
             "end_idx": 243,
             "invalidated": false,
             "rank": "Alternative",
-            "headline": "Alternative Developing Harmonic D FORMING 45%",
-            "expected": "SHORT",
-            "expected_weight": 0.4,
-            "stage_text": "D inca nu a ajuns in zona PRZ",
+            "headline": "Alternative Harmonic D 45%",
+            "expected": "LONG",
+            "expected_weight": 0.2,
+            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
             "targets_hit": {
               "tp1": true,
               "tp2": true
@@ -41906,8 +43189,8 @@
                 "label": "C",
                 "price": 4.07,
                 "idx": 243,
-                "confirmed": false,
-                "display": "C FORMING"
+                "confirmed": true,
+                "display": "C CONFIRMED"
               }
             ],
             "targets": {
@@ -41918,10 +43201,10 @@
             "end_idx": 243,
             "invalidated": false,
             "rank": "Secondary",
-            "headline": "Secondary Developing Zigzag C FORMING 36%",
-            "expected": "SHORT",
-            "expected_weight": 0.5,
-            "stage_text": "unda C inca in desfasurare, contra trendului",
+            "headline": "Secondary Zigzag C 36%",
+            "expected": "LONG",
+            "expected_weight": 0.2,
+            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
             "targets_hit": {
               "tp1": true,
               "tp2": true
