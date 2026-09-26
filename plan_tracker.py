@@ -161,6 +161,17 @@ def archive_stale_plans(store):
 # filtreaza nimic implicit. Pune True doar daca ai dovezi walk-forward proprii.
 USE_DECISION_GATE = os.environ.get("USE_DECISION_GATE", "false").lower() == "true"
 
+# FILTRUL AGENTULUI, separat de poarta de calibrare. Cele doua au dovezi diferite:
+#   - poarta de calibrare (EV din rata pe interval de scor) a INRAUTATIT
+#     rezultatul pe walk-forward in 2 din 3 rulari -> ramane oprita implicit;
+#   - filtrul agentului (elimina treimea de jos a ordonarii) a fost masurat pe
+#     3.000 de predictii in afara esantionului, pe 8.6 ani de date reale:
+#     treimea de jos -0.240R/plan, treimea de sus +0.269R/plan, avantaj
+#     +0.257R cu IC95 +0.158..+0.363 -> ACTIVAT implicit.
+# Activarea ramane conditionata de starea ACTIVE si de ranking_edge peste prag,
+# deci se opreste singur daca avantajul dispare.
+USE_AGENT_FILTER = os.environ.get("USE_AGENT_FILTER", "true").lower() == "true"
+
 # Versiunea geometriei planului. Cand regulile de plasare a TP1/TP2 se schimba,
 # rezultatele vechi devin necomparabile: descriu o structura care nu mai exista.
 # Calibrarea foloseste doar planuri din versiunea curenta.
@@ -736,6 +747,19 @@ def decide(calibration, signal, agent_pred=None, bucket_size=20):
     """
     score = signal.get("risk_adjusted", 0)
     cal = calibrated_probability(calibration, score, bucket_size)
+
+    agent_p0 = (agent_pred or {}).get("probability")
+    cut0 = (agent_pred or {}).get("rank_cut")
+    if (USE_AGENT_FILTER and (agent_pred or {}).get("active")
+            and (agent_pred or {}).get("superior")
+            and agent_p0 is not None and cut0 is not None and agent_p0 < cut0):
+        return {"action": "SKIP", "mode": "FILTRU_AGENT",
+                "reason": (f"agentul pune semnalul in treimea de jos ({agent_p0:.3f} "
+                           f"< {cut0:.3f}); masurat in afara esantionului, acea "
+                           f"treime pierde in medie"),
+                "expected_value_r": None,
+                "calibrated_prob": cal["win_rate"] if cal else None,
+                "agent_prob": agent_p0, "agent_used": True}
 
     if not USE_DECISION_GATE:
         # Masuram si raportam in continuare - cifrele apar in dashboard si pe
