@@ -31,6 +31,9 @@ permissions:
 jobs:
   scan:
     runs-on: ubuntu-latest
+    # Fara timeout, GitHub aplica 360 de minute: un API de bursa blocat ar tine
+    # scanarea orara agatata 6 ore si le-ar bloca pe urmatoarele (concurrency).
+    timeout-minutes: 30
     env:
       # Trebuie sa fie ACELASI ca la backtest, altfel scanarea live si
       # backtest-ul produc geometrii diferite si nu invata din acelasi set.
