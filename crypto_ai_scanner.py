@@ -867,6 +867,15 @@ def main():
     # pe luna in git. Pastrez in schimb doar indicatorii (cateva numere) si o
     # linie de pret scurta pentru graficul mic.
     details = {}
+    # ISTORICUL MASURAT pentru prognoza de pe grafic: rata de castig si durata
+    # mediana pe (directie, interval de scor), din planurile inchise ale
+    # familiei. Citire separata - planurile se incarca in flux abia mai jos.
+    try:
+        _hist_tab = plan_tracker.history_table(plan_tracker.load_plans())
+    except Exception as _e:
+        print(f"[!] istoric indisponibil pentru prognoza: {_e}")
+        _hist_tab = {}
+
     for r in results:
         candles = ohlcv_cache.get(r["symbol"])
         if not candles:
@@ -891,6 +900,7 @@ def main():
             _nb = max(CHART_BARS, min(len(candles) - min(_pri_idx) + 8, CHART_BARS_MAX))
         _nb = min(_nb, len(candles))
 
+        _plan_tok = compute_trade_plan(r["direction"], r["price"], r["atr"], d_struct, d_fib)
         details[r["symbol"]] = {
             "direction": r["direction"],
             "score": r["risk_adjusted"],
@@ -903,7 +913,15 @@ def main():
             "indicators": indicators.compute_all(candles),
             "structure": d_struct,
             "fibonacci": d_fib,
-            "plan": compute_trade_plan(r["direction"], r["price"], r["atr"], d_struct, d_fib),
+            "plan": _plan_tok,
+            # PROGNOZA: linie continua prin pretul real pana acum, apoi punctata
+            # din prezent - scenariul Elliott ramas sau drumul planului, cu
+            # durata si probabilitatea din istoric.
+            "forecast": ew_mod.forecast_path(
+                _ew_tok.get("primary"), [c[2] for c in candles], [c[3] for c in candles],
+                d_closes, plan=_plan_tok,
+                hist=_hist_tab.get(f"{r['direction']}:{int(r['risk_adjusted'] // 20) * 20}"),
+                plan_dir=r["direction"]),
             "sparkline": [round_price(c) for c in d_closes[-SPARKLINE_BARS:]],
             # LUMANARI pentru graficul bogat al fiecarui token cu semnal.
             # Pastrez CHART_BARS bare, rotunjite, doar OHLC + volum - suficient
@@ -1080,6 +1098,11 @@ def main():
             },
             "current": best_plan,
             "locked": locked,
+            "forecast": ew_mod.forecast_path(
+                (_ew_full or {}).get("primary"), [c[2] for c in best_ohlcv],
+                [c[3] for c in best_ohlcv], closes, plan=best_plan,
+                hist=_hist_tab.get(f"{best['direction']}:{int(best['risk_adjusted'] // 20) * 20}"),
+                plan_dir=best["direction"]),
             # ELLIOTT pentru grafic: punctele undelor cu indicii lor de bara,
             # ca sa poata fi desenate exact peste lumanarile corespunzatoare.
             # `idx` e pozitia in seria COMPLETA, iar graficul afiseaza doar
