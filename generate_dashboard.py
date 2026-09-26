@@ -856,6 +856,7 @@ def render_token_details(details, plans_store, watchlist=None):
                    "current": d.get("plan"),
                    "macd": (d.get("indicators") or {}).get("macd"),
                    "elliott": d.get("elliott"),
+                   "forecast": d.get("forecast"),
                    "liq_structure": d.get("liq_structure")}
             # FARA maximizare pe graficele per token: suprapunerea duplica
             # intregul SVG, iar la 30 de tokenuri asta inseamna ~2.4 MB de
