@@ -461,6 +461,11 @@ def stage_view(c, price):
     tg = c.get("targets") or {}
     pat = c["pattern"]
     pts = c.get("points") or []
+    # SCENARIU REALIZAT: toate tintele atinse. Pe POL real, armonica isi
+    # atinsese ambele tinte, dar stadiul spunea tot "inversare asteptata".
+    vals = [v for v in tg.values() if v is not None]
+    if vals and all(sign * (price - v) >= 0 for v in vals):
+        return d, 0.2, "scenariul s-a realizat - toate tintele atinse; potential ramas redus"
     last = pts[-1] if pts else {}
     if pat == "IMPULS IN DEZVOLTARE":
         if c.get("stage") == "W3":
@@ -484,6 +489,104 @@ def stage_view(c, price):
     if prz and not (prz["low"] <= price <= prz["high"]) and not last.get("confirmed"):
         return opp, 0.4, "D inca nu a ajuns in zona PRZ"
     return d, 0.7, "pretul e in zona PRZ - inversare asteptata"
+
+
+def forecast_path(count, highs, lows, closes, plan=None, hist=None, plan_dir=None):
+    """Prognoza afisata pe grafic: linie CONTINUA prin pretul real pana la
+    lumanarea curenta, apoi linie PUNCTATA din prezent spre viitor.
+
+    DE CE ASA
+    ---------
+    Proiectia anterioara pornea din ultimul punct al structurii, oricat de vechi,
+    si ignora lumanarile de dupa el. Masurat pe POL real: pornea din D (bara 62)
+    spre tinte aflate SUB pretul curent (bara 79), desi ambele fusesera deja
+    atinse. Acum:
+
+    1. LINIA CONTINUA (realitatea): de la ultimul punct al structurii, prin
+       pivotii formati de atunci, pana la inchiderea curenta. Urmeaza lumanarile.
+    2. LINIA PUNCTATA (prognoza) porneste din ACUM:
+       a) scenariul Elliott ramas - doar punctele pe care pretul real nu le-a
+          atins inca, si doar daca directia asteptata nu contrazice planul;
+       b) altfel, drumul planului evaluat de agent: pullback la intrare (daca e
+          cazul), apoi TP1 si TP2 - nivelurile pe care agentul le evalueaza.
+    3. DURATA vine din istoric: mediana, in bare, a planurilor castigatoare din
+       aceeasi directie si acelasi interval de scor. Probabilitatea afisata e
+       rata de castig masurata pe aceleasi planuri - nu o estimare aleasa.
+    """
+    n = len(closes)
+    if n < 5:
+        return None
+    now, px = n - 1, closes[-1]
+    solid, points, source = [], [], None
+    step = 12
+
+    if count and count.get("points") and not count.get("invalidated"):
+        pts = count["points"]
+        last = pts[-1]
+        durs = [b["idx"] - a["idx"] for a, b in zip(pts, pts[1:])]
+        step = max(4, int(sum(durs) / len(durs))) if durs else 12
+        if last["idx"] < now:
+            solid = [{"idx": last["idx"], "price": last["price"]}]
+            seg_h, seg_l = highs[last["idx"]:], lows[last["idx"]:]
+            for tp in find_pivots(seg_h, seg_l, left=2, right=2):
+                gi = last["idx"] + tp["idx"]
+                if last["idx"] < gi < now - 1:
+                    solid.append({"idx": gi, "price": tp["price"]})
+            solid.append({"idx": now, "price": px})
+
+    hstep = max(3, int(hist["median_bars_win"])) if (hist or {}).get("median_bars_win") else None
+
+    # a) scenariul Elliott ramas, fara punctele deja atinse de pretul real
+    remaining = []
+    if count and count.get("projection") and not count.get("invalidated"):
+        proj = count["projection"].get("path") or []
+        base = count["points"][-1]["price"]
+        since = count["points"][-1]["idx"]
+        hi_s, lo_s = max(highs[since:]), min(lows[since:])
+        prev, skipping = base, True
+        for pt in [q for q in proj if q.get("projected")]:
+            up = pt["price"] > prev
+            passed = (hi_s >= pt["price"]) if up else (lo_s <= pt["price"])
+            prev = pt["price"]
+            if skipping and passed:
+                continue
+            skipping = False
+            remaining.append(pt)
+    exp = (count or {}).get("expected")
+    if remaining and (plan_dir is None or exp == plan_dir or (count or {}).get("expected_weight") == 0):
+        source = "elliott"
+        k = now
+        for i, pt in enumerate(remaining):
+            k += (hstep or step) if i == 0 else step
+            points.append({"label": pt["label"], "price": pt["price"], "idx": k,
+                           "projected": True})
+    elif plan and plan_dir in ("LONG", "SHORT"):
+        # b) drumul planului evaluat de agent
+        source = "plan"
+        dsign = 1 if plan_dir == "LONG" else -1
+        total = hstep or (2 * step)
+        seq = []
+        if plan.get("entry") and dsign * (px - plan["entry"]) > 0.001 * abs(px):
+            seq.append(("(ENTRY)", plan["entry"], max(2, int(total * 0.15))))
+        for lbl, key, frac in (("(TP1)", "tp1", 0.5), ("(TP2)", "tp2", 1.0)):
+            v = plan.get(key)
+            if v and dsign * (v - px) > 0:
+                seq.append((lbl, v, max(3, int(total * frac))))
+        last_k = now
+        for lbl, v, k in seq:
+            k = max(last_k + 2, now + k)
+            points.append({"label": lbl, "price": v, "idx": k, "projected": True})
+            last_k = k
+
+    if not points:
+        return {"solid": solid, "path": [], "source": None, "hist": hist}
+    anchor = {"label": "ACUM", "price": px, "idx": now, "projected": False}
+    floor = 0.05 * abs(px)
+    for pt in points:
+        if not (pt["price"] == pt["price"]) or pt["price"] < floor:
+            pt["price"] = floor
+    return {"solid": solid, "path": [anchor] + points, "source": source,
+            "hist": hist, "confidence": (count or {}).get("confidence")}
 
 
 def analyze(highs, lows, closes, price=None):
@@ -598,6 +701,33 @@ def analyze(highs, lows, closes, price=None):
             continue
         seen.add(key)
         unique.append(c)
+
+    # CONFIRMAREA SE JUDECA FATA DE BARA CURENTA. Varianta anterioara compara
+    # fiecare punct cu ULTIMUL punct al structurii: pe POL real, C (bara 60) si
+    # D (bara 62) apareau amandoua "FORMING", desi D se incheiase de 17 bare si
+    # pretul urcase de atunci cu 20%. Acum:
+    #   - un punct intermediar e confirmat dupa 3 bare;
+    #   - ULTIMUL punct e confirmat doar daca pretul nu l-a depasit si s-a
+    #     indepartat de el cu cel putin 23.6% din ultima unda. Altfel unda se
+    #     inca formeaza (ex. un W3 aflat chiar la extremul curent).
+    now_idx = len(closes) - 1
+    for c in unique:
+        pts = c.get("points") or []
+        for j, pt in enumerate(pts):
+            ok = (now_idx - pt["idx"]) >= 3
+            if ok and j == len(pts) - 1 and j > 0:
+                leg = abs(pt["price"] - pts[j - 1]["price"]) or 1e-12
+                after = range(pt["idx"] + 1, now_idx + 1)
+                if pt["price"] > pts[j - 1]["price"]:       # varf
+                    exceeded = any(highs[i] > pt["price"] for i in after)
+                    away = (pt["price"] - closes[-1]) / leg
+                else:                                      # minim
+                    exceeded = any(lows[i] < pt["price"] for i in after)
+                    away = (closes[-1] - pt["price"]) / leg
+                ok = (not exceeded) and away >= 0.236
+            pt["confirmed"] = ok
+            pt["display"] = (pt["label"] if pt["label"] == "MAJOR START"
+                             else f'{pt["label"]} {"CONFIRMED" if ok else "FORMING"}')
 
     # Invalidarea se calculeaza INAINTE de rang: Primary / Alternative /
     # Secondary numesc scenariile inca VII, ca in capturile de referinta. O
