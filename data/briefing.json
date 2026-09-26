@@ -1,12 +1,12 @@
 {
-  "text": "Din 19 planuri inchise, rata de succes e 22.2%, cu -10.45R cumulat (-0.580R in medie pe plan) si profit factor 0.29. 18 planuri sunt inca deschise. Separat, 21445 planuri inchise (+1398.68R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #121046 LINK/USDT +2.78R, #121038 GRAM/USDT +0.00R, #121039 MANA/USDT +0.53R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (inca nu am destule exemple cu R masurat pentru a evalua utilitatea filtrului (25, necesare 300)).",
+  "text": "Din 20 planuri inchise, rata de succes e 22.2%, cu -10.45R cumulat (-0.580R in medie pe plan) si profit factor 0.29. 19 planuri sunt inca deschise. Separat, 21445 planuri inchise (+1398.68R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #121047 ALGO/USDT +0.00R, #121046 LINK/USDT +2.78R, #121038 GRAM/USDT +0.00R. Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (inca nu am destule exemple cu R masurat pentru a evalua utilitatea filtrului (25, necesare 300)).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-25 23:20 UTC",
+    "scan_time": "2026-09-26 00:28 UTC",
     "universe_size": 30,
-    "plans_total": 21482,
-    "plans_open": 18,
-    "plans_closed": 19,
+    "plans_total": 21484,
+    "plans_open": 19,
+    "plans_closed": 20,
     "legacy_closed": 21445,
     "legacy_total_r": 1398.68,
     "win_rate": 22.2,
@@ -14,6 +14,13 @@
     "avg_r": -0.58,
     "profit_factor": 0.29,
     "recent_closed": [
+      {
+        "id": 121047,
+        "symbol": "ALGO/USDT",
+        "direction": "LONG",
+        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
+        "r": 0.0
+      },
       {
         "id": 121046,
         "symbol": "LINK/USDT",
@@ -41,16 +48,21 @@
         "direction": "LONG",
         "state": "TP1 HIT - SL LA BREAKEVEN",
         "r": 0.475
-      },
-      {
-        "id": 121045,
-        "symbol": "TRX/USDT",
-        "direction": "LONG",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.139
       }
     ],
     "open_now": [
+      {
+        "id": 121089,
+        "symbol": "ALGO/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 121088,
+        "symbol": "POL/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
       {
         "id": 121087,
         "symbol": "THETA/USDT",
@@ -61,25 +73,13 @@
         "id": 121086,
         "symbol": "TRX/USDT",
         "direction": "SHORT",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
+        "state": "INTRARE ATINSA - pozitie activa"
       },
       {
         "id": 121085,
         "symbol": "LINK/USDT",
         "direction": "LONG",
         "state": "INTRARE ATINSA - pozitie activa"
-      },
-      {
-        "id": 121084,
-        "symbol": "AXS/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 121053,
-        "symbol": "FET/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
       }
     ],
     "best_bucket": null,
