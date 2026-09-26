@@ -292,10 +292,39 @@ def projection(count, price):
         # intre pivot si acum au trecut cateva bare, iar un punct proiectat nu
         # are voie sa cada in trecut, peste pretul real.
         base = max(out[-1]["idx"], now_idx) if len(out) == 1 else out[-1]["idx"]
+        # Un pret proiectat nu poate fi zero sau negativ. Pe miscari abrupte in
+        # jos, la preturi mici, extensiile aditive ajungeau sub zero - masurat
+        # de testul de proprietati. Plafonez la 5% din pretul de pornire.
+        floor = 0.05 * abs(last["price"])
+        if not (price == price) or price < floor:      # NaN sau sub prag
+            price = floor
         out.append({"label": f"({label})", "price": price,
                     "idx": base + step, "projected": True})
 
-    if count["pattern"].startswith("IMPULS"):
+    if count["pattern"] == "IMPULS IN DEZVOLTARE":
+        # W3 spre prima tinta neatinsa, W4 retrage 38.2% din W3, W5 = W1 din W4.
+        len1 = count.get("len1") or abs(pts[1]["price"] - pts[0]["price"])
+        w2p = pts[2]["price"]
+        if count.get("stage") == "W3":
+            ahead = sorted((v for v in tg.values() if v and (v - price) * sign > 0),
+                           key=lambda v: abs(v - price))
+            w3 = ahead[0] if ahead else last["price"]
+            if ahead:
+                add("W3", w3)
+        else:
+            w3 = pts[3]["price"]
+        len3 = abs(w3 - w2p)
+        w4 = w3 - sign * len3 * 0.382
+        if count.get("stage") == "W3" or sign * (last["price"] - w4) > 0:
+            add("W4", w4)
+        # W5: ghidul standard - egal cu W1 SAU 61.8% din distanta START->W3,
+        # care e mai mare. Doar "egal cu W1" dadea un W5 trunchiat (sub varful
+        # lui W3) cand W4 retragea exact cat W1 - caz rar in practica.
+        w5 = w4 + sign * max(len1, 0.618 * abs(w3 - pts[0]["price"]))
+        if sign * (w5 - w3) <= 0:
+            w5 = w3 + sign * 0.382 * len1
+        add("W5", w5)
+    elif count["pattern"].startswith("IMPULS"):
         # unda 5 spre prima tinta inca neatinsa in directia trendului
         ahead = sorted((v for v in tg.values() if v and (v - price) * sign > 0),
                        key=lambda v: abs(v - price))
@@ -333,11 +362,128 @@ def projection(count, price):
                 if tg.get(key):
                     add(lbl, tg[key])
 
+    # puncte consecutive la acelasi pret (ex. doua extensii plafonate) nu
+    # descriu o unda - le comprim ca sa nu apara segmente de lungime zero
+    comp = [out[0]]
+    for pt in out[1:]:
+        if abs(pt["price"] - comp[-1]["price"]) > 1e-12 * max(1.0, abs(comp[-1]["price"])):
+            comp.append(pt)
+    out = comp
     if len(out) < 2:
         return None
     return {"path": out, "step_bars": step,
             "invalidation": count.get("invalidation"),
             "confidence": count.get("confidence")}
+
+
+def _developing_motive(piv, highs, lows, closes):
+    """Impuls in DEZVOLTARE: START, W1, W2 confirmate si unda 3 in formare.
+
+    Motorul recunostea doar impulsuri complete (6 pivoti). Cand unda 3 se
+    extinde - faza cea mai puternica a unui trend - varfurile si minimele ei
+    interne erau luate drept unde 3-4-5 complete, iar pretul le depasea apoi.
+    Masurat pe FET real: "W5 FORMING" la 0.2160 cu pretul la 0.2435, desi dupa
+    acel "W5" pretul coborase SUB W4, ceea ce exclude un W5 real. Citirea
+    corecta e un W3 in extindere, exact "Primary Developing Motive W3 FORMING"
+    din capturile de referinta.
+
+    Reguli: W2 < 100% din W1; niciun minim dupa W2 sub W2 (altfel nu e W3 pornit
+    din acel W2); extremul curent a depasit W1 (W3 a iesit din zona W1). Daca
+    pretul a retras peste 23.6% din W3, W3 e probabil incheiat si W4 e in formare.
+    """
+    conf = [p for p in piv if not p.get("provisional")]
+    n = len(closes)
+    found = []
+    for k in range(len(conf) - 1, max(1, len(conf) - 8), -1):
+        s0, w1, w2 = conf[k - 2], conf[k - 1], conf[k]
+        up = w1["price"] > s0["price"]
+        want = ("L", "H", "L") if up else ("H", "L", "H")
+        if (s0["type"], w1["type"], w2["type"]) != want:
+            continue
+        a = w2["idx"] + 1
+        if a >= n:
+            continue
+        seg_h, seg_l = highs[a:n], lows[a:n]
+        if up:
+            ext = max(seg_h); ei = a + seg_h.index(ext)
+            if min(seg_l) <= w2["price"] or ext <= w1["price"]:
+                continue
+        else:
+            ext = min(seg_l); ei = a + seg_l.index(ext)
+            if max(seg_h) >= w2["price"] or ext >= w1["price"]:
+                continue
+        len1, len2, len3 = (abs(w1["price"] - s0["price"]), abs(w2["price"] - w1["price"]),
+                            abs(ext - w2["price"]))
+        if len1 <= 0 or len2 >= len1:
+            continue
+        sign = 1 if up else -1
+        retr = sign * (ext - closes[-1]) / (len3 or 1e-12)
+        prop = (_fib_score(len2 / len1, FIB_W2)
+                + _fib_score(len3 / len1, (1.618, 2.618, 4.236), tol=0.25)) / 2.0
+        conf_ = round(min(0.50 + 0.30 * prop, 0.85), 4)
+        pseudo = [s0, w1, w2, {"idx": ei, "price": ext}]
+        labels = ["MAJOR START", "W1", "W2", "W3"]
+        prices = [s0["price"], w1["price"], w2["price"], ext]
+        stage = "W3"
+        if retr > 0.236 and ei < n - 1:
+            stage = "W4"
+            tail = lows[ei + 1:n] if up else highs[ei + 1:n]
+            w4 = min(tail) if up else max(tail)
+            pseudo.append({"idx": ei + 1 + tail.index(w4), "price": w4})
+            labels.append("W4"); prices.append(w4)
+        found.append({
+            "pattern": "IMPULS IN DEZVOLTARE",
+            "direction": "LONG" if up else "SHORT",
+            "confidence": conf_, "stage": stage,
+            # in W3 invalidarea e sub startul lui W3 (W2); in W4, intrarea in
+            # teritoriul lui W1 (regula 3)
+            "invalidation": w2["price"] if stage == "W3" else w1["price"],
+            "points": _label_points(pseudo, labels, prices),
+            "targets": {"tp1": w2["price"] + sign * len1 * 1.618,
+                        "tp2": w2["price"] + sign * len1 * 2.618,
+                        "tp3": w2["price"] + sign * len1 * 4.236},
+            "len1": len1, "start_idx": s0["idx"], "end_idx": pseudo[-1]["idx"],
+        })
+        break    # cel mai recent W2 valid e citirea relevanta
+    return found
+
+
+def stage_view(c, price):
+    """Ce miscare URMEAZA, dupa stadiul structurii - nu directia ei statica.
+
+    Un impuls ascendent in unda 5 nu e un semnal de LONG: dupa W5 urmeaza
+    corectia, iar cumpararea in W5 e cea mai slaba intrare din Elliott. Asta
+    returneaza directia asteptata a urmatoarei miscari, ponderea (0 = neutru)
+    si o explicatie pentru dashboard.
+    """
+    d, opp = c["direction"], ("SHORT" if c["direction"] == "LONG" else "LONG")
+    sign = 1 if d == "LONG" else -1
+    tg = c.get("targets") or {}
+    pat = c["pattern"]
+    pts = c.get("points") or []
+    last = pts[-1] if pts else {}
+    if pat == "IMPULS IN DEZVOLTARE":
+        if c.get("stage") == "W3":
+            return d, 1.0, "unda 3 in formare - faza cea mai puternica a trendului"
+        return d, 0.4, "unda 4 corectiva - continuarea (W5) e asteptata dupa ea"
+    if pat.startswith("IMPULS"):
+        t1, t3 = tg.get("tp1"), tg.get("tp3")
+        if last.get("confirmed") or (t3 and sign * (price - t3) >= 0):
+            return opp, 0.7, "impulsul e complet sau dincolo de tinte - urmeaza corectia A-B-C"
+        if t1 and sign * (price - t1) < 0:
+            return d, 0.5, "unda 5 are inca spatiu pana la prima tinta"
+        return d, 0.0, "unda 5 in zona tintelor - potential ramas redus"
+    if pat.startswith("CORECTIE"):
+        if len(pts) >= 3:
+            a_len = abs(pts[1]["price"] - pts[0]["price"])
+            c_tgt = pts[2]["price"] - sign * a_len        # C = A, in sensul corectiei
+            if not last.get("confirmed") and sign * (price - c_tgt) > 0:
+                return opp, 0.5, "unda C inca in desfasurare, contra trendului"
+        return d, 0.8, "corectia e aproape incheiata - trendul e asteptat sa reia"
+    prz = c.get("prz") or {}
+    if prz and not (prz["low"] <= price <= prz["high"]) and not last.get("confirmed"):
+        return opp, 0.4, "D inca nu a ajuns in zona PRZ"
+    return d, 0.7, "pretul e in zona PRZ - inversare asteptata"
 
 
 def analyze(highs, lows, closes, price=None):
@@ -409,6 +555,30 @@ def analyze(highs, lows, closes, price=None):
                 res["confidence"] = round(res["confidence"] * (1 - 0.08 * back), 4)
                 counts.append(res)
 
+    counts.extend(_developing_motive(piv, highs, lows, closes))
+
+    # DEPASIRE DE PRET. O numaratoare al carei ultim punct a fost depasit clar
+    # de pret (peste 25% din ultima unda, in continuarea ei) nu mai descrie
+    # structura curenta: pe FET, "W5 FORMING" la 0.2160 cu pretul la 0.2435.
+    # Ramane in lista, dar cu incredere redusa, ca sa nu mai poata fi Primary
+    # cand exista o citire actuala.
+    for c in counts:
+        if c["pattern"] == "IMPULS IN DEZVOLTARE":
+            continue
+        pts = c.get("points") or []
+        if len(pts) < 2:
+            continue
+        lp, pp = pts[-1], pts[-2]
+        leg = abs(lp["price"] - pp["price"]) or 1e-12
+        after = range(lp["idx"] + 1, len(closes))
+        if lp["price"] > pp["price"]:
+            beyond = (max((highs[i] for i in after), default=lp["price"]) - lp["price"]) / leg
+        else:
+            beyond = (lp["price"] - min((lows[i] for i in after), default=lp["price"])) / leg
+        if beyond > 0.25:
+            c["confidence"] = round(c["confidence"] * 0.45, 4)
+            c["stale"] = True
+
     # STRUCTURI EXPIRATE. O numaratoare care s-a incheiat demult nu descrie
     # piata de acum: pretul s-a miscat de atunci, iar o proiectie pornita din
     # ea s-ar desena peste pretul real, in trecut. Cand actiunea recenta nu
@@ -466,6 +636,11 @@ def analyze(highs, lows, closes, price=None):
                              f"{c['confidence'] * 100:.0f}%")
         # invalidarea e deja calculata mai sus, inainte de rang
 
+    for c in unique:
+        c["expected"], c["expected_weight"], c["stage_text"] = stage_view(c, px)
+        sgn = 1 if c["direction"] == "LONG" else -1
+        c["targets_hit"] = {k: sgn * (px - v) >= 0 for k, v in (c.get("targets") or {}).items()
+                            if v is not None}
     alive = [c for c in unique if not c["invalidated"]]
     primary = alive[0] if alive else None
     # Proiectia doar pentru numaratoarea principala VALIDA - o proiectie pentru
@@ -490,9 +665,14 @@ def bias(result, direction):
     alive = [c for c in result["counts"] if not c.get("invalidated")]
     if not alive:
         return None
+    # Directia ASTEPTATA pe stadiu, nu directia statica a structurii: un impuls
+    # in W5 dincolo de tinte vota LONG pana acum, desi urmeaza corectia.
     total = sum(c["confidence"] for c in alive)
     if total <= 0:
         return None
-    agree = sum(c["confidence"] for c in alive if c["direction"] == direction)
-    return round((2.0 * agree / total) - 1.0, 4)
-
+    net = 0.0
+    for c in alive:
+        exp = c.get("expected", c["direction"])
+        w = c.get("expected_weight", 1.0)
+        net += c["confidence"] * w * (1 if exp == direction else -1)
+    return round(max(-1.0, min(1.0, net / total)), 4)
