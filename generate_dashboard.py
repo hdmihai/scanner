@@ -472,10 +472,19 @@ def render_elliott(ew):
     head = ""
     if pr:
         cls = "nb-ok" if pr["direction"] == "LONG" else "nb-bad"
-        head = ('<div class="ev-neighbors {}"><strong>{}</strong> &middot; {} '
-                '&middot; incredere {:.0f}% &middot; {} din {} inca valide</div>').format(
-                    cls, pr["pattern"], pr["direction"], pr["confidence"] * 100,
-                    ew.get("alive", 0), ew.get("total", 0))
+        # DIRECTIA ASTEPTATA pe stadiu, nu directia statica a structurii: un
+        # impuls in W5 dincolo de tinte anunta corectia, nu continuarea.
+        exp = pr.get("expected", pr["direction"])
+        w = pr.get("expected_weight", 1.0)
+        exp_txt = ("NEUTRU" if w == 0 else exp)
+        cls = "nb-neu" if w == 0 else ("nb-ok" if exp == "LONG" else "nb-bad")
+        head = ('<div class="ev-neighbors {}"><strong>{}</strong> &middot; '
+                'incredere {:.0f}% &middot; {} din {} inca valide</div>'
+                '<div class="ew-stage">Urmatoarea miscare asteptata: <strong>{}</strong>'
+                ' &middot; {}</div>').format(
+                    cls, pr.get("headline") or pr["pattern"], pr["confidence"] * 100,
+                    ew.get("alive", 0), ew.get("total", 0), exp_txt,
+                    pr.get("stage_text", ""))
     else:
         head = ('<div class="ev-neighbors nb-neu">Toate numaratorile au fost '
                 'invalidate de pret - nicio structura in joc.</div>')
@@ -493,8 +502,11 @@ def render_elliott(ew):
 
     tgt = ""
     if pr and pr.get("targets"):
-        parts = " &middot; ".join(f"{k.upper()} {fmt_price(v)}"
-                                  for k, v in pr["targets"].items())
+        hit = pr.get("targets_hit") or {}
+        parts = " &middot; ".join(
+            (f'<s>{k.upper()} {fmt_price(v)}</s> atins' if hit.get(k)
+             else f"{k.upper()} {fmt_price(v)}")
+            for k, v in pr["targets"].items())
         tgt = f'<div class="ew-targets">Tinte Elliott: {parts}</div>'
     if pr and pr.get("prz"):
         tgt += ('<div class="ew-targets">PRZ: {} - {}</div>'.format(
@@ -1318,6 +1330,8 @@ header{{display:flex;justify-content:space-between;align-items:baseline;
 .ew-line-2-t{{fill:var(--ew2);}} .ew-dead-line-t{{fill:var(--text-dim);opacity:.5;}}
 .ew-pt{{font-family:var(--font-mono);font-size:7.5px;font-weight:700;}}
 .ew-tag{{font-family:var(--font-mono);font-size:7px;}}
+.ew-stage{{font-size:12px;margin:6px 0 2px;padding:6px 10px;background:var(--panel-2);
+  border-radius:6px;}}
 .ew-list{{display:flex;flex-direction:column;gap:3px;margin-top:6px;}}
 .ew-row{{display:grid;grid-template-columns:70px 1fr 54px 40px 92px;gap:6px;
   align-items:center;font-size:10.5px;font-family:var(--font-mono);
@@ -1350,6 +1364,8 @@ header{{display:flex;justify-content:space-between;align-items:baseline;
 .ew-line-2-t{{fill:var(--ew2);}} .ew-dead-line-t{{fill:var(--text-dim);opacity:.5;}}
 .ew-pt{{font-family:var(--font-mono);font-size:7.5px;font-weight:700;}}
 .ew-tag{{font-family:var(--font-mono);font-size:7px;}}
+.ew-stage{{font-size:12px;margin:6px 0 2px;padding:6px 10px;background:var(--panel-2);
+  border-radius:6px;}}
 .ew-list{{display:flex;flex-direction:column;gap:3px;margin-top:6px;}}
 .ew-row{{display:grid;grid-template-columns:70px 1fr 54px 40px 92px;gap:6px;
   align-items:center;font-size:10.5px;font-family:var(--font-mono);
@@ -1689,4 +1705,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
