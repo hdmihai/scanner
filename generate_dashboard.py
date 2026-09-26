@@ -21,6 +21,8 @@ chiar si offline, o data descarcata.
 
 import json
 import os
+
+import chart_render
 from datetime import datetime, timezone
 
 DATA_DIR = "data"
@@ -450,238 +452,11 @@ def render_token_chart(sym, d, plans_by_symbol):
 
 
 def render_rich_chart(chart, fullscreen_id=None):
-    """Grafic cu lumanari, niveluri etichetate si panouri de volum / RSI / MACD.
-
-    Reproduce ce arata sistemul de referinta din capturile de ecran: nivelurile
-    planului INGHETAT (LOCKED) langa cele recalculate ACUM (CURRENT), plus
-    VWAP, POC, VAH, VAL si SuperTrend - toate ca linii orizontale etichetate,
-    nu ca numere intr-un card separat.
-
-    Toate valorile veneau deja calculate; singurul lucru care lipsea era
-    desenarea. SVG pur, fara librarie si fara CDN.
-    """
-    candles = (chart or {}).get("candles") or []
-    if len(candles) < 5:
-        return '<p class="dim">Graficul apare dupa prima scanare cu semnale.</p>'
-
-    W, H = 760, 300
-    VOL_H, IND_H, GAP = 54, 58, 10
-    PAD_R = 132                      # spatiu pentru etichetele de nivel
-    plot_w = W - PAD_R
-
-    highs = [c[2] for c in candles]
-    lows = [c[3] for c in candles]
-    vols = [c[5] or 0 for c in candles]
-    n = len(candles)
-
-    levels = []            # (pret, eticheta, clasa, stil linie)
-    ind = (chart.get("indicators") or {})
-    cur = chart.get("current") or {}
-    lock = chart.get("locked") or {}
-
-    for key, lbl in (("tp2", "TP2"), ("tp1", "TP1"), ("entry", "ENTRY"), ("sl", "SL")):
-        if cur.get(key) is not None:
-            levels.append((cur[key], f"CURRENT {lbl}",
-                           "lv-sl" if key == "sl" else ("lv-entry" if key == "entry" else "lv-tp"),
-                           "6 3"))
-        if lock.get(key) is not None:
-            levels.append((lock[key], f"PLAN #{lock.get('id','?')} {lbl} - LOCKED",
-                           "lv-sl" if key == "sl" else ("lv-entry" if key == "entry" else "lv-tp"),
-                           None))
-    for key, lbl, cls in (("vwap", "VWAP", "lv-vwap"), ("poc", "POC", "lv-poc"),
-                          ("vah", "VAH", "lv-va"), ("val", "VAL", "lv-va")):
-        if ind.get(key):
-            levels.append((ind[key], lbl, cls, "2 3"))
-    # NIVELURI ELLIOTT: tintele numaratorii principale si invalidarile fiecarei
-    # ipoteze, ca in capturile de referinta (ELLIOTT TP1/TP2/TP3 si
-    # PRIMARY / ALTERNATIVE / SECONDARY E INV).
-    ew = chart.get("elliott") or {}
-    ew_primary = ew.get("primary")
-    if ew_primary:
-        for _k, _lbl in (("tp3", "ELLIOTT TP3"), ("tp2", "ELLIOTT TP2"),
-                         ("tp1", "ELLIOTT TP1")):
-            _v = (ew_primary.get("targets") or {}).get(_k)
-            if _v:
-                levels.append((_v, _lbl, "lv-ew", "1 4"))
-    for _c in (ew.get("counts") or []):
-        if _c.get("invalidation"):
-            levels.append((_c["invalidation"],
-                           str(_c.get("rank", "?")).upper() + " E INV", "lv-sl", "1 4"))
-
-    # LICHIDITATE STRUCTURALA, ca in capturi: STRUCT BUY-SIDE LIQ - 4h -
-    # EQUAL HIGHS - TARGET si asa mai departe. Nivelurile deja maturate apar
-    # ca ENTRY, cele neatinse ca TARGET.
-    for _l in ((chart.get("liq_structure") or {}).get("levels") or [])[:6]:
-        levels.append((_l["price"], _l["label"],
-                       "lv-liqb" if _l["side"] == "BUY" else "lv-liqs", "5 2"))
-
-    st = ind.get("supertrend") or {}
-    if st.get("level"):
-        levels.append((st["level"], f"SuperTrend {st.get('direction','')}",
-                       "lv-tp" if st.get("direction") == "BULLISH" else "lv-sl", "2 3"))
-
-    liq = chart.get("liquidation") or {}
-    liq_clusters = [c for c in (liq.get("clusters") or [])
-                    if c.get("price") and c.get("intensity")]
-
-    lo = min(lows + [l[0] for l in levels])
-    hi = max(highs + [l[0] for l in levels])
-    rng = (hi - lo) or (hi or 1)
-    lo -= rng * 0.04
-    hi += rng * 0.04
-    rng = hi - lo
-
-    def y(v):
-        return H - ((v - lo) / rng) * H
-
-    def x(i):
-        return (i / max(n - 1, 1)) * plot_w
-
-    cw = max(1.5, plot_w / n * 0.62)
-    body = []
-    # Lumanarile se deseneaza ca DOUA trasee (unul urcator, unul coborator),
-    # nu ca doua elemente per lumanare. La 90 de bare asta inseamna 4 elemente
-    # in loc de 360, si taie dimensiunea paginii de cateva ori - conteaza,
-    # fiindca pagina are un grafic pentru fiecare token cu semnal.
-    _wick = {"up": [], "dn": []}
-    _bodyp = {"up": [], "dn": []}
-
-    # BENZI DE LICHIDARE, desenate INAINTE de lumanari ca sa ramana in fundal.
-    # Echivalentul vizual al heatmap-ului: cu cat banda e mai intensa, cu atat
-    # densitatea estimata de pozitii lichidabile la acel pret e mai mare.
-    for c in liq_clusters:
-        cy = y(c["price"])
-        if not (0 <= cy <= H):
-            continue
-        op = 0.06 + 0.30 * c["intensity"]
-        cls = "liq-short" if c["side"] == "SHORT" else "liq-long"
-        body.append(f'<rect class="{cls}" x="0" y="{cy - 2.5:.1f}" '
-                    f'width="{plot_w:.1f}" height="5" opacity="{op:.3f}"/>')
-    for i, c in enumerate(candles):
-        o, h, l, cl = c[1], c[2], c[3], c[4]
-        k = "up" if cl >= o else "dn"
-        cx = x(i)
-        _wick[k].append(f"M{cx:.0f} {y(h):.0f}V{y(l):.0f}")
-        top, bot = y(max(o, cl)), y(min(o, cl))
-        _bodyp[k].append(f"M{cx - cw/2:.0f} {top:.0f}h{cw:.0f}"
-                         f"v{max(bot - top, 1):.0f}h{-cw:.0f}z")
-    for k, cls in (("up", "cnd-up"), ("dn", "cnd-dn")):
-        if _wick[k]:
-            body.append(f'<path class="{cls}" d="{"".join(_wick[k])}" '
-                        f'fill="none" stroke-width="1"/>')
-        if _bodyp[k]:
-            body.append(f'<path class="{cls}-f" d="{"".join(_bodyp[k])}"/>')
-
-    for key, cls in (("ema9", "ema9"), ("ema20", "ema20"),
-                     ("ema50", "ema50"), ("ema200", "ema200")):
-        series = chart.get(key) or []
-        pts = " ".join(f"{x(i):.0f},{y(v):.0f}"
-                       for i, v in enumerate(series) if v is not None)
-        if pts:
-            body.append(f'<polyline class="{cls}" points="{pts}" fill="none"/>')
-
-    # PUNCTELE UNDELOR ELLIOTT, desenate peste lumanari.
-    # Fiecare numaratoare primeste propria linie frânta care uneste punctele,
-    # plus etichete la fiecare varf - forma din capturi: MAJOR START, W1, W2,
-    # W3, W4, W5 pentru impuls; A, B, C pentru corectie.
-    # Numaratorile INVALIDATE de pret se deseneaza estompat si punctat: le arat
-    # pentru ca au fost in joc, dar nu trebuie sa para active.
-    ew_off = ew.get("offset", 0)
-    for ci, count in enumerate(ew.get("counts") or []):
-        pts = [pt for pt in (count.get("points") or [])
-               if pt.get("idx") is not None and 0 <= pt["idx"] - ew_off < n]
-        if len(pts) < 2:
-            continue
-        dead = count.get("invalidated")
-        cls = "ew-dead-line" if dead else f"ew-line-{ci % 3}"
-        coords = [(x(pt["idx"] - ew_off), y(pt["price"])) for pt in pts]
-        poly = " ".join(f"{cx:.1f},{cy:.1f}" for cx, cy in coords)
-        body.append(f'<polyline class="{cls}" points="{poly}" fill="none"/>')
-        for (cx, cy), pt in zip(coords, pts):
-            body.append(f'<circle class="{cls}-dot" cx="{cx:.1f}" cy="{cy:.1f}" r="3"/>')
-            above = pt["label"] in ("W1", "W3", "W5", "B")
-            body.append(f'<text class="ew-pt {cls}-t" x="{cx:.1f}" '
-                        f'y="{cy + (-7 if above else 13):.1f}" '
-                        f'text-anchor="middle">{pt.get("display", pt["label"])}</text>')
-        # eticheta numaratorii, la ultimul punct
-        lx, ly = coords[-1]
-        body.append(f'<text class="ew-tag {cls}-t" x="{lx + 6:.1f}" y="{ly:.1f}">'
-                    f'{count.get("headline") or count.get("rank","")}</text>')
-
-    # etichetele se impraștie vertical ca sa nu se suprapuna
-    levels.sort(key=lambda t: t[0], reverse=True)
-    last_y = -99
-    for price, label, cls, dash in levels:
-        ly = y(price)
-        ty = max(ly, last_y + 12)
-        last_y = ty
-        d = f' stroke-dasharray="{dash}"' if dash else ""
-        body.append(f'<line class="{cls}" x1="0" y1="{ly:.1f}" x2="{plot_w:.1f}" '
-                    f'y2="{ly:.1f}"{d}/>')
-        body.append(f'<text class="lv-t {cls}-t" x="{plot_w + 4}" y="{ty + 3:.1f}">'
-                    f'{label} {fmt_price(price)}</text>')
-
-    vmax = max(vols) or 1
-    vy0 = H + GAP
-    vol = "".join(
-        f'<rect class="{"cnd-up-f" if candles[i][4] >= candles[i][1] else "cnd-dn-f"}" '
-        f'x="{x(i) - cw/2:.1f}" y="{vy0 + VOL_H - (v/vmax)*VOL_H:.1f}" '
-        f'width="{cw:.1f}" height="{(v/vmax)*VOL_H:.1f}"/>'
-        for i, v in enumerate(vols))
-    vol += f'<text class="pnl-t" x="2" y="{vy0 + 10}">VOLUM</text>'
-
-    ry0 = vy0 + VOL_H + GAP
-    rs = chart.get("rsi") or []
-    rpts = " ".join(f"{x(i):.1f},{ry0 + IND_H - (min(max(v,0),100)/100)*IND_H:.1f}"
-                    for i, v in enumerate(rs) if v is not None)
-    rsi_svg = ""
-    if rpts:
-        for lvl in (30, 70):
-            ly = ry0 + IND_H - (lvl / 100) * IND_H
-            rsi_svg += (f'<line class="gridline" x1="0" y1="{ly:.1f}" '
-                        f'x2="{plot_w:.1f}" y2="{ly:.1f}" stroke-dasharray="2 3"/>')
-        last = next((v for v in reversed(rs) if v is not None), None)
-        rsi_svg += f'<polyline class="rsi-l" points="{rpts}" fill="none"/>'
-        rsi_svg += (f'<text class="pnl-t" x="2" y="{ry0 + 10}">RSI 14'
-                    f'{f" &middot; {last:.0f}" if last is not None else ""}</text>')
-
-    macd = chart.get("macd") or {}
-    my0 = ry0 + IND_H + GAP
-    macd_svg = ""
-    if macd.get("histogram") is not None:
-        h_ = macd["histogram"]
-        mid = my0 + IND_H / 2
-        bar_h = min(abs(h_) / (abs(h_) or 1) * (IND_H / 2 - 4), IND_H / 2 - 4)
-        cls = "cnd-up-f" if h_ > 0 else "cnd-dn-f"
-        macd_svg = (f'<line class="gridline" x1="0" y1="{mid:.1f}" x2="{plot_w:.1f}" '
-                    f'y2="{mid:.1f}"/>'
-                    f'<rect class="{cls}" x="{plot_w - 40}" '
-                    f'y="{mid - bar_h if h_ > 0 else mid:.1f}" width="34" '
-                    f'height="{bar_h:.1f}"/>'
-                    f'<text class="pnl-t" x="2" y="{my0 + 10}">MACD hist '
-                    f'{h_:+.6f}</text>')
-        my0 += IND_H
-
-    total_h = my0 + (IND_H if not macd_svg else 0) + 6
-    tf = chart.get("timeframe", "")
-    svg = (f'<svg viewBox="0 0 {W} {total_h:.0f}" class="rich-chart" '
-           f'preserveAspectRatio="xMidYMid meet">'
-           f'{"".join(body)}{vol}{rsi_svg}{macd_svg}</svg>')
-    head = (f'<div class="chart-head"><strong>{chart.get("symbol","")}</strong> '
-            f'&middot; {chart.get("direction","")} &middot; {tf} '
-            f'&middot; <span class="dim">{n} lumanari</span>')
-    if fullscreen_id:
-        # Maximizare fara JavaScript: ancora #id + selectorul :target din CSS.
-        # Merge in orice browser si pe telefon, si nu depinde de niciun script.
-        head += (f'<a class="fs-btn" href="#{fullscreen_id}">Maximizeaza</a>')
-    head += '</div>'
-    out = head + svg
-    if fullscreen_id:
-        out += (f'<div id="{fullscreen_id}" class="fs-overlay">'
-                f'<a class="fs-close" href="#">Inchide</a>'
-                f'<div class="fs-inner">{svg}</div></div>')
-    return out
-
+    """Graficul curat, cu straturile principale. Randarea propriu-zisa e in
+    chart_render.py; functia ramane aici pentru compatibilitate cu apelurile
+    existente (graficele per token)."""
+    return chart_render.render_chart(chart, chart_render.MAIN_LAYERS, 300,
+                                     fullscreen_id=fullscreen_id)
 
 def render_elliott(ew):
     """Ipotezele Elliott concurente, in forma din capturi: Primary /
@@ -1376,7 +1151,7 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
     watchlist = sorted({s_.split("/")[0] for s_ in (_pscan.get("resolved") or [])}
                        | set(_pscan.get("missing") or []))
     tokens_html = render_token_details(details, plans_store, watchlist)
-    chart_svg = render_rich_chart(chart, fullscreen_id="chart-max")
+    chart_svg = chart_render.render_components(chart, "main")
     weight_bars = render_weight_bars(weights)
     long_rows = render_opportunity_rows(scan.get("top_long", []))
     short_rows = render_opportunity_rows(scan.get("top_short", []))
@@ -1394,17 +1169,17 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
+{chart_render.CSS}
 :root{{
-  --bg:#0B0F14; --panel:#131920; --panel-2:#1A222B; --border:#232C36;
-  --text:#E7E4DD; --text-dim:#8A93A0;
-  --bull:#34D399; --bear:#FB7A6C; --amber:#E6B450;
-  --ema20:#6FB7FF;
-      --ema9: #7ec8e3;
-      --ew0: #a855f7;
-      --ew1: #38bdf8;
-      --ew2: #fb923c;
-      --ema200: #9b8ec4;
-      --info: #4ea3d1; --ema50:#C792EA;
+  /* FUNDAL ALB, ca in capturile de referinta. Culorile de semnal urmeaza
+     conventia TradingView (verde #089981, rosu #F23645), iar tonurile de
+     "amber" sunt inchise, ca textul sa ramana lizibil pe alb. */
+  --bg:#F5F7FA; --panel:#FFFFFF; --panel-2:#F1F4F8; --border:#E3E8EF;
+  --text:#0F172A; --text-dim:#64748B;
+  --bull:#089981; --bear:#F23645; --amber:#B45309;
+  --ema9:#26A69A; --ema20:#F57C00; --ema50:#E53935; --ema200:#1565C0;
+  --ew0:#7E57C2; --ew1:#1E88E5; --ew2:#FB8C00;
+  --info:#0288D1;
   --font-sans:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
   --font-mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
 }}
@@ -1523,6 +1298,11 @@ header{{display:flex;justify-content:space-between;align-items:baseline;
   padding:7px 14px;border-radius:6px;background:var(--panel-2);
   color:var(--amber);text-decoration:none;border:1px solid var(--border);
   margin-bottom:8px;}}
+.proj-line{{stroke:var(--ew0);stroke-width:1.5;stroke-dasharray:5 4;opacity:.85;}}
+.proj-dot{{fill:var(--panel);stroke:var(--ew0);stroke-width:1.3;}}
+.proj-t{{font-family:var(--font-mono);font-size:7.5px;font-weight:700;fill:var(--ew0);}}
+.proj-tag{{font-family:var(--font-mono);font-size:7px;fill:var(--ew0);opacity:.9;}}
+.proj-now{{stroke:var(--text-dim);stroke-width:.8;stroke-dasharray:2 3;opacity:.6;}}
 .lv-liqb{{stroke:var(--amber);stroke-width:1.1;}}
 .lv-liqs{{stroke:var(--amber);stroke-width:1.1;opacity:.8;}}
 .lv-liqb-t,.lv-liqs-t{{fill:var(--amber);font-size:6.5px;}}
@@ -1550,7 +1330,12 @@ header{{display:flex;justify-content:space-between;align-items:baseline;
 @media(max-width:560px){{.ew-row{{grid-template-columns:62px 1fr 46px 36px;}}
   .ew-row span:last-child{{display:none;}}}}
 .ms-grid{{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0;}}
-@media(max-width:560px){{.lv-liqb{{stroke:var(--amber);stroke-width:1.1;}}
+@media(max-width:560px){{.proj-line{{stroke:var(--ew0);stroke-width:1.5;stroke-dasharray:5 4;opacity:.85;}}
+.proj-dot{{fill:var(--panel);stroke:var(--ew0);stroke-width:1.3;}}
+.proj-t{{font-family:var(--font-mono);font-size:7.5px;font-weight:700;fill:var(--ew0);}}
+.proj-tag{{font-family:var(--font-mono);font-size:7px;fill:var(--ew0);opacity:.9;}}
+.proj-now{{stroke:var(--text-dim);stroke-width:.8;stroke-dasharray:2 3;opacity:.6;}}
+.lv-liqb{{stroke:var(--amber);stroke-width:1.1;}}
 .lv-liqs{{stroke:var(--amber);stroke-width:1.1;opacity:.8;}}
 .lv-liqb-t,.lv-liqs-t{{fill:var(--amber);font-size:6.5px;}}
 .lv-ew{{stroke:var(--ew0);stroke-width:1;}}
@@ -1759,17 +1544,17 @@ footer{{margin-top:26px;color:var(--text-dim);font-size:11px;line-height:1.6;}}
   <div class="grid">
     <div>
       <div class="card">
-        <h2>Chart &middot; niveluri LOCKED si CURRENT, indicatori, volum, RSI, MACD</h2>
+        <h2>Grafic &middot; {(best or {}).get("symbol", "-")}</h2>
         {chart_svg}
         <div class="legend">
-          <span><i class="dot" style="background:var(--ema9)"></i>EMA 9</span>
-          <span><i class="dot" style="background:var(--ema20)"></i>EMA 20</span>
-          <span><i class="dot" style="background:var(--ema50)"></i>EMA 50</span>
-          <span><i class="dot" style="background:var(--ema200)"></i>EMA 200</span>
-          <span><i class="dot" style="background:var(--bull)"></i>TP</span>
-          <span><i class="dot" style="background:var(--bear)"></i>SL</span>
-          <span><i class="dot" style="background:var(--info)"></i>entry</span>
-          <span><i class="dot" style="background:var(--amber)"></i>VWAP/POC/VA</span>
+          <span><i class="dot" style="background:#26A69A"></i>EMA 9</span>
+          <span><i class="dot" style="background:#F57C00"></i>EMA 20</span>
+          <span><i class="dot" style="background:#E53935"></i>EMA 50</span>
+          <span><i class="dot" style="background:#1565C0"></i>EMA 200</span>
+          <span><i class="dot" style="background:#7E57C2"></i>Elliott</span>
+          <span><i class="dot" style="background:#089981"></i>TP</span>
+          <span><i class="dot" style="background:#F23645"></i>SL / E INV</span>
+          <span><i class="dot" style="background:#0288D1"></i>entry</span>
         </div>
       </div>
 
