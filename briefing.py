@@ -65,11 +65,22 @@ def gather_facts():
     # Fara asta apare o inconsistenta - `plans_closed` ar include planuri vechi
     # in timp ce `avg_r` (din summary) le exclude, si briefing-ul ar raporta
     # cifre care nu se potrivesc intre ele.
-    all_closed = [p for p in plans if p.get("realized_r") is not None]
-    closed = [p for p in all_closed if p.get("geometry", "v1") == current_geo]
+    # FARA planurile NO_ENTRY (pretul nu a revenit la intrare, R = 0): rata de
+    # castig si R-ul mediu din summary le exclud, deci si numaratoarea trebuie.
+    # Altfel briefing-ul spunea "din 21.488 planuri, +0.087R in medie" desi
+    # 1409R / 21488 = 0.066 - numitori diferiti in aceeasi propozitie.
+    all_closed = [p for p in plans if p.get("realized_r") is not None
+                  and p.get("state") != "NO_ENTRY"]
+    # FAMILIA de geometrie (versiune + timeframe), ca in plan_tracker.summarize.
+    # Comparatia exacta a semnaturii raporta pe dashboard ca "geometrie
+    # anterioara, nu intra in calibrare" 21.458 de planuri care INTRA in
+    # calibrare - cardul de calibrare de pe aceeasi pagina le folosea.
+    fam = "-".join(str(current_geo).split("-")[:2])
+    same = lambda g: "-".join(str(g or "v1").split("-")[:2]) == fam
+    closed = [p for p in all_closed if same(p.get("geometry", "v1"))]
     open_plans = [p for p in plans if p.get("realized_r") is None
                   and not p.get("migrated")]
-    legacy_closed = [p for p in all_closed if p.get("geometry", "v1") != current_geo]
+    legacy_closed = [p for p in all_closed if not same(p.get("geometry", "v1"))]
 
     # ce s-a inchis recent (ultimele 5, dupa momentul inchiderii)
     recent_closed = sorted(closed, key=lambda p: p.get("closed_ts") or 0, reverse=True)[:5]
