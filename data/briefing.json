@@ -1,33 +1,19 @@
 {
-  "text": "Din 34 planuri inchise, rata de succes e 33.3%, cu +1412.10R cumulat (+0.087R in medie pe plan) si profit factor 1.12. 24 planuri sunt inca deschise. Separat, 21458 planuri inchise (+1419.99R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #121091 AVAX/USDT +0.00R, #121088 POL/USDT +0.00R, #142557 DASH/USDT -1.02R. Pe intervalele de scor cu destule date, cel mai bine merge 0-19 (29.0%, +0.42R mediu, n=145), iar cel mai slab 40-59 (29.4%, +0.07R, n=7382). Deciziile de a deschide sau refuza planuri se bazeaza pe aceste cifre masurate, nu pe scorul brut. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 69.7% fata de 33.3% baseline, pe 16289 planuri invatate.",
+  "text": "Din 16289 planuri inchise, rata de succes e 33.3%, cu +1412.10R cumulat (+0.087R in medie pe plan) si profit factor 1.12. 24 planuri sunt inca deschise. Ultimele inchise: #142557 DASH/USDT -1.02R, #121035 SOL/USDT +3.67R, #121089 ALGO/USDT +0.47R. Pe intervalele de scor cu destule date, cel mai bine merge 0-19 (29.0%, +0.42R mediu, n=145), iar cel mai slab 40-59 (29.4%, +0.07R, n=7382). Deciziile de a deschide sau refuza planuri se bazeaza pe aceste cifre masurate, nu pe scorul brut. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 69.7% fata de 33.3% baseline, pe 16289 planuri invatate.",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-27 21:21 UTC",
+    "scan_time": "2026-09-27 23:20 UTC",
     "universe_size": 30,
     "plans_total": 21516,
     "plans_open": 24,
-    "plans_closed": 34,
-    "legacy_closed": 21458,
-    "legacy_total_r": 1419.99,
+    "plans_closed": 16289,
+    "legacy_closed": 0,
+    "legacy_total_r": null,
     "win_rate": 33.3,
     "total_r": 1412.1,
     "avg_r": 0.087,
     "profit_factor": 1.12,
     "recent_closed": [
-      {
-        "id": 121091,
-        "symbol": "AVAX/USDT",
-        "direction": "LONG",
-        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
-        "r": 0.0
-      },
-      {
-        "id": 121088,
-        "symbol": "POL/USDT",
-        "direction": "LONG",
-        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
-        "r": 0.0
-      },
       {
         "id": 142557,
         "symbol": "DASH/USDT",
@@ -48,6 +34,20 @@
         "direction": "LONG",
         "state": "TP1 HIT - SL LA BREAKEVEN",
         "r": 0.467
+      },
+      {
+        "id": 121085,
+        "symbol": "LINK/USDT",
+        "direction": "LONG",
+        "state": "TP1 HIT - SL LA BREAKEVEN",
+        "r": 0.465
+      },
+      {
+        "id": 121097,
+        "symbol": "DOT/USDT",
+        "direction": "LONG",
+        "state": "SL HIT - INVALIDATED",
+        "r": -1.031
       }
     ],
     "open_now": [
