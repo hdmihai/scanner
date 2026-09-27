@@ -204,6 +204,13 @@ def check_compaction_step():
         content = read(os.path.join(".github", "workflows", name)) or ""
         if "git commit" not in content:
             continue
+        # Compactarea e necesara doar daca workflow-ul SALVEAZA planurile - adica
+        # adauga tot data/ sau plans.json. Un workflow care salveaza doar
+        # token_metadata.json si docs/ (metadata.yml) nu atinge plans.json.
+        import re as _re
+        adds = " ".join(_re.findall(r"git add ([^\n]+)", content))
+        if not (_re.search(r"(^|\s)data/?(\s|$)", adds) or "plans.json" in adds):
+            continue
         if "compact_plans.py" not in content:
             problems.append(
                 f"{name} face commit dar nu ruleaza compact_plans.py inainte. "
@@ -357,6 +364,29 @@ def check_feature_extension():
             f"greutati invatate pe rezultate care nu mai sunt comparabile.")
 
 
+def check_signal_block_uses_own_series():
+    """Evidentele fiecarui semnal trebuie calculate DOAR din seria acelui semnal.
+
+    DE CE: in bucla per semnal, `candles` e al semnalului, dar modulele adaugate
+    ulterior primeau `closes` din exterior - inchiderile candidatului principal.
+    Ichimoku, regimul, Elliott si lichiditatea combinau astfel maximele unui
+    token cu inchiderile altuia (NEAR aparea "SUB NOR" desi era peste), iar
+    agentul invata din caracteristici corupte. Compila si rula fara nicio eroare.
+    """
+    import re as _re
+    src = read("crypto_ai_scanner.py") or ""
+    a = src.find('candles = ohlcv_cache.get(sig["symbol"])')
+    b = src.find("sig_evidence = ev_mod.build_evidence(", a)
+    if a < 0 or b < 0:
+        return
+    b = src.find("liqs=sig_liqs", b)
+    stray = _re.findall(r"(?<![\w.])closes(?![\w])", src[a:b])
+    if stray:
+        problems.append(
+            f"blocul de evidente per semnal foloseste `closes` ({len(stray)}x) in loc "
+            f"de `closes_s`: indicatorii s-ar calcula cu inchiderile altui token.")
+
+
 def check_family_preservation():
     """Un proces care nu stie ce capabilitati a detectat alt proces nu are voie
     sa-i stearga datele.
@@ -465,6 +495,7 @@ def main():
     check_archival_behavior()
     check_family_preservation()
     check_feature_extension()
+    check_signal_block_uses_own_series()
     check_no_direct_plan_writes()
     check_compaction_step()
     check_timeframe_consistency()
