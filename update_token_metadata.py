@@ -35,6 +35,7 @@ import json
 import os
 import sys
 import time
+import urllib.error
 import urllib.request
 
 DATA_DIR = "data"
@@ -76,10 +77,21 @@ def save_json(path, data):
         json.dump(data, f, indent=2)
 
 
-def http_get_json(url, headers=None):
-    req = urllib.request.Request(url, headers=headers or {})
-    with urllib.request.urlopen(req, timeout=20) as resp:
-        return json.loads(resp.read().decode())
+def http_get_json(url, headers=None, retries=2):
+    """GET JSON, cu reincercare la 429 (limita de rata CoinGecko). Fara ea, un
+    singur 429 facea tokenul sa dispara din metadata pana la urmatoarea rulare."""
+    for attempt in range(retries + 1):
+        req = urllib.request.Request(url, headers=headers or {})
+        try:
+            with urllib.request.urlopen(req, timeout=30) as r:
+                return json.loads(r.read().decode("utf-8"))
+        except urllib.error.HTTPError as e:
+            if e.code == 429 and attempt < retries:
+                wait = 20 * (attempt + 1)
+                print(f"    limita de rata CoinGecko - astept {wait}s si reincerc")
+                time.sleep(wait)
+                continue
+            raise
 
 
 def coingecko_headers():
@@ -95,9 +107,47 @@ def current_universe():
     return sorted({r["symbol"] for r in history[-1].get("results", [])})
 
 
-def find_coingecko_id(symbol_base, coins_list):
-    matches = [c for c in coins_list if c["symbol"].lower() == symbol_base.lower()]
-    return matches[0]["id"] if matches else None
+def resolve_ids(bases, delay):
+    """Simbol -> ID CoinGecko, alegand proiectul cu CEA MAI MARE capitalizare.
+
+    DEFECT REPARAT: varianta anterioara lua PRIMA potrivire din /coins/list,
+    ordonata alfabetic dupa ID. Pentru tickere comune asta alegea proiectul
+    gresit - masurat: ADA -> "ada-the-dog" (o memecoin de pe Solana, rang 6128)
+    in loc de Cardano, iar "proiectele similare" se calculau din categoriile ei
+    ("Meme", "Dog-Themed").
+
+    1) topul dupa capitalizare (/coins/markets, primele 500): prima aparitie a
+       unui simbol e proiectul cu capitalizarea cea mai mare;
+    2) pentru ce lipseste, /search: potrivire exacta de simbol cu rangul minim.
+    """
+    want = {b.lower() for b in bases}
+    found = {}
+    for page in (1, 2):
+        try:
+            rows = http_get_json(f"{COINGECKO_BASE}/coins/markets?vs_currency=usd"
+                                 f"&order=market_cap_desc&per_page=250&page={page}",
+                                 coingecko_headers())
+        except Exception as e:
+            print(f"[!] /coins/markets pagina {page}: {e}")
+            break
+        for c in rows or []:
+            sym = (c.get("symbol") or "").lower()
+            if sym in want and sym not in found:
+                found[sym] = (c["id"], "market_cap")
+        time.sleep(delay)
+    for b in sorted(want - set(found)):
+        try:
+            res = http_get_json(f"{COINGECKO_BASE}/search?query={b}", coingecko_headers())
+        except Exception as e:
+            print(f"[!] /search {b}: {e}")
+            continue
+        cands = [c for c in (res.get("coins") or [])
+                 if (c.get("symbol") or "").lower() == b and c.get("market_cap_rank")]
+        if cands:
+            best = min(cands, key=lambda c: c["market_cap_rank"])
+            found[b] = (best["id"], "search")
+        time.sleep(delay)
+    return found
 
 
 def fetch_token_info(coingecko_id):
@@ -162,15 +212,25 @@ def main():
     meta = load_json(METADATA_FILE, {})
     force = "--force" in sys.argv
 
-    if not force and time.time() - meta.get("_updated_ts", 0) < REFRESH_DAYS * 86400:
-        print("Metadata e proaspata (< 7 zile) - sar peste actualizare. "
-              "Foloseste --force pentru actualizare imediata.")
-        return
-
     universe = current_universe()
     if not universe:
         print("Nu exista inca nicio scanare - ruleaza intai crypto_ai_scanner.py.")
         return
+
+    # CAND ACTUALIZEZ. Doar vechimea (7 zile) nu ajungea: tokenii adaugati in
+    # watchlist dupa ultima actualizare lipseau o saptamana intreaga - masurat,
+    # 10 din 30, inclusiv candidatul principal. Actualizez si cand lipsesc
+    # tokeni, sau cand exista intrari rezolvate cu metoda veche (gresita).
+    old_tokens = meta.get("tokens") or {}
+    missing = [t for t in universe if t not in old_tokens]
+    legacy = [t for t, v in old_tokens.items() if not v.get("resolved_by")]
+    stale = time.time() - meta.get("_updated_ts", 0) >= REFRESH_DAYS * 86400
+    if not (force or stale or missing or legacy):
+        print("Metadata e completa si proaspata - nimic de actualizat. "
+              "Foloseste --force pentru actualizare imediata.")
+        return
+    print(f"Actualizez: fortat={force}, vechi={stale}, lipsa={len(missing)}, "
+          f"rezolvari vechi={len(legacy)}")
 
     seed_path = find_labs_seed()
     if seed_path is None:
@@ -186,28 +246,49 @@ def main():
     print(f"Actualizez metadata pentru {len(universe)} simboluri "
           f"(delay {delay}s intre apeluri, {'cu' if COINGECKO_API_KEY else 'fara'} cheie Demo)...")
 
-    try:
-        coins_list = http_get_json(f"{COINGECKO_BASE}/coins/list", coingecko_headers())
-    except Exception as e:
-        # NU las asta sa omoare workflow-ul: daca pasul iese cu cod != 0,
-        # GitHub Actions opreste job-ul si nu mai ajunge la pasul de commit,
-        # deci s-ar pierde toata scanarea. Metadata e optionala; scanarea nu.
-        print(f"[!] CoinGecko indisponibil ({e}) - sar peste actualizarea metadata "
-              f"in aceasta rulare. Se reincearca la urmatoarea.")
+    ids = resolve_ids([sym.split("/")[0] for sym in universe], delay)
+    print(f"ID-uri rezolvate: {len(ids)} din {len(universe)}")
+    if not ids:
+        # FARA RASPUNS DE LA API, NU SALVEZ NIMIC. Varianta initiala scria totusi
+        # fisierul: arunca intrarile existente si punea o data proaspata - o pana
+        # CoinGecko ar fi sters toata metadata (prins la simulare, cu HTTP 403).
+        print("[!] CoinGecko nu a raspuns - pastrez metadata existenta neschimbata. "
+              "Se reincearca la urmatoarea rulare.")
         return
 
-    tokens = {}
+    # IMBINARE peste datele existente: un token al carui apel esueaza acum isi
+    # pastreaza informatia anterioara. O intrare veche se elimina DOAR cand e
+    # dovedita gresita - API-ul a rezolvat simbolul la alt ID.
+    tokens = {t: v for t, v in old_tokens.items() if t in universe}
+    changed = False
     for sym in universe:
         base = sym.split("/")[0]
-        cg_id = find_coingecko_id(base, coins_list)
-        if cg_id:
-            info = fetch_token_info(cg_id)
-            if info:
-                info["coingecko_id"] = cg_id
-                info["binance_labs"] = base in labs_tickers
-                tokens[sym] = info
+        hit = ids.get(base.lower())
+        if not hit:
+            print(f"  {sym}: niciun proiect CoinGecko gasit")
+            continue
+        cg_id, how = hit
+        if (not force and not stale and sym in tokens and tokens[sym].get("resolved_by")
+                and tokens[sym].get("coingecko_id") == cg_id):
+            continue                      # deja corect si proaspat
+        info = fetch_token_info(cg_id)
+        if not info and sym in tokens and tokens[sym].get("coingecko_id") != cg_id:
+            del tokens[sym]               # maparea veche e dovedit gresita
+            changed = True
+            print(f"  {sym}: maparea veche ({old_tokens[sym].get('coingecko_id')}) era "
+                  f"gresita; o elimin, se completeaza la urmatoarea rulare")
+        if info:
+            changed = True
+            info["coingecko_id"] = cg_id
+            info["resolved_by"] = how
+            info["binance_labs"] = base in labs_tickers
+            tokens[sym] = info
+            print(f"  {sym} -> {cg_id} (rang {info.get('market_cap_rank')}, prin {how})")
         time.sleep(delay)
 
+    if not changed:
+        print("Nimic nou obtinut de la CoinGecko - metadata ramane neschimbata.")
+        return
     tokens = compute_similarity(tokens, labs_tickers)
     result = {
         "_updated_ts": time.time(),
