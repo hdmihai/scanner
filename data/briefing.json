@@ -1,12 +1,12 @@
 {
-  "text": "Din 33 planuri inchise, rata de succes e 33.3%, cu +1412.10R cumulat (+0.087R in medie pe plan) si profit factor 1.12. 23 planuri sunt inca deschise. Separat, 21458 planuri inchise (+1419.99R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #121088 POL/USDT +0.00R, #142557 DASH/USDT -1.02R, #121035 SOL/USDT +3.67R. Pe intervalele de scor cu destule date, cel mai bine merge 0-19 (29.0%, +0.42R mediu, n=145), iar cel mai slab 40-59 (29.4%, +0.07R, n=7382). Deciziile de a deschide sau refuza planuri se bazeaza pe aceste cifre masurate, nu pe scorul brut. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 69.7% fata de 33.3% baseline, pe 16289 planuri invatate.",
+  "text": "Din 34 planuri inchise, rata de succes e 33.3%, cu +1412.10R cumulat (+0.087R in medie pe plan) si profit factor 1.12. 24 planuri sunt inca deschise. Separat, 21458 planuri inchise (+1419.99R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #121091 AVAX/USDT +0.00R, #121088 POL/USDT +0.00R, #142557 DASH/USDT -1.02R. Pe intervalele de scor cu destule date, cel mai bine merge 0-19 (29.0%, +0.42R mediu, n=145), iar cel mai slab 40-59 (29.4%, +0.07R, n=7382). Deciziile de a deschide sau refuza planuri se bazeaza pe aceste cifre masurate, nu pe scorul brut. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 69.7% fata de 33.3% baseline, pe 16289 planuri invatate.",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-27 19:20 UTC",
+    "scan_time": "2026-09-27 20:22 UTC",
     "universe_size": 30,
-    "plans_total": 21514,
-    "plans_open": 23,
-    "plans_closed": 33,
+    "plans_total": 21516,
+    "plans_open": 24,
+    "plans_closed": 34,
     "legacy_closed": 21458,
     "legacy_total_r": 1419.99,
     "win_rate": 33.3,
@@ -14,6 +14,13 @@
     "avg_r": 0.087,
     "profit_factor": 1.12,
     "recent_closed": [
+      {
+        "id": 121091,
+        "symbol": "AVAX/USDT",
+        "direction": "LONG",
+        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
+        "r": 0.0
+      },
       {
         "id": 121088,
         "symbol": "POL/USDT",
@@ -41,16 +48,21 @@
         "direction": "LONG",
         "state": "TP1 HIT - SL LA BREAKEVEN",
         "r": 0.467
-      },
-      {
-        "id": 121085,
-        "symbol": "LINK/USDT",
-        "direction": "LONG",
-        "state": "TP1 HIT - SL LA BREAKEVEN",
-        "r": 0.465
       }
     ],
     "open_now": [
+      {
+        "id": 142566,
+        "symbol": "ALGO/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 142565,
+        "symbol": "POL/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
       {
         "id": 142564,
         "symbol": "GRT/USDT",
@@ -68,18 +80,6 @@
         "symbol": "SOL/USDT",
         "direction": "LONG",
         "state": "INTRARE ATINSA - pozitie activa"
-      },
-      {
-        "id": 142561,
-        "symbol": "NEAR/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 142560,
-        "symbol": "DOT/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
       }
     ],
     "best_bucket": {
