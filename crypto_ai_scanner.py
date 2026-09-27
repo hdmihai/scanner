@@ -1183,6 +1183,11 @@ def main():
         # EVIDENTE: din OHLCV-ul deja descarcat, deci zero apeluri API in plus.
         # Acelasi obiect alimenteaza si agentul (ca vector orientat) si
         # dashboard-ul (ca lista citibila) - o singura sursa de adevar.
+        # ATENTIE: in acest bloc se folosesc DOAR highs_s / lows_s / closes_s.
+        # Seria de inchideri din exterior (a candidatului principal) calcula Ichimoku,
+        # regimul, Elliott si lichiditatea cu maximele unui token si inchiderile
+        # altuia - pe dashboard, NEAR aparea "SUB NOR" desi era peste, iar
+        # agentul invata din caracteristici corupte. Garda: check_integrity.
         sig_ind = indicators.compute_all(candles)
         sig_rsi = rsi(closes_s, 14)
         # Order flow si dezechilibrul cartii: exista doar daca bursa le suporta.
@@ -1204,7 +1209,7 @@ def main():
         # insemna 28 x 3 apeluri in plus la fiecare scanare.
         def _confirm_closes(tf):
             if tf == CONFIG["timeframe"]:
-                return closes
+                return closes_s
             try:
                 o = exchange.fetch_ohlcv(sig["symbol"], timeframe=tf, limit=120)
             except Exception:
@@ -1214,17 +1219,17 @@ def main():
             return [c[4] for c in o[:-1]]
 
         sig_struct = struct_mod.build(
-            closes, [c[2] for c in candles], [c[3] for c in candles],
+            closes_s, [c[2] for c in candles], [c[3] for c in candles],
             sig["atr"], base_tf=CONFIG["timeframe"],
             fetch_closes=_confirm_closes, order_book=liquidity,
             price=sig["price"])
 
         sig_ew = ew_mod.analyze([c[2] for c in candles], [c[3] for c in candles],
-                                closes, sig["price"])
+                                closes_s, sig["price"])
         sig_ew_bias = ew_mod.bias(sig_ew, sig["direction"])
 
         sig_liqs = ls_mod.build([c[2] for c in candles], [c[3] for c in candles],
-                                closes, sig["atr"], sig["price"], CONFIG["timeframe"])
+                                closes_s, sig["atr"], sig["price"], CONFIG["timeframe"])
         sig_liqs_bias = ls_mod.bias(sig_liqs, sig["direction"])
 
         sig_evidence = ev_mod.build_evidence(sig_ind, sig["price"], sig["atr"],
