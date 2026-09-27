@@ -1,19 +1,33 @@
 {
-  "text": "Din 31 planuri inchise, rata de succes e 33.3%, cu +1413.12R cumulat (+0.087R in medie pe plan) si profit factor 1.12. 23 planuri sunt inca deschise. Separat, 21458 planuri inchise (+1419.99R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #121035 SOL/USDT +3.67R, #121089 ALGO/USDT +0.47R, #121085 LINK/USDT +0.47R. Pe intervalele de scor cu destule date, cel mai bine merge 0-19 (29.0%, +0.42R mediu, n=145), iar cel mai slab 40-59 (29.4%, +0.07R, n=7382). Deciziile de a deschide sau refuza planuri se bazeaza pe aceste cifre masurate, nu pe scorul brut. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 69.7% fata de 33.3% baseline, pe 16288 planuri invatate.",
+  "text": "Din 33 planuri inchise, rata de succes e 33.3%, cu +1412.10R cumulat (+0.087R in medie pe plan) si profit factor 1.12. 23 planuri sunt inca deschise. Separat, 21458 planuri inchise (+1419.99R) provin dintr-o geometrie anterioara si nu intra in calibrare - regulile de plasare a tintelor s-au schimbat, deci rezultatele lor nu sunt comparabile. Ultimele inchise: #121088 POL/USDT +0.00R, #142557 DASH/USDT -1.02R, #121035 SOL/USDT +3.67R. Pe intervalele de scor cu destule date, cel mai bine merge 0-19 (29.0%, +0.42R mediu, n=145), iar cel mai slab 40-59 (29.4%, +0.07R, n=7382). Deciziile de a deschide sau refuza planuri se bazeaza pe aceste cifre masurate, nu pe scorul brut. Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete echilibrata 69.7% fata de 33.3% baseline, pe 16289 planuri invatate.",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-09-27 15:21 UTC",
+    "scan_time": "2026-09-27 16:22 UTC",
     "universe_size": 30,
-    "plans_total": 21512,
+    "plans_total": 21514,
     "plans_open": 23,
-    "plans_closed": 31,
+    "plans_closed": 33,
     "legacy_closed": 21458,
     "legacy_total_r": 1419.99,
     "win_rate": 33.3,
-    "total_r": 1413.12,
+    "total_r": 1412.1,
     "avg_r": 0.087,
     "profit_factor": 1.12,
     "recent_closed": [
+      {
+        "id": 121088,
+        "symbol": "POL/USDT",
+        "direction": "LONG",
+        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
+        "r": 0.0
+      },
+      {
+        "id": 142557,
+        "symbol": "DASH/USDT",
+        "direction": "LONG",
+        "state": "SL HIT - INVALIDATED",
+        "r": -1.024
+      },
       {
         "id": 121035,
         "symbol": "SOL/USDT",
@@ -34,28 +48,26 @@
         "direction": "LONG",
         "state": "TP1 HIT - SL LA BREAKEVEN",
         "r": 0.465
-      },
-      {
-        "id": 121097,
-        "symbol": "DOT/USDT",
-        "direction": "LONG",
-        "state": "SL HIT - INVALIDATED",
-        "r": -1.031
-      },
-      {
-        "id": 121084,
-        "symbol": "AXS/USDT",
-        "direction": "LONG",
-        "state": "PRETUL NU A REVENIT in 8 bare - anulat",
-        "r": 0.0
       }
     ],
     "open_now": [
       {
+        "id": 142564,
+        "symbol": "GRT/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 142563,
+        "symbol": "DASH/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
         "id": 142562,
         "symbol": "SOL/USDT",
         "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
+        "state": "INTRARE ATINSA - pozitie activa"
       },
       {
         "id": 142561,
@@ -66,18 +78,6 @@
       {
         "id": 142560,
         "symbol": "DOT/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 142559,
-        "symbol": "GRAM/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 142558,
-        "symbol": "LINK/USDT",
         "direction": "LONG",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       }
@@ -106,36 +106,36 @@
     },
     "agent_status": "ACTIVE",
     "agent_reason": "acuratete echilibrata 69.7% vs euristica 33.3%",
-    "agent_samples": 16288,
-    "agent_balanced": 69.67908309248189,
-    "baseline_balanced": 33.3282122996011,
+    "agent_samples": 16289,
+    "agent_balanced": 69.67477335909815,
+    "baseline_balanced": 33.32612542440041,
     "agent_weights": {
-      "trend": 0.102808,
-      "momentum": -0.041662,
+      "trend": 0.076038,
+      "momentum": -0.07335,
       "volatility": 0.006101,
-      "volume": 0.009887,
-      "persistence_n": -0.160781,
-      "ev_ema_fast": -0.005672,
-      "ev_ema_stack": 0.935994,
-      "ev_supertrend": 0.000533,
-      "ev_macd": 0.896349,
-      "ev_vwap": 0.303425,
-      "ev_poc": -0.208024,
-      "ev_value_area": -0.113584,
-      "ev_rsi": -0.073073,
+      "volume": -0.025758,
+      "persistence_n": -0.196425,
+      "ev_ema_fast": -0.017613,
+      "ev_ema_stack": 0.900345,
+      "ev_supertrend": -0.035112,
+      "ev_macd": 0.879524,
+      "ev_vwap": 0.267779,
+      "ev_poc": -0.243668,
+      "ev_value_area": -0.113583,
+      "ev_rsi": -0.070082,
       "ev_volume": 0.0,
       "ev_volatility": 0.0,
-      "ev_order_flow": -0.065544,
-      "ev_book_imbalance": -0.003174,
-      "ev_liq_magnet": -0.065713,
-      "ev_ichimoku": 0.200155,
-      "ev_ma_cross": 0.634687,
-      "ev_regime": 0.446909,
-      "ev_mtf_align": -0.134047,
-      "ev_elliott": 0.039136,
-      "ev_liq_struct": 0.098827,
+      "ev_order_flow": -0.059841,
+      "ev_book_imbalance": -0.01545,
+      "ev_liq_magnet": -0.066732,
+      "ev_ichimoku": 0.235799,
+      "ev_ma_cross": 0.60239,
+      "ev_regime": 0.429084,
+      "ev_mtf_align": -0.169691,
+      "ev_elliott": 0.022194,
+      "ev_liq_struct": 0.124484,
       "ev_liq_sweep": 0.0,
-      "ev_fusion": -0.005858
+      "ev_fusion": -0.02753
     }
   }
 }
