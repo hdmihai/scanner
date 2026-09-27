@@ -43,6 +43,7 @@ MIN_SAMPLES_FOR_VALIDATION = 100
 
 
 TOKEN_METADATA_FILE = os.path.join(DATA_DIR, "token_metadata.json")
+TOKEN_META_UPDATED = {}   # data ultimei actualizari a metadatelor, pentru mesajul din card
 
 
 def load_json(path, default):
@@ -204,9 +205,16 @@ def render_liquidity(deep):
     return f'<div class="liq-list">{bid_rows}{ask_rows}</div>'
 
 
-def render_similar_projects(token_meta, narrative):
+def render_similar_projects(token_meta, narrative, symbol=None, updated=None):
     if not token_meta:
-        return '<p class="dim">Fara date inca &mdash; ruleaza update_token_metadata.py.</p>'
+        # Mesaj actionabil, inclusiv de pe telefon - "ruleaza scriptul" nu se
+        # poate face de acolo. Actiunea dedicata e .github/workflows/metadata.yml.
+        who = f" pentru <strong>{symbol}</strong>" if symbol else ""
+        when = f" Ultima actualizare: {updated}." if updated else ""
+        return (f'<p class="dim">Fara metadata{who} inca.{when} Se completeaza automat la '
+                f'urmatoarea scanare; imediat, de pe telefon: aplicatia GitHub &rarr; '
+                f'Actions &rarr; <strong>Metadata proiecte (Similar projects)</strong> '
+                f'&rarr; Run workflow.</p>')
     labs_badge = ' <span class="badge-labs">BINANCE LABS</span>' if token_meta.get("binance_labs") else ""
     cats = ", ".join(token_meta.get("categories", [])[:4]) or "-"
     similar = token_meta.get("similar") or []
@@ -744,9 +752,13 @@ def render_exchange_tabs(store, scans_store=None):
 
     sig = ""
     if active_sig:
+        # Textul vechi ("se invata separat") descria comportamentul de dinainte de
+        # familia de geometrie. Acum planurile cu capabilitati diferite se invata
+        # IMPREUNA; evidentele indisponibile sunt doar omise din vector.
         sig = ('<div class="ex-sig">Semnatura activa: <strong>{}</strong> '
-               '&middot; planurile create cu seturi diferite de capabilitati se '
-               'invata separat</div>').format(active_sig)
+               '&middot; planurile cu capabilitati diferite se invata impreuna, pe '
+               'aceeasi familie de geometrie; evidentele indisponibile sunt omise, '
+               'nu inlocuite</div>').format(active_sig)
     return '<div class="tabs">' + "".join(tabs) + "".join(panels) + "</div>" + sig
 
 
@@ -1144,7 +1156,9 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
     plan_html = render_plan(best, deep)
     levels_html = render_levels(deep)
     liquidity_html = render_liquidity(deep)
-    similar_html = render_similar_projects(token_meta, narrative)
+    similar_html = render_similar_projects(
+        token_meta, narrative, symbol=(best or {}).get("symbol"),
+        updated=(TOKEN_META_UPDATED or {}).get("when"))
     learning_curve_html = render_learning_curve(history, weights_history, health, agent_state)
     agent_html = render_agent_card(agent_state)
     plans_html = render_plan_memory(plans_store)
@@ -1695,6 +1709,7 @@ def main():
         token_meta = token_metadata["tokens"].get(best["symbol"])
         if narrative and narrative.get("symbol") != best["symbol"]:
             narrative = None  # narativul e vechi, pt alt candidat - nu-l arat ca fiind curent
+    TOKEN_META_UPDATED["when"] = (token_metadata or {}).get("_updated")
 
     os.makedirs(DOCS_DIR, exist_ok=True)
     html = build_html(scan, best, deep, chart, health, weights, session, token_meta, narrative, history, weights_history, agent_state, plans_store, briefing, details, exchanges_store,
