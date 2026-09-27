@@ -1,50 +1,50 @@
 {
   "model": {
     "weights": {
-      "trend": 0.092343,
-      "momentum": -0.029504,
-      "volatility": -0.010677,
-      "volume": 0.00513,
-      "persistence_n": -0.168513,
-      "ev_ema_fast": -0.007022,
-      "ev_ema_stack": 0.928284,
-      "ev_supertrend": 0.011043,
-      "ev_macd": 0.91655,
-      "ev_vwap": 0.295703,
-      "ev_poc": -0.215757,
-      "ev_value_area": -0.118996,
-      "ev_rsi": -0.081582,
+      "trend": 0.073325,
+      "momentum": -0.053268,
+      "volatility": -0.02103,
+      "volume": -0.023067,
+      "persistence_n": -0.196934,
+      "ev_ema_fast": -0.016626,
+      "ev_ema_stack": 0.899852,
+      "ev_supertrend": -0.01738,
+      "ev_macd": 0.90205,
+      "ev_vwap": 0.267277,
+      "ev_poc": -0.244178,
+      "ev_value_area": -0.138891,
+      "ev_rsi": -0.081435,
       "ev_volume": 0.0,
       "ev_volatility": 0.0,
-      "ev_order_flow": -0.07271,
-      "ev_book_imbalance": -0.013989,
-      "ev_liq_magnet": -0.073163,
-      "ev_ichimoku": 0.140089,
-      "ev_ma_cross": 0.623433,
-      "ev_regime": 0.440508,
-      "ev_mtf_align": -0.128379,
-      "ev_elliott": 0.031408,
-      "ev_liq_struct": 0.065978,
+      "ev_order_flow": -0.055714,
+      "ev_book_imbalance": -0.010287,
+      "ev_liq_magnet": -0.06123,
+      "ev_ichimoku": 0.186941,
+      "ev_ma_cross": 0.598542,
+      "ev_regime": 0.429018,
+      "ev_mtf_align": -0.149695,
+      "ev_elliott": 0.002985,
+      "ev_liq_struct": 0.0944,
       "ev_liq_sweep": 0.0,
-      "ev_fusion": -0.021718
+      "ev_fusion": -0.034686
     },
-    "bias": -0.862358
+    "bias": -0.890781
   },
-  "samples_trained": 16284,
+  "samples_trained": 16286,
   "last_trained_scan_ts": 0.0,
   "agent": {
-    "correct": 11347,
-    "total": 16284
+    "correct": 11348,
+    "total": 16286
   },
   "baseline": {
-    "correct": 5425,
-    "total": 16284
+    "correct": 5426,
+    "total": 16286
   },
   "by_direction": {
     "LONG": {
-      "agent": 5575,
-      "baseline": 2698,
-      "total": 8040
+      "agent": 5576,
+      "baseline": 2699,
+      "total": 8042
     },
     "SHORT": {
       "agent": 5772,
@@ -54,16 +54,6 @@
   },
   "first_scan_ts": 1518537600.0,
   "pairs": [
-    [
-      0.10497,
-      0.0,
-      -1.05
-    ],
-    [
-      0.17241,
-      0.0,
-      -1.034
-    ],
     [
       0.15449,
       0.0,
@@ -15053,6 +15043,16 @@
       0.53731,
       1.0,
       3.131
+    ],
+    [
+      0.8157,
+      1.0,
+      0.465
+    ],
+    [
+      0.75276,
+      0.0,
+      -1.031
     ]
   ],
   "recent": [
@@ -15061,8 +15061,6 @@
     1,
     1,
     1,
-    1,
-    1,
     0,
     1,
     1,
@@ -15255,7 +15253,9 @@
     0,
     1,
     1,
-    1
+    1,
+    1,
+    0
   ],
   "recent_baseline": [
     0,
@@ -15263,8 +15263,6 @@
     0,
     0,
     0,
-    0,
-    0,
     1,
     0,
     0,
@@ -15453,11 +15451,13 @@
     1,
     1,
     0,
+    1,
+    1,
     1,
     1,
     1,
     1,
-    1
+    0
   ],
   "curve": [
     {
@@ -19371,14 +19371,6 @@
   "source": "plans-v6-4h",
   "feature_version": "f6",
   "score_pairs": [
-    [
-      0.66,
-      0.0
-    ],
-    [
-      0.54,
-      0.0
-    ],
     [
       0.62,
       0.0
@@ -31370,20 +31362,28 @@
     [
       0.56,
       1.0
+    ],
+    [
+      0.76,
+      1.0
+    ],
+    [
+      0.74,
+      0.0
     ]
   ],
-  "last_event_ts": 1790438400.0,
+  "last_event_ts": 1790452800.0,
   "status_reason": "acuratete echilibrata 69.7% vs euristica 33.3%",
-  "days_covered": 3147.0,
-  "balanced_agent": 69.67767603032871,
-  "balanced_baseline": 33.3179082752178,
+  "days_covered": 3147.17,
+  "balanced_agent": 69.67527105693652,
+  "balanced_baseline": 33.319952889252825,
   "balanced_directions": [
     "LONG",
     "SHORT"
   ],
-  "auc": 0.6718379337893029,
-  "auc_score_baseline": 0.5738552527533444,
+  "auc": 0.6716156382477626,
+  "auc_score_baseline": 0.5742055479879314,
   "agent_superior": true,
-  "majority_baseline": 67.86666666666666,
-  "predicted_positive_rate": 15.833333333333334
+  "majority_baseline": 67.83333333333333,
+  "predicted_positive_rate": 15.9
 }
