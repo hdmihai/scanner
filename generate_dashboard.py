@@ -36,6 +36,8 @@ BRIEFING_FILE = os.path.join(DATA_DIR, "briefing.json")
 DETAILS_FILE = os.path.join(DATA_DIR, "latest_details.json")
 EXCHANGES_FILE = os.path.join(DATA_DIR, "exchanges.json")
 EXCHANGE_SCANS_FILE = os.path.join(DATA_DIR, "exchange_scans.json")
+ALTSEASON_FILE = os.path.join(DATA_DIR, "altseason.json")
+ALTSEASON_HISTORY_FILE = os.path.join(DATA_DIR, "altseason_history.json")
 CHART_FILE = os.path.join(DATA_DIR, "latest_chart.json")
 OUTPUT_FILE = os.path.join(DOCS_DIR, "index.html")
 
@@ -203,6 +205,99 @@ def render_liquidity(deep):
         for a in liq["asks"]
     )
     return f'<div class="liq-list">{bid_rows}{ask_rows}</div>'
+
+
+def render_altseason(state, history):
+    """Faza ciclului altcoin season, pe date reale: faza curenta si increderea,
+    ce o sustine si ce lipseste inca, faza urmatoare cu conditiile concrete de
+    confirmare, indicatorii, proiectele cu semnale de crestere si istoricul."""
+    if not state or not state.get("classification"):
+        return ('<p class="dim">Evaluarea apare dupa prima scanare cu acces la CoinGecko '
+                '(dominanta BTC, top 250, lumanari zilnice pentru indicele pe 90 de zile).</p>')
+    import altseason as _A
+    c, ind = state["classification"], state.get("indicators") or {}
+    f1 = lambda v, suf="", nd=1, sign=False: ("n/d" if v is None else
+                                              (f"{v:+.{nd}f}{suf}" if sign else f"{v:.{nd}f}{suf}"))
+    stale = (' <span class="tag tag-bear">DATE VECHI - CoinGecko indisponibil la ultima '
+             'scanare</span>' if state.get("stale") else "")
+    trans = (f' &middot; <strong>tranzitie {c["transition"]}</strong>' if c.get("transition") else "")
+    ai = ind.get("alt_index_90d")
+    season_cls = ("tag-bull" if (ai or 0) >= 75 else "tag-bear" if ai is not None and ai <= 25 else "tag-info")
+    head = (f'<div class="as-head"><div class="as-phase">FAZA {c["phase"]}</div>'
+            f'<div><strong class="as-name">{c["name"]}</strong><div class="dim">{c["what"]}</div>'
+            f'<div class="as-meta">incredere {c["confidence"]*100:.0f}% &middot; locul 2: faza '
+            f'{c["runner_up"]["phase"]} ({c["runner_up"]["name"]}){trans}</div></div></div>'
+            f'<div class="as-season"><span class="tag {season_cls}">{c["season"].upper()}</span> '
+            f'Indice Altcoin Season 90z (definitia CoinMarketCap): <strong>{f1(ai, "", 0)}</strong>'
+            f' / 100 &middot; calculat pe {ind.get("alt_index_coverage", 0)} din top 100 altcoins{stale}</div>')
+
+    sc = c.get("scores") or {}
+    mx = max(sc.values()) if sc else 1
+    steps = []
+    for num, name, _w, _t in _A.PHASES:
+        v = sc.get(str(num), 0)
+        cls = "as-step cur" if num == c["phase"] else ("as-step nxt" if num == c["next"]["phase"] else "as-step")
+        steps.append(f'<div class="{cls}"><span class="as-n">{num}</span><span class="as-t">{name}</span>'
+                     f'<span class="as-bar"><i style="width:{100*v/(mx or 1):.0f}%"></i></span></div>')
+    ladder = '<div class="as-ladder">' + "".join(steps) + "</div>"
+
+    bt, mr = ind.get("breadth30_tier") or {}, ind.get("med_rel30_tier") or {}
+    cells = [
+        ("Dominanta BTC", f'{f1(ind.get("btc_d"), "%")}',
+         f'acum 30z ~{f1(ind.get("btc_d_30d_ago"), "%")} ({f1(ind.get("btc_d_delta30"), " pp", 1, True)}) &middot; '
+         f'acum 200z ~{f1(ind.get("btc_d_200d_ago"), "%")}'),
+        ("ETH/BTC", f'{f1(ind.get("eth_btc"), "", 5)}',
+         f'30z {f1(ind.get("eth_btc_30d"), "%", 1, True)} &middot; 200z {f1(ind.get("eth_btc_200d"), "%", 1, True)}'),
+        ("Latime 30z (bat BTC)", f'{f1(ind.get("breadth30"), "%", 0)} din top 100',
+         f'large {f1(bt.get("large"), "%", 0)} &middot; mid {f1(bt.get("mid"), "%", 0)} &middot; '
+         f'small {f1(bt.get("small"), "%", 0)}'),
+        ("Mediana fata de BTC, 30z", f'large {f1(mr.get("large"), "%", 1, True)}',
+         f'mid {f1(mr.get("mid"), "%", 1, True)} &middot; small {f1(mr.get("small"), "%", 1, True)}'),
+        ("Bitcoin", f'{f1(ind.get("btc_r30"), "%", 1, True)} pe 30z',
+         f'200z {f1(ind.get("btc_r200"), "%", 0, True)} &middot; fata de ATH {f1(ind.get("btc_ath_dd"), "%", 1)}'),
+        ("Speculatie", f'{f1((ind.get("spec_share") or 0)*100, "%", 0)} small caps +50%/30z',
+         f'volum altcoins {f1((ind.get("alt_vol_share") or 0)*100, "%", 0)} din total'),
+    ]
+    grid = '<div class="as-grid">' + "".join(
+        f'<div class="as-cell"><span class="as-lbl">{a}</span><strong>{b}</strong><span class="dim">{d}</span></div>'
+        for a, b, d in cells) + "</div>"
+
+    why = "".join(f"<li>{r}</li>" for r in c.get("reasons") or [])
+    miss = "".join(f"<li>{r}</li>" for r in c.get("missing") or [])
+    trig = "".join(f"<li>{t}</li>" for t in c["next"].get("triggers") or [])
+    analysis = (f'<div class="as-cols"><div><h4 class="scan-h">De ce faza {c["phase"]}</h4><ul class="as-ul">{why}</ul>'
+                + (f'<h4 class="scan-h">Ce nu se potriveste inca</h4><ul class="as-ul as-miss">{miss}</ul>' if miss else "")
+                + f'</div><div><h4 class="scan-h">Predictie: faza {c["next"]["phase"]} - {c["next"]["name"]}</h4>'
+                f'<p class="dim">Trecerea se confirma cand:</p><ul class="as-ul">{trig}</ul></div></div>')
+
+    rows = []
+    for r in state.get("candidates") or []:
+        conf = (f'<span class="tag tag-bull">SCANER {r["scanner_score"]}</span>' if r.get("scanner") else "")
+        rows.append(f'<tr><td><strong>{r["symbol"]}</strong> <span class="dim">{r.get("name") or ""}</span> {conf}</td>'
+                    f'<td>#{r.get("rank")}</td><td>{r.get("tier")}</td>'
+                    f'<td>{f1(r.get("rs7"), "%", 1, True)}</td><td>{f1(r.get("rs30"), "%", 1, True)}</td>'
+                    f'<td>{f1(r.get("rs90"), "%", 0, True)}</td></tr>')
+    tier = _A.PHASE_TIER.get(c["phase"])
+    cand_note = (f"in nivelul favorizat de faza curenta: <strong>{tier} caps</strong>" if tier
+                 else "faza curenta nu favorizeaza altcoins - lista e doar informativa")
+    cands = ('<h4 class="scan-h">Proiecte cu semnale de crestere</h4>'
+             f'<p class="dim">Forta relativa fata de BTC pozitiva pe 7 si 30 de zile, {cand_note}. '
+             'SCANER = confirmat si de semnalul LONG al scanerului nostru.</p>'
+             + ('<div class="as-table-wrap"><table class="as-table"><tr><th>Proiect</th><th>Rang</th><th>Nivel</th>'
+                '<th>vs BTC 7z</th><th>vs BTC 30z</th><th>vs BTC 90z</th></tr>' + "".join(rows) + "</table></div>"
+                if rows else '<p class="dim">Niciun proiect nu bate BTC simultan pe 7 si 30 de zile in acest nivel.</p>'))
+
+    tl = ""
+    if history:
+        chips = "".join(f'<span class="as-chip p{h.get("phase")}" title="{h.get("ts")}">{h.get("phase")}</span>'
+                        for h in history[-36:])
+        tl = f'<h4 class="scan-h">Istoric faze (ultimele {min(36, len(history))} evaluari)</h4><div class="as-tl">{chips}</div>'
+
+    note = (f'<p class="dim as-note">Surse: CoinGecko (/global, top 250) si lumanari zilnice de pe exchange, '
+            f'evaluat la {state.get("when")}. Dominanta de acum 30/200 de zile e ESTIMATA din randamentele '
+            'top 250 (ignora schimbarile de oferta). Faza e o clasificare pe reguli transparente, nu o certitudine '
+            '- ciclurile nu se repeta identic.</p>')
+    return head + ladder + grid + analysis + cands + tl + note
 
 
 def render_similar_projects(token_meta, narrative, symbol=None, updated=None):
@@ -1156,6 +1251,8 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
     plan_html = render_plan(best, deep)
     levels_html = render_levels(deep)
     liquidity_html = render_liquidity(deep)
+    altseason_html = render_altseason(load_json(ALTSEASON_FILE, None),
+                                      load_json(ALTSEASON_HISTORY_FILE, []))
     similar_html = render_similar_projects(
         token_meta, narrative, symbol=(best or {}).get("symbol"),
         updated=(TOKEN_META_UPDATED or {}).get("when"))
@@ -1347,6 +1444,38 @@ header{{display:flex;justify-content:space-between;align-items:baseline;
 .ew-tag{{font-family:var(--font-mono);font-size:7px;}}
 .ew-stage{{font-size:12px;margin:6px 0 2px;padding:6px 10px;background:var(--panel-2);
   border-radius:6px;}}
+.as-head{{display:flex;gap:14px;align-items:center;margin-bottom:8px;}}
+.as-phase{{font:800 20px var(--font-mono);color:#FFFFFF;background:#7E57C2;border-radius:8px;
+  padding:10px 12px;white-space:nowrap;}}
+.as-name{{font-size:16px;}} .as-meta{{font-size:11px;color:var(--text-dim);margin-top:3px;}}
+.as-season{{font-size:12px;margin:6px 0 10px;}}
+.as-ladder{{display:grid;grid-template-columns:repeat(9,1fr);gap:4px;margin:8px 0 12px;}}
+@media(max-width:700px){{.as-ladder{{grid-template-columns:repeat(3,1fr);}}}}
+.as-step{{border:1px solid var(--border);border-radius:6px;padding:5px 6px;background:var(--panel-2);
+  display:flex;flex-direction:column;gap:2px;min-width:0;}}
+.as-step.cur{{border-color:#7E57C2;background:#F3EEFB;}} .as-step.nxt{{border-style:dashed;border-color:#7E57C2;}}
+.as-n{{font:700 13px var(--font-mono);}} .as-t{{font-size:9.5px;line-height:1.2;color:var(--text-dim);}}
+.as-step.cur .as-t{{color:#5E35B1;font-weight:700;}}
+.as-bar{{height:3px;background:var(--border);border-radius:2px;overflow:hidden;}}
+.as-bar i{{display:block;height:100%;background:#7E57C2;}}
+.as-grid{{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;}}
+@media(max-width:700px){{.as-grid{{grid-template-columns:1fr 1fr;}}}}
+.as-cell{{padding:8px 10px;border-radius:7px;background:var(--panel-2);display:flex;flex-direction:column;gap:2px;}}
+.as-cell .dim{{font-size:10px;font-family:var(--font-mono);}}
+.as-lbl{{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-dim);}}
+.as-cols{{display:grid;grid-template-columns:1fr 1fr;gap:14px;}}
+@media(max-width:700px){{.as-cols{{grid-template-columns:1fr;}}}}
+.as-ul{{margin:4px 0 8px 18px;padding:0;font-size:12px;}} .as-miss li{{color:var(--amber);}}
+.as-table-wrap{{overflow-x:auto;}}
+.as-table{{width:100%;border-collapse:collapse;font-size:11.5px;font-family:var(--font-mono);}}
+.as-table th,.as-table td{{padding:5px 6px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap;}}
+.as-tl{{display:flex;flex-wrap:wrap;gap:3px;margin:4px 0 8px;}}
+.as-chip{{font:700 10px var(--font-mono);width:18px;height:18px;border-radius:4px;display:inline-flex;
+  align-items:center;justify-content:center;color:#FFFFFF;background:#94A3B8;}}
+.as-chip.p0,.as-chip.p8{{background:#F23645;}} .as-chip.p1,.as-chip.p2{{background:#F57C00;}}
+.as-chip.p3{{background:#1E88E5;}} .as-chip.p4,.as-chip.p5{{background:#089981;}}
+.as-chip.p6,.as-chip.p7{{background:#7E57C2;}}
+.as-note{{font-size:10.5px;margin-top:8px;}}
 .ew-list{{display:flex;flex-direction:column;gap:3px;margin-top:6px;}}
 .ew-row{{display:grid;grid-template-columns:70px 1fr 54px 40px 92px;gap:6px;
   align-items:center;font-size:10.5px;font-family:var(--font-mono);
@@ -1623,6 +1752,11 @@ footer{{margin-top:26px;color:var(--text-dim);font-size:11px;line-height:1.6;}}
       <div class="card">
         <h2>AI plan &middot; best candidate</h2>
         {plan_html}
+      </div>
+
+      <div class="card">
+        <h2>Altcoin season &middot; faza ciclului (date reale de piata)</h2>
+        {altseason_html}
       </div>
 
       <div class="card">
