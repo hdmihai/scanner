@@ -1,0 +1,65 @@
+name: Auto-reparare cod (self-repair)
+
+# Citeste erorile gasite de auto-diagnostic (data/self_check.json), cere unui
+# model de limbaj un patch MINIM pentru cauza si il trece prin poarta de
+# validare: fisiere protejate neatinse, doar fisierele implicate, patch mic,
+# sintaxa + nume nedefinite, invariantii de arhitectura, invariantul reparat pe
+# ACELEASI date reale si fara erori noi. Doar daca trec toate, deschide un Pull
+# Request. Merge-ul ramane al tau (aplicatia GitHub -> Pull requests).
+#
+# Necesita, o singura data:
+#   1. secretul ANTHROPIC_API_KEY (Settings -> Secrets and variables -> Actions)
+#   2. Settings -> Actions -> General -> Workflow permissions ->
+#      bifat "Allow GitHub Actions to create and approve pull requests"
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 */6 * * *"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: scanner-data
+  cancel-in-progress: false
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      SCAN_TIMEFRAME: 4h
+    steps:
+      - name: Descarca repo-ul
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Configureaza git
+        run: |
+          git config user.name "crypto-ai-scanner-bot"
+          git config user.email "actions@users.noreply.github.com"
+
+      - name: Auto-reparare (patch -> poarta de validare -> Pull Request)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPAIR_MODEL: claude-sonnet-5
+        run: python self_repair.py
+
+      - name: Salveaza jurnalul de reparatii (memoria incercarilor)
+        run: |
+          git add data/repair_log.json 2>/dev/null || true
+          if git diff --staged --quiet; then
+            echo "Nimic nou in jurnal."
+            exit 0
+          fi
+          git commit -m "self-repair log $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git pull --rebase
+          git push
