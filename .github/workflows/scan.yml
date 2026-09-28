@@ -86,6 +86,8 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          # altseason.py: dominanta, top 250 si indicele pe 90 de zile
+          COINGECKO_API_KEY: ${{ secrets.COINGECKO_API_KEY }}
         run: python crypto_ai_scanner.py
 
       - name: Antreneaza agentul AI pe semnalele nou evaluate
