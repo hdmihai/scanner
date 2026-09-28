@@ -123,6 +123,12 @@ def _collect_levels(chart, layers):
             lv.append((st["level"], f"SuperTrend {'Bullish' if bull else 'Bearish'}",
                        "stb" if bull else "sts", 6))
 
+    # NIVELUL URMARIT PENTRU INTRARE, cand Elliott contrazice planul: capatul
+    # corectiei proiectate - ca "NEXT ENTRY WATCH" din capturile de referinta.
+    fcn = (chart.get("forecast") or {}) if "projection" in layers else {}
+    if fcn.get("next_entry") and fcn.get("plan_dir"):
+        lv.append((fcn["next_entry"], f"NEXT ENTRY WATCH · {fcn['plan_dir']}", "nextentry", 10))
+
     if "liq_struct" in layers:
         for l in ((chart.get("liq_structure") or {}).get("levels") or [])[:6]:
             side = "BUY" if l["side"] == "BUY" else "SELL"
@@ -350,10 +356,14 @@ def render_chart(chart, layers=None, height=300, fullscreen_id=None, show_head=T
             prev = coords[full.index(p) - 1][1]
             place_label(cx, cy, p["label"], cy <= prev, "proj-t")
         hist = fc.get("hist") or {}
-        src = {"elliott": "scenariu Elliott", "plan": "drumul planului"}.get(fc.get("source"), "scenariu")
+        # doua randuri scurte: un singur rand lung iesea din grafic in dreapta
+        src = {"elliott": "scenariu Elliott", "plan": "drumul planului",
+               "elliott_conflict": "CONFLICT: corectie Elliott",
+               "plan_split": "drumul planului · Elliott impartit"}.get(fc.get("source"), "scenariu")
         htxt = (f" · istoric {hist['win_rate']}% din {hist['n']}" if hist.get("n") else "")
-        b.append(f'<text class="proj-tag" x="{nx + 4:.0f}" y="{H - 16}">PROGNOZA · {src}{htxt}</text>')
-        b.append(f'<text class="proj-tag" x="{nx + 4:.0f}" y="{H - 5}">structura '
+        b.append(f'<text class="proj-tag" x="{nx + 4:.0f}" y="{H - 16}">PROGNOZA · {src}</text>')
+        b.append(f'<text class="proj-tag" x="{nx + 4:.0f}" y="{H - 5}">{htxt.lstrip(" ·")}'
+                 f'{" · " if htxt else ""}structura '
                  f'{(proj.get("confidence") or 0) * 100:.0f}%</text>')
 
     # PASTILELE: scenariul Elliott + nivelurile, pe axa din dreapta, fara
@@ -543,7 +553,7 @@ CSS = """
 .pill-t{font:600 8.5px var(--font-mono);fill:#FFFFFF;}
 .pill-tp,.pill-stb{fill:#089981;} .pill-sl,.pill-inv,.pill-sts{fill:#F23645;}
 .pill-entry,.pill-vwap,.pill-val{fill:#0288D1;} .pill-locked{fill:#455A64;}
-.pill-ew,.pill-ewh{fill:#7E57C2;} .pill-hit{fill:#94A3B8;} .lvl-hit{stroke:#94A3B8;} .pill-ewa{fill:#1E88E5;}
+.pill-ew,.pill-ewh{fill:#7E57C2;} .pill-hit{fill:#94A3B8;} .pill-nextentry{fill:#B7791F;} .lvl-nextentry{stroke:#B7791F;stroke-dasharray:6 3;} .lvl-hit{stroke:#94A3B8;} .pill-ewa{fill:#1E88E5;}
 .pill-vah,.pill-poc,.pill-liqb{fill:#E67E22;} .pill-liqs{fill:#C0651A;}
 .ew0-l{stroke:#7E57C2;stroke-width:2;} .ew0-d{fill:#7E57C2;}
 .halo{fill:#FFFFFF;stroke:#FFFFFF;stroke-width:3px;stroke-linejoin:round;}
