@@ -101,10 +101,20 @@ def coingecko_headers():
 def current_universe():
     """Refolosesc simbolurile din ultima scanare deja salvata de
     crypto_ai_scanner.py, ca sa nu mai interoghez inca o data exchange-ul."""
+    # TOT universul scanat, nu doar simbolurile cu semnal in ultima scanare.
+    # Varianta anterioara lua doar `results` din ultima scanare: in productie,
+    # metadata acoperea 14 din 30 de tokeni (ADA lipsea), iar "Similar projects"
+    # ramanea gol ori de cate ori candidatul principal nu avusese semnal inainte.
+    # exchange_scans.json are lista completa de simboluri rezolvate pe bursa.
+    syms = set()
     history = load_json(HISTORY_FILE, [])
-    if not history:
-        return []
-    return sorted({r["symbol"] for r in history[-1].get("results", [])})
+    if history:
+        syms |= {r["symbol"] for r in history[-1].get("results", [])}
+    scans = load_json(os.path.join(os.path.dirname(HISTORY_FILE), "exchange_scans.json"), {})
+    for sc in (scans.get("scans") or {}).values():
+        syms |= {x for x in (sc.get("resolved") or []) if isinstance(x, str)}
+    # doar perechile in USDT: aceleasi proiecte apar si ca /USD pe unele burse
+    return sorted(x for x in syms if x.endswith("/USDT"))
 
 
 def resolve_ids(bases, delay):
