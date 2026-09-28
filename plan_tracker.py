@@ -204,6 +204,29 @@ USE_AGENT_FILTER = os.environ.get("USE_AGENT_FILTER", "true").lower() == "true"
 # Fractiunea semnalelor filtrate care se emit totusi, pentru explorare.
 AGENT_EXPLORE_RATE = float(os.environ.get("AGENT_EXPLORE_RATE", "0.15"))
 
+# FILTRUL DE CONFLICT ELLIOTT. Masurat pe 16.318 planuri reale inchise:
+#   Elliott contrazice planul (ev_elliott <= -0.1): n=5.795, R mediu +0.042,
+#       IC95 -0.02..+0.11 -> niciun avantaj demonstrat, dupa costuri
+#   fara conflict:                                  n=10.523, R mediu +0.112
+#   diferenta +0.070R, IC95 +0.006..+0.137
+# Efectul filtrului pe istoric: R pe plan +0.087 -> +0.112 (+29%), drawdown
+# maxim 236R -> 202R (-14%), dar R TOTAL +1424 -> +1179 (-17%): tranzactiile
+# contra Elliott aduceau totusi ceva, doar ca fara avantaj dovedit. Activ
+# implicit; se opreste cu USE_ELLIOTT_FILTER=false.
+USE_ELLIOTT_FILTER = os.environ.get("USE_ELLIOTT_FILTER", "true").lower() == "true"
+ELLIOTT_CONFLICT_MAX = -0.1
+
+
+def auto_mitigations():
+    """Atenuarile decise de self_check.py la rularea anterioara: modul de
+    siguranta si starea filtrului Elliott (pornit/oprit dupa datele recente).
+    Lipsa fisierului inseamna comportamentul implicit."""
+    try:
+        with open(os.path.join(os.path.dirname(PLANS_FILE), "self_check.json")) as f:
+            return json.load(f).get("mitigations") or {}
+    except Exception:
+        return {}
+
 # Versiunea geometriei planului. Cand regulile de plasare a TP1/TP2 se schimba,
 # rezultatele vechi devin necomparabile: descriu o structura care nu mai exista.
 # Calibrarea foloseste doar planuri din versiunea curenta.
@@ -809,6 +832,15 @@ def decide(calibration, signal, agent_pred=None, bucket_size=20):
     score = signal.get("risk_adjusted", 0)
     cal = calibrated_probability(calibration, score, bucket_size)
 
+    auto = auto_mitigations()
+    if auto.get("safe_mode"):
+        # MOD DE SIGURANTA: auto-diagnosticul a gasit niveluri de plan imposibile.
+        # Nu emit planuri noi pana cand calculul e din nou coerent.
+        return {"action": "SKIP", "mode": "MOD_SIGURANTA",
+                "reason": auto.get("safe_reason") or "mod de siguranta activ",
+                "expected_value_r": None, "calibrated_prob": cal["win_rate"] if cal else None,
+                "agent_prob": (agent_pred or {}).get("probability"), "agent_used": False}
+
     agent_p0 = (agent_pred or {}).get("probability")
     cut0 = (agent_pred or {}).get("rank_cut")
     if (USE_AGENT_FILTER and (agent_pred or {}).get("active")
@@ -839,6 +871,29 @@ def decide(calibration, signal, agent_pred=None, bucket_size=20):
                 "expected_value_r": None,
                 "calibrated_prob": cal["win_rate"] if cal else None,
                 "agent_prob": agent_p0, "agent_used": True}
+
+    ec = signal.get("elliott_conflict") or {}
+    if (USE_ELLIOTT_FILTER and auto.get("elliott_filter", True) and ec.get("bias") is not None
+            and ec["bias"] <= ELLIOTT_CONFLICT_MAX):
+        nxt = ec.get("next_entry")
+        watch = f" Nivel urmarit pentru intrare: ~{nxt:.6g}." if nxt else ""
+        base = (f"Elliott contrazice planul {signal.get('direction')} "
+                f"({ec.get('headline') or 'structura curenta'}: {ec.get('text') or ''}).")
+        # explorare, ca efectul conflictului sa ramana masurabil (altfel
+        # planurile contra Elliott n-ar mai produce niciodata rezultate)
+        key = f"ew|{signal.get('symbol', '')}|{signal.get('price')}|{ec['bias']:.8f}"
+        if (int(hashlib.sha256(key.encode()).hexdigest(), 16) % 1000) < AGENT_EXPLORE_RATE * 1000:
+            return {"action": "ISSUE", "mode": "EXPLORARE_ELLIOTT",
+                    "reason": base + " Emis pentru explorare, ca efectul sa ramana masurat.",
+                    "expected_value_r": None,
+                    "calibrated_prob": cal["win_rate"] if cal else None,
+                    "agent_prob": (agent_pred or {}).get("probability"), "agent_used": False}
+        return {"action": "SKIP", "mode": "ASTEAPTA_CORECTIA",
+                "reason": (base + " Istoric: planurile contra Elliott n-au avut avantaj "
+                           "(+0.04R/plan, fata de +0.11R fara conflict)." + watch),
+                "expected_value_r": None,
+                "calibrated_prob": cal["win_rate"] if cal else None,
+                "agent_prob": (agent_pred or {}).get("probability"), "agent_used": False}
 
     if not USE_DECISION_GATE:
         # Masuram si raportam in continuare - cifrele apar in dashboard si pe
