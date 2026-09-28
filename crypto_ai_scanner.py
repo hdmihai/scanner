@@ -931,7 +931,7 @@ def main():
                 _ew_tok.get("primary"), [c[2] for c in candles], [c[3] for c in candles],
                 d_closes, plan=_plan_tok,
                 hist=_hist_tab.get(f"{r['direction']}:{int(r['risk_adjusted'] // 20) * 20}"),
-                plan_dir=r["direction"]),
+                plan_dir=r["direction"], agg_bias=ew_mod.bias(_ew_tok, r["direction"])),
             "sparkline": [round_price(c) for c in d_closes[-SPARKLINE_BARS:]],
             # LUMANARI pentru graficul bogat al fiecarui token cu semnal.
             # Pastrez CHART_BARS bare, rotunjite, doar OHLC + volum - suficient
@@ -1112,7 +1112,7 @@ def main():
                 (_ew_full or {}).get("primary"), [c[2] for c in best_ohlcv],
                 [c[3] for c in best_ohlcv], closes, plan=best_plan,
                 hist=_hist_tab.get(f"{best['direction']}:{int(best['risk_adjusted'] // 20) * 20}"),
-                plan_dir=best["direction"]),
+                plan_dir=best["direction"], agg_bias=ew_mod.bias(_ew_full, best["direction"])),
             # ELLIOTT pentru grafic: punctele undelor cu indicii lor de bara,
             # ca sa poata fi desenate exact peste lumanarile corespunzatoare.
             # `idx` e pozitia in seria COMPLETA, iar graficul afiseaza doar
@@ -1177,6 +1177,7 @@ def main():
                             and plan_tracker.same_family(p.get("geometry"))
                             and p.get("state") != plan_tracker.STATE_NO_ENTRY]
     issued, skipped = [], []
+    decisions_out = {}          # decizia pentru fiecare semnal - citita de dashboard
     for sig in (longs[: CONFIG["top_n_per_direction"]] + shorts[: CONFIG["top_n_per_direction"]]):
         if plan_tracker.has_open_plan(plan_store, sig["symbol"], sig["direction"]):
             continue
@@ -1252,7 +1253,22 @@ def main():
                                              liqs=sig_liqs, liqs_bias=sig_liqs_bias,
                                              alt=alt_state, symbol=sig["symbol"],
                                              direction=sig["direction"])
+        # CONFLICT PLAN - ELLIOTT. `sig_ew_bias` e exact caracteristica ev_elliott
+        # a agentului (directia asteptata a structurii, fata de directia planului).
+        # Masurat pe 16.318 planuri reale: cu ev_elliott <= -0.1 (Elliott
+        # contrazice planul) R mediu +0.042, fara avantaj demonstrat (IC95 include
+        # zero); fara conflict +0.112R. Diferenta +0.070R, IC95 +0.006..+0.137.
+        _pr = (sig_ew or {}).get("primary") or {}
+        _next = None
+        if _pr.get("expected") and _pr["expected"] != sig["direction"]:
+            _pp = [q["price"] for q in ((_pr.get("projection") or {}).get("path") or [])
+                   if q.get("projected")]
+            if _pp:
+                _next = min(_pp) if sig["direction"] == "LONG" else max(_pp)
+        _conflict = {"bias": sig_ew_bias, "text": _pr.get("stage_text"),
+                     "next_entry": _next, "headline": _pr.get("headline")}
         sig = {**sig,
+               "elliott_conflict": _conflict,
                "evidence": sig_evidence,
                "fusion": ev_mod.fusion(sig_evidence, sig["direction"]),
                "indicators": sig_ind,
@@ -1279,12 +1295,23 @@ def main():
         agent_pred = ai_agent.predict_for_signal(agent_model, agent_state, sig)
         sig = {**sig, "bar_seconds": timeframe_seconds()}
         decision = plan_tracker.decide(calibration, sig, agent_pred)
+        decisions_out[sig["symbol"]] = {
+            "action": decision["action"], "mode": decision.get("mode"),
+            "reason": decision.get("reason"),
+            "calibrated_prob": decision.get("calibrated_prob"),
+            "agent_prob": decision.get("agent_prob"),
+            "elliott_bias": (sig.get("elliott_conflict") or {}).get("bias"),
+            "next_entry": (sig.get("elliott_conflict") or {}).get("next_entry")}
         if decision["action"] == "SKIP":
             skipped.append((sig["symbol"], decision["reason"]))
             continue
         new_plan = plan_tracker.create_plan(plan_store, sig, levels, decision)
         if new_plan:
             issued.append(new_plan)
+
+    save_json(os.path.join(os.path.dirname(DETAILS_FILE), "decisions.json"),
+              {"scan_time": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
+               "decisions": decisions_out})
 
     # 4) salvez calibrarea finala si rezumatul
     plan_store["calibration"] = plan_tracker.build_calibration(plan_store)
