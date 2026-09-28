@@ -463,8 +463,8 @@ def stage_view(c, price):
     pts = c.get("points") or []
     # SCENARIU REALIZAT: toate tintele atinse. Pe POL real, armonica isi
     # atinsese ambele tinte, dar stadiul spunea tot "inversare asteptata".
-    vals = [v for v in tg.values() if v is not None]
-    if vals and all(sign * (price - v) >= 0 for v in vals):
+    hit = c.get("targets_hit") or {}
+    if (not pat.startswith("IMPULS")) and hit and all(hit.values()):
         return d, 0.2, "scenariul s-a realizat - toate tintele atinse; potential ramas redus"
     last = pts[-1] if pts else {}
     if pat == "IMPULS IN DEZVOLTARE":
@@ -472,12 +472,17 @@ def stage_view(c, price):
             return d, 1.0, "unda 3 in formare - faza cea mai puternica a trendului"
         return d, 0.4, "unda 4 corectiva - continuarea (W5) e asteptata dupa ea"
     if pat.startswith("IMPULS"):
-        t1, t3 = tg.get("tp1"), tg.get("tp3")
-        if last.get("confirmed") or (t3 and sign * (price - t3) >= 0):
-            return opp, 0.7, "impulsul e complet sau dincolo de tinte - urmeaza corectia A-B-C"
-        if t1 and sign * (price - t1) < 0:
-            return d, 0.5, "unda 5 are inca spatiu pana la prima tinta"
-        return d, 0.0, "unda 5 in zona tintelor - potential ramas redus"
+        ext = c.get("extreme", price)
+        w4 = pts[-2]["price"] if len(pts) >= 2 else price
+        leg = abs(ext - w4) or 1e-12
+        ret = sign * (ext - price) / leg          # cat din W5 a retras pretul
+        if last.get("confirmed") or hit.get("tp3") or ret >= 0.382:
+            return opp, 0.7, (f"impulsul pare complet - W5 a atins {ext:.6g}, iar pretul a retras "
+                              f"{ret:.0%} din ea; urmeaza corectia A-B-C")
+        if hit.get("tp1"):
+            return opp, 0.4, (f"W5 a atins deja tinta minima ({ext:.6g}); finalul impulsului e "
+                              f"aproape - potentialul ramas e mic, corectia A-B-C urmeaza")
+        return d, 0.5, "unda 5 are inca spatiu pana la prima tinta"
     if pat.startswith("CORECTIE"):
         if len(pts) >= 3:
             a_len = abs(pts[1]["price"] - pts[0]["price"])
@@ -491,7 +496,7 @@ def stage_view(c, price):
     return d, 0.7, "pretul e in zona PRZ - inversare asteptata"
 
 
-def forecast_path(count, highs, lows, closes, plan=None, hist=None, plan_dir=None):
+def forecast_path(count, highs, lows, closes, plan=None, hist=None, plan_dir=None, agg_bias=None):
     """Prognoza afisata pe grafic: linie CONTINUA prin pretul real pana la
     lumanarea curenta, apoi linie PUNCTATA din prezent spre viitor.
 
@@ -553,8 +558,23 @@ def forecast_path(count, highs, lows, closes, plan=None, hist=None, plan_dir=Non
             skipping = False
             remaining.append(pt)
     exp = (count or {}).get("expected")
-    if remaining and (plan_dir is None or exp == plan_dir or (count or {}).get("expected_weight") == 0):
-        source = "elliott"
+    # CONFLICT: structura asteapta miscarea opusa planului. Desenez scenariul
+    # Elliott - asta e asteptarea structurala - marcat ca atare, plus nivelul de
+    # intrare urmarit la capatul corectiei. Varianta anterioara desena in acest
+    # caz drumul planului (spre TP), contrazicand chiar analiza Elliott.
+    primary_against = bool(remaining and plan_dir and exp and exp != plan_dir
+                           and ((count or {}).get("expected_weight") or 0) >= 0.3)
+    # ACEEASI LOGICA CA DECIZIA. Filtrul de conflict judeca ANSAMBLUL ipotezelor
+    # vii (bias agregat), nu doar principala. Prins de auto-diagnostic, pe codul
+    # deja reparat: pe ETH, Primary 73% spunea LONG iar Alternative 72% SHORT -
+    # ansamblul nu vedea conflict si planul SHORT era emis, dar graficul desena
+    # scenariul Primary ca "conflict". Cand ipotezele sunt impartite, structura
+    # nu da o directie clara: se deseneaza drumul planului, marcat ca atare.
+    split = primary_against and agg_bias is not None and agg_bias > -0.1
+    conflict = primary_against and not split
+    if remaining and not split and (plan_dir is None or exp == plan_dir
+                                    or (count or {}).get("expected_weight") == 0 or conflict):
+        source = "elliott_conflict" if conflict else "elliott"
         k = now
         for i, pt in enumerate(remaining):
             k += (hstep or step) if i == 0 else step
@@ -562,7 +582,7 @@ def forecast_path(count, highs, lows, closes, plan=None, hist=None, plan_dir=Non
                            "projected": True})
     elif plan and plan_dir in ("LONG", "SHORT"):
         # b) drumul planului evaluat de agent
-        source = "plan"
+        source = "plan_split" if split else "plan"
         dsign = 1 if plan_dir == "LONG" else -1
         total = hstep or (2 * step)
         seq = []
@@ -585,8 +605,13 @@ def forecast_path(count, highs, lows, closes, plan=None, hist=None, plan_dir=Non
     for pt in points:
         if not (pt["price"] == pt["price"]) or pt["price"] < floor:
             pt["price"] = floor
+    nxt = None
+    if source == "elliott_conflict":
+        pp = [pt["price"] for pt in points]
+        nxt = min(pp) if plan_dir == "LONG" else max(pp)
     return {"solid": solid, "path": [anchor] + points, "source": source,
-            "hist": hist, "confidence": (count or {}).get("confidence")}
+            "hist": hist, "confidence": (count or {}).get("confidence"),
+            "next_entry": nxt, "plan_dir": plan_dir}
 
 
 def analyze(highs, lows, closes, price=None):
@@ -756,21 +781,45 @@ def analyze(highs, lows, closes, price=None):
         forming = next((p for p in pts if not p.get("confirmed")), None)
         kind = ("Motive" if c["pattern"].startswith("IMPULS")
                 else "Zigzag" if c["pattern"].startswith("CORECTIE") else "Harmonic")
+        # directia structurii in titlu (BULLISH / BEARISH), ca in capturile de
+        # referinta: "Developing Motive W3 FORMING" nu spunea ca impulsul era
+        # DESCENDENT - pe EGLD real, sursa unui conflict cu un plan LONG
+        bias_w = "BULLISH" if c["direction"] == "LONG" else "BEARISH"
         if forming:
             c["headline"] = (f"{c['rank']} Developing {kind} "
-                             f"{forming['label']} FORMING "
+                             f"{forming['label']} FORMING {bias_w} "
                              f"{c['confidence'] * 100:.0f}%")
         else:
             tail = pts[-1]["label"] if pts else ""
-            c["headline"] = (f"{c['rank']} {kind} {tail} "
+            c["headline"] = (f"{c['rank']} {kind} {tail} {bias_w} "
                              f"{c['confidence'] * 100:.0f}%")
         # invalidarea e deja calculata mai sus, inainte de rang
 
     for c in unique:
-        c["expected"], c["expected_weight"], c["stage_text"] = stage_view(c, px)
+        # EXTREMUL ATINS DE UNDA, nu pretul curent. BUG REPARAT: pe SEI real, W5
+        # urcase la 0.08662 - peste prima tinta (0.08145) - iar pretul coborase
+        # apoi la 0.07976. Comparand tintele cu pretul CURENT, codul credea ca W5
+        # "are inca spatiu pana la prima tinta" si vota LONG, in timp ce proiectia
+        # (calculata din extrem) arata corectia A-B-C: aceeasi structura spunea
+        # LONG in text si SHORT pe grafic. Ancora extremului depinde de tipar:
+        # tintele impulsului sunt ale lui W5 (masurate de la W4), ale motivului in
+        # dezvoltare ale lui W3 (de la W2), iar ale corectiei si armonicei sunt
+        # tintele miscarii de DUPA tipar (de la ultimul punct).
+        pts = c.get("points") or []
+        if pts:
+            if c["pattern"] == "IMPULS 1-2-3-4-5" and len(pts) >= 2:
+                a = pts[-2]["idx"]
+            elif c["pattern"] == "IMPULS IN DEZVOLTARE" and len(pts) >= 3:
+                a = pts[2]["idx"]
+            else:
+                a = pts[-1]["idx"]
+            a = max(0, min(a, len(highs) - 1))
+            c["extreme"] = (max(highs[a:]) if c["direction"] == "LONG" else min(lows[a:]))
         sgn = 1 if c["direction"] == "LONG" else -1
-        c["targets_hit"] = {k: sgn * (px - v) >= 0 for k, v in (c.get("targets") or {}).items()
+        ext = c.get("extreme", px)
+        c["targets_hit"] = {k: sgn * (ext - v) >= 0 for k, v in (c.get("targets") or {}).items()
                             if v is not None}
+        c["expected"], c["expected_weight"], c["stage_text"] = stage_view(c, px)
     alive = [c for c in unique if not c["invalidated"]]
     primary = alive[0] if alive else None
     # Proiectia doar pentru numaratoarea principala VALIDA - o proiectie pentru
