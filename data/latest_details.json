@@ -1,5 +1,5 @@
 {
-  "scan_time": "2026-09-28 17:22 UTC",
+  "scan_time": "2026-09-28 18:25 UTC",
   "timeframe": "4h",
   "exchange": "okx",
   "symbols": {
@@ -15,8 +15,8 @@
       },
       "price": 2677.77,
       "atr": 27.11,
-      "persistence": 5,
-      "age_minutes": 294,
+      "persistence": 6,
+      "age_minutes": 357,
       "indicators": {
         "emas": {
           "ema9": 2676.564094785394,
@@ -120,32 +120,28 @@
             "projected": false
           },
           {
-            "label": "(ENTRY)",
-            "price": 2664.215,
-            "idx": 260,
-            "projected": true
-          },
-          {
-            "label": "(TP1)",
-            "price": 2742.69,
-            "idx": 267,
-            "projected": true
-          },
-          {
-            "label": "(TP2)",
-            "price": 2786.21,
+            "label": "(1)",
+            "price": 2628.18,
             "idx": 276,
+            "projected": true
+          },
+          {
+            "label": "(2)",
+            "price": 2716.0,
+            "idx": 282,
             "projected": true
           }
         ],
-        "source": "plan",
+        "source": "elliott_conflict",
         "hist": {
           "n": 3528,
           "win_rate": 28.7,
           "median_bars_win": 18,
           "median_bars_all": 8
         },
-        "confidence": 0.5856
+        "confidence": 0.5856,
+        "next_entry": 2628.18,
+        "plan_dir": "LONG"
       },
       "sparkline": [
         2739.46,
@@ -1261,14 +1257,15 @@
             "end_idx": 239,
             "invalidated": false,
             "rank": "Primary",
-            "headline": "Primary Harmonic D 59%",
-            "expected": "SHORT",
-            "expected_weight": 0.7,
-            "stage_text": "pretul e in zona PRZ - inversare asteptata",
+            "headline": "Primary Harmonic D BEARISH 59%",
+            "extreme": 2635.71,
             "targets_hit": {
               "tp1": false,
               "tp2": true
             },
+            "expected": "SHORT",
+            "expected_weight": 0.7,
+            "stage_text": "pretul e in zona PRZ - inversare asteptata",
             "projection": {
               "path": [
                 {
@@ -1354,15 +1351,16 @@
             "end_idx": 258,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Developing Motive W3 FORMING 61%",
-            "expected": "SHORT",
-            "expected_weight": 0.4,
-            "stage_text": "unda 4 corectiva - continuarea (W5) e asteptata dupa ea",
+            "headline": "Invalidat Developing Motive W3 FORMING BEARISH 61%",
+            "extreme": 2635.71,
             "targets_hit": {
               "tp1": false,
               "tp2": false,
               "tp3": false
-            }
+            },
+            "expected": "SHORT",
+            "expected_weight": 0.4,
+            "stage_text": "unda 4 corectiva - continuarea (W5) e asteptata dupa ea"
           },
           {
             "pattern": "CORECTIE A-B-C",
@@ -1407,14 +1405,15 @@
             "end_idx": 256,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Developing Zigzag C FORMING 56%",
+            "headline": "Invalidat Developing Zigzag C FORMING BULLISH 56%",
+            "extreme": 2699.0,
+            "targets_hit": {
+              "tp1": true,
+              "tp2": false
+            },
             "expected": "SHORT",
             "expected_weight": 0.5,
-            "stage_text": "unda C inca in desfasurare, contra trendului",
-            "targets_hit": {
-              "tp1": false,
-              "tp2": false
-            }
+            "stage_text": "unda C inca in desfasurare, contra trendului"
           },
           {
             "pattern": "ARMONICA AB=CD",
@@ -1463,14 +1462,15 @@
             "end_idx": 256,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Developing Harmonic D FORMING 50%",
-            "expected": "SHORT",
-            "expected_weight": 0.4,
-            "stage_text": "D inca nu a ajuns in zona PRZ",
+            "headline": "Invalidat Developing Harmonic D FORMING BULLISH 50%",
+            "extreme": 2699.0,
             "targets_hit": {
               "tp1": false,
               "tp2": false
-            }
+            },
+            "expected": "SHORT",
+            "expected_weight": 0.4,
+            "stage_text": "D inca nu a ajuns in zona PRZ"
           }
         ],
         "primary": {
@@ -1520,14 +1520,15 @@
           "end_idx": 239,
           "invalidated": false,
           "rank": "Primary",
-          "headline": "Primary Harmonic D 59%",
-          "expected": "SHORT",
-          "expected_weight": 0.7,
-          "stage_text": "pretul e in zona PRZ - inversare asteptata",
+          "headline": "Primary Harmonic D BEARISH 59%",
+          "extreme": 2635.71,
           "targets_hit": {
             "tp1": false,
             "tp2": true
           },
+          "expected": "SHORT",
+          "expected_weight": 0.7,
+          "stage_text": "pretul e in zona PRZ - inversare asteptata",
           "projection": {
             "path": [
               {
@@ -1619,8 +1620,8 @@
       },
       "price": 118.72,
       "atr": 2.1957143,
-      "persistence": 5,
-      "age_minutes": 294,
+      "persistence": 6,
+      "age_minutes": 357,
       "indicators": {
         "emas": {
           "ema9": 120.13790408382289,
@@ -1720,7 +1721,9 @@
           "median_bars_win": 18,
           "median_bars_all": 8
         },
-        "confidence": null
+        "confidence": null,
+        "next_entry": null,
+        "plan_dir": "LONG"
       },
       "sparkline": [
         116.81,
@@ -2832,14 +2835,15 @@
             "end_idx": 251,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Zigzag C 37%",
+            "headline": "Invalidat Zigzag C BEARISH 37%",
+            "extreme": 117.36,
+            "targets_hit": {
+              "tp1": true,
+              "tp2": false
+            },
             "expected": "SHORT",
             "expected_weight": 0.8,
-            "stage_text": "corectia e aproape incheiata - trendul e asteptat sa reia",
-            "targets_hit": {
-              "tp1": false,
-              "tp2": false
-            }
+            "stage_text": "corectia e aproape incheiata - trendul e asteptat sa reia"
           }
         ],
         "primary": null,
@@ -2890,6 +2894,1413 @@
         "oi_scaled": false
       }
     },
+    "NEAR/USDT": {
+      "direction": "LONG",
+      "score": 54,
+      "probability": 68.9,
+      "components": {
+        "trend": 1.0,
+        "momentum": 0.149,
+        "volatility": 0.0,
+        "volume": 1.0
+      },
+      "price": 4.906,
+      "atr": 0.25978571,
+      "persistence": 146,
+      "age_minutes": 8764,
+      "indicators": {
+        "emas": {
+          "ema9": 5.122550146401368,
+          "ema20": 5.018561311882636,
+          "ema50": 4.584541093337945,
+          "ema100": 3.971022631408584,
+          "ema200": 3.2058137679916494
+        },
+        "vwap": 3.9890522928670236,
+        "volume_profile": {
+          "poc": 1.98233333,
+          "vah": 3.99033333,
+          "val": 1.64766667,
+          "value_area_pct": 71.2
+        },
+        "supertrend": {
+          "direction": "BULLISH",
+          "level": 4.66746029
+        },
+        "macd": {
+          "macd": 0.16847187,
+          "signal": 0.21150216,
+          "histogram": -0.04303029,
+          "bullish": false
+        },
+        "price": 4.906,
+        "price_vs_value_area": "PESTE VAH"
+      },
+      "structure": {
+        "resistance": [
+          5.213,
+          4.804,
+          3.917
+        ],
+        "support": [
+          2.244,
+          1.907,
+          1.828
+        ]
+      },
+      "fibonacci": {
+        "swing_high": 5.58,
+        "swing_low": 2.269,
+        "retracement": {
+          "0.236": 4.798604,
+          "0.382": 4.315198,
+          "0.5": 3.9245,
+          "0.618": 3.533802,
+          "0.786": 2.977554
+        },
+        "extension": {
+          "1.272": 6.480592,
+          "1.618": 7.626198,
+          "2.0": 8.891
+        }
+      },
+      "plan": {
+        "entry": 4.7761071,
+        "sl": 4.5163214,
+        "signal_price": 4.906,
+        "tp1": 5.213,
+        "tp2": 5.9451428,
+        "expected_r": 4.5
+      },
+      "forecast": {
+        "solid": [],
+        "path": [
+          {
+            "label": "ACUM",
+            "price": 4.906,
+            "idx": 258,
+            "projected": false
+          },
+          {
+            "label": "(ENTRY)",
+            "price": 4.7761071,
+            "idx": 260,
+            "projected": true
+          },
+          {
+            "label": "(TP1)",
+            "price": 5.213,
+            "idx": 267,
+            "projected": true
+          },
+          {
+            "label": "(TP2)",
+            "price": 5.9451428,
+            "idx": 276,
+            "projected": true
+          }
+        ],
+        "source": "plan",
+        "hist": {
+          "n": 3528,
+          "win_rate": 28.7,
+          "median_bars_win": 18,
+          "median_bars_all": 8
+        },
+        "confidence": null,
+        "next_entry": null,
+        "plan_dir": "LONG"
+      },
+      "sparkline": [
+        4.388,
+        4.366,
+        4.557,
+        4.411,
+        4.35,
+        4.426,
+        4.388,
+        4.408,
+        4.691,
+        4.216,
+        4.407,
+        4.334,
+        4.37,
+        4.36,
+        4.327,
+        4.581,
+        4.763,
+        4.592,
+        4.465,
+        4.525,
+        5.026,
+        5.1,
+        5.037,
+        4.952,
+        4.881,
+        4.862,
+        4.896,
+        4.847,
+        4.835,
+        5.036,
+        5.035,
+        5.41,
+        5.177,
+        5.198,
+        5.431,
+        5.39,
+        5.221,
+        5.122,
+        5.145,
+        4.906
+      ],
+      "candles": [
+        [
+          1789315200000,
+          2.287,
+          2.382,
+          2.287,
+          2.33,
+          497495.45
+        ],
+        [
+          1789329600000,
+          2.329,
+          2.356,
+          2.283,
+          2.297,
+          318067.55
+        ],
+        [
+          1789344000000,
+          2.299,
+          2.392,
+          2.279,
+          2.38,
+          520502.41
+        ],
+        [
+          1789358400000,
+          2.38,
+          2.456,
+          2.379,
+          2.425,
+          834196.53
+        ],
+        [
+          1789372800000,
+          2.421,
+          2.434,
+          2.392,
+          2.421,
+          648462.45
+        ],
+        [
+          1789387200000,
+          2.417,
+          2.436,
+          2.378,
+          2.397,
+          658727.99
+        ],
+        [
+          1789401600000,
+          2.398,
+          2.598,
+          2.397,
+          2.533,
+          1597120.85
+        ],
+        [
+          1789416000000,
+          2.535,
+          2.591,
+          2.455,
+          2.469,
+          778178.44
+        ],
+        [
+          1789430400000,
+          2.468,
+          2.488,
+          2.414,
+          2.419,
+          684161.28
+        ],
+        [
+          1789444800000,
+          2.418,
+          2.457,
+          2.338,
+          2.358,
+          780913.72
+        ],
+        [
+          1789459200000,
+          2.358,
+          2.407,
+          2.351,
+          2.372,
+          894488.63
+        ],
+        [
+          1789473600000,
+          2.37,
+          2.407,
+          2.328,
+          2.367,
+          973634.84
+        ],
+        [
+          1789488000000,
+          2.368,
+          2.422,
+          2.298,
+          2.337,
+          894536.68
+        ],
+        [
+          1789502400000,
+          2.337,
+          2.348,
+          2.304,
+          2.337,
+          264774.41
+        ],
+        [
+          1789516800000,
+          2.336,
+          2.367,
+          2.298,
+          2.349,
+          333760.84
+        ],
+        [
+          1789531200000,
+          2.351,
+          2.376,
+          2.33,
+          2.333,
+          320113.0
+        ],
+        [
+          1789545600000,
+          2.332,
+          2.488,
+          2.313,
+          2.486,
+          812223.37
+        ],
+        [
+          1789560000000,
+          2.485,
+          2.503,
+          2.423,
+          2.456,
+          890450.77
+        ],
+        [
+          1789574400000,
+          2.457,
+          2.578,
+          2.439,
+          2.549,
+          1367586.66
+        ],
+        [
+          1789588800000,
+          2.549,
+          2.635,
+          2.523,
+          2.62,
+          908093.23
+        ],
+        [
+          1789603200000,
+          2.62,
+          2.717,
+          2.59,
+          2.695,
+          971715.65
+        ],
+        [
+          1789617600000,
+          2.698,
+          2.759,
+          2.635,
+          2.722,
+          981376.28
+        ],
+        [
+          1789632000000,
+          2.721,
+          2.876,
+          2.711,
+          2.873,
+          1397974.39
+        ],
+        [
+          1789646400000,
+          2.875,
+          2.917,
+          2.805,
+          2.878,
+          1642770.96
+        ],
+        [
+          1789660800000,
+          2.878,
+          3.079,
+          2.875,
+          3.049,
+          2981690.41
+        ],
+        [
+          1789675200000,
+          3.047,
+          3.206,
+          2.982,
+          3.146,
+          1538163.6
+        ],
+        [
+          1789689600000,
+          3.147,
+          3.508,
+          3.069,
+          3.498,
+          3388750.29
+        ],
+        [
+          1789704000000,
+          3.499,
+          3.574,
+          3.417,
+          3.501,
+          3340415.77
+        ],
+        [
+          1789718400000,
+          3.502,
+          3.596,
+          3.414,
+          3.505,
+          2352924.61
+        ],
+        [
+          1789732800000,
+          3.504,
+          3.797,
+          3.47,
+          3.653,
+          3390343.18
+        ],
+        [
+          1789747200000,
+          3.654,
+          3.837,
+          3.579,
+          3.675,
+          2099939.78
+        ],
+        [
+          1789761600000,
+          3.677,
+          3.819,
+          3.622,
+          3.763,
+          1132655.02
+        ],
+        [
+          1789776000000,
+          3.764,
+          3.917,
+          3.691,
+          3.757,
+          1634172.37
+        ],
+        [
+          1789790400000,
+          3.758,
+          3.796,
+          3.635,
+          3.687,
+          1111540.02
+        ],
+        [
+          1789804800000,
+          3.682,
+          3.748,
+          3.624,
+          3.683,
+          1183204.19
+        ],
+        [
+          1789819200000,
+          3.684,
+          3.688,
+          3.542,
+          3.618,
+          1106163.29
+        ],
+        [
+          1789833600000,
+          3.617,
+          3.681,
+          3.403,
+          3.522,
+          1170208.24
+        ],
+        [
+          1789848000000,
+          3.522,
+          3.628,
+          3.512,
+          3.587,
+          466112.82
+        ],
+        [
+          1789862400000,
+          3.588,
+          3.61,
+          3.469,
+          3.51,
+          954702.42
+        ],
+        [
+          1789876800000,
+          3.51,
+          3.517,
+          3.425,
+          3.46,
+          678549.59
+        ],
+        [
+          1789891200000,
+          3.463,
+          3.669,
+          3.463,
+          3.616,
+          1163518.24
+        ],
+        [
+          1789905600000,
+          3.616,
+          3.918,
+          3.563,
+          3.91,
+          2154541.18
+        ],
+        [
+          1789920000000,
+          3.911,
+          4.306,
+          3.854,
+          4.155,
+          3696559.99
+        ],
+        [
+          1789934400000,
+          4.158,
+          4.273,
+          4.047,
+          4.166,
+          1852839.09
+        ],
+        [
+          1789948800000,
+          4.166,
+          4.409,
+          4.104,
+          4.402,
+          2495105.1
+        ],
+        [
+          1789963200000,
+          4.405,
+          4.454,
+          4.21,
+          4.267,
+          1746680.36
+        ],
+        [
+          1789977600000,
+          4.266,
+          4.375,
+          4.146,
+          4.175,
+          2097168.37
+        ],
+        [
+          1789992000000,
+          4.175,
+          4.235,
+          4.009,
+          4.069,
+          1435227.23
+        ],
+        [
+          1790006400000,
+          4.066,
+          4.175,
+          3.917,
+          4.161,
+          1636636.33
+        ],
+        [
+          1790020800000,
+          4.16,
+          4.343,
+          4.021,
+          4.271,
+          1198233.58
+        ],
+        [
+          1790035200000,
+          4.27,
+          4.586,
+          4.206,
+          4.388,
+          2641651.01
+        ],
+        [
+          1790049600000,
+          4.389,
+          4.506,
+          4.255,
+          4.366,
+          1712167.42
+        ],
+        [
+          1790064000000,
+          4.368,
+          4.635,
+          4.35,
+          4.557,
+          2103162.1
+        ],
+        [
+          1790078400000,
+          4.561,
+          4.661,
+          4.293,
+          4.411,
+          2168072.11
+        ],
+        [
+          1790092800000,
+          4.411,
+          4.494,
+          4.319,
+          4.35,
+          822633.02
+        ],
+        [
+          1790107200000,
+          4.349,
+          4.468,
+          4.223,
+          4.426,
+          832313.18
+        ],
+        [
+          1790121600000,
+          4.425,
+          4.444,
+          4.284,
+          4.388,
+          923604.71
+        ],
+        [
+          1790136000000,
+          4.388,
+          4.554,
+          4.323,
+          4.408,
+          1387483.65
+        ],
+        [
+          1790150400000,
+          4.406,
+          4.749,
+          4.371,
+          4.691,
+          1895695.17
+        ],
+        [
+          1790164800000,
+          4.694,
+          4.804,
+          4.15,
+          4.216,
+          5206148.41
+        ],
+        [
+          1790179200000,
+          4.216,
+          4.483,
+          4.029,
+          4.407,
+          2274843.33
+        ],
+        [
+          1790193600000,
+          4.407,
+          4.451,
+          4.246,
+          4.334,
+          1633172.5
+        ],
+        [
+          1790208000000,
+          4.332,
+          4.436,
+          4.214,
+          4.37,
+          1060026.9
+        ],
+        [
+          1790222400000,
+          4.37,
+          4.551,
+          4.248,
+          4.36,
+          2077691.26
+        ],
+        [
+          1790236800000,
+          4.36,
+          4.367,
+          4.097,
+          4.327,
+          1751085.52
+        ],
+        [
+          1790251200000,
+          4.325,
+          4.753,
+          4.309,
+          4.581,
+          3618921.62
+        ],
+        [
+          1790265600000,
+          4.581,
+          4.822,
+          4.522,
+          4.763,
+          1823875.79
+        ],
+        [
+          1790280000000,
+          4.762,
+          4.814,
+          4.545,
+          4.592,
+          909400.77
+        ],
+        [
+          1790294400000,
+          4.59,
+          4.696,
+          4.441,
+          4.465,
+          963350.78
+        ],
+        [
+          1790308800000,
+          4.465,
+          4.544,
+          4.446,
+          4.525,
+          532591.1
+        ],
+        [
+          1790323200000,
+          4.525,
+          5.061,
+          4.519,
+          5.026,
+          3230672.96
+        ],
+        [
+          1790337600000,
+          5.026,
+          5.19,
+          4.898,
+          5.1,
+          3281652.47
+        ],
+        [
+          1790352000000,
+          5.103,
+          5.213,
+          4.917,
+          5.037,
+          1316082.09
+        ],
+        [
+          1790366400000,
+          5.037,
+          5.15,
+          4.855,
+          4.952,
+          890573.24
+        ],
+        [
+          1790380800000,
+          4.951,
+          5.0,
+          4.848,
+          4.881,
+          797788.58
+        ],
+        [
+          1790395200000,
+          4.882,
+          4.967,
+          4.84,
+          4.862,
+          691016.89
+        ],
+        [
+          1790409600000,
+          4.86,
+          4.973,
+          4.794,
+          4.896,
+          1120948.53
+        ],
+        [
+          1790424000000,
+          4.897,
+          4.946,
+          4.763,
+          4.847,
+          1142684.97
+        ],
+        [
+          1790438400000,
+          4.846,
+          4.91,
+          4.798,
+          4.835,
+          548044.68
+        ],
+        [
+          1790452800000,
+          4.835,
+          5.049,
+          4.733,
+          5.036,
+          1020423.0
+        ],
+        [
+          1790467200000,
+          5.037,
+          5.168,
+          5.004,
+          5.035,
+          1115257.42
+        ],
+        [
+          1790481600000,
+          5.035,
+          5.497,
+          5.005,
+          5.41,
+          2495052.89
+        ],
+        [
+          1790496000000,
+          5.411,
+          5.439,
+          5.13,
+          5.177,
+          1559021.75
+        ],
+        [
+          1790510400000,
+          5.176,
+          5.281,
+          5.109,
+          5.198,
+          1176000.17
+        ],
+        [
+          1790524800000,
+          5.198,
+          5.485,
+          5.143,
+          5.431,
+          1165539.15
+        ],
+        [
+          1790539200000,
+          5.433,
+          5.58,
+          5.342,
+          5.39,
+          1292447.27
+        ],
+        [
+          1790553600000,
+          5.39,
+          5.425,
+          5.206,
+          5.221,
+          1130189.03
+        ],
+        [
+          1790568000000,
+          5.221,
+          5.292,
+          5.07,
+          5.122,
+          1246432.58
+        ],
+        [
+          1790582400000,
+          5.126,
+          5.188,
+          4.933,
+          5.145,
+          1889988.3
+        ],
+        [
+          1790596800000,
+          5.145,
+          5.261,
+          4.827,
+          4.906,
+          2959852.8
+        ]
+      ],
+      "ema20": [
+        2.3715349,
+        2.3644363,
+        2.3659186,
+        2.3715454,
+        2.3762554,
+        2.378231,
+        2.3929709,
+        2.4002118,
+        2.4020012,
+        2.3978106,
+        2.3953524,
+        2.3926522,
+        2.387352,
+        2.3825566,
+        2.3793607,
+        2.3749454,
+        2.385522,
+        2.3922342,
+        2.4071643,
+        2.4274344,
+        2.4529168,
+        2.4785438,
+        2.516111,
+        2.5505766,
+        2.5980455,
+        2.6502317,
+        2.7309715,
+        2.8043076,
+        2.8710402,
+        2.9455125,
+        3.0149875,
+        3.0862268,
+        3.15011,
+        3.2012424,
+        3.247124,
+        3.2824456,
+        3.3052603,
+        3.3320926,
+        3.3490362,
+        3.3596042,
+        3.3840228,
+        3.4341159,
+        3.5027715,
+        3.5659361,
+        3.6455613,
+        3.7047459,
+        3.749532,
+        3.7799575,
+        3.8162473,
+        3.8595571,
+        3.909885,
+        3.9533245,
+        4.0108174,
+        4.04893,
+        4.0776034,
+        4.110784,
+        4.1371855,
+        4.1629774,
+        4.2132652,
+        4.2135257,
+        4.2319518,
+        4.2416707,
+        4.2538925,
+        4.263998,
+        4.2699982,
+        4.2996174,
+        4.3437491,
+        4.367392,
+        4.376688,
+        4.390813,
+        4.451307,
+        4.5130873,
+        4.5629837,
+        4.6000329,
+        4.6267917,
+        4.6491925,
+        4.6726979,
+        4.6892981,
+        4.7031745,
+        4.7348722,
+        4.7634558,
+        4.8250314,
+        4.8585522,
+        4.8908806,
+        4.9423205,
+        4.9849567,
+        5.007437,
+        5.0183478,
+        5.0304099,
+        5.0185613
+      ],
+      "ema50": [
+        2.3288057,
+        2.3275584,
+        2.329615,
+        2.3333556,
+        2.3367926,
+        2.3391537,
+        2.3467555,
+        2.3515494,
+        2.3541945,
+        2.3543437,
+        2.3550361,
+        2.3555053,
+        2.3547796,
+        2.3540824,
+        2.3538831,
+        2.3530641,
+        2.3582773,
+        2.3621096,
+        2.3694386,
+        2.3792645,
+        2.3916463,
+        2.4046014,
+        2.4229699,
+        2.4408143,
+        2.4646647,
+        2.4913837,
+        2.5308589,
+        2.5689036,
+        2.6056133,
+        2.6466873,
+        2.6870132,
+        2.7292088,
+        2.7695143,
+        2.8054942,
+        2.8399062,
+        2.8704197,
+        2.8959718,
+        2.923071,
+        2.9460878,
+        2.9662412,
+        2.9917219,
+        3.0277329,
+        3.0719394,
+        3.1148437,
+        3.1653205,
+        3.2085236,
+        3.2464246,
+        3.2786825,
+        3.3132832,
+        3.3508407,
+        3.3915136,
+        3.4297288,
+        3.4739355,
+        3.5106831,
+        3.5435975,
+        3.5782015,
+        3.6099583,
+        3.6412541,
+        3.6824206,
+        3.7033453,
+        3.7309396,
+        3.754589,
+        3.7787228,
+        3.8015179,
+        3.8221251,
+        3.8518849,
+        3.8876149,
+        3.9152378,
+        3.9367971,
+        3.9598639,
+        4.0016732,
+        4.0447448,
+        4.0836568,
+        4.1177095,
+        4.1476424,
+        4.1756564,
+        4.2039052,
+        4.2291246,
+        4.2528844,
+        4.2835948,
+        4.3130617,
+        4.3560789,
+        4.3882719,
+        4.4200259,
+        4.459672,
+        4.4961554,
+        4.5245807,
+        4.5480089,
+        4.5714203,
+        4.5845411
+      ],
+      "liq_structure": {
+        "levels": [
+          {
+            "price": 2.2961428571428573,
+            "side": "SELL",
+            "kind": "EQUAL LOWS",
+            "role": "TARGET",
+            "touches": 7,
+            "swept": false,
+            "distance_pct": -53.2,
+            "label": "STRUCT SELL-SIDE LIQ - 4h - EQUAL LOWS - TARGET",
+            "strength": 0.2005
+          },
+          {
+            "price": 4.733,
+            "side": "SELL",
+            "kind": "MAJOR SWING LOW",
+            "role": "TARGET",
+            "touches": 1,
+            "swept": false,
+            "distance_pct": -3.53,
+            "label": "STRUCT SELL-SIDE LIQ - 4h - MAJOR SWING LOW - TARGET",
+            "strength": 0.1955
+          },
+          {
+            "price": 5.213,
+            "side": "BUY",
+            "kind": "MAJOR SWING HIGH",
+            "role": "ENTRY",
+            "touches": 1,
+            "swept": true,
+            "distance_pct": 6.26,
+            "label": "STRUCT BUY-SIDE LIQ - 4h - MAJOR SWING HIGH - ENTRY",
+            "strength": 0.148
+          },
+          {
+            "price": 1.8058333333333332,
+            "side": "SELL",
+            "kind": "EQUAL LOWS",
+            "role": "TARGET",
+            "touches": 6,
+            "swept": false,
+            "distance_pct": -63.19,
+            "label": "STRUCT SELL-SIDE LIQ - 4h - EQUAL LOWS - TARGET",
+            "strength": 0.1466
+          },
+          {
+            "price": 5.497,
+            "side": "BUY",
+            "kind": "MAJOR SWING HIGH",
+            "role": "ENTRY",
+            "touches": 1,
+            "swept": true,
+            "distance_pct": 12.05,
+            "label": "STRUCT BUY-SIDE LIQ - 4h - MAJOR SWING HIGH - ENTRY",
+            "strength": 0.0978
+          },
+          {
+            "price": 1.6335,
+            "side": "SELL",
+            "kind": "EQUAL LOWS",
+            "role": "TARGET",
+            "touches": 4,
+            "swept": false,
+            "distance_pct": -66.7,
+            "label": "STRUCT SELL-SIDE LIQ - 4h - EQUAL LOWS - TARGET",
+            "strength": 0.093
+          },
+          {
+            "price": 5.58,
+            "side": "BUY",
+            "kind": "MAJOR SWING HIGH",
+            "role": "TARGET",
+            "touches": 1,
+            "swept": false,
+            "distance_pct": 13.74,
+            "label": "STRUCT BUY-SIDE LIQ - 4h - MAJOR SWING HIGH - TARGET",
+            "strength": 0.0889
+          },
+          {
+            "price": 4.223,
+            "side": "SELL",
+            "kind": "MAJOR SWING LOW",
+            "role": "ENTRY",
+            "touches": 1,
+            "swept": true,
+            "distance_pct": -13.92,
+            "label": "STRUCT SELL-SIDE LIQ - 4h - MAJOR SWING LOW - ENTRY",
+            "strength": 0.0881
+          }
+        ],
+        "two_sided_sweep": true,
+        "swept_buy": true,
+        "swept_sell": true,
+        "above": {
+          "price": 5.213,
+          "side": "BUY",
+          "kind": "MAJOR SWING HIGH",
+          "role": "ENTRY",
+          "touches": 1,
+          "swept": true,
+          "distance_pct": 6.26,
+          "label": "STRUCT BUY-SIDE LIQ - 4h - MAJOR SWING HIGH - ENTRY",
+          "strength": 0.148
+        },
+        "below": {
+          "price": 4.733,
+          "side": "SELL",
+          "kind": "MAJOR SWING LOW",
+          "role": "TARGET",
+          "touches": 1,
+          "swept": false,
+          "distance_pct": -3.53,
+          "label": "STRUCT SELL-SIDE LIQ - 4h - MAJOR SWING LOW - TARGET",
+          "strength": 0.1955
+        }
+      },
+      "elliott": {
+        "counts": [
+          {
+            "pattern": "ARMONICA AB=CD",
+            "direction": "LONG",
+            "confidence": 0.7587,
+            "invalidation": 5.213,
+            "prz": {
+              "low": 4.96944,
+              "high": 5.1
+            },
+            "points": [
+              {
+                "label": "A",
+                "price": 5.213,
+                "idx": 241,
+                "confirmed": true,
+                "display": "A CONFIRMED"
+              },
+              {
+                "label": "B",
+                "price": 4.733,
+                "idx": 248,
+                "confirmed": true,
+                "display": "B CONFIRMED"
+              },
+              {
+                "label": "C",
+                "price": 5.58,
+                "idx": 254,
+                "confirmed": true,
+                "display": "C CONFIRMED"
+              },
+              {
+                "label": "D",
+                "price": 4.827,
+                "idx": 258,
+                "confirmed": false,
+                "display": "D FORMING"
+              }
+            ],
+            "targets": {
+              "tp1": 5.58,
+              "tp2": 5.213
+            },
+            "start_idx": 241,
+            "end_idx": 258,
+            "invalidated": true,
+            "rank": "Invalidat",
+            "headline": "Invalidat Developing Harmonic D FORMING BULLISH 76%",
+            "extreme": 5.261,
+            "targets_hit": {
+              "tp1": false,
+              "tp2": true
+            },
+            "expected": "SHORT",
+            "expected_weight": 0.4,
+            "stage_text": "D inca nu a ajuns in zona PRZ"
+          },
+          {
+            "pattern": "IMPULS IN DEZVOLTARE",
+            "direction": "LONG",
+            "confidence": 0.5734,
+            "stage": "W4",
+            "invalidation": 5.213,
+            "points": [
+              {
+                "label": "MAJOR START",
+                "price": 4.029,
+                "idx": 229,
+                "confirmed": true,
+                "display": "MAJOR START"
+              },
+              {
+                "label": "W1",
+                "price": 5.213,
+                "idx": 241,
+                "confirmed": true,
+                "display": "W1 CONFIRMED"
+              },
+              {
+                "label": "W2",
+                "price": 4.733,
+                "idx": 248,
+                "confirmed": true,
+                "display": "W2 CONFIRMED"
+              },
+              {
+                "label": "W3",
+                "price": 5.58,
+                "idx": 254,
+                "confirmed": true,
+                "display": "W3 CONFIRMED"
+              },
+              {
+                "label": "W4",
+                "price": 4.827,
+                "idx": 258,
+                "confirmed": false,
+                "display": "W4 FORMING"
+              }
+            ],
+            "targets": {
+              "tp1": 6.648712,
+              "tp2": 7.832712,
+              "tp3": 9.748424
+            },
+            "len1": 1.1840000000000002,
+            "start_idx": 229,
+            "end_idx": 258,
+            "invalidated": true,
+            "rank": "Invalidat",
+            "headline": "Invalidat Developing Motive W4 FORMING BULLISH 57%",
+            "extreme": 5.58,
+            "targets_hit": {
+              "tp1": false,
+              "tp2": false,
+              "tp3": false
+            },
+            "expected": "LONG",
+            "expected_weight": 0.4,
+            "stage_text": "unda 4 corectiva - continuarea (W5) e asteptata dupa ea"
+          },
+          {
+            "pattern": "CORECTIE A-B-C",
+            "direction": "SHORT",
+            "confidence": 0.368,
+            "invalidation": 4.029,
+            "points": [
+              {
+                "label": "MAJOR START",
+                "price": 4.029,
+                "idx": 229,
+                "confirmed": true,
+                "display": "MAJOR START"
+              },
+              {
+                "label": "A",
+                "price": 5.213,
+                "idx": 241,
+                "confirmed": true,
+                "display": "A CONFIRMED"
+              },
+              {
+                "label": "B",
+                "price": 4.733,
+                "idx": 248,
+                "confirmed": true,
+                "display": "B CONFIRMED"
+              },
+              {
+                "label": "C",
+                "price": 5.58,
+                "idx": 254,
+                "confirmed": true,
+                "display": "C CONFIRMED"
+              }
+            ],
+            "targets": {
+              "tp1": 4.848288,
+              "tp2": 4.396
+            },
+            "start_idx": 229,
+            "end_idx": 254,
+            "invalidated": true,
+            "rank": "Invalidat",
+            "headline": "Invalidat Zigzag C BEARISH 37%",
+            "extreme": 4.827,
+            "targets_hit": {
+              "tp1": true,
+              "tp2": false
+            },
+            "expected": "SHORT",
+            "expected_weight": 0.8,
+            "stage_text": "corectia e aproape incheiata - trendul e asteptat sa reia"
+          }
+        ],
+        "primary": null,
+        "alive": 0,
+        "total": 3,
+        "offset": 169
+      },
+      "structure_panel": {
+        "regime": {
+          "label": "TREND SLAB SUS",
+          "strength": 53,
+          "vote": 0.4,
+          "atr_pct": 5.3
+        },
+        "cross": {
+          "type": "GOLDEN CROSS",
+          "fast": 4.584541093337945,
+          "slow": 3.2058137679916494,
+          "bullish": true,
+          "strength": 1.0
+        },
+        "ichimoku": {
+          "position": "IN NOR",
+          "vote": 0.0,
+          "tenkan": 5.2035,
+          "kijun": 4.8385,
+          "span_a": 5.021,
+          "span_b": 4.5024999999999995,
+          "strength": 0.0
+        }
+      },
+      "liquidation": {
+        "above": {
+          "price": 5.214737333333333,
+          "density": 0.040658,
+          "side": "SHORT",
+          "distance_pct": 6.29,
+          "intensity": 0.5735
+        },
+        "below": {
+          "price": 4.331084,
+          "density": 0.070897,
+          "side": "LONG",
+          "distance_pct": -11.72,
+          "intensity": 1.0
+        },
+        "bias": -0.0815,
+        "oi_scaled": false
+      }
+    },
     "SUI/USDT": {
       "direction": "LONG",
       "score": 50,
@@ -2902,8 +4313,8 @@
       },
       "price": 1.1505,
       "atr": 0.051207143,
-      "persistence": 28,
-      "age_minutes": 1737,
+      "persistence": 29,
+      "age_minutes": 1800,
       "indicators": {
         "emas": {
           "ema9": 1.1985308585960706,
@@ -3003,7 +4414,9 @@
           "median_bars_win": 18,
           "median_bars_all": 8
         },
-        "confidence": null
+        "confidence": null,
+        "next_entry": null,
+        "plan_dir": "LONG"
       },
       "sparkline": [
         1.0373,
@@ -4125,15 +5538,16 @@
             "end_idx": 258,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Developing Motive W4 FORMING 50%",
-            "expected": "LONG",
-            "expected_weight": 0.4,
-            "stage_text": "unda 4 corectiva - continuarea (W5) e asteptata dupa ea",
+            "headline": "Invalidat Developing Motive W4 FORMING BULLISH 50%",
+            "extreme": 1.2939,
             "targets_hit": {
               "tp1": false,
               "tp2": false,
               "tp3": false
-            }
+            },
+            "expected": "LONG",
+            "expected_weight": 0.4,
+            "stage_text": "unda 4 corectiva - continuarea (W5) e asteptata dupa ea"
           },
           {
             "pattern": "CORECTIE A-B-C",
@@ -4178,14 +5592,15 @@
             "end_idx": 254,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Zigzag C 47%",
-            "expected": "SHORT",
-            "expected_weight": 0.8,
-            "stage_text": "corectia e aproape incheiata - trendul e asteptat sa reia",
+            "headline": "Invalidat Zigzag C BEARISH 47%",
+            "extreme": 1.1333,
             "targets_hit": {
               "tp1": false,
               "tp2": false
-            }
+            },
+            "expected": "SHORT",
+            "expected_weight": 0.8,
+            "stage_text": "corectia e aproape incheiata - trendul e asteptat sa reia"
           },
           {
             "pattern": "ARMONICA AB=CD",
@@ -4234,14 +5649,15 @@
             "end_idx": 258,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Developing Harmonic D FORMING 47%",
-            "expected": "SHORT",
-            "expected_weight": 0.4,
-            "stage_text": "D inca nu a ajuns in zona PRZ",
+            "headline": "Invalidat Developing Harmonic D FORMING BULLISH 47%",
+            "extreme": 1.2057,
             "targets_hit": {
               "tp1": false,
               "tp2": false
-            }
+            },
+            "expected": "SHORT",
+            "expected_weight": 0.4,
+            "stage_text": "D inca nu a ajuns in zona PRZ"
           }
         ],
         "primary": null,
@@ -4292,1412 +5708,10 @@
         "oi_scaled": false
       }
     },
-    "NEAR/USDT": {
-      "direction": "LONG",
-      "score": 55,
-      "probability": 69.2,
-      "components": {
-        "trend": 1.0,
-        "momentum": 0.149,
-        "volatility": 0.0,
-        "volume": 1.0
-      },
-      "price": 4.906,
-      "atr": 0.25978571,
-      "persistence": 145,
-      "age_minutes": 8701,
-      "indicators": {
-        "emas": {
-          "ema9": 5.122550146401368,
-          "ema20": 5.018561311882636,
-          "ema50": 4.584541093337945,
-          "ema100": 3.971022631408584,
-          "ema200": 3.2058137679916494
-        },
-        "vwap": 3.9890522928670236,
-        "volume_profile": {
-          "poc": 1.98233333,
-          "vah": 3.99033333,
-          "val": 1.64766667,
-          "value_area_pct": 71.2
-        },
-        "supertrend": {
-          "direction": "BULLISH",
-          "level": 4.66746029
-        },
-        "macd": {
-          "macd": 0.16847187,
-          "signal": 0.21150216,
-          "histogram": -0.04303029,
-          "bullish": false
-        },
-        "price": 4.906,
-        "price_vs_value_area": "PESTE VAH"
-      },
-      "structure": {
-        "resistance": [
-          5.213,
-          4.804,
-          3.917
-        ],
-        "support": [
-          2.244,
-          1.907,
-          1.828
-        ]
-      },
-      "fibonacci": {
-        "swing_high": 5.58,
-        "swing_low": 2.269,
-        "retracement": {
-          "0.236": 4.798604,
-          "0.382": 4.315198,
-          "0.5": 3.9245,
-          "0.618": 3.533802,
-          "0.786": 2.977554
-        },
-        "extension": {
-          "1.272": 6.480592,
-          "1.618": 7.626198,
-          "2.0": 8.891
-        }
-      },
-      "plan": {
-        "entry": 4.7761071,
-        "sl": 4.5163214,
-        "signal_price": 4.906,
-        "tp1": 5.213,
-        "tp2": 5.9451428,
-        "expected_r": 4.5
-      },
-      "forecast": {
-        "solid": [],
-        "path": [
-          {
-            "label": "ACUM",
-            "price": 4.906,
-            "idx": 258,
-            "projected": false
-          },
-          {
-            "label": "(ENTRY)",
-            "price": 4.7761071,
-            "idx": 260,
-            "projected": true
-          },
-          {
-            "label": "(TP1)",
-            "price": 5.213,
-            "idx": 267,
-            "projected": true
-          },
-          {
-            "label": "(TP2)",
-            "price": 5.9451428,
-            "idx": 276,
-            "projected": true
-          }
-        ],
-        "source": "plan",
-        "hist": {
-          "n": 3528,
-          "win_rate": 28.7,
-          "median_bars_win": 18,
-          "median_bars_all": 8
-        },
-        "confidence": null
-      },
-      "sparkline": [
-        4.388,
-        4.366,
-        4.557,
-        4.411,
-        4.35,
-        4.426,
-        4.388,
-        4.408,
-        4.691,
-        4.216,
-        4.407,
-        4.334,
-        4.37,
-        4.36,
-        4.327,
-        4.581,
-        4.763,
-        4.592,
-        4.465,
-        4.525,
-        5.026,
-        5.1,
-        5.037,
-        4.952,
-        4.881,
-        4.862,
-        4.896,
-        4.847,
-        4.835,
-        5.036,
-        5.035,
-        5.41,
-        5.177,
-        5.198,
-        5.431,
-        5.39,
-        5.221,
-        5.122,
-        5.145,
-        4.906
-      ],
-      "candles": [
-        [
-          1789315200000,
-          2.287,
-          2.382,
-          2.287,
-          2.33,
-          497495.45
-        ],
-        [
-          1789329600000,
-          2.329,
-          2.356,
-          2.283,
-          2.297,
-          318067.55
-        ],
-        [
-          1789344000000,
-          2.299,
-          2.392,
-          2.279,
-          2.38,
-          520502.41
-        ],
-        [
-          1789358400000,
-          2.38,
-          2.456,
-          2.379,
-          2.425,
-          834196.53
-        ],
-        [
-          1789372800000,
-          2.421,
-          2.434,
-          2.392,
-          2.421,
-          648462.45
-        ],
-        [
-          1789387200000,
-          2.417,
-          2.436,
-          2.378,
-          2.397,
-          658727.99
-        ],
-        [
-          1789401600000,
-          2.398,
-          2.598,
-          2.397,
-          2.533,
-          1597120.85
-        ],
-        [
-          1789416000000,
-          2.535,
-          2.591,
-          2.455,
-          2.469,
-          778178.44
-        ],
-        [
-          1789430400000,
-          2.468,
-          2.488,
-          2.414,
-          2.419,
-          684161.28
-        ],
-        [
-          1789444800000,
-          2.418,
-          2.457,
-          2.338,
-          2.358,
-          780913.72
-        ],
-        [
-          1789459200000,
-          2.358,
-          2.407,
-          2.351,
-          2.372,
-          894488.63
-        ],
-        [
-          1789473600000,
-          2.37,
-          2.407,
-          2.328,
-          2.367,
-          973634.84
-        ],
-        [
-          1789488000000,
-          2.368,
-          2.422,
-          2.298,
-          2.337,
-          894536.68
-        ],
-        [
-          1789502400000,
-          2.337,
-          2.348,
-          2.304,
-          2.337,
-          264774.41
-        ],
-        [
-          1789516800000,
-          2.336,
-          2.367,
-          2.298,
-          2.349,
-          333760.84
-        ],
-        [
-          1789531200000,
-          2.351,
-          2.376,
-          2.33,
-          2.333,
-          320113.0
-        ],
-        [
-          1789545600000,
-          2.332,
-          2.488,
-          2.313,
-          2.486,
-          812223.37
-        ],
-        [
-          1789560000000,
-          2.485,
-          2.503,
-          2.423,
-          2.456,
-          890450.77
-        ],
-        [
-          1789574400000,
-          2.457,
-          2.578,
-          2.439,
-          2.549,
-          1367586.66
-        ],
-        [
-          1789588800000,
-          2.549,
-          2.635,
-          2.523,
-          2.62,
-          908093.23
-        ],
-        [
-          1789603200000,
-          2.62,
-          2.717,
-          2.59,
-          2.695,
-          971715.65
-        ],
-        [
-          1789617600000,
-          2.698,
-          2.759,
-          2.635,
-          2.722,
-          981376.28
-        ],
-        [
-          1789632000000,
-          2.721,
-          2.876,
-          2.711,
-          2.873,
-          1397974.39
-        ],
-        [
-          1789646400000,
-          2.875,
-          2.917,
-          2.805,
-          2.878,
-          1642770.96
-        ],
-        [
-          1789660800000,
-          2.878,
-          3.079,
-          2.875,
-          3.049,
-          2981690.41
-        ],
-        [
-          1789675200000,
-          3.047,
-          3.206,
-          2.982,
-          3.146,
-          1538163.6
-        ],
-        [
-          1789689600000,
-          3.147,
-          3.508,
-          3.069,
-          3.498,
-          3388750.29
-        ],
-        [
-          1789704000000,
-          3.499,
-          3.574,
-          3.417,
-          3.501,
-          3340415.77
-        ],
-        [
-          1789718400000,
-          3.502,
-          3.596,
-          3.414,
-          3.505,
-          2352924.61
-        ],
-        [
-          1789732800000,
-          3.504,
-          3.797,
-          3.47,
-          3.653,
-          3390343.18
-        ],
-        [
-          1789747200000,
-          3.654,
-          3.837,
-          3.579,
-          3.675,
-          2099939.78
-        ],
-        [
-          1789761600000,
-          3.677,
-          3.819,
-          3.622,
-          3.763,
-          1132655.02
-        ],
-        [
-          1789776000000,
-          3.764,
-          3.917,
-          3.691,
-          3.757,
-          1634172.37
-        ],
-        [
-          1789790400000,
-          3.758,
-          3.796,
-          3.635,
-          3.687,
-          1111540.02
-        ],
-        [
-          1789804800000,
-          3.682,
-          3.748,
-          3.624,
-          3.683,
-          1183204.19
-        ],
-        [
-          1789819200000,
-          3.684,
-          3.688,
-          3.542,
-          3.618,
-          1106163.29
-        ],
-        [
-          1789833600000,
-          3.617,
-          3.681,
-          3.403,
-          3.522,
-          1170208.24
-        ],
-        [
-          1789848000000,
-          3.522,
-          3.628,
-          3.512,
-          3.587,
-          466112.82
-        ],
-        [
-          1789862400000,
-          3.588,
-          3.61,
-          3.469,
-          3.51,
-          954702.42
-        ],
-        [
-          1789876800000,
-          3.51,
-          3.517,
-          3.425,
-          3.46,
-          678549.59
-        ],
-        [
-          1789891200000,
-          3.463,
-          3.669,
-          3.463,
-          3.616,
-          1163518.24
-        ],
-        [
-          1789905600000,
-          3.616,
-          3.918,
-          3.563,
-          3.91,
-          2154541.18
-        ],
-        [
-          1789920000000,
-          3.911,
-          4.306,
-          3.854,
-          4.155,
-          3696559.99
-        ],
-        [
-          1789934400000,
-          4.158,
-          4.273,
-          4.047,
-          4.166,
-          1852839.09
-        ],
-        [
-          1789948800000,
-          4.166,
-          4.409,
-          4.104,
-          4.402,
-          2495105.1
-        ],
-        [
-          1789963200000,
-          4.405,
-          4.454,
-          4.21,
-          4.267,
-          1746680.36
-        ],
-        [
-          1789977600000,
-          4.266,
-          4.375,
-          4.146,
-          4.175,
-          2097168.37
-        ],
-        [
-          1789992000000,
-          4.175,
-          4.235,
-          4.009,
-          4.069,
-          1435227.23
-        ],
-        [
-          1790006400000,
-          4.066,
-          4.175,
-          3.917,
-          4.161,
-          1636636.33
-        ],
-        [
-          1790020800000,
-          4.16,
-          4.343,
-          4.021,
-          4.271,
-          1198233.58
-        ],
-        [
-          1790035200000,
-          4.27,
-          4.586,
-          4.206,
-          4.388,
-          2641651.01
-        ],
-        [
-          1790049600000,
-          4.389,
-          4.506,
-          4.255,
-          4.366,
-          1712167.42
-        ],
-        [
-          1790064000000,
-          4.368,
-          4.635,
-          4.35,
-          4.557,
-          2103162.1
-        ],
-        [
-          1790078400000,
-          4.561,
-          4.661,
-          4.293,
-          4.411,
-          2168072.11
-        ],
-        [
-          1790092800000,
-          4.411,
-          4.494,
-          4.319,
-          4.35,
-          822633.02
-        ],
-        [
-          1790107200000,
-          4.349,
-          4.468,
-          4.223,
-          4.426,
-          832313.18
-        ],
-        [
-          1790121600000,
-          4.425,
-          4.444,
-          4.284,
-          4.388,
-          923604.71
-        ],
-        [
-          1790136000000,
-          4.388,
-          4.554,
-          4.323,
-          4.408,
-          1387483.65
-        ],
-        [
-          1790150400000,
-          4.406,
-          4.749,
-          4.371,
-          4.691,
-          1895695.17
-        ],
-        [
-          1790164800000,
-          4.694,
-          4.804,
-          4.15,
-          4.216,
-          5206148.41
-        ],
-        [
-          1790179200000,
-          4.216,
-          4.483,
-          4.029,
-          4.407,
-          2274843.33
-        ],
-        [
-          1790193600000,
-          4.407,
-          4.451,
-          4.246,
-          4.334,
-          1633172.5
-        ],
-        [
-          1790208000000,
-          4.332,
-          4.436,
-          4.214,
-          4.37,
-          1060026.9
-        ],
-        [
-          1790222400000,
-          4.37,
-          4.551,
-          4.248,
-          4.36,
-          2077691.26
-        ],
-        [
-          1790236800000,
-          4.36,
-          4.367,
-          4.097,
-          4.327,
-          1751085.52
-        ],
-        [
-          1790251200000,
-          4.325,
-          4.753,
-          4.309,
-          4.581,
-          3618921.62
-        ],
-        [
-          1790265600000,
-          4.581,
-          4.822,
-          4.522,
-          4.763,
-          1823875.79
-        ],
-        [
-          1790280000000,
-          4.762,
-          4.814,
-          4.545,
-          4.592,
-          909400.77
-        ],
-        [
-          1790294400000,
-          4.59,
-          4.696,
-          4.441,
-          4.465,
-          963350.78
-        ],
-        [
-          1790308800000,
-          4.465,
-          4.544,
-          4.446,
-          4.525,
-          532591.1
-        ],
-        [
-          1790323200000,
-          4.525,
-          5.061,
-          4.519,
-          5.026,
-          3230672.96
-        ],
-        [
-          1790337600000,
-          5.026,
-          5.19,
-          4.898,
-          5.1,
-          3281652.47
-        ],
-        [
-          1790352000000,
-          5.103,
-          5.213,
-          4.917,
-          5.037,
-          1316082.09
-        ],
-        [
-          1790366400000,
-          5.037,
-          5.15,
-          4.855,
-          4.952,
-          890573.24
-        ],
-        [
-          1790380800000,
-          4.951,
-          5.0,
-          4.848,
-          4.881,
-          797788.58
-        ],
-        [
-          1790395200000,
-          4.882,
-          4.967,
-          4.84,
-          4.862,
-          691016.89
-        ],
-        [
-          1790409600000,
-          4.86,
-          4.973,
-          4.794,
-          4.896,
-          1120948.53
-        ],
-        [
-          1790424000000,
-          4.897,
-          4.946,
-          4.763,
-          4.847,
-          1142684.97
-        ],
-        [
-          1790438400000,
-          4.846,
-          4.91,
-          4.798,
-          4.835,
-          548044.68
-        ],
-        [
-          1790452800000,
-          4.835,
-          5.049,
-          4.733,
-          5.036,
-          1020423.0
-        ],
-        [
-          1790467200000,
-          5.037,
-          5.168,
-          5.004,
-          5.035,
-          1115257.42
-        ],
-        [
-          1790481600000,
-          5.035,
-          5.497,
-          5.005,
-          5.41,
-          2495052.89
-        ],
-        [
-          1790496000000,
-          5.411,
-          5.439,
-          5.13,
-          5.177,
-          1559021.75
-        ],
-        [
-          1790510400000,
-          5.176,
-          5.281,
-          5.109,
-          5.198,
-          1176000.17
-        ],
-        [
-          1790524800000,
-          5.198,
-          5.485,
-          5.143,
-          5.431,
-          1165539.15
-        ],
-        [
-          1790539200000,
-          5.433,
-          5.58,
-          5.342,
-          5.39,
-          1292447.27
-        ],
-        [
-          1790553600000,
-          5.39,
-          5.425,
-          5.206,
-          5.221,
-          1130189.03
-        ],
-        [
-          1790568000000,
-          5.221,
-          5.292,
-          5.07,
-          5.122,
-          1246432.58
-        ],
-        [
-          1790582400000,
-          5.126,
-          5.188,
-          4.933,
-          5.145,
-          1889988.3
-        ],
-        [
-          1790596800000,
-          5.145,
-          5.261,
-          4.827,
-          4.906,
-          2959852.8
-        ]
-      ],
-      "ema20": [
-        2.3715349,
-        2.3644363,
-        2.3659186,
-        2.3715454,
-        2.3762554,
-        2.378231,
-        2.3929709,
-        2.4002118,
-        2.4020012,
-        2.3978106,
-        2.3953524,
-        2.3926522,
-        2.387352,
-        2.3825566,
-        2.3793607,
-        2.3749454,
-        2.385522,
-        2.3922342,
-        2.4071643,
-        2.4274344,
-        2.4529168,
-        2.4785438,
-        2.516111,
-        2.5505766,
-        2.5980455,
-        2.6502317,
-        2.7309715,
-        2.8043076,
-        2.8710402,
-        2.9455125,
-        3.0149875,
-        3.0862268,
-        3.15011,
-        3.2012424,
-        3.247124,
-        3.2824456,
-        3.3052603,
-        3.3320926,
-        3.3490362,
-        3.3596042,
-        3.3840228,
-        3.4341159,
-        3.5027715,
-        3.5659361,
-        3.6455613,
-        3.7047459,
-        3.749532,
-        3.7799575,
-        3.8162473,
-        3.8595571,
-        3.909885,
-        3.9533245,
-        4.0108174,
-        4.04893,
-        4.0776034,
-        4.110784,
-        4.1371855,
-        4.1629774,
-        4.2132652,
-        4.2135257,
-        4.2319518,
-        4.2416707,
-        4.2538925,
-        4.263998,
-        4.2699982,
-        4.2996174,
-        4.3437491,
-        4.367392,
-        4.376688,
-        4.390813,
-        4.451307,
-        4.5130873,
-        4.5629837,
-        4.6000329,
-        4.6267917,
-        4.6491925,
-        4.6726979,
-        4.6892981,
-        4.7031745,
-        4.7348722,
-        4.7634558,
-        4.8250314,
-        4.8585522,
-        4.8908806,
-        4.9423205,
-        4.9849567,
-        5.007437,
-        5.0183478,
-        5.0304099,
-        5.0185613
-      ],
-      "ema50": [
-        2.3288057,
-        2.3275584,
-        2.329615,
-        2.3333556,
-        2.3367926,
-        2.3391537,
-        2.3467555,
-        2.3515494,
-        2.3541945,
-        2.3543437,
-        2.3550361,
-        2.3555053,
-        2.3547796,
-        2.3540824,
-        2.3538831,
-        2.3530641,
-        2.3582773,
-        2.3621096,
-        2.3694386,
-        2.3792645,
-        2.3916463,
-        2.4046014,
-        2.4229699,
-        2.4408143,
-        2.4646647,
-        2.4913837,
-        2.5308589,
-        2.5689036,
-        2.6056133,
-        2.6466873,
-        2.6870132,
-        2.7292088,
-        2.7695143,
-        2.8054942,
-        2.8399062,
-        2.8704197,
-        2.8959718,
-        2.923071,
-        2.9460878,
-        2.9662412,
-        2.9917219,
-        3.0277329,
-        3.0719394,
-        3.1148437,
-        3.1653205,
-        3.2085236,
-        3.2464246,
-        3.2786825,
-        3.3132832,
-        3.3508407,
-        3.3915136,
-        3.4297288,
-        3.4739355,
-        3.5106831,
-        3.5435975,
-        3.5782015,
-        3.6099583,
-        3.6412541,
-        3.6824206,
-        3.7033453,
-        3.7309396,
-        3.754589,
-        3.7787228,
-        3.8015179,
-        3.8221251,
-        3.8518849,
-        3.8876149,
-        3.9152378,
-        3.9367971,
-        3.9598639,
-        4.0016732,
-        4.0447448,
-        4.0836568,
-        4.1177095,
-        4.1476424,
-        4.1756564,
-        4.2039052,
-        4.2291246,
-        4.2528844,
-        4.2835948,
-        4.3130617,
-        4.3560789,
-        4.3882719,
-        4.4200259,
-        4.459672,
-        4.4961554,
-        4.5245807,
-        4.5480089,
-        4.5714203,
-        4.5845411
-      ],
-      "liq_structure": {
-        "levels": [
-          {
-            "price": 2.2961428571428573,
-            "side": "SELL",
-            "kind": "EQUAL LOWS",
-            "role": "TARGET",
-            "touches": 7,
-            "swept": false,
-            "distance_pct": -53.2,
-            "label": "STRUCT SELL-SIDE LIQ - 4h - EQUAL LOWS - TARGET",
-            "strength": 0.2005
-          },
-          {
-            "price": 4.733,
-            "side": "SELL",
-            "kind": "MAJOR SWING LOW",
-            "role": "TARGET",
-            "touches": 1,
-            "swept": false,
-            "distance_pct": -3.53,
-            "label": "STRUCT SELL-SIDE LIQ - 4h - MAJOR SWING LOW - TARGET",
-            "strength": 0.1955
-          },
-          {
-            "price": 5.213,
-            "side": "BUY",
-            "kind": "MAJOR SWING HIGH",
-            "role": "ENTRY",
-            "touches": 1,
-            "swept": true,
-            "distance_pct": 6.26,
-            "label": "STRUCT BUY-SIDE LIQ - 4h - MAJOR SWING HIGH - ENTRY",
-            "strength": 0.148
-          },
-          {
-            "price": 1.8058333333333332,
-            "side": "SELL",
-            "kind": "EQUAL LOWS",
-            "role": "TARGET",
-            "touches": 6,
-            "swept": false,
-            "distance_pct": -63.19,
-            "label": "STRUCT SELL-SIDE LIQ - 4h - EQUAL LOWS - TARGET",
-            "strength": 0.1466
-          },
-          {
-            "price": 5.497,
-            "side": "BUY",
-            "kind": "MAJOR SWING HIGH",
-            "role": "ENTRY",
-            "touches": 1,
-            "swept": true,
-            "distance_pct": 12.05,
-            "label": "STRUCT BUY-SIDE LIQ - 4h - MAJOR SWING HIGH - ENTRY",
-            "strength": 0.0978
-          },
-          {
-            "price": 1.6335,
-            "side": "SELL",
-            "kind": "EQUAL LOWS",
-            "role": "TARGET",
-            "touches": 4,
-            "swept": false,
-            "distance_pct": -66.7,
-            "label": "STRUCT SELL-SIDE LIQ - 4h - EQUAL LOWS - TARGET",
-            "strength": 0.093
-          },
-          {
-            "price": 5.58,
-            "side": "BUY",
-            "kind": "MAJOR SWING HIGH",
-            "role": "TARGET",
-            "touches": 1,
-            "swept": false,
-            "distance_pct": 13.74,
-            "label": "STRUCT BUY-SIDE LIQ - 4h - MAJOR SWING HIGH - TARGET",
-            "strength": 0.0889
-          },
-          {
-            "price": 4.223,
-            "side": "SELL",
-            "kind": "MAJOR SWING LOW",
-            "role": "ENTRY",
-            "touches": 1,
-            "swept": true,
-            "distance_pct": -13.92,
-            "label": "STRUCT SELL-SIDE LIQ - 4h - MAJOR SWING LOW - ENTRY",
-            "strength": 0.0881
-          }
-        ],
-        "two_sided_sweep": true,
-        "swept_buy": true,
-        "swept_sell": true,
-        "above": {
-          "price": 5.213,
-          "side": "BUY",
-          "kind": "MAJOR SWING HIGH",
-          "role": "ENTRY",
-          "touches": 1,
-          "swept": true,
-          "distance_pct": 6.26,
-          "label": "STRUCT BUY-SIDE LIQ - 4h - MAJOR SWING HIGH - ENTRY",
-          "strength": 0.148
-        },
-        "below": {
-          "price": 4.733,
-          "side": "SELL",
-          "kind": "MAJOR SWING LOW",
-          "role": "TARGET",
-          "touches": 1,
-          "swept": false,
-          "distance_pct": -3.53,
-          "label": "STRUCT SELL-SIDE LIQ - 4h - MAJOR SWING LOW - TARGET",
-          "strength": 0.1955
-        }
-      },
-      "elliott": {
-        "counts": [
-          {
-            "pattern": "ARMONICA AB=CD",
-            "direction": "LONG",
-            "confidence": 0.7587,
-            "invalidation": 5.213,
-            "prz": {
-              "low": 4.96944,
-              "high": 5.1
-            },
-            "points": [
-              {
-                "label": "A",
-                "price": 5.213,
-                "idx": 241,
-                "confirmed": true,
-                "display": "A CONFIRMED"
-              },
-              {
-                "label": "B",
-                "price": 4.733,
-                "idx": 248,
-                "confirmed": true,
-                "display": "B CONFIRMED"
-              },
-              {
-                "label": "C",
-                "price": 5.58,
-                "idx": 254,
-                "confirmed": true,
-                "display": "C CONFIRMED"
-              },
-              {
-                "label": "D",
-                "price": 4.827,
-                "idx": 258,
-                "confirmed": false,
-                "display": "D FORMING"
-              }
-            ],
-            "targets": {
-              "tp1": 5.58,
-              "tp2": 5.213
-            },
-            "start_idx": 241,
-            "end_idx": 258,
-            "invalidated": true,
-            "rank": "Invalidat",
-            "headline": "Invalidat Developing Harmonic D FORMING 76%",
-            "expected": "SHORT",
-            "expected_weight": 0.4,
-            "stage_text": "D inca nu a ajuns in zona PRZ",
-            "targets_hit": {
-              "tp1": false,
-              "tp2": false
-            }
-          },
-          {
-            "pattern": "IMPULS IN DEZVOLTARE",
-            "direction": "LONG",
-            "confidence": 0.5734,
-            "stage": "W4",
-            "invalidation": 5.213,
-            "points": [
-              {
-                "label": "MAJOR START",
-                "price": 4.029,
-                "idx": 229,
-                "confirmed": true,
-                "display": "MAJOR START"
-              },
-              {
-                "label": "W1",
-                "price": 5.213,
-                "idx": 241,
-                "confirmed": true,
-                "display": "W1 CONFIRMED"
-              },
-              {
-                "label": "W2",
-                "price": 4.733,
-                "idx": 248,
-                "confirmed": true,
-                "display": "W2 CONFIRMED"
-              },
-              {
-                "label": "W3",
-                "price": 5.58,
-                "idx": 254,
-                "confirmed": true,
-                "display": "W3 CONFIRMED"
-              },
-              {
-                "label": "W4",
-                "price": 4.827,
-                "idx": 258,
-                "confirmed": false,
-                "display": "W4 FORMING"
-              }
-            ],
-            "targets": {
-              "tp1": 6.648712,
-              "tp2": 7.832712,
-              "tp3": 9.748424
-            },
-            "len1": 1.1840000000000002,
-            "start_idx": 229,
-            "end_idx": 258,
-            "invalidated": true,
-            "rank": "Invalidat",
-            "headline": "Invalidat Developing Motive W4 FORMING 57%",
-            "expected": "LONG",
-            "expected_weight": 0.4,
-            "stage_text": "unda 4 corectiva - continuarea (W5) e asteptata dupa ea",
-            "targets_hit": {
-              "tp1": false,
-              "tp2": false,
-              "tp3": false
-            }
-          },
-          {
-            "pattern": "CORECTIE A-B-C",
-            "direction": "SHORT",
-            "confidence": 0.368,
-            "invalidation": 4.029,
-            "points": [
-              {
-                "label": "MAJOR START",
-                "price": 4.029,
-                "idx": 229,
-                "confirmed": true,
-                "display": "MAJOR START"
-              },
-              {
-                "label": "A",
-                "price": 5.213,
-                "idx": 241,
-                "confirmed": true,
-                "display": "A CONFIRMED"
-              },
-              {
-                "label": "B",
-                "price": 4.733,
-                "idx": 248,
-                "confirmed": true,
-                "display": "B CONFIRMED"
-              },
-              {
-                "label": "C",
-                "price": 5.58,
-                "idx": 254,
-                "confirmed": true,
-                "display": "C CONFIRMED"
-              }
-            ],
-            "targets": {
-              "tp1": 4.848288,
-              "tp2": 4.396
-            },
-            "start_idx": 229,
-            "end_idx": 254,
-            "invalidated": true,
-            "rank": "Invalidat",
-            "headline": "Invalidat Zigzag C 37%",
-            "expected": "SHORT",
-            "expected_weight": 0.8,
-            "stage_text": "corectia e aproape incheiata - trendul e asteptat sa reia",
-            "targets_hit": {
-              "tp1": false,
-              "tp2": false
-            }
-          }
-        ],
-        "primary": null,
-        "alive": 0,
-        "total": 3,
-        "offset": 169
-      },
-      "structure_panel": {
-        "regime": {
-          "label": "TREND SLAB SUS",
-          "strength": 53,
-          "vote": 0.4,
-          "atr_pct": 5.3
-        },
-        "cross": {
-          "type": "GOLDEN CROSS",
-          "fast": 4.584541093337945,
-          "slow": 3.2058137679916494,
-          "bullish": true,
-          "strength": 1.0
-        },
-        "ichimoku": {
-          "position": "IN NOR",
-          "vote": 0.0,
-          "tenkan": 5.2035,
-          "kijun": 4.8385,
-          "span_a": 5.021,
-          "span_b": 4.5024999999999995,
-          "strength": 0.0
-        }
-      },
-      "liquidation": {
-        "above": {
-          "price": 5.214737333333333,
-          "density": 0.040658,
-          "side": "SHORT",
-          "distance_pct": 6.29,
-          "intensity": 0.5735
-        },
-        "below": {
-          "price": 4.331084,
-          "density": 0.070897,
-          "side": "LONG",
-          "distance_pct": -11.72,
-          "intensity": 1.0
-        },
-        "bias": -0.0815,
-        "oi_scaled": false
-      }
-    },
     "LINK/USDT": {
       "direction": "LONG",
-      "score": 79,
-      "probability": 77.7,
+      "score": 78,
+      "probability": 77.3,
       "components": {
         "trend": 0.814,
         "momentum": 0.621,
@@ -5706,8 +5720,8 @@
       },
       "price": 14.432,
       "atr": 0.37621429,
-      "persistence": 98,
-      "age_minutes": 5819,
+      "persistence": 99,
+      "age_minutes": 5882,
       "indicators": {
         "emas": {
           "ema9": 14.090224043557862,
@@ -5807,7 +5821,9 @@
           "median_bars_win": 9,
           "median_bars_all": 6
         },
-        "confidence": 0.5388
+        "confidence": 0.5388,
+        "next_entry": null,
+        "plan_dir": "LONG"
       },
       "sparkline": [
         12.995,
@@ -6922,15 +6938,16 @@
             "end_idx": 258,
             "invalidated": false,
             "rank": "Primary",
-            "headline": "Primary Developing Motive W3 FORMING 54%",
-            "expected": "LONG",
-            "expected_weight": 1.0,
-            "stage_text": "unda 3 in formare - faza cea mai puternica a trendului",
+            "headline": "Primary Developing Motive W3 FORMING BULLISH 54%",
+            "extreme": 15.017,
             "targets_hit": {
               "tp1": true,
               "tp2": false,
               "tp3": false
             },
+            "expected": "LONG",
+            "expected_weight": 1.0,
+            "stage_text": "unda 3 in formare - faza cea mai puternica a trendului",
             "projection": {
               "path": [
                 {
@@ -7048,15 +7065,16 @@
             "stale": true,
             "invalidated": false,
             "rank": "Alternative",
-            "headline": "Alternative Developing Motive W5 FORMING 28%",
-            "expected": "LONG",
-            "expected_weight": 0.5,
-            "stage_text": "unda 5 are inca spatiu pana la prima tinta",
+            "headline": "Alternative Developing Motive W5 FORMING BULLISH 28%",
+            "extreme": 15.017,
             "targets_hit": {
-              "tp1": false,
+              "tp1": true,
               "tp2": false,
               "tp3": false
-            }
+            },
+            "expected": "SHORT",
+            "expected_weight": 0.7,
+            "stage_text": "impulsul pare complet - W5 a atins 15.017, iar pretul a retras 51% din ea; urmeaza corectia A-B-C"
           },
           {
             "pattern": "ARMONICA AB=CD",
@@ -7105,14 +7123,15 @@
             "end_idx": 257,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Developing Harmonic D FORMING 73%",
-            "expected": "SHORT",
-            "expected_weight": 0.4,
-            "stage_text": "D inca nu a ajuns in zona PRZ",
+            "headline": "Invalidat Developing Harmonic D FORMING BULLISH 73%",
+            "extreme": 15.017,
             "targets_hit": {
-              "tp1": false,
-              "tp2": false
-            }
+              "tp1": true,
+              "tp2": true
+            },
+            "expected": "LONG",
+            "expected_weight": 0.2,
+            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus"
           },
           {
             "pattern": "CORECTIE A-B-C",
@@ -7157,14 +7176,15 @@
             "end_idx": 257,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Developing Zigzag C FORMING 55%",
-            "expected": "LONG",
-            "expected_weight": 0.2,
-            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
+            "headline": "Invalidat Developing Zigzag C FORMING BULLISH 55%",
+            "extreme": 15.017,
             "targets_hit": {
               "tp1": true,
               "tp2": true
-            }
+            },
+            "expected": "LONG",
+            "expected_weight": 0.2,
+            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus"
           }
         ],
         "primary": {
@@ -7213,15 +7233,16 @@
           "end_idx": 258,
           "invalidated": false,
           "rank": "Primary",
-          "headline": "Primary Developing Motive W3 FORMING 54%",
-          "expected": "LONG",
-          "expected_weight": 1.0,
-          "stage_text": "unda 3 in formare - faza cea mai puternica a trendului",
+          "headline": "Primary Developing Motive W3 FORMING BULLISH 54%",
+          "extreme": 15.017,
           "targets_hit": {
             "tp1": true,
             "tp2": false,
             "tp3": false
           },
+          "expected": "LONG",
+          "expected_weight": 1.0,
+          "stage_text": "unda 3 in formare - faza cea mai puternica a trendului",
           "projection": {
             "path": [
               {
@@ -7303,8 +7324,8 @@
     },
     "GRAM/USDT": {
       "direction": "LONG",
-      "score": 63,
-      "probability": 72.0,
+      "score": 62,
+      "probability": 71.7,
       "components": {
         "trend": 0.953,
         "momentum": 0.519,
@@ -7313,8 +7334,8 @@
       },
       "price": 1.61,
       "atr": 0.074071429,
-      "persistence": 36,
-      "age_minutes": 2221,
+      "persistence": 37,
+      "age_minutes": 2284,
       "indicators": {
         "emas": {
           "ema9": 1.610012743394057,
@@ -7411,7 +7432,9 @@
           "median_bars_win": 9,
           "median_bars_all": 6
         },
-        "confidence": 0.6147
+        "confidence": 0.6147,
+        "next_entry": null,
+        "plan_dir": "LONG"
       },
       "sparkline": [
         1.437,
@@ -8472,14 +8495,15 @@
             "end_idx": 256,
             "invalidated": false,
             "rank": "Primary",
-            "headline": "Primary Developing Harmonic D FORMING 61%",
-            "expected": "LONG",
-            "expected_weight": 0.7,
-            "stage_text": "pretul e in zona PRZ - inversare asteptata",
+            "headline": "Primary Developing Harmonic D FORMING BULLISH 61%",
+            "extreme": 1.726,
             "targets_hit": {
-              "tp1": false,
+              "tp1": true,
               "tp2": true
             },
+            "expected": "LONG",
+            "expected_weight": 0.2,
+            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
             "projection": {
               "path": [
                 {
@@ -8565,15 +8589,16 @@
             "end_idx": 258,
             "invalidated": false,
             "rank": "Alternative",
-            "headline": "Alternative Developing Motive W3 FORMING 52%",
-            "expected": "LONG",
-            "expected_weight": 0.4,
-            "stage_text": "unda 4 corectiva - continuarea (W5) e asteptata dupa ea",
+            "headline": "Alternative Developing Motive W3 FORMING BULLISH 52%",
+            "extreme": 1.726,
             "targets_hit": {
               "tp1": true,
-              "tp2": false,
+              "tp2": true,
               "tp3": false
-            }
+            },
+            "expected": "LONG",
+            "expected_weight": 0.4,
+            "stage_text": "unda 4 corectiva - continuarea (W5) e asteptata dupa ea"
           },
           {
             "pattern": "ARMONICA AB=CD",
@@ -8622,14 +8647,15 @@
             "end_idx": 229,
             "invalidated": false,
             "rank": "Secondary",
-            "headline": "Secondary Harmonic D 42%",
-            "expected": "LONG",
-            "expected_weight": 0.2,
-            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
+            "headline": "Secondary Harmonic D BULLISH 42%",
+            "extreme": 1.726,
             "targets_hit": {
               "tp1": true,
               "tp2": true
-            }
+            },
+            "expected": "LONG",
+            "expected_weight": 0.2,
+            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus"
           },
           {
             "pattern": "IMPULS 1-2-3-4-5",
@@ -8716,15 +8742,16 @@
             "stale": true,
             "invalidated": false,
             "rank": "Family",
-            "headline": "Family Developing Motive W5 FORMING 21%",
-            "expected": "LONG",
-            "expected_weight": 0.2,
-            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
+            "headline": "Family Developing Motive W5 FORMING BULLISH 21%",
+            "extreme": 1.726,
             "targets_hit": {
               "tp1": true,
               "tp2": true,
               "tp3": true
-            }
+            },
+            "expected": "SHORT",
+            "expected_weight": 0.7,
+            "stage_text": "impulsul pare complet - W5 a atins 1.726, iar pretul a retras 37% din ea; urmeaza corectia A-B-C"
           }
         ],
         "primary": {
@@ -8774,14 +8801,15 @@
           "end_idx": 256,
           "invalidated": false,
           "rank": "Primary",
-          "headline": "Primary Developing Harmonic D FORMING 61%",
-          "expected": "LONG",
-          "expected_weight": 0.7,
-          "stage_text": "pretul e in zona PRZ - inversare asteptata",
+          "headline": "Primary Developing Harmonic D FORMING BULLISH 61%",
+          "extreme": 1.726,
           "targets_hit": {
-            "tp1": false,
+            "tp1": true,
             "tp2": true
           },
+          "expected": "LONG",
+          "expected_weight": 0.2,
+          "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
           "projection": {
             "path": [
               {
@@ -8863,8 +8891,8 @@
     },
     "SEI/USDT": {
       "direction": "LONG",
-      "score": 62,
-      "probability": 71.7,
+      "score": 61,
+      "probability": 71.3,
       "components": {
         "trend": 1.0,
         "momentum": 0.57,
@@ -8873,8 +8901,8 @@
       },
       "price": 0.07765,
       "atr": 0.0037907143,
-      "persistence": 9,
-      "age_minutes": 536,
+      "persistence": 10,
+      "age_minutes": 599,
       "indicators": {
         "emas": {
           "ema9": 0.07758259822433106,
@@ -8949,32 +8977,28 @@
             "projected": false
           },
           {
-            "label": "(ENTRY)",
-            "price": 0.075754643,
-            "idx": 260,
-            "projected": true
-          },
-          {
-            "label": "(TP1)",
-            "price": 0.079545357,
-            "idx": 262,
-            "projected": true
-          },
-          {
-            "label": "(TP2)",
-            "price": 0.092812857,
+            "label": "(1)",
+            "price": 0.08662,
             "idx": 267,
+            "projected": true
+          },
+          {
+            "label": "(2)",
+            "price": 0.07722,
+            "idx": 272,
             "projected": true
           }
         ],
-        "source": "plan",
+        "source": "elliott_conflict",
         "hist": {
           "n": 2614,
           "win_rate": 43.1,
           "median_bars_win": 9,
           "median_bars_all": 6
         },
-        "confidence": 0.8004
+        "confidence": 0.8004,
+        "next_entry": 0.07722,
+        "plan_dir": "LONG"
       },
       "sparkline": [
         0.0603,
@@ -10068,14 +10092,15 @@
             "end_idx": 258,
             "invalidated": false,
             "rank": "Primary",
-            "headline": "Primary Developing Harmonic D FORMING 80%",
-            "expected": "SHORT",
-            "expected_weight": 0.4,
-            "stage_text": "D inca nu a ajuns in zona PRZ",
+            "headline": "Primary Developing Harmonic D FORMING BULLISH 80%",
+            "extreme": 0.0829,
             "targets_hit": {
               "tp1": false,
               "tp2": true
             },
+            "expected": "SHORT",
+            "expected_weight": 0.4,
+            "stage_text": "D inca nu a ajuns in zona PRZ",
             "projection": {
               "path": [
                 {
@@ -10161,15 +10186,16 @@
             "end_idx": 258,
             "invalidated": false,
             "rank": "Alternative",
-            "headline": "Alternative Developing Motive W4 FORMING 50%",
-            "expected": "LONG",
-            "expected_weight": 0.4,
-            "stage_text": "unda 4 corectiva - continuarea (W5) e asteptata dupa ea",
+            "headline": "Alternative Developing Motive W4 FORMING BULLISH 50%",
+            "extreme": 0.08662,
             "targets_hit": {
               "tp1": false,
               "tp2": false,
               "tp3": false
-            }
+            },
+            "expected": "LONG",
+            "expected_weight": 0.4,
+            "stage_text": "unda 4 corectiva - continuarea (W5) e asteptata dupa ea"
           },
           {
             "pattern": "IMPULS 1-2-3-4-5",
@@ -10255,15 +10281,16 @@
             "end_idx": 255,
             "invalidated": false,
             "rank": "Secondary",
-            "headline": "Secondary Motive W5 47%",
-            "expected": "SHORT",
-            "expected_weight": 0.7,
-            "stage_text": "impulsul e complet sau dincolo de tinte - urmeaza corectia A-B-C",
+            "headline": "Secondary Motive W5 BULLISH 47%",
+            "extreme": 0.08662,
             "targets_hit": {
-              "tp1": false,
+              "tp1": true,
               "tp2": false,
               "tp3": false
-            }
+            },
+            "expected": "SHORT",
+            "expected_weight": 0.7,
+            "stage_text": "impulsul pare complet - W5 a atins 0.08662, iar pretul a retras 56% din ea; urmeaza corectia A-B-C"
           },
           {
             "pattern": "ARMONICA AB=CD",
@@ -10312,14 +10339,15 @@
             "end_idx": 248,
             "invalidated": false,
             "rank": "Family",
-            "headline": "Family Harmonic D 34%",
-            "expected": "LONG",
-            "expected_weight": 0.2,
-            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
+            "headline": "Family Harmonic D BULLISH 34%",
+            "extreme": 0.08662,
             "targets_hit": {
               "tp1": true,
               "tp2": true
-            }
+            },
+            "expected": "LONG",
+            "expected_weight": 0.2,
+            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus"
           }
         ],
         "primary": {
@@ -10369,14 +10397,15 @@
           "end_idx": 258,
           "invalidated": false,
           "rank": "Primary",
-          "headline": "Primary Developing Harmonic D FORMING 80%",
-          "expected": "SHORT",
-          "expected_weight": 0.4,
-          "stage_text": "D inca nu a ajuns in zona PRZ",
+          "headline": "Primary Developing Harmonic D FORMING BULLISH 80%",
+          "extreme": 0.0829,
           "targets_hit": {
             "tp1": false,
             "tp2": true
           },
+          "expected": "SHORT",
+          "expected_weight": 0.4,
+          "stage_text": "D inca nu a ajuns in zona PRZ",
           "projection": {
             "path": [
               {
@@ -10458,8 +10487,8 @@
     },
     "ALGO/USDT": {
       "direction": "LONG",
-      "score": 73,
-      "probability": 75.5,
+      "score": 72,
+      "probability": 75.2,
       "components": {
         "trend": 1.0,
         "momentum": 0.877,
@@ -10468,8 +10497,8 @@
       },
       "price": 0.13326,
       "atr": 0.0054635714,
-      "persistence": 106,
-      "age_minutes": 6299,
+      "persistence": 107,
+      "age_minutes": 6362,
       "indicators": {
         "emas": {
           "ema9": 0.12256581140216648,
@@ -10569,7 +10598,9 @@
           "median_bars_win": 9,
           "median_bars_all": 6
         },
-        "confidence": null
+        "confidence": null,
+        "next_entry": null,
+        "plan_dir": "LONG"
       },
       "sparkline": [
         0.11238,
@@ -11672,14 +11703,15 @@
             "stale": true,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Developing Zigzag C FORMING 15%",
-            "expected": "SHORT",
-            "expected_weight": 0.8,
-            "stage_text": "corectia e aproape incheiata - trendul e asteptat sa reia",
+            "headline": "Invalidat Developing Zigzag C FORMING BEARISH 15%",
+            "extreme": 0.11408,
             "targets_hit": {
               "tp1": false,
               "tp2": false
-            }
+            },
+            "expected": "SHORT",
+            "expected_weight": 0.8,
+            "stage_text": "corectia e aproape incheiata - trendul e asteptat sa reia"
           }
         ],
         "primary": null,
@@ -11742,8 +11774,8 @@
       },
       "price": 0.33461,
       "atr": 0.0013535714,
-      "persistence": 74,
-      "age_minutes": 4379,
+      "persistence": 75,
+      "age_minutes": 4442,
       "indicators": {
         "emas": {
           "ema9": 0.33433218842648904,
@@ -11860,7 +11892,9 @@
           "median_bars_win": 20,
           "median_bars_all": 8
         },
-        "confidence": 0.6142
+        "confidence": 0.6142,
+        "next_entry": null,
+        "plan_dir": "SHORT"
       },
       "sparkline": [
         0.34812,
@@ -12975,15 +13009,16 @@
             "end_idx": 249,
             "invalidated": false,
             "rank": "Primary",
-            "headline": "Primary Developing Motive W3 FORMING 61%",
-            "expected": "SHORT",
-            "expected_weight": 1.0,
-            "stage_text": "unda 3 in formare - faza cea mai puternica a trendului",
+            "headline": "Primary Developing Motive W3 FORMING BEARISH 61%",
+            "extreme": 0.33222,
             "targets_hit": {
               "tp1": false,
               "tp2": false,
               "tp3": false
             },
+            "expected": "SHORT",
+            "expected_weight": 1.0,
+            "stage_text": "unda 3 in formare - faza cea mai puternica a trendului",
             "projection": {
               "path": [
                 {
@@ -13059,14 +13094,15 @@
             "end_idx": 231,
             "invalidated": false,
             "rank": "Alternative",
-            "headline": "Alternative Zigzag C 34%",
-            "expected": "SHORT",
-            "expected_weight": 0.8,
-            "stage_text": "corectia e aproape incheiata - trendul e asteptat sa reia",
+            "headline": "Alternative Zigzag C BEARISH 34%",
+            "extreme": 0.33222,
             "targets_hit": {
               "tp1": true,
               "tp2": false
-            }
+            },
+            "expected": "SHORT",
+            "expected_weight": 0.8,
+            "stage_text": "corectia e aproape incheiata - trendul e asteptat sa reia"
           },
           {
             "pattern": "CORECTIE A-B-C",
@@ -13111,14 +13147,15 @@
             "end_idx": 249,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Developing Zigzag C FORMING 57%",
-            "expected": "SHORT",
-            "expected_weight": 0.5,
-            "stage_text": "unda C inca in desfasurare, contra trendului",
+            "headline": "Invalidat Developing Zigzag C FORMING BULLISH 57%",
+            "extreme": 0.33592,
             "targets_hit": {
               "tp1": false,
               "tp2": false
-            }
+            },
+            "expected": "SHORT",
+            "expected_weight": 0.5,
+            "stage_text": "unda C inca in desfasurare, contra trendului"
           },
           {
             "pattern": "ARMONICA AB=CD",
@@ -13167,14 +13204,15 @@
             "end_idx": 249,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Developing Harmonic D FORMING 52%",
-            "expected": "SHORT",
-            "expected_weight": 0.4,
-            "stage_text": "D inca nu a ajuns in zona PRZ",
+            "headline": "Invalidat Developing Harmonic D FORMING BULLISH 52%",
+            "extreme": 0.33592,
             "targets_hit": {
               "tp1": false,
               "tp2": false
-            }
+            },
+            "expected": "SHORT",
+            "expected_weight": 0.4,
+            "stage_text": "D inca nu a ajuns in zona PRZ"
           }
         ],
         "primary": {
@@ -13223,15 +13261,16 @@
           "end_idx": 249,
           "invalidated": false,
           "rank": "Primary",
-          "headline": "Primary Developing Motive W3 FORMING 61%",
-          "expected": "SHORT",
-          "expected_weight": 1.0,
-          "stage_text": "unda 3 in formare - faza cea mai puternica a trendului",
+          "headline": "Primary Developing Motive W3 FORMING BEARISH 61%",
+          "extreme": 0.33222,
           "targets_hit": {
             "tp1": false,
             "tp2": false,
             "tp3": false
           },
+          "expected": "SHORT",
+          "expected_weight": 1.0,
+          "stage_text": "unda 3 in formare - faza cea mai puternica a trendului",
           "projection": {
             "path": [
               {
@@ -13313,8 +13352,8 @@
     },
     "GRT/USDT": {
       "direction": "LONG",
-      "score": 63,
-      "probability": 72.0,
+      "score": 62,
+      "probability": 71.7,
       "components": {
         "trend": 1.0,
         "momentum": 0.475,
@@ -13323,8 +13362,8 @@
       },
       "price": 0.03115,
       "atr": 0.0019257143,
-      "persistence": 13,
-      "age_minutes": 779,
+      "persistence": 14,
+      "age_minutes": 842,
       "indicators": {
         "emas": {
           "ema9": 0.031016914873922944,
@@ -13412,7 +13451,9 @@
           "median_bars_win": 9,
           "median_bars_all": 6
         },
-        "confidence": 0.6625
+        "confidence": 0.6625,
+        "next_entry": null,
+        "plan_dir": "LONG"
       },
       "sparkline": [
         0.02358,
@@ -14534,15 +14575,16 @@
             "end_idx": 258,
             "invalidated": false,
             "rank": "Primary",
-            "headline": "Primary Developing Motive W4 FORMING 66%",
-            "expected": "LONG",
-            "expected_weight": 0.4,
-            "stage_text": "unda 4 corectiva - continuarea (W5) e asteptata dupa ea",
+            "headline": "Primary Developing Motive W4 FORMING BULLISH 66%",
+            "extreme": 0.03669,
             "targets_hit": {
-              "tp1": false,
+              "tp1": true,
               "tp2": false,
               "tp3": false
             },
+            "expected": "LONG",
+            "expected_weight": 0.4,
+            "stage_text": "unda 4 corectiva - continuarea (W5) e asteptata dupa ea",
             "projection": {
               "path": [
                 {
@@ -14648,15 +14690,16 @@
             "stale": true,
             "invalidated": false,
             "rank": "Alternative",
-            "headline": "Alternative Developing Motive W5 FORMING 21%",
-            "expected": "LONG",
-            "expected_weight": 0.2,
-            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
+            "headline": "Alternative Developing Motive W5 FORMING BULLISH 21%",
+            "extreme": 0.03669,
             "targets_hit": {
               "tp1": true,
               "tp2": true,
               "tp3": true
-            }
+            },
+            "expected": "SHORT",
+            "expected_weight": 0.7,
+            "stage_text": "impulsul pare complet - W5 a atins 0.03669, iar pretul a retras 45% din ea; urmeaza corectia A-B-C"
           },
           {
             "pattern": "CORECTIE A-B-C",
@@ -14701,14 +14744,15 @@
             "end_idx": 254,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Zigzag C 37%",
-            "expected": "SHORT",
-            "expected_weight": 0.2,
-            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
+            "headline": "Invalidat Zigzag C BEARISH 37%",
+            "extreme": 0.03058,
             "targets_hit": {
               "tp1": true,
               "tp2": true
-            }
+            },
+            "expected": "SHORT",
+            "expected_weight": 0.2,
+            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus"
           },
           {
             "pattern": "ARMONICA AB=CD",
@@ -14758,14 +14802,15 @@
             "stale": true,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Developing Harmonic D FORMING 23%",
-            "expected": "LONG",
-            "expected_weight": 0.4,
-            "stage_text": "D inca nu a ajuns in zona PRZ",
+            "headline": "Invalidat Developing Harmonic D FORMING BEARISH 23%",
+            "extreme": 0.02711,
             "targets_hit": {
               "tp1": false,
               "tp2": false
-            }
+            },
+            "expected": "LONG",
+            "expected_weight": 0.4,
+            "stage_text": "D inca nu a ajuns in zona PRZ"
           }
         ],
         "primary": {
@@ -14821,15 +14866,16 @@
           "end_idx": 258,
           "invalidated": false,
           "rank": "Primary",
-          "headline": "Primary Developing Motive W4 FORMING 66%",
-          "expected": "LONG",
-          "expected_weight": 0.4,
-          "stage_text": "unda 4 corectiva - continuarea (W5) e asteptata dupa ea",
+          "headline": "Primary Developing Motive W4 FORMING BULLISH 66%",
+          "extreme": 0.03669,
           "targets_hit": {
-            "tp1": false,
+            "tp1": true,
             "tp2": false,
             "tp3": false
           },
+          "expected": "LONG",
+          "expected_weight": 0.4,
+          "stage_text": "unda 4 corectiva - continuarea (W5) e asteptata dupa ea",
           "projection": {
             "path": [
               {
@@ -14899,8 +14945,8 @@
     },
     "FET/USDT": {
       "direction": "LONG",
-      "score": 48,
-      "probability": 66.8,
+      "score": 47,
+      "probability": 66.5,
       "components": {
         "trend": 1.0,
         "momentum": 0.013,
@@ -14909,8 +14955,8 @@
       },
       "price": 0.2261,
       "atr": 0.0096428571,
-      "persistence": 196,
-      "age_minutes": 11818,
+      "persistence": 197,
+      "age_minutes": 11881,
       "indicators": {
         "emas": {
           "ema9": 0.2359759031526668,
@@ -14998,7 +15044,9 @@
           "median_bars_win": 18,
           "median_bars_all": 8
         },
-        "confidence": 0.642
+        "confidence": 0.642,
+        "next_entry": null,
+        "plan_dir": "LONG"
       },
       "sparkline": [
         0.2023,
@@ -16120,15 +16168,16 @@
             "end_idx": 258,
             "invalidated": false,
             "rank": "Primary",
-            "headline": "Primary Developing Motive W4 FORMING 64%",
-            "expected": "LONG",
-            "expected_weight": 0.4,
-            "stage_text": "unda 4 corectiva - continuarea (W5) e asteptata dupa ea",
+            "headline": "Primary Developing Motive W4 FORMING BULLISH 64%",
+            "extreme": 0.26,
             "targets_hit": {
-              "tp1": false,
+              "tp1": true,
               "tp2": false,
               "tp3": false
             },
+            "expected": "LONG",
+            "expected_weight": 0.4,
+            "stage_text": "unda 4 corectiva - continuarea (W5) e asteptata dupa ea",
             "projection": {
               "path": [
                 {
@@ -16196,14 +16245,15 @@
             "end_idx": 258,
             "invalidated": false,
             "rank": "Alternative",
-            "headline": "Alternative Developing Harmonic D FORMING 54%",
-            "expected": "SHORT",
-            "expected_weight": 0.4,
-            "stage_text": "D inca nu a ajuns in zona PRZ",
+            "headline": "Alternative Developing Harmonic D FORMING BULLISH 54%",
+            "extreme": 0.2362,
             "targets_hit": {
               "tp1": false,
               "tp2": true
-            }
+            },
+            "expected": "SHORT",
+            "expected_weight": 0.4,
+            "stage_text": "D inca nu a ajuns in zona PRZ"
           },
           {
             "pattern": "IMPULS 1-2-3-4-5",
@@ -16290,15 +16340,16 @@
             "stale": true,
             "invalidated": false,
             "rank": "Secondary",
-            "headline": "Secondary Developing Motive W5 FORMING 22%",
-            "expected": "LONG",
-            "expected_weight": 0.0,
-            "stage_text": "unda 5 in zona tintelor - potential ramas redus",
+            "headline": "Secondary Developing Motive W5 FORMING BULLISH 22%",
+            "extreme": 0.26,
             "targets_hit": {
               "tp1": true,
-              "tp2": false,
+              "tp2": true,
               "tp3": false
-            }
+            },
+            "expected": "SHORT",
+            "expected_weight": 0.7,
+            "stage_text": "impulsul pare complet - W5 a atins 0.26, iar pretul a retras 53% din ea; urmeaza corectia A-B-C"
           },
           {
             "pattern": "CORECTIE A-B-C",
@@ -16344,14 +16395,15 @@
             "stale": true,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Developing Zigzag C FORMING 14%",
-            "expected": "LONG",
-            "expected_weight": 0.5,
-            "stage_text": "unda C inca in desfasurare, contra trendului",
+            "headline": "Invalidat Developing Zigzag C FORMING BEARISH 14%",
+            "extreme": 0.1904,
             "targets_hit": {
               "tp1": false,
               "tp2": false
-            }
+            },
+            "expected": "LONG",
+            "expected_weight": 0.5,
+            "stage_text": "unda C inca in desfasurare, contra trendului"
           }
         ],
         "primary": {
@@ -16407,15 +16459,16 @@
           "end_idx": 258,
           "invalidated": false,
           "rank": "Primary",
-          "headline": "Primary Developing Motive W4 FORMING 64%",
-          "expected": "LONG",
-          "expected_weight": 0.4,
-          "stage_text": "unda 4 corectiva - continuarea (W5) e asteptata dupa ea",
+          "headline": "Primary Developing Motive W4 FORMING BULLISH 64%",
+          "extreme": 0.26,
           "targets_hit": {
-            "tp1": false,
+            "tp1": true,
             "tp2": false,
             "tp3": false
           },
+          "expected": "LONG",
+          "expected_weight": 0.4,
+          "stage_text": "unda 4 corectiva - continuarea (W5) e asteptata dupa ea",
           "projection": {
             "path": [
               {
@@ -16485,8 +16538,8 @@
     },
     "DASH/USDT": {
       "direction": "LONG",
-      "score": 36,
-      "probability": 62.6,
+      "score": 35,
+      "probability": 62.2,
       "components": {
         "trend": 0.766,
         "momentum": 0.013,
@@ -16495,8 +16548,8 @@
       },
       "price": 64.07,
       "atr": 3.1385714,
-      "persistence": 110,
-      "age_minutes": 6541,
+      "persistence": 111,
+      "age_minutes": 6604,
       "indicators": {
         "emas": {
           "ema9": 66.49124369235369,
@@ -16596,7 +16649,9 @@
           "median_bars_win": 23,
           "median_bars_all": 9
         },
-        "confidence": null
+        "confidence": null,
+        "next_entry": null,
+        "plan_dir": "LONG"
       },
       "sparkline": [
         60.21,
@@ -17718,15 +17773,16 @@
             "end_idx": 258,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Developing Motive W4 FORMING 71%",
-            "expected": "LONG",
-            "expected_weight": 0.4,
-            "stage_text": "unda 4 corectiva - continuarea (W5) e asteptata dupa ea",
+            "headline": "Invalidat Developing Motive W4 FORMING BULLISH 71%",
+            "extreme": 73.6,
             "targets_hit": {
               "tp1": false,
               "tp2": false,
               "tp3": false
-            }
+            },
+            "expected": "LONG",
+            "expected_weight": 0.4,
+            "stage_text": "unda 4 corectiva - continuarea (W5) e asteptata dupa ea"
           },
           {
             "pattern": "CORECTIE A-B-C",
@@ -17771,14 +17827,15 @@
             "end_idx": 248,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Zigzag C 60%",
-            "expected": "SHORT",
-            "expected_weight": 0.2,
-            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
+            "headline": "Invalidat Zigzag C BEARISH 60%",
+            "extreme": 62.88,
             "targets_hit": {
               "tp1": true,
               "tp2": true
-            }
+            },
+            "expected": "SHORT",
+            "expected_weight": 0.2,
+            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus"
           },
           {
             "pattern": "ARMONICA AB=CD",
@@ -17827,14 +17884,15 @@
             "end_idx": 248,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Harmonic D 59%",
-            "expected": "SHORT",
-            "expected_weight": 0.7,
-            "stage_text": "pretul e in zona PRZ - inversare asteptata",
+            "headline": "Invalidat Harmonic D BEARISH 59%",
+            "extreme": 62.88,
             "targets_hit": {
               "tp1": false,
               "tp2": false
-            }
+            },
+            "expected": "SHORT",
+            "expected_weight": 0.7,
+            "stage_text": "pretul e in zona PRZ - inversare asteptata"
           },
           {
             "pattern": "CORECTIE A-B-C",
@@ -17879,14 +17937,15 @@
             "end_idx": 240,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Zigzag C 34%",
-            "expected": "LONG",
-            "expected_weight": 0.8,
-            "stage_text": "corectia e aproape incheiata - trendul e asteptat sa reia",
+            "headline": "Invalidat Zigzag C BULLISH 34%",
+            "extreme": 73.6,
             "targets_hit": {
-              "tp1": false,
-              "tp2": false
-            }
+              "tp1": true,
+              "tp2": true
+            },
+            "expected": "LONG",
+            "expected_weight": 0.2,
+            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus"
           }
         ],
         "primary": null,
@@ -17949,8 +18008,8 @@
       },
       "price": 0.11501,
       "atr": 0.0041292857,
-      "persistence": 5,
-      "age_minutes": 294,
+      "persistence": 6,
+      "age_minutes": 357,
       "indicators": {
         "emas": {
           "ema9": 0.11681815348181632,
@@ -18052,14 +18111,16 @@
             "projected": true
           }
         ],
-        "source": "plan",
+        "source": "plan_split",
         "hist": {
           "n": 3528,
           "win_rate": 28.7,
           "median_bars_win": 18,
           "median_bars_all": 8
         },
-        "confidence": 0.7838
+        "confidence": 0.7838,
+        "next_entry": null,
+        "plan_dir": "LONG"
       },
       "sparkline": [
         0.11028,
@@ -19175,14 +19236,15 @@
             "end_idx": 257,
             "invalidated": false,
             "rank": "Primary",
-            "headline": "Primary Developing Harmonic D FORMING 78%",
-            "expected": "SHORT",
-            "expected_weight": 0.4,
-            "stage_text": "D inca nu a ajuns in zona PRZ",
+            "headline": "Primary Developing Harmonic D FORMING BULLISH 78%",
+            "extreme": 0.12008,
             "targets_hit": {
               "tp1": false,
               "tp2": true
             },
+            "expected": "SHORT",
+            "expected_weight": 0.4,
+            "stage_text": "D inca nu a ajuns in zona PRZ",
             "projection": {
               "path": [
                 {
@@ -19262,14 +19324,15 @@
             "end_idx": 229,
             "invalidated": false,
             "rank": "Alternative",
-            "headline": "Alternative Harmonic D 68%",
-            "expected": "LONG",
-            "expected_weight": 0.2,
-            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
+            "headline": "Alternative Harmonic D BULLISH 68%",
+            "extreme": 0.12526,
             "targets_hit": {
               "tp1": true,
               "tp2": true
-            }
+            },
+            "expected": "LONG",
+            "expected_weight": 0.2,
+            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus"
           },
           {
             "pattern": "CORECTIE A-B-C",
@@ -19314,14 +19377,15 @@
             "end_idx": 229,
             "invalidated": false,
             "rank": "Secondary",
-            "headline": "Secondary Zigzag C 54%",
-            "expected": "LONG",
-            "expected_weight": 0.2,
-            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
+            "headline": "Secondary Zigzag C BULLISH 54%",
+            "extreme": 0.12526,
             "targets_hit": {
               "tp1": true,
               "tp2": true
-            }
+            },
+            "expected": "LONG",
+            "expected_weight": 0.2,
+            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus"
           },
           {
             "pattern": "CORECTIE A-B-C",
@@ -19367,14 +19431,15 @@
             "stale": true,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Developing Zigzag C FORMING 19%",
-            "expected": "LONG",
-            "expected_weight": 0.5,
-            "stage_text": "unda C inca in desfasurare, contra trendului",
+            "headline": "Invalidat Developing Zigzag C FORMING BEARISH 19%",
+            "extreme": 0.09986,
             "targets_hit": {
-              "tp1": false,
-              "tp2": false
-            }
+              "tp1": true,
+              "tp2": true
+            },
+            "expected": "SHORT",
+            "expected_weight": 0.2,
+            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus"
           }
         ],
         "primary": {
@@ -19424,14 +19489,15 @@
           "end_idx": 257,
           "invalidated": false,
           "rank": "Primary",
-          "headline": "Primary Developing Harmonic D FORMING 78%",
-          "expected": "SHORT",
-          "expected_weight": 0.4,
-          "stage_text": "D inca nu a ajuns in zona PRZ",
+          "headline": "Primary Developing Harmonic D FORMING BULLISH 78%",
+          "extreme": 0.12008,
           "targets_hit": {
             "tp1": false,
             "tp2": true
           },
+          "expected": "SHORT",
+          "expected_weight": 0.4,
+          "stage_text": "D inca nu a ajuns in zona PRZ",
           "projection": {
             "path": [
               {
@@ -19523,8 +19589,8 @@
       },
       "price": 0.08814,
       "atr": 0.0022442857,
-      "persistence": 5,
-      "age_minutes": 294,
+      "persistence": 6,
+      "age_minutes": 357,
       "indicators": {
         "emas": {
           "ema9": 0.08961977872772199,
@@ -19633,7 +19699,9 @@
           "median_bars_win": 18,
           "median_bars_all": 8
         },
-        "confidence": 0.7724
+        "confidence": 0.7724,
+        "next_entry": null,
+        "plan_dir": "LONG"
       },
       "sparkline": [
         0.0871,
@@ -20749,14 +20817,15 @@
             "end_idx": 255,
             "invalidated": false,
             "rank": "Primary",
-            "headline": "Primary Harmonic D 77%",
-            "expected": "SHORT",
-            "expected_weight": 0.2,
-            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
+            "headline": "Primary Harmonic D BEARISH 77%",
+            "extreme": 0.08672,
             "targets_hit": {
               "tp1": true,
               "tp2": true
             },
+            "expected": "SHORT",
+            "expected_weight": 0.2,
+            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
             "projection": {
               "path": [
                 {
@@ -20835,15 +20904,16 @@
             "end_idx": 257,
             "invalidated": false,
             "rank": "Alternative",
-            "headline": "Alternative Developing Motive W3 FORMING 61%",
-            "expected": "SHORT",
-            "expected_weight": 1.0,
-            "stage_text": "unda 3 in formare - faza cea mai puternica a trendului",
+            "headline": "Alternative Developing Motive W3 FORMING BEARISH 61%",
+            "extreme": 0.08672,
             "targets_hit": {
-              "tp1": false,
+              "tp1": true,
               "tp2": false,
               "tp3": false
-            }
+            },
+            "expected": "SHORT",
+            "expected_weight": 1.0,
+            "stage_text": "unda 3 in formare - faza cea mai puternica a trendului"
           },
           {
             "pattern": "ARMONICA AB=CD",
@@ -20892,14 +20962,15 @@
             "end_idx": 257,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Developing Harmonic D FORMING 64%",
-            "expected": "SHORT",
-            "expected_weight": 0.4,
-            "stage_text": "D inca nu a ajuns in zona PRZ",
+            "headline": "Invalidat Developing Harmonic D FORMING BULLISH 64%",
+            "extreme": 0.0905,
             "targets_hit": {
               "tp1": false,
               "tp2": false
-            }
+            },
+            "expected": "SHORT",
+            "expected_weight": 0.4,
+            "stage_text": "D inca nu a ajuns in zona PRZ"
           },
           {
             "pattern": "CORECTIE A-B-C",
@@ -20944,14 +21015,15 @@
             "end_idx": 257,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Developing Zigzag C FORMING 50%",
-            "expected": "LONG",
-            "expected_weight": 0.8,
-            "stage_text": "corectia e aproape incheiata - trendul e asteptat sa reia",
+            "headline": "Invalidat Developing Zigzag C FORMING BULLISH 50%",
+            "extreme": 0.0905,
             "targets_hit": {
-              "tp1": false,
-              "tp2": false
-            }
+              "tp1": true,
+              "tp2": true
+            },
+            "expected": "LONG",
+            "expected_weight": 0.2,
+            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus"
           }
         ],
         "primary": {
@@ -21001,14 +21073,15 @@
           "end_idx": 255,
           "invalidated": false,
           "rank": "Primary",
-          "headline": "Primary Harmonic D 77%",
-          "expected": "SHORT",
-          "expected_weight": 0.2,
-          "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
+          "headline": "Primary Harmonic D BEARISH 77%",
+          "extreme": 0.08672,
           "targets_hit": {
             "tp1": true,
             "tp2": true
           },
+          "expected": "SHORT",
+          "expected_weight": 0.2,
+          "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
           "projection": {
             "path": [
               {
@@ -21100,8 +21173,8 @@
       },
       "price": 0.2244,
       "atr": 0.0061857143,
-      "persistence": 5,
-      "age_minutes": 294,
+      "persistence": 6,
+      "age_minutes": 357,
       "indicators": {
         "emas": {
           "ema9": 0.2278894702203593,
@@ -21176,32 +21249,34 @@
             "projected": false
           },
           {
-            "label": "(ENTRY)",
-            "price": 0.22130714,
-            "idx": 260,
-            "projected": true
-          },
-          {
-            "label": "(TP1)",
-            "price": 0.2279,
-            "idx": 267,
-            "projected": true
-          },
-          {
-            "label": "(TP2)",
-            "price": 0.24914286,
+            "label": "(W3)",
+            "price": 0.21878399999999998,
             "idx": 276,
+            "projected": true
+          },
+          {
+            "label": "(W4)",
+            "price": 0.22620091199999998,
+            "idx": 280,
+            "projected": true
+          },
+          {
+            "label": "(W5)",
+            "price": 0.21364562399999995,
+            "idx": 284,
             "projected": true
           }
         ],
-        "source": "plan",
+        "source": "elliott_conflict",
         "hist": {
           "n": 3528,
           "win_rate": 28.7,
           "median_bars_win": 18,
           "median_bars_all": 8
         },
-        "confidence": 0.6032
+        "confidence": 0.6032,
+        "next_entry": 0.21364562399999995,
+        "plan_dir": "LONG"
       },
       "sparkline": [
         0.2256,
@@ -22316,15 +22391,16 @@
             "end_idx": 258,
             "invalidated": false,
             "rank": "Primary",
-            "headline": "Primary Developing Motive W3 FORMING 60%",
-            "expected": "SHORT",
-            "expected_weight": 1.0,
-            "stage_text": "unda 3 in formare - faza cea mai puternica a trendului",
+            "headline": "Primary Developing Motive W3 FORMING BEARISH 60%",
+            "extreme": 0.2203,
             "targets_hit": {
               "tp1": false,
               "tp2": false,
               "tp3": false
             },
+            "expected": "SHORT",
+            "expected_weight": 1.0,
+            "stage_text": "unda 3 in formare - faza cea mai puternica a trendului",
             "projection": {
               "path": [
                 {
@@ -22404,14 +22480,15 @@
             "end_idx": 258,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Developing Harmonic D FORMING 62%",
-            "expected": "LONG",
-            "expected_weight": 0.7,
-            "stage_text": "pretul e in zona PRZ - inversare asteptata",
+            "headline": "Invalidat Developing Harmonic D FORMING BULLISH 62%",
+            "extreme": 0.2296,
             "targets_hit": {
               "tp1": false,
               "tp2": false
-            }
+            },
+            "expected": "LONG",
+            "expected_weight": 0.7,
+            "stage_text": "pretul e in zona PRZ - inversare asteptata"
           },
           {
             "pattern": "ARMONICA AB=CD",
@@ -22460,14 +22537,15 @@
             "end_idx": 246,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Harmonic D 51%",
-            "expected": "SHORT",
-            "expected_weight": 0.7,
-            "stage_text": "pretul e in zona PRZ - inversare asteptata",
+            "headline": "Invalidat Harmonic D BEARISH 51%",
+            "extreme": 0.2203,
             "targets_hit": {
               "tp1": false,
               "tp2": false
-            }
+            },
+            "expected": "SHORT",
+            "expected_weight": 0.7,
+            "stage_text": "pretul e in zona PRZ - inversare asteptata"
           },
           {
             "pattern": "CORECTIE A-B-C",
@@ -22512,14 +22590,15 @@
             "end_idx": 258,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Developing Zigzag C FORMING 48%",
+            "headline": "Invalidat Developing Zigzag C FORMING BULLISH 48%",
+            "extreme": 0.2296,
+            "targets_hit": {
+              "tp1": true,
+              "tp2": false
+            },
             "expected": "LONG",
             "expected_weight": 0.8,
-            "stage_text": "corectia e aproape incheiata - trendul e asteptat sa reia",
-            "targets_hit": {
-              "tp1": false,
-              "tp2": false
-            }
+            "stage_text": "corectia e aproape incheiata - trendul e asteptat sa reia"
           }
         ],
         "primary": {
@@ -22568,15 +22647,16 @@
           "end_idx": 258,
           "invalidated": false,
           "rank": "Primary",
-          "headline": "Primary Developing Motive W3 FORMING 60%",
-          "expected": "SHORT",
-          "expected_weight": 1.0,
-          "stage_text": "unda 3 in formare - faza cea mai puternica a trendului",
+          "headline": "Primary Developing Motive W3 FORMING BEARISH 60%",
+          "extreme": 0.2203,
           "targets_hit": {
             "tp1": false,
             "tp2": false,
             "tp3": false
           },
+          "expected": "SHORT",
+          "expected_weight": 1.0,
+          "stage_text": "unda 3 in formare - faza cea mai puternica a trendului",
           "projection": {
             "path": [
               {
@@ -22668,8 +22748,8 @@
       },
       "price": 4.44,
       "atr": 0.15121429,
-      "persistence": 153,
-      "age_minutes": 9180,
+      "persistence": 154,
+      "age_minutes": 9243,
       "indicators": {
         "emas": {
           "ema9": 4.569148910298799,
@@ -22778,7 +22858,9 @@
           "median_bars_win": 18,
           "median_bars_all": 8
         },
-        "confidence": 0.6186
+        "confidence": 0.6186,
+        "next_entry": null,
+        "plan_dir": "LONG"
       },
       "sparkline": [
         4.379,
@@ -23890,14 +23972,15 @@
             "end_idx": 253,
             "invalidated": false,
             "rank": "Primary",
-            "headline": "Primary Zigzag C 62%",
-            "expected": "SHORT",
-            "expected_weight": 0.8,
-            "stage_text": "corectia e aproape incheiata - trendul e asteptat sa reia",
+            "headline": "Primary Zigzag C BEARISH 62%",
+            "extreme": 4.396,
             "targets_hit": {
               "tp1": true,
-              "tp2": false
+              "tp2": true
             },
+            "expected": "SHORT",
+            "expected_weight": 0.2,
+            "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
             "projection": {
               "path": [
                 {
@@ -23976,15 +24059,16 @@
             "end_idx": 258,
             "invalidated": false,
             "rank": "Alternative",
-            "headline": "Alternative Developing Motive W3 FORMING 60%",
-            "expected": "SHORT",
-            "expected_weight": 1.0,
-            "stage_text": "unda 3 in formare - faza cea mai puternica a trendului",
+            "headline": "Alternative Developing Motive W3 FORMING BEARISH 60%",
+            "extreme": 4.396,
             "targets_hit": {
               "tp1": false,
               "tp2": false,
               "tp3": false
-            }
+            },
+            "expected": "SHORT",
+            "expected_weight": 1.0,
+            "stage_text": "unda 3 in formare - faza cea mai puternica a trendului"
           },
           {
             "pattern": "ARMONICA AB=CD",
@@ -24033,14 +24117,15 @@
             "end_idx": 258,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Developing Harmonic D FORMING 54%",
-            "expected": "LONG",
-            "expected_weight": 0.7,
-            "stage_text": "pretul e in zona PRZ - inversare asteptata",
+            "headline": "Invalidat Developing Harmonic D FORMING BULLISH 54%",
+            "extreme": 4.578,
             "targets_hit": {
               "tp1": false,
               "tp2": false
-            }
+            },
+            "expected": "LONG",
+            "expected_weight": 0.7,
+            "stage_text": "pretul e in zona PRZ - inversare asteptata"
           },
           {
             "pattern": "CORECTIE A-B-C",
@@ -24085,14 +24170,15 @@
             "end_idx": 258,
             "invalidated": true,
             "rank": "Invalidat",
-            "headline": "Invalidat Developing Zigzag C FORMING 44%",
+            "headline": "Invalidat Developing Zigzag C FORMING BULLISH 44%",
+            "extreme": 4.578,
+            "targets_hit": {
+              "tp1": true,
+              "tp2": false
+            },
             "expected": "LONG",
             "expected_weight": 0.8,
-            "stage_text": "corectia e aproape incheiata - trendul e asteptat sa reia",
-            "targets_hit": {
-              "tp1": false,
-              "tp2": false
-            }
+            "stage_text": "corectia e aproape incheiata - trendul e asteptat sa reia"
           }
         ],
         "primary": {
@@ -24138,14 +24224,15 @@
           "end_idx": 253,
           "invalidated": false,
           "rank": "Primary",
-          "headline": "Primary Zigzag C 62%",
-          "expected": "SHORT",
-          "expected_weight": 0.8,
-          "stage_text": "corectia e aproape incheiata - trendul e asteptat sa reia",
+          "headline": "Primary Zigzag C BEARISH 62%",
+          "extreme": 4.396,
           "targets_hit": {
             "tp1": true,
-            "tp2": false
+            "tp2": true
           },
+          "expected": "SHORT",
+          "expected_weight": 0.2,
+          "stage_text": "scenariul s-a realizat - toate tintele atinse; potential ramas redus",
           "projection": {
             "path": [
               {
