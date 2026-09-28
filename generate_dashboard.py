@@ -207,6 +207,58 @@ def render_liquidity(deep):
     return f'<div class="liq-list">{bid_rows}{ask_rows}</div>'
 
 
+def render_self_check(diag, repairs):
+    """Auto-diagnosticul si auto-repararea: ce verifica agentul singur la fiecare
+    scanare, ce a gasit, ce atenuari a aplicat automat si ce reparatii de cod a
+    propus - vizibil fara ca cineva sa trimita date."""
+    if not diag:
+        return '<p class="dim">Primul auto-diagnostic ruleaza la urmatoarea scanare.</p>'
+    st = diag.get("status", "OK")
+    cls = {"OK": "tag-bull", "WARN": "tag-info", "ERROR": "tag-bear"}.get(st, "tag-info")
+    label = {"OK": "TOTUL COERENT", "WARN": "AVERTISMENTE", "ERROR": "ERORI DETECTATE"}.get(st, st)
+    checks = diag.get("checks") or []
+    bad = [c for c in checks if c["level"] != "OK"]
+    good = [c for c in checks if c["level"] == "OK"]
+    rows = []
+    for c in bad:
+        ex = "".join(f"<li>{e}</li>" for e in c.get("examples") or [])
+        rows.append(f'<details class="sc-item sc-{c["level"].lower()}"><summary><span class="tag '
+                    f'{"tag-bear" if c["level"] == "ERROR" else "tag-info"}">{c["level"]}</span> '
+                    f'<strong>{c["title"]}</strong></summary><p>{c["detail"]}</p>'
+                    + (f'<ul class="as-ul">{ex}</ul>' if ex else "") + "</details>")
+    ok_list = " &middot; ".join(c["title"] for c in good)
+    m = diag.get("mitigations") or {}
+    q = m.get("quarantine") or {}
+    qtxt = ("".join(f'<li><code>{f}</code> - {v.get("reason", "")} (din {v.get("since", "?")}, '
+                    f'{v.get("clean_runs", 0)}/3 rulari curate pana la eliberare)</li>' for f, v in q.items())
+            or "<li>nicio caracteristica in carantina</li>")
+    mit = (f'<h4 class="scan-h">Atenuari automate active</h4><ul class="as-ul">{qtxt}'
+           f'<li>Filtrul de conflict Elliott: <strong>{"ACTIV" if m.get("elliott_filter", True) else "OPRIT"}</strong>'
+           f' - {m.get("elliott_filter_reason", "")}</li>'
+           + (f'<li><strong>MOD DE SIGURANTA ACTIV</strong> - {m.get("safe_reason")}</li>' if m.get("safe_mode") else "")
+           + "</ul>")
+    rep = ""
+    if repairs:
+        items = []
+        for r in repairs[-5:][::-1]:
+            link = f' &middot; <a href="{r["pr"]}">Pull Request</a>' if r.get("pr") else ""
+            items.append(f'<li><code>{r.get("when")}</code> {r.get("check")}: <strong>{r.get("outcome")}</strong>'
+                         f' - {r.get("reason", "")}{link}</li>')
+        rep = f'<h4 class="scan-h">Reparatii de cod propuse (ultimele 5)</h4><ul class="as-ul">{"".join(items)}</ul>'
+    chips = "".join(f'<span class="sc-chip sc-{h.get("status", "OK").lower()}"></span>'
+                    for h in (diag.get("history") or [])[-48:])
+    return (f'<div class="sc-head"><span class="tag {cls}">{label}</span> <span class="dim">verificat la '
+            f'{diag.get("when")} &middot; {len(checks)} verificari</span></div>'
+            + "".join(rows)
+            + (f'<p class="dim sc-ok">In regula: {ok_list}</p>' if good else "")
+            + mit + rep
+            + (f'<h4 class="scan-h">Istoric (ultimele {min(48, len(diag.get("history") or []))} scanari)</h4>'
+               f'<div class="sc-tl">{chips}</div>' if chips else "")
+            + '<p class="dim as-note">Agentul invata PONDERI din rezultate; logica de calcul o verifica '
+              'aceste invariante la fiecare scanare. O eroare noua deschide automat un Issue, iar '
+              'auto-repararea propune un patch validat automat - merge-ul ramane al tau.</p>')
+
+
 def render_altseason(state, history):
     """Faza ciclului altcoin season, pe date reale: faza curenta si increderea,
     ce o sustine si ce lipseste inca, faza urmatoare cu conditiile concrete de
@@ -378,19 +430,73 @@ def render_levels(deep):
     <div class="fib-list">{fib_rows}</div>'''
 
 
-def render_plan(best, deep):
+def elliott_outcome_stats(plans_store):
+    """Masurat live din planurile inchise: rezultatul planurilor luate CONTRA
+    numaratorii Elliott, fata de restul. Arata daca filtrul de conflict e inca
+    justificat de date - se recalculeaza la fiecare generare."""
+    con, rest = [], []
+    for p in (plans_store or {}).get("plans") or []:
+        if p.get("realized_r") is None or p.get("state") == "NO_ENTRY":
+            continue
+        v = (p.get("components") or {}).get("ev_elliott")
+        if v is None:
+            continue
+        (con if v <= -0.1 else rest).append(p["realized_r"])
+    if len(con) < 50 or len(rest) < 50:
+        return None
+    return {"n_con": len(con), "r_con": sum(con) / len(con),
+            "n_rest": len(rest), "r_rest": sum(rest) / len(rest)}
+
+
+def render_plan(best, deep, calibration=None, decision=None, ew_stats=None):
+    """Cardul "AI plan". CONFIDENCE afisa formula din scor (ex. 76.2%), desi
+    probabilitatea MASURATA pe acelasi interval de scor era mult mai mica - iar
+    cardul nu spunea nimic cand Elliott contrazicea planul. Acum: probabilitatea
+    masurata, decizia efectiva a agentului si conflictul, cu nivelul urmarit."""
     if not best or not deep:
         return '<p class="dim">Niciun candidat cu semnal clar in scanarea curenta.</p>'
     plan = deep["plan"]
     direction_cls = "long" if best["direction"] == "LONG" else "short"
+    b = str(int((best.get("risk_adjusted") or best.get("score") or 0) // 20) * 20)
+    cal = (calibration or {}).get(b) or {}
+    if cal.get("reliable"):
+        conf_html = (f'<span class="confidence-value">{cal["win_rate"]}%</span>'
+                     f'<div class="dim conf-note">masurat pe {cal["total"]} planuri cu scor {b}-{int(b)+19} '
+                     f'(IC {cal["ci_low"]}-{cal["ci_high"]}%) &middot; formula din scor: {best["probability"]}%</div>')
+    else:
+        conf_html = (f'<span class="confidence-value">{best["probability"]}%</span>'
+                     f'<div class="dim conf-note">formula din scor - necalibrat inca pe acest interval</div>')
+    dec_html = ""
+    if decision:
+        mode = decision.get("mode") or ""
+        if mode == "ASTEAPTA_CORECTIA":
+            nxt = decision.get("next_entry")
+            dec_html = ('<div class="plan-conflict"><strong>ASTEAPTA CORECTIA</strong> &middot; '
+                        f'Elliott contrazice planul {best["direction"]}. '
+                        + (f'Nivel urmarit pentru intrare: <strong>{fmt_price(nxt)}</strong>. ' if nxt else "")
+                        + "Planul nu se deschide acum.</div>")
+        elif mode in ("FILTRU_AGENT",):
+            dec_html = ('<div class="plan-conflict"><strong>FILTRAT DE AGENT</strong> &middot; '
+                        f'{decision.get("reason") or ""}</div>')
+        elif mode.startswith("EXPLORARE"):
+            dec_html = ('<div class="plan-conflict explore"><strong>EMIS PENTRU EXPLORARE</strong> &middot; '
+                        f'{decision.get("reason") or ""}</div>')
+        else:
+            dec_html = '<div class="plan-ok">Plan emis &middot; nicio contradictie Elliott</div>'
+    stats_html = ""
+    if ew_stats:
+        stats_html = (f'<div class="dim conf-note">Istoric masurat: contra Elliott '
+                      f'{ew_stats["r_con"]:+.3f}R/plan (n={ew_stats["n_con"]}) &middot; fara conflict '
+                      f'{ew_stats["r_rest"]:+.3f}R/plan (n={ew_stats["n_rest"]})</div>')
     return f'''
     <div class="plan-head">
       <span class="symbol">{best["symbol"]}</span>
       <span class="badge badge-{direction_cls}">{best["direction"]}</span>
     </div>
+    {dec_html}
     <div class="confidence-row">
-      <span class="dim">CONFIDENCE</span>
-      <span class="confidence-value">{best["probability"]}%</span>
+      <span class="dim">PROBABILITATE</span>
+      <div>{conf_html}</div>
     </div>
     <div class="plan-grid">
       <div><span class="dim">ENTRY</span><br>{fmt_price(plan["entry"])}</div>
@@ -399,6 +505,7 @@ def render_plan(best, deep):
       <div><span class="dim">TP2</span><br>{fmt_price(plan["tp2"])}</div>
     </div>
     <div class="expected-r">Expected R &middot; <strong>{plan["expected_r"]}R</strong></div>
+    {stats_html}
     '''
 
 
@@ -1248,9 +1355,14 @@ def render_learning_curve(history, weights_history, health, agent_state=None):
 
 def build_html(scan, best, deep, chart, health, weights, session, token_meta, narrative, history, weights_history, agent_state, plans_store, briefing, details, exchanges_store,
                exchange_scans=None):
-    plan_html = render_plan(best, deep)
+    _dec = (load_json(os.path.join(DATA_DIR, "decisions.json"), {}).get("decisions") or {})
+    plan_html = render_plan(best, deep, (plans_store or {}).get("calibration"),
+                            _dec.get((best or {}).get("symbol")),
+                            elliott_outcome_stats(plans_store))
     levels_html = render_levels(deep)
     liquidity_html = render_liquidity(deep)
+    selfcheck_html = render_self_check(load_json(os.path.join(DATA_DIR, "self_check.json"), None),
+                                       load_json(os.path.join(DATA_DIR, "repair_log.json"), []))
     altseason_html = render_altseason(load_json(ALTSEASON_FILE, None),
                                       load_json(ALTSEASON_HISTORY_FILE, []))
     similar_html = render_similar_projects(
@@ -1444,6 +1556,18 @@ header{{display:flex;justify-content:space-between;align-items:baseline;
 .ew-tag{{font-family:var(--font-mono);font-size:7px;}}
 .ew-stage{{font-size:12px;margin:6px 0 2px;padding:6px 10px;background:var(--panel-2);
   border-radius:6px;}}
+.sc-head{{margin-bottom:8px;font-size:12px;}}
+.sc-item{{border:1px solid var(--border);border-radius:7px;padding:6px 10px;margin:6px 0;background:var(--panel-2);}}
+.sc-item summary{{cursor:pointer;font-size:12.5px;}} .sc-item p{{font-size:12px;margin:6px 0;}}
+.sc-error{{border-left:3px solid #F23645;}} .sc-warn{{border-left:3px solid #1E88E5;}}
+.sc-ok{{font-size:11px;}} .sc-tl{{display:flex;flex-wrap:wrap;gap:2px;}}
+.sc-chip{{width:9px;height:14px;border-radius:2px;background:#089981;display:inline-block;}}
+.sc-chip.sc-warn{{background:#1E88E5;}} .sc-chip.sc-error{{background:#F23645;}}
+.plan-conflict{{margin:8px 0;padding:8px 10px;border-radius:6px;font-size:12px;
+  background:#FFF4E5;border-left:3px solid #E67E22;color:#7C3A00;}}
+.plan-conflict.explore{{background:#EEF4FF;border-left-color:#1E88E5;color:#0B3B78;}}
+.plan-ok{{margin:8px 0;padding:6px 10px;border-radius:6px;font-size:12px;background:#E6F4F1;color:#086B5B;}}
+.conf-note{{font-size:10.5px;margin-top:2px;}}
 .as-head{{display:flex;gap:14px;align-items:center;margin-bottom:8px;}}
 .as-phase{{font:800 20px var(--font-mono);color:#FFFFFF;background:#7E57C2;border-radius:8px;
   padding:10px 12px;white-space:nowrap;}}
@@ -1752,6 +1876,11 @@ footer{{margin-top:26px;color:var(--text-dim);font-size:11px;line-height:1.6;}}
       <div class="card">
         <h2>AI plan &middot; best candidate</h2>
         {plan_html}
+      </div>
+
+      <div class="card">
+        <h2>Auto-diagnostic &middot; auto-reparare agent</h2>
+        {selfcheck_html}
       </div>
 
       <div class="card">
