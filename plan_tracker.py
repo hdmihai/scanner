@@ -247,7 +247,7 @@ AGENT_EXPLORE_RATE = float(os.environ.get("AGENT_EXPLORE_RATE", "0.15"))
 # 72.837 de planuri aruncate la resetari, din care ~40.000 pentru schimbari de
 # tip "am adaugat un indicator". Agentul repornea de la zero exact cand se
 # apropia de pragul de activare. De asta nu-l trecea niciodata.
-FEATURE_VERSION = "f6"      # f5 = + Elliott cu numaratori concurente
+FEATURE_VERSION = "f7"      # f5 = + Elliott cu numaratori concurente
 
 
 def _build_geometry(caps_sig=None):
