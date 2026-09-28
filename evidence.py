@@ -62,7 +62,7 @@ def _item(key, label, direction, strength, value=None):
 def build_evidence(ind, price, atr, rsi=None, components=None,
                    flow=None, book=None, caps=None, liq=None, liq_bias=None,
                    struct=None, ew=None, ew_bias=None,
-                   liqs=None, liqs_bias=None):
+                   liqs=None, liqs_bias=None, alt=None, symbol=None, direction=None):
     """Construieste lista de evidente dintr-un set de indicatori.
 
     `ind` e iesirea lui indicators.compute_all(). Orice lipseste se sare -
@@ -250,6 +250,23 @@ def build_evidence(ind, price, atr, rsi=None, components=None,
                             "Sweep bilateral - lichiditate luata sus SI jos",
                             DIR_NEUTRAL, 0.5, 1))
 
+    # FAZA ALTCOIN SEASON: context de piata, acelasi pentru toate simbolurile
+    # la un moment dat, dar cu sens diferit: o faza care favorizeaza altcoins
+    # sustine un LONG pe un altcoin si contrazice un SHORT; pentru BTC conteaza
+    # cat favorizeaza faza bitcoin. Ponderat deja cu increderea clasificarii.
+    if alt and (alt.get("classification") or {}).get("phase") is not None and direction:
+        is_btc = (symbol or "").upper().startswith("BTC/")
+        b = alt.get("btc_bias" if is_btc else "alt_bias") or 0.0
+        cls = alt["classification"]
+        if abs(b) >= 0.05:
+            favors = (b > 0) == (direction == "LONG")
+            ev.append(_item("altseason",
+                            f"Faza {cls['phase']} - {cls['name']}: "
+                            f"{'favorizeaza' if b > 0 else 'defavorizeaza'} LONG pe "
+                            f"{'BTC' if is_btc else 'altcoins'}",
+                            direction if favors else ("SHORT" if direction == "LONG" else "LONG"),
+                            _clip(abs(b), 0, 1), cls["phase"]))
+
     comp = components or {}
     if comp.get("volume") is not None:
         v = comp["volume"]
@@ -285,7 +302,7 @@ EVIDENCE_KEYS = ["ema_fast", "ema_stack", "supertrend", "macd", "vwap",
                  "poc", "value_area", "rsi", "volume", "volatility",
                  "order_flow", "book_imbalance", "liq_magnet",
                  "ichimoku", "ma_cross", "regime", "mtf_align", "elliott",
-                 "liq_struct", "liq_sweep"]
+                 "liq_struct", "liq_sweep", "altseason"]
 
 
 def evidence_features(evidence, direction):
