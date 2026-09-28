@@ -37,6 +37,7 @@ import liquidation as liq_mod
 import market_structure as struct_mod
 import elliott as ew_mod
 import liquidity_structure as ls_mod
+import altseason as alt_mod
 import ai_agent
 import json
 import os
@@ -852,6 +853,15 @@ def main():
         persistence, age_minutes = compute_persistence_and_age(history, symbol, scored["direction"], now_ts)
         results.append({"symbol": symbol, "persistence": persistence, "age_minutes": age_minutes, **scored})
 
+    # FAZA CICLULUI ALTCOIN SEASON, evaluata la fiecare scanare pe date reale
+    # (CoinGecko + lumanari zilnice de pe exchange). Nu opreste niciodata
+    # scanarea: la o problema de date pastreaza ultima evaluare.
+    try:
+        alt_state = alt_mod.update(exchange, results)
+    except Exception as _e:
+        print(f"[!] altseason: {_e}")
+        alt_state = None
+
     longs = sorted([r for r in results if r["direction"] == "LONG"], key=lambda r: r["risk_adjusted"], reverse=True)
     shorts = sorted([r for r in results if r["direction"] == "SHORT"], key=lambda r: r["risk_adjusted"], reverse=True)
     best = max(results, key=lambda r: r["risk_adjusted"]) if results else None
@@ -1239,7 +1249,9 @@ def main():
                                              liq=sig_liq, liq_bias=sig_liq_bias,
                                              struct=sig_struct,
                                              ew=sig_ew, ew_bias=sig_ew_bias,
-                                             liqs=sig_liqs, liqs_bias=sig_liqs_bias)
+                                             liqs=sig_liqs, liqs_bias=sig_liqs_bias,
+                                             alt=alt_state, symbol=sig["symbol"],
+                                             direction=sig["direction"])
         sig = {**sig,
                "evidence": sig_evidence,
                "fusion": ev_mod.fusion(sig_evidence, sig["direction"]),
