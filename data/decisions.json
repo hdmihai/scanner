@@ -1,4 +1,32 @@
 {
-  "scan_time": "2026-09-29 15:26 UTC",
-  "decisions": {}
+  "scan_time": "2026-09-29 16:27 UTC",
+  "decisions": {
+    "XRP/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta dezactivata: pe walk-forward a inrautatit rezultatul in 2 din 3 rulari",
+      "calibrated_prob": 29.3,
+      "agent_prob": 0.4841,
+      "elliott_bias": 0.4,
+      "next_entry": null
+    },
+    "NEAR/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta dezactivata: pe walk-forward a inrautatit rezultatul in 2 din 3 rulari",
+      "calibrated_prob": 29.3,
+      "agent_prob": 0.5316,
+      "elliott_bias": null,
+      "next_entry": null
+    },
+    "ZEC/USDT": {
+      "action": "SKIP",
+      "mode": "FILTRU_AGENT",
+      "reason": "agentul pune semnalul in treimea de jos (0.166 < 0.212); masurat in afara esantionului, acea treime pierde in medie",
+      "calibrated_prob": 25.2,
+      "agent_prob": 0.1659,
+      "elliott_bias": 0.2,
+      "next_entry": null
+    }
+  }
 }
