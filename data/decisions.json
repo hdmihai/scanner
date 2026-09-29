@@ -1,12 +1,21 @@
 {
-  "scan_time": "2026-09-29 11:23 UTC",
+  "scan_time": "2026-09-29 12:30 UTC",
   "decisions": {
+    "AXS/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta dezactivata: pe walk-forward a inrautatit rezultatul in 2 din 3 rulari",
+      "calibrated_prob": 41.6,
+      "agent_prob": 0.5424,
+      "elliott_bias": 0.7,
+      "next_entry": null
+    },
     "FLOW/USDT": {
-      "action": "SKIP",
-      "mode": "FILTRU_AGENT",
-      "reason": "agentul pune semnalul in treimea de jos (0.115 < 0.212); masurat in afara esantionului, acea treime pierde in medie",
+      "action": "ISSUE",
+      "mode": "EXPLORARE_FILTRU",
+      "reason": "semnal din treimea de jos (0.151 < 0.212), emis pentru explorare (15% din cele filtrate) - pastreaza evaluarea agentului nedeformata",
       "calibrated_prob": 25.2,
-      "agent_prob": 0.1154,
+      "agent_prob": 0.151,
       "elliott_bias": null,
       "next_entry": null
     }
