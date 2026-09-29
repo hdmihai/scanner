@@ -1,51 +1,51 @@
 {
   "model": {
     "weights": {
-      "trend": -0.07799,
-      "momentum": -0.128031,
+      "trend": -0.055033,
+      "momentum": -0.107897,
       "volatility": -0.095265,
-      "volume": -0.106058,
-      "persistence_n": -0.050018,
-      "ev_ema_fast": -0.080099,
-      "ev_ema_stack": 0.764356,
-      "ev_supertrend": -0.07284,
-      "ev_macd": 0.865521,
-      "ev_vwap": 0.138446,
-      "ev_poc": -0.137503,
-      "ev_value_area": 0.025557,
-      "ev_rsi": -0.201282,
+      "volume": -0.083101,
+      "persistence_n": -0.027061,
+      "ev_ema_fast": -0.072566,
+      "ev_ema_stack": 0.787309,
+      "ev_supertrend": -0.049883,
+      "ev_macd": 0.874387,
+      "ev_vwap": 0.161402,
+      "ev_poc": -0.114545,
+      "ev_value_area": 0.041627,
+      "ev_rsi": -0.202792,
       "ev_volume": 0.0,
       "ev_volatility": 0.0,
-      "ev_order_flow": 0.136145,
-      "ev_book_imbalance": 0.015769,
-      "ev_liq_magnet": -0.070918,
-      "ev_ichimoku": -0.034755,
-      "ev_ma_cross": 0.467143,
-      "ev_regime": 0.264341,
-      "ev_mtf_align": 0.006631,
+      "ev_order_flow": 0.130864,
+      "ev_book_imbalance": 0.022381,
+      "ev_liq_magnet": -0.062977,
+      "ev_ichimoku": -0.011798,
+      "ev_ma_cross": 0.490098,
+      "ev_regime": 0.287297,
+      "ev_mtf_align": 0.023849,
       "ev_elliott": 0.087598,
-      "ev_liq_struct": 0.153058,
+      "ev_liq_struct": 0.1301,
       "ev_liq_sweep": 0.0,
-      "ev_altseason": -0.004224,
-      "ev_fusion": -0.019444
+      "ev_altseason": 0.000367,
+      "ev_fusion": -0.001767
     },
-    "bias": -1.003112
+    "bias": -0.980155
   },
-  "samples_trained": 16300,
+  "samples_trained": 16301,
   "last_trained_scan_ts": 0.0,
   "agent": {
-    "correct": 11340,
-    "total": 16300
+    "correct": 11341,
+    "total": 16301
   },
   "baseline": {
-    "correct": 5438,
-    "total": 16300
+    "correct": 5439,
+    "total": 16301
   },
   "by_direction": {
     "LONG": {
-      "agent": 5581,
-      "baseline": 2711,
-      "total": 8056
+      "agent": 5582,
+      "baseline": 2712,
+      "total": 8057
     },
     "SHORT": {
       "agent": 5759,
@@ -55,11 +55,6 @@
   },
   "first_scan_ts": 1518537600.0,
   "pairs": [
-    [
-      0.08416,
-      0.0,
-      -1.037
-    ],
     [
       0.18074,
       0.0,
@@ -15054,6 +15049,11 @@
       0.40419,
       0.0,
       -1.025
+    ],
+    [
+      0.54086,
+      1.0,
+      0.476
     ]
   ],
   "recent": [
@@ -15070,7 +15070,6 @@
     1,
     1,
     1,
-    1,
     0,
     1,
     1,
@@ -15256,6 +15255,7 @@
     0,
     1,
     0,
+    1,
     1
   ],
   "recent_baseline": [
@@ -15272,7 +15272,6 @@
     0,
     0,
     0,
-    0,
     1,
     0,
     0,
@@ -15457,8 +15456,9 @@
     1,
     1,
     1,
+    0,
     0,
-    0
+    1
   ],
   "curve": [
     {
@@ -19378,10 +19378,6 @@
   "source": "plans-v6-4h",
   "feature_version": "f7",
   "score_pairs": [
-    [
-      0.3,
-      0.0
-    ],
     [
       0.51,
       0.0
@@ -31377,20 +31373,24 @@
     [
       0.59,
       0.0
+    ],
+    [
+      0.73,
+      1.0
     ]
   ],
-  "last_event_ts": 1790640000.0,
+  "last_event_ts": 1790654400.0,
   "status_reason": "acuratete echilibrata 69.6% vs euristica 33.4%",
-  "days_covered": 3149.33,
-  "balanced_agent": 69.56721134976081,
-  "balanced_baseline": 33.36526953248657,
+  "days_covered": 3149.5,
+  "balanced_agent": 69.56911791814231,
+  "balanced_baseline": 33.36938694985998,
   "balanced_directions": [
     "LONG",
     "SHORT"
   ],
-  "auc": 0.6740902569784336,
-  "auc_score_baseline": 0.5715763772209641,
+  "auc": 0.6741819455845571,
+  "auc_score_baseline": 0.5717457185143421,
   "agent_superior": true,
-  "majority_baseline": 67.6,
-  "predicted_positive_rate": 16.5
+  "majority_baseline": 67.56666666666666,
+  "predicted_positive_rate": 16.533333333333335
 }
