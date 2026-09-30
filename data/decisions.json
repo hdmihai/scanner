@@ -1,13 +1,22 @@
 {
-  "scan_time": "2026-09-30 15:28 UTC",
+  "scan_time": "2026-09-30 16:28 UTC",
   "decisions": {
-    "ZEN/USDT": {
+    "ICP/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta dezactivata: pe walk-forward a inrautatit rezultatul in 2 din 3 rulari",
+      "calibrated_prob": 41.6,
+      "agent_prob": 0.4967,
+      "elliott_bias": 0.5714,
+      "next_entry": null
+    },
+    "ZEC/USDT": {
       "action": "SKIP",
       "mode": "FILTRU_AGENT",
-      "reason": "agentul pune semnalul in treimea de jos (0.096 < 0.212); masurat in afara esantionului, acea treime pierde in medie",
-      "calibrated_prob": 25.2,
-      "agent_prob": 0.0955,
-      "elliott_bias": null,
+      "reason": "agentul pune semnalul in treimea de jos (0.104 < 0.212); masurat in afara esantionului, acea treime pierde in medie",
+      "calibrated_prob": 29.3,
+      "agent_prob": 0.1044,
+      "elliott_bias": 0.2,
       "next_entry": null
     }
   }

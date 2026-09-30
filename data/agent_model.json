@@ -1,70 +1,60 @@
 {
   "model": {
     "weights": {
-      "trend": -0.088554,
-      "momentum": -0.132543,
-      "volatility": -0.072749,
-      "volume": -0.10488,
-      "persistence_n": -0.046551,
-      "ev_ema_fast": -0.0828,
-      "ev_ema_stack": 0.781189,
-      "ev_supertrend": -0.058546,
-      "ev_macd": 0.860193,
-      "ev_vwap": 0.136313,
-      "ev_poc": -0.137408,
-      "ev_value_area": 0.027777,
-      "ev_rsi": -0.229662,
+      "trend": -0.062891,
+      "momentum": -0.132239,
+      "volatility": -0.062915,
+      "volume": -0.089461,
+      "persistence_n": -0.019767,
+      "ev_ema_fast": -0.076406,
+      "ev_ema_stack": 0.813201,
+      "ev_supertrend": -0.059318,
+      "ev_macd": 0.851556,
+      "ev_vwap": 0.162379,
+      "ev_poc": -0.103111,
+      "ev_value_area": 0.047003,
+      "ev_rsi": -0.234363,
       "ev_volume": 0.0,
       "ev_volatility": 0.0,
-      "ev_order_flow": 0.138459,
-      "ev_book_imbalance": 0.045653,
-      "ev_liq_magnet": -0.053282,
-      "ev_ichimoku": -0.016028,
-      "ev_ma_cross": 0.497757,
-      "ev_regime": 0.266259,
-      "ev_mtf_align": -0.001656,
-      "ev_elliott": 0.070608,
-      "ev_liq_struct": 0.165386,
+      "ev_order_flow": 0.127626,
+      "ev_book_imbalance": 0.048634,
+      "ev_liq_magnet": -0.057312,
+      "ev_ichimoku": -0.022858,
+      "ev_ma_cross": 0.532048,
+      "ev_regime": 0.271178,
+      "ev_mtf_align": 0.002934,
+      "ev_elliott": 0.077467,
+      "ev_liq_struct": 0.1594,
       "ev_liq_sweep": 0.0,
-      "ev_altseason": -0.001507,
-      "ev_fusion": -0.012891
+      "ev_altseason": 0.000344,
+      "ev_fusion": 0.00598
     },
-    "bias": -1.020471
+    "bias": -0.999835
   },
-  "samples_trained": 16307,
+  "samples_trained": 16309,
   "last_trained_scan_ts": 0.0,
   "agent": {
-    "correct": 11345,
-    "total": 16307
+    "correct": 11346,
+    "total": 16309
   },
   "baseline": {
-    "correct": 5440,
-    "total": 16307
+    "correct": 5441,
+    "total": 16309
   },
   "by_direction": {
     "LONG": {
       "agent": 5583,
-      "baseline": 2713,
-      "total": 8060
+      "baseline": 2714,
+      "total": 8061
     },
     "SHORT": {
-      "agent": 5762,
+      "agent": 5763,
       "baseline": 2727,
-      "total": 8247
+      "total": 8248
     }
   },
   "first_scan_ts": 1518537600.0,
   "pairs": [
-    [
-      0.09483,
-      0.0,
-      -1.041
-    ],
-    [
-      0.29148,
-      0.0,
-      -1.032
-    ],
     [
       0.17396,
       0.0,
@@ -15054,6 +15044,16 @@
       0.14776,
       0.0,
       -1.021
+    ],
+    [
+      0.45068,
+      1.0,
+      0.986
+    ],
+    [
+      0.1366,
+      0.0,
+      -1.023
     ]
   ],
   "recent": [
@@ -15062,8 +15062,6 @@
     1,
     1,
     1,
-    1,
-    1,
     0,
     1,
     1,
@@ -15256,6 +15254,8 @@
     1,
     1,
     1,
+    1,
+    0,
     1
   ],
   "recent_baseline": [
@@ -15264,8 +15264,6 @@
     0,
     0,
     0,
-    0,
-    0,
     1,
     0,
     0,
@@ -15458,6 +15456,8 @@
     0,
     0,
     0,
+    0,
+    1,
     0
   ],
   "curve": [
@@ -19378,14 +19378,6 @@
   "source": "plans-v6-4h",
   "feature_version": "f7",
   "score_pairs": [
-    [
-      0.57,
-      0.0
-    ],
-    [
-      0.64,
-      0.0
-    ],
     [
       0.36,
       0.0
@@ -31377,20 +31369,28 @@
     [
       0.33,
       0.0
+    ],
+    [
+      0.63,
+      1.0
+    ],
+    [
+      0.36,
+      0.0
     ]
   ],
-  "last_event_ts": 1790755200.0,
+  "last_event_ts": 1790769600.0,
   "status_reason": "acuratete echilibrata 69.6% vs euristica 33.4%",
-  "days_covered": 3150.67,
-  "balanced_agent": 69.5679104003832,
-  "balanced_baseline": 33.36330964474336,
+  "days_covered": 3150.83,
+  "balanced_agent": 69.56544054662731,
+  "balanced_baseline": 33.365419995280895,
   "balanced_directions": [
     "LONG",
     "SHORT"
   ],
-  "auc": 0.6740876380578531,
-  "auc_score_baseline": 0.5716777765327381,
+  "auc": 0.6742417869543977,
+  "auc_score_baseline": 0.5722154598028504,
   "agent_superior": true,
-  "majority_baseline": 67.56666666666666,
+  "majority_baseline": 67.53333333333333,
   "predicted_positive_rate": 16.566666666666666
 }
