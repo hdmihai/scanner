@@ -1,4 +1,32 @@
 {
-  "scan_time": "2026-09-30 03:24 UTC",
-  "decisions": {}
+  "scan_time": "2026-09-30 04:25 UTC",
+  "decisions": {
+    "SEI/USDT": {
+      "action": "SKIP",
+      "mode": "ASTEAPTA_CORECTIA",
+      "reason": "Elliott contrazice planul LONG (Primary Motive W5 BULLISH 47%: impulsul pare complet - W5 a atins 0.08662, iar pretul a retras 83% din ea; urmeaza corectia A-B-C). Istoric: planurile contra Elliott n-au avut avantaj (+0.04R/plan, fata de +0.11R fara conflict). Nivel urmarit pentru intrare: ~0.0617381.",
+      "calibrated_prob": 25.2,
+      "agent_prob": 0.4194,
+      "elliott_bias": -0.3997,
+      "next_entry": 0.06173805702
+    },
+    "LINK/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta dezactivata: pe walk-forward a inrautatit rezultatul in 2 din 3 rulari",
+      "calibrated_prob": 25.2,
+      "agent_prob": 0.5334,
+      "elliott_bias": 0.1038,
+      "next_entry": null
+    },
+    "ATOM/USDT": {
+      "action": "SKIP",
+      "mode": "FILTRU_AGENT",
+      "reason": "agentul pune semnalul in treimea de jos (0.141 < 0.212); masurat in afara esantionului, acea treime pierde in medie",
+      "calibrated_prob": 25.2,
+      "agent_prob": 0.1415,
+      "elliott_bias": null,
+      "next_entry": null
+    }
+  }
 }
