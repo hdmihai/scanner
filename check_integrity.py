@@ -487,6 +487,40 @@ def check_data_geometry_match():
             f"sau pana integrezi un backtest de pe acest timeframe.")
 
 
+def check_self_check_step():
+    """Auto-diagnosticul trebuie sa RULEZE in scanare, nu doar sa existe.
+
+    DE CE: self_check.py a fost adaugat fara pas in scan.yml. data/self_check.json
+    nu a fost scris niciodata, desi dashboard-ul, self_repair.py, ai_agent.py
+    (carantina) si plan_tracker.py (filtrul Elliott, modul de siguranta) il
+    citesc. Totul arata "verde" - lipsa fisierului inseamna comportament implicit
+    - deci eroarea era invizibila. Verific CINE il apeleaza, nu doar ca exista.
+    """
+    if not os.path.exists(os.path.join(ROOT, "self_check.py")):
+        return
+    scan = read(os.path.join(".github", "workflows", "scan.yml"))
+    if not scan:
+        return
+    import re as _re
+    m = _re.search(r"^\s*run:\s*python3?\s+self_check\.py\b", scan, _re.M)
+    if not m:
+        problems.append(
+            "scan.yml nu ruleaza self_check.py. data/self_check.json nu se scrie, deci "
+            "auto-diagnosticul, carantina, filtrul Elliott adaptiv si self_repair.yml "
+            "raman inactive in tacere. Adauga pasul dupa ai_agent.py, inainte de "
+            "generate_dashboard.py.")
+        return
+    pos = m.start()
+    agent = _re.search(r"^\s*run:\s*python3?\s+ai_agent\.py\b", scan, _re.M)
+    dash = _re.search(r"^\s*run:\s*python3?\s+generate_dashboard\.py\b", scan, _re.M)
+    if agent and pos < agent.start():
+        problems.append("scan.yml ruleaza self_check.py INAINTE de ai_agent.py - "
+                        "diagnosticul ar vedea starea agentului de la scanarea anterioara.")
+    if dash and pos > dash.start():
+        problems.append("scan.yml ruleaza self_check.py DUPA generate_dashboard.py - "
+                        "dashboard-ul ar afisa diagnosticul scanarii anterioare.")
+
+
 def main():
     check_referenced_files_exist()
     check_geometry_versioning()
@@ -498,6 +532,7 @@ def main():
     check_signal_block_uses_own_series()
     check_no_direct_plan_writes()
     check_compaction_step()
+    check_self_check_step()
     check_timeframe_consistency()
     check_data_geometry_match()
 
