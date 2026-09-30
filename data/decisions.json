@@ -1,39 +1,21 @@
 {
-  "scan_time": "2026-09-30 20:40 UTC",
+  "scan_time": "2026-09-30 22:59 UTC",
   "decisions": {
-    "SUI/USDT": {
-      "action": "ISSUE",
-      "mode": "POARTA_DEZACTIVATA",
-      "reason": "poarta dezactivata: pe walk-forward a inrautatit rezultatul in 2 din 3 rulari",
-      "calibrated_prob": 29.3,
-      "agent_prob": 0.5153,
-      "elliott_bias": null,
-      "next_entry": null
-    },
-    "GRT/USDT": {
-      "action": "ISSUE",
-      "mode": "POARTA_DEZACTIVATA",
-      "reason": "poarta dezactivata: pe walk-forward a inrautatit rezultatul in 2 din 3 rulari",
-      "calibrated_prob": 25.2,
-      "agent_prob": 0.4226,
-      "elliott_bias": 0.1399,
-      "next_entry": null
-    },
     "ZEC/USDT": {
       "action": "SKIP",
       "mode": "FILTRU_AGENT",
-      "reason": "agentul pune semnalul in treimea de jos (0.110 < 0.212); masurat in afara esantionului, acea treime pierde in medie",
+      "reason": "agentul pune semnalul in treimea de jos (0.093 < 0.212); masurat in afara esantionului, acea treime pierde in medie",
       "calibrated_prob": 25.2,
-      "agent_prob": 0.11,
+      "agent_prob": 0.093,
       "elliott_bias": 0.2,
       "next_entry": null
     },
     "ZEN/USDT": {
-      "action": "SKIP",
-      "mode": "FILTRU_AGENT",
-      "reason": "agentul pune semnalul in treimea de jos (0.078 < 0.212); masurat in afara esantionului, acea treime pierde in medie",
+      "action": "ISSUE",
+      "mode": "EXPLORARE_FILTRU",
+      "reason": "semnal din treimea de jos (0.078 < 0.212), emis pentru explorare (15% din cele filtrate) - pastreaza evaluarea agentului nedeformata",
       "calibrated_prob": 25.2,
-      "agent_prob": 0.0781,
+      "agent_prob": 0.0777,
       "elliott_bias": null,
       "next_entry": null
     }
