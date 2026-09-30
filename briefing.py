@@ -190,6 +190,9 @@ def deterministic_briefing(f):
 
 # ========================= VARIANTA CU GEMINI ==============================
 
+LLM_ERROR = None      # cauza ultimului esec Gemini, raportata de diagnostic
+
+
 def gemini_briefing(f):
     if not GEMINI_API_KEY:
         return None
@@ -213,7 +216,18 @@ def gemini_briefing(f):
             data = json.loads(resp.read().decode())
         return data["candidates"][0]["content"]["parts"][0]["text"].strip()
     except Exception as e:
-        print(f"[!] Gemini indisponibil ({e}) - folosesc briefing-ul determinist.")
+        # CAUZA EXACTA, salvata in briefing.json (fara cheie): in productie
+        # briefing-ul cadea tacut pe varianta determinista, iar motivul aparea
+        # doar in jurnalul Actions. Acum il raporteaza modulul selfrepair.
+        global LLM_ERROR
+        detail = str(e)
+        try:
+            detail += " " + e.read().decode()[:160]
+        except Exception:
+            pass
+        import re as _re
+        LLM_ERROR = _re.sub(r"key=[A-Za-z0-9_\-]+", "key=***", detail)[:240].strip()
+        print(f"[!] Gemini indisponibil ({LLM_ERROR}) - folosesc briefing-ul determinist.")
         return None
 
 
@@ -227,7 +241,10 @@ def main():
         source = "gemini" if text else "determinist"
         if not text:
             text = deterministic_briefing(facts)
-        save_json(BRIEFING_FILE, {"text": text, "source": source, "facts": facts})
+        out = {"text": text, "source": source, "facts": facts}
+        if source == "determinist":
+            out["llm_error"] = LLM_ERROR if GEMINI_API_KEY else "GEMINI_API_KEY lipseste"
+        save_json(BRIEFING_FILE, out)
         print(f"Briefing ({source}):\n{text}")
     except Exception as e:
         print(f"[!] Briefing esuat ({type(e).__name__}: {e}) - continui fara el.")
