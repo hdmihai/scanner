@@ -968,6 +968,32 @@ def decide(calibration, signal, agent_pred=None, bucket_size=20):
 
 # ============================== RAPORTARE ===================================
 
+def _split_stats(closed):
+    """Statistici pentru un subset de planuri inchise, cu incertitudinea lor:
+    rata de castig cu interval Wilson, R mediu cu IC95 normal (eroare standard).
+    Planurile din aceeasi zi sunt corelate (aceeasi miscare de piata), deci
+    intervalele sunt mai degraba prea INGUSTE decat prea largi."""
+    n = len(closed)
+    if not n:
+        return {"closed": 0}
+    rs = [p["realized_r"] for p in closed]
+    wins = sum(1 for r in rs if r > 0)
+    lo, hi = wilson_interval(wins, n)
+    m = sum(rs) / n
+    se = math.sqrt(sum((r - m) ** 2 for r in rs) / (n - 1) / n) if n > 1 else None
+    first = min((p.get("created_ts") or 0 for p in closed), default=0)
+    return {
+        "closed": n,
+        "win_rate": round(100 * wins / n, 1),
+        "wr_ci_low": round(100 * lo, 1), "wr_ci_high": round(100 * hi, 1),
+        "avg_r": round(m, 3),
+        "avg_r_ci_low": round(m - 1.96 * se, 3) if se is not None else None,
+        "avg_r_ci_high": round(m + 1.96 * se, 3) if se is not None else None,
+        "total_r": round(sum(rs), 2),
+        "since": time.strftime("%Y-%m-%d", time.gmtime(first)) if first else None,
+    }
+
+
 def summarize(store):
     plans = store["plans"]
     all_closed = [p for p in plans if p["state"] in CLOSED_STATES and p.get("realized_r") is not None]
@@ -1000,6 +1026,12 @@ def summarize(store):
         profit_factor = round(gross_win / gross_loss, 2) if gross_loss > 0 else None
 
     return {
+        # SEPARAT LIVE vs BACKTEST: cifrele de mai jos (total_r, win_rate, avg_r)
+        # amesteca ambele surse - in productie >99% sunt din backtest, deci descriu
+        # backtest-ul, nu ce a facut sistemul live. Dashboard-ul si briefing-ul
+        # le prezentau ca rezultatul sistemului, desi live era negativ.
+        "live": _split_stats([p for p in closed if p.get("source") != "backtest"]),
+        "backtest": _split_stats([p for p in closed if p.get("source") == "backtest"]),
         "no_entry": len(no_entry),
         "no_entry_pct": round(100 * len(no_entry) / len(current_geo), 1) if current_geo else None,
         "legacy_closed": len(legacy) + archived_closed,
