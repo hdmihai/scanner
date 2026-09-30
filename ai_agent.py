@@ -437,7 +437,24 @@ def agent_is_active(state, plans=None):
     if bal_agent <= bal_base:
         return False, (f"acuratete echilibrata {bal_agent:.1f}% nu bate inca "
                        f"euristica ({bal_base:.1f}%)")
-    return True, f"acuratete echilibrata {bal_agent:.1f}% vs euristica {bal_base:.1f}%"
+    # MOTIVUL AFISAT spune ce a masurat de fapt poarta. Varianta veche,
+    # "acuratete echilibrata 69.6% vs euristica 33.4%", compara cu formula
+    # min(50 + 0.35*scor, 88)% - care e MEREU >= 50%, deci prezice mereu
+    # "castig" si nimereste exact rata de castig (~33%). Pragul trivial real e
+    # clasa majoritara ("mereu pierdere", ~67%), iar dovada utilitatii e
+    # ordonarea (AUC fata de scorul brut) si R-ul treimii de sus.
+    auc_sc = auc_score(state.get("score_pairs") or [])
+    maj = majority_class_accuracy(pairs)
+    # acuratetea agentului pe ACELEASI exemple ca pragul majoritar (fereastra
+    # `pairs`), nu pe tot istoricul - altfel s-ar compara numitori diferiti
+    acc_w = (100 * sum(1 for pp in pairs if (pp[0] >= 0.5) == (pp[1] == 1.0)) / len(pairs)
+             if pairs else None)
+    return True, (f"ordoneaza mai bine decat scorul brut: AUC {auc:.3f} vs {auc_sc:.3f}"
+                  if auc_sc is not None else f"AUC {auc:.3f}") + (
+                  f"; treimea de sus {r_top:+.3f}R vs toate {r_all:+.3f}R (prequential)"
+                  f"; acuratete {acc_w:.1f}% vs {maj:.1f}% prezicand mereu pierdere "
+                  f"(ultimele {len(pairs)} exemple)"
+                  if maj is not None and acc_w is not None else "")
 
 
 # ============================== ANTRENARE =================================
