@@ -170,6 +170,24 @@ class OnlineLogisticRegression:
 
 # ============================ CARACTERISTICI ==============================
 
+_Q_CACHE = {"ts": 0, "set": set()}
+
+
+def _quarantined():
+    """Caracteristicile puse in carantina de auto-diagnostic (reincarcate cel
+    mult o data pe minut - extract_features ruleaza pentru fiecare plan)."""
+    import time as _t
+    if _t.time() - _Q_CACHE["ts"] > 60:
+        try:
+            with open(os.path.join(os.path.dirname(MODEL_FILE), "self_check.json")) as f:
+                q = (json.load(f).get("mitigations") or {}).get("quarantine") or {}
+            _Q_CACHE["set"] = set(q)
+        except Exception:
+            _Q_CACHE["set"] = set()
+        _Q_CACHE["ts"] = _t.time()
+    return _Q_CACHE["set"]
+
+
 def extract_features(result):
     """Accepta atat un rezultat de scanare cat si un plan - planurile pastreaza
     contextul de la momentul deschiderii sub alte nume de campuri."""
@@ -193,6 +211,12 @@ def extract_features(result):
         stored = ev_mod.evidence_features(result["evidence"], result.get("direction"))
     for k in ev_mod.FEATURE_KEYS:
         feats[k] = float(stored.get(k, 0.0))
+    # CARANTINA decisa de modulul selfrepair (data/self_check.json): o caracteristica al carei calcul a fost
+    # gasit incoerent valoreaza 0 - la antrenare SI la predictie, deci agentul
+    # nici nu invata din ea, nici nu decide pe baza ei, pana iese din carantina.
+    for f in _quarantined():
+        if f in feats:
+            feats[f] = 0.0
     return feats
 
 
