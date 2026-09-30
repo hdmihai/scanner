@@ -1339,6 +1339,22 @@ def render_plan_memory(store):
       <div><span class="dim">R MEDIU</span><br>{summary["avg_r"]:+.3f}R</div>
       <div><span class="dim">PROFIT FACTOR</span><br>{pf if pf is not None else "&mdash;"}</div>
     </div>'''
+        # Cifrele de sus amesteca LIVE si BACKTEST (in productie >99% backtest).
+        # Afisez separat rezultatul live, cu incertitudinea lui, ca sa nu para ca
+        # sistemul a produs live R-ul cumulat al backtest-ului.
+        lv, bt = summary.get("live") or {}, summary.get("backtest") or {}
+        if lv.get("closed") or bt.get("closed"):
+            def _ln(tag, d):
+                if not d.get("closed"):
+                    return f"<strong>{tag}</strong>: niciun plan inchis inca"
+                ci = (f' (IC95 {d["avg_r_ci_low"]:+.3f}..{d["avg_r_ci_high"]:+.3f}R)'
+                      if d.get("avg_r_ci_low") is not None else "")
+                return (f'<strong>{tag}</strong>: {d["closed"]} inchise'
+                        + (f' din {d["since"]}' if d.get("since") else "")
+                        + f' &middot; castig {d["win_rate"]}% (IC {d["wr_ci_low"]}-{d["wr_ci_high"]}%)'
+                        f' &middot; R mediu {d["avg_r"]:+.3f}R{ci} &middot; total {d["total_r"]:+.2f}R')
+            head += (f'<p class="dim" style="margin:-6px 0 12px;">Totalul de mai sus include backtest-ul. '
+                     f'{_ln("LIVE", lv)}<br>{_ln("BACKTEST", bt)}</p>')
 
     cards = []
     for p in sorted(plans, key=lambda x: x["id"], reverse=True)[:12]:
@@ -1405,7 +1421,16 @@ def render_agent_card(agent_state):
         for k, v in weights.items()
     )
 
-    bal_line = (f'{ba:.1f}% vs euristica {bb:.1f}%' if ba is not None else "in curs de acumulare")
+    # "euristica" = min(50 + 0.35*scor, 88)%, mereu >= 50% -> prezice mereu castig,
+    # deci acuratetea ei e doar rata de castig. Pragul care conteaza e clasa
+    # majoritara (mereu pierdere); ordonarea se vede in AUC fata de scorul brut.
+    maj = agent_state.get("majority_baseline")
+    auc_a, auc_s = agent_state.get("auc"), agent_state.get("auc_score_baseline")
+    bal_line = ((f'{ba:.1f}% vs euristica {bb:.1f}% (euristica prezice mereu castig)'
+                 + (f' &middot; prag real, mereu pierdere: {maj:.1f}%' if maj is not None else ""))
+                if ba is not None else "in curs de acumulare")
+    if auc_a is not None and auc_s is not None:
+        bal_line += f'<br><span class="dim">ordonare AUC: agent {auc_a:.3f} vs scor brut {auc_s:.3f} (0.5 = hazard)</span>'
 
     return f'''
     <div class="agent-status agent-{status_cls}">
