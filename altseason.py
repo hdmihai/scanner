@@ -534,6 +534,15 @@ def update(exchange=None, scan_results=None):
              "candidates": cands, "perf90": perf90,
              "alt_bias": round(ALT_BIAS[cls["phase"]] * cls["confidence"], 3),
              "btc_bias": round(BTC_BIAS[cls["phase"]] * cls["confidence"], 3)}
+    # CONTEXTUL ISTORIC PE 10 ANI (altseason_history.py): ciclurile, pozitia de
+    # acum fata de ele, analogiile si predictiile invatate. Actualizat zilnic
+    # (zilele noi inchise) si reconstruit saptamanal; nu opreste niciodata evaluarea.
+    try:
+        import altseason_history as _AH
+        state["history"] = _AH.update(exchange)
+    except Exception as _e:
+        print(f"[!] context istoric altseason: {_e}")
+        state["history"] = None
     _save(STATE_FILE, state)
     history.append({"ts": int(state["ts"]), "phase": cls["phase"], "conf": cls["confidence"],
                     "btc_d": ind.get("btc_d"), "eth_btc": ind.get("eth_btc"),
