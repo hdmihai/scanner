@@ -104,6 +104,8 @@ def gather_facts():
         "total_r": summary.get("total_r"),
         "avg_r": summary.get("avg_r"),
         "profit_factor": summary.get("profit_factor"),
+        "live": summary.get("live") or {},
+        "backtest": summary.get("backtest") or {},
         "recent_closed": [
             {"id": p["id"], "symbol": p["symbol"], "direction": p["direction"],
              "state": p.get("state_detail"), "r": p["realized_r"]}
@@ -151,6 +153,22 @@ def deterministic_briefing(f):
             f"Din {f['plans_closed']} planuri inchise, rata de succes e {wr}, "
             f"cu {tr} cumulat ({ar} in medie pe plan) "
             f"si profit factor {pf}. {f['plans_open']} planuri sunt inca deschise.")
+        # Totalul de mai sus amesteca live si backtest. Spun explicit cat e live -
+        # altfel cifrele backtest-ului par rezultatul sistemului in piata reala.
+        lv, bt = f.get("live") or {}, f.get("backtest") or {}
+        if bt.get("closed"):
+            if lv.get("closed"):
+                ci = (f" (IC95 {lv['avg_r_ci_low']:+.3f}..{lv['avg_r_ci_high']:+.3f}R)"
+                      if lv.get("avg_r_ci_low") is not None else "")
+                parts.append(
+                    f"Atentie: {bt['closed']} dintre ele sunt din backtest. LIVE"
+                    + (f", din {lv['since']}" if lv.get("since") else "")
+                    + f": {lv['closed']} planuri inchise, castig {lv['win_rate']}% "
+                    f"(IC {lv['wr_ci_low']}-{lv['wr_ci_high']}%), R mediu {lv['avg_r']:+.3f}R{ci}, "
+                    f"total {lv['total_r']:+.2f}R.")
+            else:
+                parts.append(f"Atentie: toate cele {bt['closed']} sunt din backtest; "
+                             f"niciun plan live inchis inca.")
 
     if f.get("legacy_closed"):
         parts.append(
@@ -176,10 +194,12 @@ def deterministic_briefing(f):
             "o probabilitate calibrata, deci deschid planuri in mod explorativ, ca sa strang date.")
 
     if f["agent_status"] == "ACTIVE":
+        # Motivul vine din ai_agent.agent_is_active (AUC vs scor, R-ul treimii de
+        # sus, acuratete vs clasa majoritara). "Acuratete echilibrata vs baseline"
+        # compara cu o formula care prezice mereu castig - nu dovedea nimic.
         parts.append(
-            f"Agentul cu invatare online e ACTIV si contribuie la decizii: acuratete "
-            f"echilibrata {f['agent_balanced']:.1f}% fata de {f['baseline_balanced']:.1f}% "
-            f"baseline, pe {f['agent_samples']} planuri invatate.")
+            f"Agentul cu invatare online e ACTIV si contribuie la decizii ({f['agent_reason']}), "
+            f"pe {f['agent_samples']} planuri invatate.")
     else:
         parts.append(
             f"Agentul cu invatare online e in modul SHADOW - invata si isi masoara "
