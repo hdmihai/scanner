@@ -232,7 +232,11 @@ def main():
     # 10 din 30, inclusiv candidatul principal. Actualizez si cand lipsesc
     # tokeni, sau cand exista intrari rezolvate cu metoda veche (gresita).
     old_tokens = meta.get("tokens") or {}
-    missing = [t for t in universe if t not in old_tokens]
+    # COTA GRATUITA COINGECKO: un token care nu exista pe CoinGecko ar declansa
+    # cautari la fiecare scanare orara. Il reincerc cel mult o data pe zi.
+    unresolved = {k: v for k, v in (meta.get("_unresolved") or {}).items()
+                  if time.time() - v < 86400}
+    missing = [t for t in universe if t not in old_tokens and t not in unresolved]
     legacy = [t for t, v in old_tokens.items() if not v.get("resolved_by")]
     stale = time.time() - meta.get("_updated_ts", 0) >= REFRESH_DAYS * 86400
     if not (force or stale or missing or legacy):
@@ -275,7 +279,9 @@ def main():
         base = sym.split("/")[0]
         hit = ids.get(base.lower())
         if not hit:
-            print(f"  {sym}: niciun proiect CoinGecko gasit")
+            print(f"  {sym}: niciun proiect CoinGecko gasit - reincerc peste 24 de ore")
+            unresolved[sym] = time.time()
+            changed = True
             continue
         cg_id, how = hit
         if (not force and not stale and sym in tokens and tokens[sym].get("resolved_by")
@@ -304,6 +310,7 @@ def main():
         "_updated_ts": time.time(),
         "_updated": time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime()),
         "tokens": tokens,
+        "_unresolved": unresolved,
     }
 
     history = load_json(HISTORY_FILE, [])
