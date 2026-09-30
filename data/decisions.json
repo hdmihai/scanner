@@ -1,21 +1,12 @@
 {
-  "scan_time": "2026-09-30 13:26 UTC",
+  "scan_time": "2026-09-30 14:27 UTC",
   "decisions": {
     "ZEN/USDT": {
       "action": "SKIP",
       "mode": "FILTRU_AGENT",
-      "reason": "agentul pune semnalul in treimea de jos (0.081 < 0.212); masurat in afara esantionului, acea treime pierde in medie",
+      "reason": "agentul pune semnalul in treimea de jos (0.087 < 0.212); masurat in afara esantionului, acea treime pierde in medie",
       "calibrated_prob": 25.2,
-      "agent_prob": 0.0807,
-      "elliott_bias": null,
-      "next_entry": null
-    },
-    "ATOM/USDT": {
-      "action": "ISSUE",
-      "mode": "EXPLORARE_FILTRU",
-      "reason": "semnal din treimea de jos (0.130 < 0.212), emis pentru explorare (15% din cele filtrate) - pastreaza evaluarea agentului nedeformata",
-      "calibrated_prob": 25.2,
-      "agent_prob": 0.1303,
+      "agent_prob": 0.0873,
       "elliott_bias": null,
       "next_entry": null
     }
