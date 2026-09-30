@@ -218,7 +218,7 @@ ELLIOTT_CONFLICT_MAX = -0.1
 
 
 def auto_mitigations():
-    """Atenuarile decise de self_check.py la rularea anterioara: modul de
+    """Atenuarile decise de modulul selfrepair la rularea anterioara: modul de
     siguranta si starea filtrului Elliott (pornit/oprit dupa datele recente).
     Lipsa fisierului inseamna comportamentul implicit."""
     try:
