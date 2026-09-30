@@ -27,6 +27,7 @@ concurrency:
 permissions:
   contents: write
   actions: write   # necesar pentru stergerea run-urilor vechi (pasul de la final)
+  issues: write    # self_check.py deschide un Issue pentru fiecare eroare NOUA de auto-diagnostic
 
 jobs:
   scan:
@@ -92,6 +93,19 @@ jobs:
 
       - name: Antreneaza agentul AI pe semnalele nou evaluate
         run: python ai_agent.py
+
+      - name: Auto-diagnostic (scrie data/self_check.json)
+        # FARA pasul asta, self_check.py nu rula niciodata: data/self_check.json
+        # nu exista, dashboard-ul afisa permanent "Primul auto-diagnostic ruleaza
+        # la urmatoarea scanare", self_repair.yml nu gasea nicio eroare de reparat,
+        # iar carantina/filtrul Elliott/modul de siguranta (citite de ai_agent.py si
+        # plan_tracker.py din self_check.json) nu se aplicau. Ruleaza DUPA agent
+        # (are planurile si detaliile noi) si INAINTE de dashboard (il afiseaza).
+        # self_check.py prinde orice exceptie, deci nu opreste scanarea.
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python self_check.py
 
       - name: Genereaza briefing-ul narativ
         env:
