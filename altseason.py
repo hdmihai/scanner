@@ -87,9 +87,12 @@ BTC_BIAS = {0: -0.6, 1: 0.5, 2: 0.7, 3: 0.3, 4: 0.2, 5: 0.0, 6: 0.0, 7: -0.2, 8:
 
 
 # ---------------------------------------------------------------------------
-def _get(url, retries=2):
+KEY_NOTE = []      # de ce a fost refuzata cheia Demo (raportat de diagnostic)
+
+
+def _get_once(url, retries, use_key):
     headers = {"accept": "application/json"}
-    if CG_KEY:
+    if use_key and CG_KEY:
         headers["x-cg-demo-api-key"] = CG_KEY
     for attempt in range(retries + 1):
         try:
@@ -101,6 +104,25 @@ def _get(url, retries=2):
                 time.sleep(15 * (attempt + 1))
                 continue
             raise
+
+
+def _get(url, retries=2):
+    """Cu cheia Demo; daca e REFUZATA (invalida, sau cota lunara epuizata),
+    o singura reincercare pe API-ul public gratuit, fara cheie - suficient pentru
+    cele doua apeluri pe scanare. In productie, altseason a ramas fara date peste
+    15 ore, in timp ce apelul scanerului, facut fara cheie, nu depindea de ea."""
+    try:
+        return _get_once(url, retries, use_key=True)
+    except urllib.error.HTTPError as e:
+        if not CG_KEY or e.code not in (400, 401, 403, 429):
+            raise
+        note = f"HTTP {e.code}"
+        try:
+            note += " " + e.read().decode()[:120]
+        except Exception:
+            pass
+        KEY_NOTE.append(note.strip())
+        return _get_once(url, 1, use_key=False)
 
 
 def _load(path, default):
@@ -483,11 +505,19 @@ def update(exchange=None, scan_results=None):
     try:
         glob, markets = fetch_market()
     except Exception as e:
-        print(f"[!] altseason: CoinGecko indisponibil ({e}) - pastrez evaluarea anterioara.")
-        if state:
-            state["stale"] = True
-            _save(STATE_FILE, state)
-        return state or None
+        # CAUZA EXACTA, salvata: in productie datele au ramas vechi peste 10 ore,
+        # iar motivul aparea doar in jurnalul Actions. Acum il vede diagnosticul.
+        err = str(e)[:200]
+        try:
+            err += " " + e.read().decode()[:120]
+        except Exception:
+            pass
+        print(f"[!] altseason: CoinGecko indisponibil ({err}) - pastrez evaluarea anterioara.")
+        state = state or {}
+        state.update(stale=True, last_error=err.strip(),
+                     last_error_at=time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime()))
+        _save(STATE_FILE, state)
+        return state if state.get("classification") else None
 
     alts = alt_universe(markets)
     bases = ["btc"] + [(c.get("symbol") or "") for c in alts[:100]]
@@ -498,7 +528,9 @@ def update(exchange=None, scan_results=None):
     cands = growth_candidates(markets, perf90, cls["phase"], scan_results)
 
     state = {"ts": time.time(), "when": time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime()),
-             "stale": False, "indicators": ind, "classification": cls,
+             "stale": False, "last_error": None,
+             "key_note": (f"cheia CoinGecko a fost refuzata ({KEY_NOTE[-1]}); datele vin din API-ul "
+                          f"public gratuit" if KEY_NOTE else None), "indicators": ind, "classification": cls,
              "candidates": cands, "perf90": perf90,
              "alt_bias": round(ALT_BIAS[cls["phase"]] * cls["confidence"], 3),
              "btc_bias": round(BTC_BIAS[cls["phase"]] * cls["confidence"], 3)}
