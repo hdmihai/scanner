@@ -1,22 +1,40 @@
 {
-  "scan_time": "2026-10-01 16:22 UTC",
+  "scan_time": "2026-10-01 21:48 UTC",
   "decisions": {
-    "NEAR/USDT": {
+    "GRAM/USDT": {
       "action": "ISSUE",
       "mode": "POARTA_DEZACTIVATA",
       "reason": "poarta dezactivata: pe walk-forward a inrautatit rezultatul in 2 din 3 rulari",
-      "calibrated_prob": 29.4,
-      "agent_prob": 0.5316,
-      "elliott_bias": null,
+      "calibrated_prob": 29.8,
+      "agent_prob": 0.4296,
+      "elliott_bias": 1.0,
+      "next_entry": null
+    },
+    "AVAX/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta dezactivata: pe walk-forward a inrautatit rezultatul in 2 din 3 rulari",
+      "calibrated_prob": 29.8,
+      "agent_prob": 0.4005,
+      "elliott_bias": 0.2,
       "next_entry": null
     },
     "ZEC/USDT": {
-      "action": "SKIP",
-      "mode": "FILTRU_AGENT",
-      "reason": "agentul pune semnalul in treimea de jos (0.086 < 0.212); masurat in afara esantionului, acea treime pierde in medie",
-      "calibrated_prob": 29.4,
-      "agent_prob": 0.0864,
-      "elliott_bias": 0.2,
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta dezactivata: pe walk-forward a inrautatit rezultatul in 2 din 3 rulari",
+      "calibrated_prob": 29.8,
+      "agent_prob": 0.0787,
+      "elliott_bias": 0.513,
+      "next_entry": null
+    },
+    "TRX/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta dezactivata: pe walk-forward a inrautatit rezultatul in 2 din 3 rulari",
+      "calibrated_prob": 26.4,
+      "agent_prob": 0.3662,
+      "elliott_bias": 0.0611,
       "next_entry": null
     }
   }
