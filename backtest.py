@@ -74,13 +74,21 @@ WARMUP_BARS = 200      # cate bare are nevoie score_symbol ca sa fie valid
 
 def save_json(path, data, compact=False):
     os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
-    with open(path, "w") as f:
+    # SCRIERE ATOMICA: fisier temporar, golit pe disc, apoi inlocuire intr-un singur
+    # pas. Un job oprit in timpul scrierii (timeout, anulare) lasa intact fisierul
+    # vechi - pasul de commit din workflow ruleaza cu if: always() si ar fi urcat
+    # un JSON trunchiat, oprind toate scanarile urmatoare.
+    tmp = f"{path}.tmp"
+    with open(tmp, "w") as f:
         if compact:
             # Fisierele cu zeci de mii de planuri: `indent=2` aproape dubleaza
             # dimensiunea fara niciun castig.
             f.write(json.dumps(data, separators=(",", ":")))
         else:
             json.dump(data, f, indent=2)
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(tmp, path)
 
 
 def load_json(path, default):
@@ -328,7 +336,10 @@ def replay_symbol(symbol, candles, weights, start_id):
     open_plan = None
     next_id = start_id
 
-    bar_ms = (candles[1][0] - candles[0][0]) if len(candles) > 1 else 4 * 3600000
+    # durata barei = diferenta cea mai frecventa (un gol chiar la inceputul seriei,
+    # frecvent la listare, ar fi dat altfel o durata gresita)
+    _d = [b[0] - a[0] for a, b in zip(candles[:80], candles[1:81]) if b[0] > a[0]]
+    bar_ms = max(set(_d), key=_d.count) if _d else 4 * 3600000
     htf = htf_closes_index(candles, bar_ms)
     for i in range(WARMUP_BARS, len(candles)):
         window = candles[:i + 1]          # <- fara look-ahead: nimic dupa bara i
