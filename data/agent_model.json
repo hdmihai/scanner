@@ -1,51 +1,51 @@
 {
   "model": {
     "weights": {
-      "trend": -0.062891,
-      "momentum": -0.132239,
-      "volatility": -0.062915,
-      "volume": -0.089461,
-      "persistence_n": -0.019767,
-      "ev_ema_fast": -0.076406,
-      "ev_ema_stack": 0.813201,
-      "ev_supertrend": -0.059318,
-      "ev_macd": 0.851556,
-      "ev_vwap": 0.162379,
-      "ev_poc": -0.103111,
-      "ev_value_area": 0.047003,
-      "ev_rsi": -0.234363,
+      "trend": -0.074006,
+      "momentum": -0.148587,
+      "volatility": -0.069523,
+      "volume": -0.120039,
+      "persistence_n": -0.031846,
+      "ev_ema_fast": -0.084372,
+      "ev_ema_stack": 0.780336,
+      "ev_supertrend": -0.078155,
+      "ev_macd": 0.840466,
+      "ev_vwap": 0.136601,
+      "ev_poc": -0.135962,
+      "ev_value_area": 0.024005,
+      "ev_rsi": -0.250648,
       "ev_volume": 0.0,
       "ev_volatility": 0.0,
-      "ev_order_flow": 0.127626,
-      "ev_book_imbalance": 0.048634,
-      "ev_liq_magnet": -0.057312,
-      "ev_ichimoku": -0.022858,
-      "ev_ma_cross": 0.532048,
-      "ev_regime": 0.271178,
-      "ev_mtf_align": 0.002934,
-      "ev_elliott": 0.077467,
-      "ev_liq_struct": 0.1594,
+      "ev_order_flow": 0.179249,
+      "ev_book_imbalance": 0.062026,
+      "ev_liq_magnet": -0.062504,
+      "ev_ichimoku": -0.044267,
+      "ev_ma_cross": 0.500029,
+      "ev_regime": 0.25916,
+      "ev_mtf_align": -0.002641,
+      "ev_elliott": 0.054861,
+      "ev_liq_struct": 0.173022,
       "ev_liq_sweep": 0.0,
-      "ev_altseason": 0.000344,
-      "ev_fusion": 0.00598
+      "ev_altseason": -0.007562,
+      "ev_fusion": -0.010579
     },
-    "bias": -0.999835
+    "bias": -1.032687
   },
-  "samples_trained": 16309,
+  "samples_trained": 16312,
   "last_trained_scan_ts": 0.0,
   "agent": {
-    "correct": 11346,
-    "total": 16309
+    "correct": 11347,
+    "total": 16312
   },
   "baseline": {
-    "correct": 5441,
-    "total": 16309
+    "correct": 5442,
+    "total": 16312
   },
   "by_direction": {
     "LONG": {
-      "agent": 5583,
-      "baseline": 2714,
-      "total": 8061
+      "agent": 5584,
+      "baseline": 2715,
+      "total": 8064
     },
     "SHORT": {
       "agent": 5763,
@@ -55,21 +55,6 @@
   },
   "first_scan_ts": 1518537600.0,
   "pairs": [
-    [
-      0.17396,
-      0.0,
-      -1.037
-    ],
-    [
-      0.22318,
-      0.0,
-      -1.037
-    ],
-    [
-      0.28425,
-      0.0,
-      -1.047
-    ],
     [
       0.07864,
       0.0,
@@ -15054,14 +15039,26 @@
       0.1366,
       0.0,
       -1.023
+    ],
+    [
+      0.53538,
+      1.0,
+      0.693
+    ],
+    [
+      0.61328,
+      0.0,
+      -1.024
+    ],
+    [
+      0.50839,
+      0.0,
+      -1.028
     ]
   ],
   "recent": [
     1,
     1,
-    1,
-    1,
-    1,
     0,
     1,
     1,
@@ -15256,14 +15253,14 @@
     1,
     1,
     0,
-    1
+    1,
+    1,
+    0,
+    0
   ],
   "recent_baseline": [
     0,
     0,
-    0,
-    0,
-    0,
     1,
     0,
     0,
@@ -15458,6 +15455,9 @@
     0,
     0,
     1,
+    0,
+    1,
+    0,
     0
   ],
   "curve": [
@@ -19378,18 +19378,6 @@
   "source": "plans-v6-4h",
   "feature_version": "f7",
   "score_pairs": [
-    [
-      0.36,
-      0.0
-    ],
-    [
-      0.51,
-      0.0
-    ],
-    [
-      0.8,
-      0.0
-    ],
     [
       0.4,
       0.0
@@ -31377,20 +31365,32 @@
     [
       0.36,
       0.0
+    ],
+    [
+      0.55,
+      1.0
+    ],
+    [
+      0.63,
+      0.0
+    ],
+    [
+      0.39,
+      0.0
     ]
   ],
-  "last_event_ts": 1790769600.0,
-  "status_reason": "ordoneaza mai bine decat scorul brut: AUC 0.674 vs 0.572; treimea de sus +0.331R vs toate +0.039R (prequential); acuratete 68.2% vs 67.5% prezicand mereu pierdere (ultimele 3000 exemple)",
-  "days_covered": 3151.0,
-  "balanced_agent": 69.56544054662731,
-  "balanced_baseline": 33.365419995280895,
+  "last_event_ts": 1790856000.0,
+  "status_reason": "ordoneaza mai bine decat scorul brut: AUC 0.674 vs 0.572; treimea de sus +0.333R vs toate +0.039R (prequential); acuratete 68.1% vs 67.5% prezicand mereu pierdere (ultimele 3000 exemple)",
+  "days_covered": 3151.83,
+  "balanced_agent": 69.55875787107601,
+  "balanced_baseline": 33.36535769133066,
   "balanced_directions": [
     "LONG",
     "SHORT"
   ],
-  "auc": 0.6742417869543977,
-  "auc_score_baseline": 0.5722154598028504,
+  "auc": 0.6738489395378284,
+  "auc_score_baseline": 0.5723081987970877,
   "agent_superior": true,
-  "majority_baseline": 67.53333333333333,
-  "predicted_positive_rate": 16.566666666666666
+  "majority_baseline": 67.5,
+  "predicted_positive_rate": 16.666666666666668
 }
