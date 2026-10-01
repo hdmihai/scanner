@@ -1,31 +1,31 @@
 {
-  "scan_time": "2026-10-01 02:05 UTC",
+  "scan_time": "2026-10-01 08:50 UTC",
   "decisions": {
-    "POL/USDT": {
-      "action": "ISSUE",
-      "mode": "POARTA_DEZACTIVATA",
-      "reason": "poarta dezactivata: pe walk-forward a inrautatit rezultatul in 2 din 3 rulari",
-      "calibrated_prob": 25.2,
-      "agent_prob": 0.5125,
-      "elliott_bias": 0.2,
-      "next_entry": null
+    "FET/USDT": {
+      "action": "SKIP",
+      "mode": "ASTEAPTA_CORECTIA",
+      "reason": "Elliott contrazice planul LONG (Primary Developing Harmonic D FORMING BULLISH 43%: D inca nu a ajuns in zona PRZ). Istoric: planurile contra Elliott n-au avut avantaj (+0.04R/plan, fata de +0.11R fara conflict). Nivel urmarit pentru intrare: ~0.216.",
+      "calibrated_prob": 29.3,
+      "agent_prob": 0.6106,
+      "elliott_bias": -0.4,
+      "next_entry": 0.216
     },
     "ZEC/USDT": {
       "action": "SKIP",
       "mode": "FILTRU_AGENT",
-      "reason": "agentul pune semnalul in treimea de jos (0.092 < 0.212); masurat in afara esantionului, acea treime pierde in medie",
+      "reason": "agentul pune semnalul in treimea de jos (0.096 < 0.212); masurat in afara esantionului, acea treime pierde in medie",
       "calibrated_prob": 25.2,
-      "agent_prob": 0.0916,
+      "agent_prob": 0.0957,
       "elliott_bias": 0.2,
       "next_entry": null
     },
     "TRX/USDT": {
       "action": "SKIP",
       "mode": "ASTEAPTA_CORECTIA",
-      "reason": "Elliott contrazice planul SHORT (Primary Developing Motive W3 FORMING BULLISH 78%: unda 4 corectiva - continuarea (W5) e asteptata dupa ea). Istoric: planurile contra Elliott n-au avut avantaj (+0.04R/plan, fata de +0.11R fara conflict). Nivel urmarit pentru intrare: ~0.343706.",
+      "reason": "Elliott contrazice planul SHORT (Primary Developing Motive W4 FORMING BULLISH 78%: unda 4 corectiva - continuarea (W5) e asteptata dupa ea). Istoric: planurile contra Elliott n-au avut avantaj (+0.04R/plan, fata de +0.11R fara conflict). Nivel urmarit pentru intrare: ~0.343706.",
       "calibrated_prob": 25.2,
-      "agent_prob": 0.2664,
-      "elliott_bias": -0.5383,
+      "agent_prob": 0.3141,
+      "elliott_bias": -0.5868,
       "next_entry": 0.3437062
     }
   }
