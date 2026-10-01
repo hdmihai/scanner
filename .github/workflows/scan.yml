@@ -152,9 +152,30 @@ jobs:
         run: |
           git config user.name "crypto-ai-scanner-bot"
           git config user.email "actions@users.noreply.github.com"
+          # GARDA: niciun JSON invalid nu ajunge in repo. Pasul ruleaza cu
+          # if: always() (si dupa anulare la timeout); un fisier trunchiat ar opri
+          # toate rularile urmatoare. Il readuc la versiunea din repo.
+          python3 - <<'PY'
+          import glob, json, os, subprocess
+          for f in glob.glob("data/**/*.json", recursive=True):
+              try:
+                  with open(f) as fh:
+                      json.load(fh)
+              except Exception as e:
+                  print(f"[!] {f} invalid ({e}) - nu il urc; revin la versiunea din repo")
+                  if subprocess.run(["git", "checkout", "--", f]).returncode != 0:
+                      os.remove(f)
+          PY
+          find data -name "*.tmp" -delete
           git add data/ docs/
           git diff --staged --quiet || git commit -m "scan $(date -u +'%Y-%m-%d %H:%M UTC')"
-          git push
+          # pull --rebase inainte de push: un commit facut intre timp (de exemplu,
+          # fisiere urcate manual) respingea push-ul si se pierdea scanarea orei
+          for i in 1 2 3; do
+            git pull --rebase && git push && break
+            git rebase --abort 2>/dev/null || true
+            sleep 5
+          done
 
       - name: Curata istoricul de rulari (pastreaza ultimele 3 zile)
         # Sterge inregistrarile de executie din tab-ul Actions - loguri, status,
