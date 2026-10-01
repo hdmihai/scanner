@@ -305,7 +305,50 @@ def season_label(ai):
     return "Altcoin Season" if ai >= 75 else ("Bitcoin Season" if ai <= 25 else "zona mixta")
 
 
-def classify(ind, history=None, prev_scores=None):
+# ---------------------------------------------------------------------------
+# REGIMUL CICLULUI BTC - primul strat al deciziei.
+# Cadrul fazelor e SECVENTIAL: altseason-urile vin DUPA faza bull a BTC. Verificat
+# pe 10 ani de date reale: toate altseason-urile de ciclu (2017, ian. 2018,
+# primavara 2021, dec. 2024) au avut loc la cel mult 51 de zile de la un maxim
+# istoric BTC; ferestrele cu altcoins peste BTC departe de ATH (aug. 2020: 974
+# zile, -39%; aug. 2022: 303 zile, -71%) au fost raliuri in piata bear sau in
+# recuperare. Fara acest strat, dupa un minim de piata bear, revenirea mai
+# puternica a altcoins (volatilitate mai mare) arata ca faza 4-5.
+REGIME_ALLOWED = {"bull": {2, 3, 4, 5, 6, 7}, "late": {6, 7, 8}, "markdown": {8},
+                  "bear": {0}, "accumulation": {1}}
+REGIME_NAME = {"bull": "PIATA BULL BTC", "late": "FINAL DE CICLU (dupa varf)",
+               "markdown": "DISTRIBUTIE / INCEPUT DE BEAR", "bear": "PIATA BEAR",
+               "accumulation": "ACUMULARE / RECUPERARE"}
+BULL_DD = -20.0        # BTC la cel mult 20% sub ATH
+LATE_DAYS = 120        # fereastra de dupa un ATH in care vin altseason-urile de ciclu
+BEAR_DD = -45.0        # scaderea care defineste o piata bear
+RECOVERY = 25.0        # revenirea de la minim care confirma recuperarea
+
+
+def cycle_regime(ctx):
+    """Regimul ciclului din structura BTC: (regim, motive). `ctx` contine dd (%
+    fata de ATH), days_since_ath, low_dd (cea mai mare scadere de la ATH),
+    rec_from_low (%), above_ma200, plus ath / low pentru afisare."""
+    dd, dsa = ctx.get("dd"), ctx.get("days_since_ath")
+    if dd is None or dsa is None:
+        return None, []
+    low_dd, rec, above = ctx.get("low_dd"), ctx.get("rec_from_low"), ctx.get("above_ma200")
+    fmt = lambda v: f"${v:,.0f}" if v else "n/d"
+    base = [f"BTC {dd:+.1f}% fata de maximul istoric ({fmt(ctx.get('ath'))}, acum {dsa} zile)"]
+    if dd >= BULL_DD:
+        return "bull", base + [f"BTC la mai putin de {abs(BULL_DD):.0f}% de ATH - piata bull"]
+    if dsa <= LATE_DAYS:
+        return "late", base + [f"sub {LATE_DAYS} zile de la ATH - fereastra de final de ciclu"]
+    if low_dd is not None and low_dd <= BEAR_DD:
+        lo = f"minimul ciclului {fmt(ctx.get('low'))} ({low_dd:+.0f}% fata de ATH, {ctx.get('low_day')})"
+        if rec is not None and rec >= RECOVERY and above:
+            return "accumulation", base + [lo, f"+{rec:.0f}% de la minim si peste media de 200 de zile - recuperare"]
+        return "bear", base + [lo, (f"revenire de doar {rec:+.0f}% de la minim" if rec is not None and rec < RECOVERY
+                                    else "sub media de 200 de zile")]
+    return "markdown", base + [f"peste {LATE_DAYS} zile de la ATH, fara minim de piata bear inca - distributie"]
+
+
+def classify(ind, history=None, prev_scores=None, cycle=None):
     """Scorul fiecarei faze, din conditii masurabile. Returneaza faza, increderea,
     motivele si conditiile care ar confirma trecerea la faza urmatoare."""
     g = ind.get
@@ -365,24 +408,51 @@ def classify(ind, history=None, prev_scores=None):
     scores = {k: (0.5 * v + 0.5 * prev_scores[str(k)]) if prev_scores and str(k) in prev_scores else v
               for k, v in raw.items()}
     order = sorted(scores.items(), key=lambda kv: -kv[1])
+    rel_phase = order[0][0]                    # ce spun DOAR metricile relative alts vs BTC
+    regime, regime_why = cycle_regime(cycle or {})
+    if regime:
+        allowed = REGIME_ALLOWED[regime]
+        order = [kv for kv in order if kv[0] in allowed] + [kv for kv in order if kv[0] not in allowed]
     phase, top = order[0]
     second = order[1][1]
-    confidence = round(max(0.0, min(1.0, 0.5 * top + 0.5 * (top - second) / (top or 1))), 3)
+    if regime and len(REGIME_ALLOWED[regime]) == 1:
+        # faza e data de regim; increderea vine din cat de clar e regimul
+        dd = (cycle or {}).get("dd") or 0
+        confidence = round(min(0.95, 0.6 + min(0.35, abs(dd - BULL_DD) / 60)), 3)
+    else:
+        confidence = round(max(0.0, min(1.0, 0.5 * top + 0.5 * (top - second) / (top or 1))), 3)
 
     reasons, missing = _reasons(phase, ind, f)
+    rotation = None
+    if regime in ("accumulation", "bear", "markdown") and rel_phase in (3, 4, 5, 6, 7):
+        # altcoins bat BTC in afara pietei bull: rotatie in interiorul regimului,
+        # nu o faza de altseason (masurat: asa au aratat aug. 2020 si aug. 2022)
+        rotation = (f"altcoins bat BTC (metricile relative indica faza {rel_phase} - {PHASES[rel_phase][1]}), "
+                    f"dar BTC e in regimul {REGIME_NAME[regime]}: rotatie in interiorul regimului, nu altseason "
+                    f"de ciclu. Istoric, altseason-urile de ciclu au venit la cel mult {LATE_DAYS} de zile de la un ATH BTC.")
+    if regime:
+        reasons = regime_why + reasons
     nxt = (phase + 1) % 9
     # TRANZITIE: cand faza de pe locul 2 e vecina si scorurile sunt apropiate,
     # o spun explicit - piata e intre doua faze, nu ferm intr-una.
     ru = order[1][0]
-    transition = (abs(ru - phase) == 1 or {ru, phase} == {0, 8}) and (top - second) < 0.1
+    single = bool(regime) and len(REGIME_ALLOWED[regime]) == 1
+    # tranzitia are sens doar intre faze permise de regim
+    transition = (not single and (abs(ru - phase) == 1 or {ru, phase} == {0, 8}) and (top - second) < 0.1
+                  and (not regime or ru in REGIME_ALLOWED[regime]))
     return {"phase": phase, "name": PHASES[phase][1], "what": PHASES[phase][2],
             "watch": PHASES[phase][3], "confidence": confidence,
+            "regime": regime, "regime_name": REGIME_NAME.get(regime), "relative_phase": rel_phase,
+            "rotation": rotation, "cycle": cycle or None,
             "scores": {str(k): round(v, 4) for k, v in scores.items()},
-            "runner_up": {"phase": order[1][0], "name": PHASES[order[1][0]][1]},
+            # in regimurile cu o singura faza posibila, "locul 2" nu e o alternativa:
+            # e semnalul metricilor relative, afisat ca atare
+            "runner_up": ({"phase": rel_phase, "name": PHASES[rel_phase][1], "kind": "relativ"} if single
+                          else {"phase": order[1][0], "name": PHASES[order[1][0]][1]}),
             "reasons": reasons, "missing": missing,
             "transition": (f"{min(ru, phase)} -> {max(ru, phase)}" if transition else None),
             "next": {"phase": nxt, "name": PHASES[nxt][1],
-                                         "triggers": _triggers(phase, ind)},
+                                         "triggers": _cycle_triggers(regime, cycle) or _triggers(phase, ind)},
             "season": season_label(g("alt_index_90d"))}
 
 
@@ -430,6 +500,27 @@ def _reasons(phase, ind, f):
     out.append(f"indice Altcoin Season 90z: {_fmt(ai, '', 0)} ({season_label(ai)})"
                if ai is not None else f"latime 30z: {_fmt(g('breadth30'), '%', 0)} din top 100 bat BTC")
     return out, miss
+
+
+def _cycle_triggers(regime, c):
+    """Conditiile concrete, cu niveluri de pret, pentru iesirea din regimul curent."""
+    if not regime or not c or not c.get("ath"):
+        return None
+    ath = c["ath"]
+    lvl = ath * (1 + BULL_DD / 100)
+    if regime == "accumulation":
+        return [f"BTC peste ${lvl:,.0f} ({BULL_DD:.0f}% fata de ATH ${ath:,.0f}) -> faza 2, piata bull BTC",
+                ("BTC ramane peste media de 200 de zile" + (f" (acum ${c['ma200']:,.0f})" if c.get("ma200") else "")),
+                "altseason de ciclu: indicele >= 75 cu BTC aproape de ATH"]
+    if regime == "bear":
+        low = c.get("low") or 0
+        return [f"BTC peste ${low * (1 + RECOVERY / 100):,.0f} (+{RECOVERY:.0f}% de la minimul ${low:,.0f}) "
+                "si peste media de 200 de zile" + (f" (${c['ma200']:,.0f})" if c.get("ma200") else "")
+                + " -> faza 1, acumulare"]
+    if regime in ("markdown", "late"):
+        return [f"o scadere de {abs(BEAR_DD):.0f}% de la ATH (sub ${ath * (1 + BEAR_DD / 100):,.0f}) -> faza 0, piata bear",
+                f"revenire peste ${lvl:,.0f} -> inapoi in piata bull"]
+    return None
 
 
 def _triggers(phase, ind):
@@ -524,7 +615,18 @@ def update(exchange=None, scan_results=None):
     perf90 = perf_90d(exchange, bases, state.get("perf90"))
     ind = indicators(glob, markets, perf90)
     history = _load(HISTORY_FILE, [])
-    cls = classify(ind, history, (state.get("classification") or {}).get("scores"))
+    # ISTORICUL SI REGIMUL CICLULUI, INAINTE de clasificare: regimul BTC (ATH,
+    # minimul pietei bear, media de 200 de zile) e primul strat al deciziei.
+    hist_ctx, ctx = None, None
+    try:
+        import altseason_history as _AH
+        hist_ctx = _AH.update(exchange)
+        ctx = _AH.cycle_context(ind.get("btc_price"))
+    except Exception as _e:
+        print(f"[!] context istoric altseason: {_e}")
+    if ctx is None:
+        print("[!] altseason: regimul ciclului indisponibil (istoric lipsa) - clasificare doar pe metrici relative")
+    cls = classify(ind, history, (state.get("classification") or {}).get("scores"), cycle=ctx)
     cands = growth_candidates(markets, perf90, cls["phase"], scan_results)
 
     state = {"ts": time.time(), "when": time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime()),
@@ -537,18 +639,14 @@ def update(exchange=None, scan_results=None):
     # CONTEXTUL ISTORIC PE 10 ANI (altseason_history.py): ciclurile, pozitia de
     # acum fata de ele, analogiile si predictiile invatate. Actualizat zilnic
     # (zilele noi inchise) si reconstruit saptamanal; nu opreste niciodata evaluarea.
-    try:
-        import altseason_history as _AH
-        state["history"] = _AH.update(exchange)
-    except Exception as _e:
-        print(f"[!] context istoric altseason: {_e}")
-        state["history"] = None
+    state["history"] = hist_ctx
     _save(STATE_FILE, state)
     history.append({"ts": int(state["ts"]), "phase": cls["phase"], "conf": cls["confidence"],
                     "btc_d": ind.get("btc_d"), "eth_btc": ind.get("eth_btc"),
                     "ai": ind.get("alt_index_90d"), "br": ind.get("breadth30")})
     _save(HISTORY_FILE, history[-HISTORY_KEEP:])
-    print(f"Altseason: faza {cls['phase']} - {cls['name']} (incredere {cls['confidence']:.0%}) | "
+    print(f"Altseason: regim {cls.get('regime_name') or 'n/d'} | faza {cls['phase']} - {cls['name']} "
+          f"(incredere {cls['confidence']:.0%}) | metrici relative: faza {cls.get('relative_phase')} | "
           f"BTC.D {ind.get('btc_d')}% | ETH/BTC 30z {ind.get('eth_btc_30d')}% | "
           f"indice 90z {ind.get('alt_index_90d')} ({cls['season']})")
     return state
