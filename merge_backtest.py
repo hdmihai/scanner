@@ -47,8 +47,16 @@ def load_json(path, default=None):
 
 def save_json(path, data):
     os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
-    with open(path, "w") as f:
+    # SCRIERE ATOMICA: fisier temporar, golit pe disc, apoi inlocuire intr-un singur
+    # pas. Un job oprit in timpul scrierii (timeout, anulare) lasa intact fisierul
+    # vechi - pasul de commit din workflow ruleaza cu if: always() si ar fi urcat
+    # un JSON trunchiat, oprind toate scanarile urmatoare.
+    tmp = f"{path}.tmp"
+    with open(tmp, "w") as f:
         f.write(json.dumps(data, separators=(",", ":")))
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(tmp, path)
 
 
 def plan_key(p):
