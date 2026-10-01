@@ -137,6 +137,9 @@ CONFIRM_TIMEFRAMES = {
 }
 
 
+TF_MIN = {"5m": 5, "15m": 15, "1h": 60, "4h": 240, "1d": 1440, "1w": 10080}
+
+
 def trend_vote(closes):
     """Votul de trend pentru o serie: +100 clar ascendent, -100 clar descendent."""
     if len(closes) < 50:
@@ -182,13 +185,23 @@ def multi_timeframe(base_tf, fetch_closes):
                      "trend": "BULLISH" if v > 0 else ("BEARISH" if v < 0 else "NEUTRU"),
                      "score": v})
         votes.append(v)
+    # ALINIEREA PENTRU EVIDENTA: doar timeframe-ul de baza si cele MAI MARI.
+    # Backtest-ul are o singura serie (4h) si poate reconstrui exact 1d si 1w din
+    # ea, dar nu 1h. Cu 1h inclus live si absent in backtest, caracteristica avea
+    # alta definitie in antrenare decat in productie (masurat: nenula in 93% din
+    # planurile live, in 0% din cele de backtest). Panoul pastreaza toate randurile.
+    htf = [r["score"] for r in rows if r["score"] is not None
+           and TF_MIN.get(r["timeframe"], 0) >= TF_MIN.get(base_tf, 0)]
+    hb, hs = sum(1 for v in htf if v > 0), sum(1 for v in htf if v < 0)
+    htf_fields = {"alignment_htf": round(sum(htf) / (100.0 * len(htf)), 4) if htf else None,
+                  "bullish_htf": hb, "bearish_htf": hs, "counted_htf": len(htf)}
     if not votes:
-        return {"rows": rows, "alignment": None, "bullish": 0, "bearish": 0}
+        return {"rows": rows, "alignment": None, "bullish": 0, "bearish": 0, **htf_fields}
     bull = sum(1 for v in votes if v > 0)
     bear = sum(1 for v in votes if v < 0)
     return {"rows": rows,
             "alignment": round(sum(votes) / (100.0 * len(votes)), 4),
-            "bullish": bull, "bearish": bear, "counted": len(votes)}
+            "bullish": bull, "bearish": bear, "counted": len(votes), **htf_fields}
 
 
 def liquidity_walls(order_book, price, top=3):
