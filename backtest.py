@@ -246,12 +246,90 @@ def resolve_symbols(exchange, markets, tickers):
 
 # ============================== REPLAY ======================================
 
+# ---------------------------------------------------------------------------
+# PARITATE LIVE-BACKTEST pentru evidente (decalajul antrenare-utilizare).
+# Masurat in productie: mtf_align si altseason erau nenule in 93-100% din
+# planurile live si in 0% din cele de backtest - modelul invata pe date fara
+# aceste semnale, apoi decidea live pe date cu ele.
+
+DAY_MS = 86400000
+WEEK_MS = 7 * DAY_MS
+MONDAY_OFFSET = 4 * DAY_MS          # 1970-01-01 a fost joi; saptamanile incep luni
+
+
+def htf_closes_index(candles, bar_ms):
+    """Inchiderile ZILNICE si SAPTAMANALE complete, construite incremental din
+    lumanarile de baza, plus cate erau complete la fiecare bara. La bara i se
+    folosesc doar perioadele inchise pana la inchiderea ei - fara privire in
+    viitor, exact ca live, unde ultima lumanare (neinchisa) e eliminata."""
+    out = {}
+    for name, span, off in (("1d", DAY_MS, 0), ("1w", WEEK_MS, MONDAY_OFFSET)):
+        closes, counts, cur, done, prev = [], [], None, False, None
+        for c in candles:
+            k = (c[0] - off) // span
+            if cur is not None and k != cur and not done and prev is not None:
+                closes.append(prev)        # lipsa ultimei lumanari din perioada
+            if k != cur:
+                cur, done = k, False
+            if (c[0] + bar_ms - off) % span == 0:
+                closes.append(c[4])        # perioada s-a inchis odata cu aceasta bara
+                done = True
+            prev = c[4]
+            counts.append(len(closes))
+        out[name] = (closes, counts)
+    return out
+
+
+def bt_fetch_closes(base_closes, htf, i, base_tf, limit=119):
+    """Echivalentul `_confirm_closes` din scaner pentru backtest: baza din fereastra,
+    1d/1w din agregarea completa; timeframe-urile mai mici decat baza nu se pot
+    reconstrui si sunt OMISE (exact ca un timeframe care nu raspunde live)."""
+    def f(tf):
+        if tf == base_tf:
+            return base_closes
+        if tf in htf:
+            closes, counts = htf[tf]
+            got = closes[:counts[i]][-limit:]
+            return got if len(got) >= 60 else None
+        return None
+    return f
+
+
+_ALT_DAYS = None
+
+
+def alt_for_bar(open_ms, bar_ms):
+    """Faza altseason a ULTIMEI zile complete la inchiderea barei, din istoricul pe
+    10 ani (altseason_cycles.json) - aceeasi forma ca starea live."""
+    global _ALT_DAYS
+    if _ALT_DAYS is None:
+        _ALT_DAYS = {}
+        st = load_json(os.path.join(DATA_DIR, "altseason_cycles.json"), {}) or {}
+        keys = st.get("timeline_keys") or []
+        if "day" in keys and "phase" in keys:
+            di, pi, ci = keys.index("day"), keys.index("phase"), keys.index("conf")
+            for r in st.get("timeline") or []:
+                _ALT_DAYS[r[di]] = (r[pi], r[ci])
+    if not _ALT_DAYS:
+        return None
+    import altseason as _A
+    day = time.strftime("%Y-%m-%d", time.gmtime((open_ms + bar_ms) / 1000.0 - 86400))
+    hit = _ALT_DAYS.get(day)
+    if not hit:
+        return None
+    ph, conf = hit
+    return {"classification": {"phase": ph, "name": _A.PHASES[ph][1]},
+            "alt_bias": round(_A.ALT_BIAS[ph] * conf, 3), "btc_bias": round(_A.BTC_BIAS[ph] * conf, 3)}
+
+
 def replay_symbol(symbol, candles, weights, start_id):
     """Parcurge istoricul bara cu bara. La fiecare bara vede STRICT trecutul."""
     plans = []
     open_plan = None
     next_id = start_id
 
+    bar_ms = (candles[1][0] - candles[0][0]) if len(candles) > 1 else 4 * 3600000
+    htf = htf_closes_index(candles, bar_ms)
     for i in range(WARMUP_BARS, len(candles)):
         window = candles[:i + 1]          # <- fara look-ahead: nimic dupa bara i
         bar = candles[i]
@@ -286,13 +364,14 @@ def replay_symbol(symbol, candles, weights, start_id):
         # lipseste, iar deciziile nu depind de ea.
         bt_liq = liq_mod.build_map(window, scored["price"])
         bt_bias = liq_mod.magnet_bias(bt_liq, scored["price"], scored["direction"])
-        # Fara multi-timeframe si fara order book: backtest-ul are o singura
-        # serie de lumanari. Evidentele care depind de ele LIPSESC, nu sunt
-        # inlocuite cu valori neutre - un zero inventat ar minti modelul
-        # despre ce a vazut.
+        # Multi-timeframe din 1d/1w agregate exact din lumanarile de baza (doar
+        # perioade inchise). Order book-ul si fluxul de tranzactii nu pot fi
+        # reconstruite istoric: lipsesc si sunt excluse din modelul agentului.
+        bt_closes = [c[4] for c in window]
         bt_struct = struct_mod.build(
-            [c[4] for c in window], [c[2] for c in window], [c[3] for c in window],
-            scored["atr"], base_tf=scanner.CONFIG["timeframe"])
+            bt_closes, [c[2] for c in window], [c[3] for c in window],
+            scored["atr"], base_tf=scanner.CONFIG["timeframe"],
+            fetch_closes=bt_fetch_closes(bt_closes, htf, i, scanner.CONFIG["timeframe"]))
         # Elliott se calculeaza din aceleasi lumanari, deci exista identic in
         # backtest - spre deosebire de order flow.
         bt_ew = ew_mod.analyze([c[2] for c in window], [c[3] for c in window],
@@ -307,7 +386,9 @@ def replay_symbol(symbol, candles, weights, start_id):
                                       liq=bt_liq, liq_bias=bt_bias,
                                       struct=bt_struct,
                                       ew=bt_ew, ew_bias=bt_ew_bias,
-                                      liqs=bt_liqs, liqs_bias=bt_liqs_bias)
+                                      liqs=bt_liqs, liqs_bias=bt_liqs_bias,
+                                      alt=alt_for_bar(bar[0], bar_ms), symbol=symbol,
+                                      direction=scored["direction"])
         levels = scanner.compute_trade_plan(
             scored["direction"], scored["price"], scored["atr"], structure, fib)
         if not levels:
