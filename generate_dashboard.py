@@ -1454,7 +1454,25 @@ def render_agent_card(agent_state):
                  + (f' &middot; prag real, mereu pierdere: {maj:.1f}%' if maj is not None else ""))
                 if ba is not None else "in curs de acumulare")
     if auc_a is not None and auc_s is not None:
-        bal_line += f'<br><span class="dim">ordonare AUC: agent {auc_a:.3f} vs scor brut {auc_s:.3f} (0.5 = hazard)</span>'
+        bal_line += (f'<br><span class="dim">ordonare AUC pe evaluarea dominata de backtest: agent {auc_a:.3f} '
+                     f'vs scor brut {auc_s:.3f} (0.5 = hazard)</span>')
+    # ORDONAREA LIVE: probabilitatea data de agent la momentul deciziei fata de
+    # rezultatul real. Statusul ACTIVE cere confirmarea ei, nu doar backtest-ul.
+    lv = agent_state.get("live") or {}
+    if lv.get("auc") is not None:
+        conf_live = lv.get("ci_low") is not None and lv["ci_low"] > 0.5 and lv.get("n", 0) >= 100
+        bal_line += (f'<br><strong>LIVE</strong>: AUC {lv["auc"]:.3f} (IC95 {lv.get("ci_low")}-{lv.get("ci_high")}) '
+                     f'pe {lv["n"]} planuri live &middot; R mediu {lv.get("avg_r", 0):+.3f}R &middot; '
+                     + ("ordonare confirmata live" if conf_live else
+                        "neconfirmata inca: filtrul cere 100 de planuri live si IC peste 0.5"))
+    elif lv.get("n") is not None:
+        bal_line += f'<br><strong>LIVE</strong>: {lv["n"]} planuri live evaluate - prea putine pentru AUC'
+    ex = agent_state.get("skew_excluded") or []
+    if ex:
+        sk = agent_state.get("skew") or {}
+        bal_line += ('<br><span class="dim">excluse din model (nu exista la fel in backtest): '
+                     + ", ".join(f'{k}{" (" + str(sk[k][0]) + "% live / " + str(sk[k][1]) + "% backtest)" if k in sk else ""}'
+                                 for k in ex) + '</span>')
 
     return f'''
     <div class="agent-status agent-{status_cls}">
