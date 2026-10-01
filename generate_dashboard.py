@@ -340,7 +340,8 @@ def render_altseason_history(h):
     nx = ", ".join(f"faza {q} ({pn(q)}) {p * 100:.0f}%" for q, p in pos.get("next30") or [])
     sk = lambda v: "n/d" if v is None else (f"+{v * 100:.0f}%" if v >= 0 else f"{v * 100:.0f}%")
     right = ('<h4 class="scan-h">Ce urmeaza, invatat din istoric</h4><ul class="as-ul">'
-             f'<li>probabilitatea unui altseason (indice &ge; 75) in 90 de zile: <strong>{pct(pred.get("p"))}</strong> '
+             f'<li>probabilitatea ca indicele sa atinga 75 in 90 de zile: <strong>{pct(pred.get("p"))}</strong> '
+             '(in acumulare ar insemna o rotatie larga; un altseason de ciclu cere si BTC aproape de ATH) '
              f'(analogii {pct(pred.get("pa"))}, tranzitii {pct(pred.get("pt"))}, frecventa istorica {pct(pred.get("pb"))})</li>'
              f'<li>putere predictiva, evaluata walk-forward pe {lr.get("evaluations", 0)} momente din 10 ani, fata de '
              f'frecventa istorica: analogii {sk(lr.get("skill_analog"))}, tranzitii {sk(lr.get("skill_trans"))}</li>'
@@ -392,8 +393,10 @@ def render_altseason(state, history):
     season_cls = ("tag-bull" if (ai or 0) >= 75 else "tag-bear" if ai is not None and ai <= 25 else "tag-info")
     head = (f'<div class="as-head"><div class="as-phase">FAZA {c["phase"]}</div>'
             f'<div><strong class="as-name">{c["name"]}</strong><div class="dim">{c["what"]}</div>'
-            f'<div class="as-meta">incredere {c["confidence"]*100:.0f}% &middot; locul 2: faza '
-            f'{c["runner_up"]["phase"]} ({c["runner_up"]["name"]}){trans}</div></div></div>'
+            f'<div class="as-meta">incredere {c["confidence"]*100:.0f}% &middot; '
+            + ("semnal relativ altcoins vs BTC: faza " if (c.get("runner_up") or {}).get("kind") == "relativ"
+               else "locul 2: faza ")
+            + f'{c["runner_up"]["phase"]} ({c["runner_up"]["name"]}){trans}</div></div></div>'
             f'<div class="as-season"><span class="tag {season_cls}">{c["season"].upper()}</span> '
             f'Indice Altcoin Season 90z (definitia CoinMarketCap): <strong>{f1(ai, "", 0)}</strong>'
             f' / 100 &middot; calculat pe {ind.get("alt_index_coverage", 0)} din top 100 altcoins{stale}</div>')
@@ -464,7 +467,28 @@ def render_altseason(state, history):
             f'evaluat la {state.get("when")}. Dominanta de acum 30/200 de zile e ESTIMATA din randamentele '
             'top 250 (ignora schimbarile de oferta). Faza e o clasificare pe reguli transparente, nu o certitudine '
             '- ciclurile nu se repeta identic.</p>')
-    return head + ladder + grid + analysis + render_altseason_history(state.get("history")) + cands + tl + note
+    # REGIMUL CICLULUI, afisat primul: faza e decisa intai de pozitia BTC in ciclu,
+    # apoi de performanta relativa a altcoins. Rotatia din afara pietei bull e
+    # aratata separat, ca rotatie - nu ca faza de altseason.
+    reg = ""
+    if c.get("regime_name"):
+        cy = c.get("cycle") or {}
+        facts = []
+        if cy.get("dd") is not None:
+            facts.append(f'BTC {cy["dd"]:+.1f}% fata de ATH (${cy.get("ath", 0):,.0f}, acum {cy.get("days_since_ath")} zile)')
+        if cy.get("low"):
+            facts.append(f'minim ${cy["low"]:,.0f} ({cy.get("low_day")}), +{cy.get("rec_from_low", 0):.0f}% de atunci')
+        if cy.get("ma200"):
+            facts.append(f'media de 200 de zile ${cy["ma200"]:,.0f} ({"peste" if cy.get("above_ma200") else "sub"})')
+        reg = (f'<div class="as-regime"><span class="as-rtag">REGIM CICLU BTC: {c["regime_name"]}</span> '
+               f'<span class="dim">{" &middot; ".join(facts)}</span></div>')
+    if c.get("rotation"):
+        reg += f'<div class="plan-conflict explore"><strong>ROTATIE, NU ALTSEASON</strong> &middot; {c["rotation"]}</div>'
+    elif c.get("regime") is None:
+        reg += ('<div class="plan-conflict"><strong>REGIMUL CICLULUI INDISPONIBIL</strong> &middot; istoricul se '
+                'construieste; faza de mai jos e doar din metrici relative.</div>')
+    return (head + reg + ladder + grid + analysis + render_altseason_history(state.get("history"))
+            + cands + tl + note)
 
 
 def render_similar_projects(token_meta, narrative, symbol=None, updated=None):
@@ -1710,6 +1734,8 @@ header{{display:flex;justify-content:space-between;align-items:baseline;
 .conf-note{{font-size:10.5px;margin-top:2px;}}
 .ah-svg{{width:100%;height:auto;margin:6px 0 4px;}} .ah-t{{font:9px var(--font-mono);fill:#64748B;}}
 .ah-legend{{font-size:10.5px;display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;}}
+.as-regime{{margin:4px 0 8px;font-size:12px;}}
+.as-rtag{{font:700 11px var(--font-mono);color:#FFFFFF;background:#0F766E;border-radius:4px;padding:3px 7px;}}
 .as-head{{display:flex;gap:14px;align-items:center;margin-bottom:8px;}}
 .as-phase{{font:800 20px var(--font-mono);color:#FFFFFF;background:#7E57C2;border-radius:8px;
   padding:10px 12px;white-space:nowrap;}}
