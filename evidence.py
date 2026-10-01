@@ -212,12 +212,15 @@ def build_evidence(ind, price, atr, rsi=None, components=None,
                             DIR_LONG if rg["vote"] > 0 else DIR_SHORT,
                             _clip(abs(rg["vote"]) * rg["strength"] / 100.0, 0, 1),
                             rg["strength"]))
+        # aceeasi definitie live si in backtest: baza + timeframe-uri mai mari
         mtf = struct.get("mtf") or {}
-        if mtf.get("alignment") is not None and mtf.get("counted"):
-            a = mtf["alignment"]
+        a = mtf.get("alignment_htf") if "alignment_htf" in mtf else mtf.get("alignment")
+        cnt = mtf.get("counted_htf") if "alignment_htf" in mtf else mtf.get("counted")
+        if a is not None and cnt:
+            bu = mtf.get("bullish_htf", mtf.get("bullish"))
+            be = mtf.get("bearish_htf", mtf.get("bearish"))
             ev.append(_item("mtf_align",
-                            f"Aliniere multi-timeframe: {mtf['bullish']} sus / "
-                            f"{mtf['bearish']} jos din {mtf['counted']}",
+                            f"Aliniere multi-timeframe: {bu} sus / {be} jos din {cnt}",
                             DIR_LONG if a > 0 else (DIR_SHORT if a < 0 else DIR_NEUTRAL),
                             _clip(abs(a), 0, 1), round(a, 3)))
 
