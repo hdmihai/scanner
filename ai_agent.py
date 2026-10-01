@@ -188,6 +188,72 @@ def _quarantined():
     return _Q_CACHE["set"]
 
 
+# ---------------------------------------------------------------------------
+# DECALAJUL ANTRENARE-UTILIZARE si CONFIRMAREA LIVE.
+# Masurat in productie (55 de planuri live inchise): AUC-ul real al agentului pe
+# planurile LIVE era 0.459 - sub hazard - in timp ce dashboard-ul afisa 0.674,
+# din evaluarea dominata de backtest (>99% din exemple). Cauza principala: patru
+# evidente erau nenule in 93-100% din planurile live si in 0% din cele de
+# backtest - modelul invata pe date fara ele, apoi decidea live cu ele.
+
+# nu pot fi reconstruite istoric (order book, fluxul de tranzactii live)
+LIVE_ONLY_FEATURES = {"ev_order_flow", "ev_book_imbalance"}
+SKEW_PP = 40           # decalaj de prezenta live-backtest care exclude o caracteristica
+SKEW_MIN_LIVE = 30     # planuri live necesare pentru a masura decalajul
+LIVE_MIN = 100         # planuri live inchise necesare pentru a confirma ordonarea
+_X_CACHE = {"ts": 0, "set": set(LIVE_ONLY_FEATURES)}
+
+
+def feature_skew(plans):
+    """{caracteristica: (% nenul live, % nenul backtest)} pe planurile inchise."""
+    closed = [p for p in plans if p.get("realized_r") is not None and p.get("state") != "NO_ENTRY"]
+    live = [p for p in closed if p.get("source") != "backtest"][-300:]
+    bt = [p for p in closed if p.get("source") == "backtest"][-5000:]
+    if len(live) < SKEW_MIN_LIVE or not bt:
+        return {}
+    pres = lambda ps, k: round(100 * sum(1 for p in ps if abs((p.get("components") or {}).get(k) or 0) > 1e-9) / len(ps))
+    return {k: (pres(live, k), pres(bt, k)) for k in ev_mod.FEATURE_KEYS}
+
+
+def skew_excluded(skew):
+    return sorted(LIVE_ONLY_FEATURES | {k for k, (pl, pb) in skew.items() if abs(pl - pb) >= SKEW_PP})
+
+
+def excluded_features():
+    """Caracteristicile excluse din model: mereu cele doar-live, plus cele cu decalaj
+    de prezenta masurat (salvate in starea agentului, reincarcate o data pe minut)."""
+    import time as _t
+    if _t.time() - _X_CACHE["ts"] > 60:
+        try:
+            with open(MODEL_FILE) as f:
+                _X_CACHE["set"] = set(json.load(f).get("skew_excluded") or []) | LIVE_ONLY_FEATURES
+        except Exception:
+            _X_CACHE["set"] = set(LIVE_ONLY_FEATURES)
+        _X_CACHE["ts"] = _t.time()
+    return _X_CACHE["set"]
+
+
+def live_ranking(plans, n_boot=1000):
+    """Ordonarea REALA pe planurile live: probabilitatea data de agent la momentul
+    deciziei, fata de rezultat. AUC cu interval de incredere bootstrap 95%."""
+    import random as _r
+    pairs = [((p.get("decision") or {}).get("agent_prob"), 1.0 if p["realized_r"] > 0 else 0.0, p["realized_r"])
+             for p in plans if p.get("source") != "backtest" and p.get("realized_r") is not None
+             and p.get("state") != "NO_ENTRY" and (p.get("decision") or {}).get("agent_prob") is not None]
+    out = {"n": len(pairs)}
+    if len(pairs) < 10:
+        return out
+    auc = auc_score(pairs)
+    if auc is None:
+        return out
+    rnd = _r.Random(0)
+    boots = sorted(a for a in (auc_score([rnd.choice(pairs) for _ in pairs]) for _ in range(n_boot)) if a is not None)
+    out.update(auc=round(auc, 3), ci_low=round(boots[int(0.025 * len(boots))], 3),
+               ci_high=round(boots[int(0.975 * len(boots)) - 1], 3),
+               avg_r=round(sum(r for *_, r in pairs) / len(pairs), 3))
+    return out
+
+
 def extract_features(result):
     """Accepta atat un rezultat de scanare cat si un plan - planurile pastreaza
     contextul de la momentul deschiderii sub alte nume de campuri."""
@@ -215,6 +281,11 @@ def extract_features(result):
     # gasit incoerent valoreaza 0 - la antrenare SI la predictie, deci agentul
     # nici nu invata din ea, nici nu decide pe baza ei, pana iese din carantina.
     for f in _quarantined():
+        if f in feats:
+            feats[f] = 0.0
+    # DECALAJUL ANTRENARE-UTILIZARE: caracteristicile care nu exista (sau au alta
+    # distributie) in backtest valoreaza 0 - la antrenare si la predictie
+    for f in excluded_features():
         if f in feats:
             feats[f] = 0.0
     return feats
@@ -379,6 +450,17 @@ def agent_is_active(state, plans=None):
       2. acopera destule zile (mai multe regimuri de piata, nu doar unul)
       3. bate euristica la acuratete ECHILIBRATA (media pe LONG si SHORT)
     Returneaza (activ, motiv) - motivul e afisat in dashboard."""
+    # CONFIRMAREA LIVE, inaintea oricarei alte conditii: filtrul se aplica pe
+    # semnale live, deci trebuie sa ordoneze bine LIVE - nu doar pe backtest.
+    lv = live_ranking(plans or [])
+    state["live"] = lv
+    if lv.get("n", 0) < LIVE_MIN:
+        return False, (f"ordonarea pe planurile LIVE nu e inca confirmata: {lv.get('n', 0)}/{LIVE_MIN} planuri "
+                       f"live evaluate" + (f" (AUC live {lv['auc']:.3f} pana acum)" if lv.get("auc") is not None else "")
+                       + " - agentul invata, dar nu filtreaza")
+    if lv.get("ci_low") is None or lv["ci_low"] <= 0.5:
+        return False, (f"AUC live {lv.get('auc')} (IC95 {lv.get('ci_low')}-{lv.get('ci_high')}) pe {lv['n']} planuri "
+                       f"live nu e peste hazard - filtrul nu se aplica")
     a = state.get("agent", {})
     if a.get("total", 0) < MIN_SAMPLES_TO_ACTIVATE:
         return False, f"are nevoie de {MIN_SAMPLES_TO_ACTIVATE} exemple (are {a.get('total', 0)})"
@@ -685,6 +767,12 @@ def summarize(state):
 def main():
     plans_store = load_json(PLANS_FILE, {"plans": []})
     plans = plans_store.get("plans", [])
+    import time as _t
+    _skew = feature_skew(plans)
+    _excl = skew_excluded(_skew)
+    _X_CACHE.update(ts=_t.time() + 10 ** 9, set=set(_excl))     # fix pentru aceasta rulare
+    if _excl:
+        print(f"[i] Excluse din model (decalaj live-backtest): {', '.join(_excl)}")
 
     state = load_json(MODEL_FILE, None)
     # Daca starea salvata provine din alta sursa/geometrie de semnal (campul `outcome`),
@@ -755,6 +843,7 @@ def main():
     if not plans:
         print("Niciun plan inca - agentul invata din planuri inchise. "
               "Ruleaza intai crypto_ai_scanner.py.")
+        state["skew"], state["skew_excluded"] = _skew, _excl
         save_json(MODEL_FILE, state)
         return
 
@@ -782,6 +871,7 @@ def main():
     state["agent_superior"] = bool(sa is not None and sb is not None and sa > sb)
     state["majority_baseline"] = majority_class_accuracy(pairs)
     state["predicted_positive_rate"] = predicted_positive_rate(pairs)
+    state["skew"], state["skew_excluded"] = _skew, _excl
     save_json(MODEL_FILE, state)
 
     acc_agent, acc_base, acc_recent = summarize(state)
