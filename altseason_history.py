@@ -48,7 +48,7 @@ from datetime import date, datetime, timedelta, timezone
 
 import altseason as A
 
-VERSION = 1
+VERSION = 2          # 2: decizia in doua straturi (regimul ciclului BTC) - reconstruire
 # NU altseason_history.json: acela e istoricul ORAR al evaluarii live (altseason.py)
 STATE_FILE = os.path.join("data", "altseason_cycles.json")
 CM_RAW = "https://raw.githubusercontent.com/coinmetrics/data/master/csv/{}.csv"
@@ -196,7 +196,17 @@ def R(row, k):
     return row[ROW_KEYS.index(k)]
 
 
-def classify_day(f, dom_d30, hist_ai, prev):
+def _ctx(price, ath, ath_day, low, low_day, day, closes):
+    """Contextul ciclului BTC pentru o zi: aceleasi campuri ca live."""
+    ma = sum(closes[-200:]) / len(closes[-200:]) if len(closes) >= 150 else None
+    return {"dd": (price / ath - 1) * 100, "days_since_ath": (_d(day) - _d(ath_day)).days, "ath": ath,
+            "ath_day": ath_day, "low": low, "low_day": low_day,
+            "low_dd": (low / ath - 1) * 100 if low else None,
+            "rec_from_low": (price / low - 1) * 100 if low else None,
+            "ma200": ma, "above_ma200": (price > ma) if ma else None}
+
+
+def classify_day(f, dom_d30, hist_ai, prev, ctx=None):
     ind = {"btc_d": None,                    # nivelul istoric nu e de incredere
            "btc_d_delta30": dom_d30, "eth_btc_30d": f["eth_btc_30d"], "btc_r30": f["btc_r30"],
            "btc_r200": f["btc_r200"], "btc_ath_dd": f["btc_ath_dd"], "alt_index_90d": f["alt_index_90d"],
@@ -206,16 +216,24 @@ def classify_day(f, dom_d30, hist_ai, prev):
     # 720 de intrari folosite pentru "deteriorare fata de maximul recent" inseamna
     # 30 de zile. Pe seria zilnica, 720 de intrari ar fi insemnat 2 ani, iar faza 8
     # (distributie) aparea in peste jumatate din istoric.
-    return A.classify(ind, [{"ai": x} for x in hist_ai[-30:]], prev)
+    return A.classify(ind, [{"ai": x} for x in hist_ai[-30:]], prev, cycle=ctx)
 
 
 def build_timeline(px, cap, start=START, end=None):
     days = sorted(px.get("btc", {}))
     end = end or days[-1]
     ath, rows, prev, hist_ai, doms = 0.0, [], None, [], {}
+    ath_day, low, low_day, closes = None, None, None, []
     for day in days:
-        ath = max(ath, px["btc"][day])
-        if day < start or day > end:
+        p = px["btc"][day]
+        if day > end:
+            break
+        closes.append(p)
+        if p >= ath:
+            ath, ath_day, low, low_day = p, day, None, None
+        elif low is None or p < low:
+            low, low_day = p, day
+        if day < start:
             continue
         f = day_features(day, px, cap, ath)
         if not f:
@@ -225,11 +243,11 @@ def build_timeline(px, cap, start=START, end=None):
         doms[day] = f["dom_proxy"]
         d30 = doms.get(_s(_d(day) - timedelta(days=30)))
         dom_d30 = (f["dom_proxy"] - d30) if (f["dom_proxy"] is not None and d30 is not None) else None
-        cls = classify_day(f, dom_d30, hist_ai, prev)
+        cls = classify_day(f, dom_d30, hist_ai, prev, _ctx(p, ath, ath_day, low, low_day, day, closes))
         prev = cls["scores"]
         hist_ai.append(f["alt_index_90d"])
         rows.append(_row(f, dom_d30, cls))
-    return rows, ath
+    return rows, {"ath": ath, "ath_day": ath_day, "low": low, "low_day": low_day}
 
 
 # ---------------------------------------------------------------------------
@@ -561,13 +579,14 @@ def build(exchange=None):
     cm_last = max(px["btc"])
     btc_full = sorted(px["btc"].items())
     extend(None, px, cap, exchange)
-    rows, ath = build_timeline(px, cap)
+    rows, trk = build_timeline(px, cap)
+    ath = trk["ath"]
     cyc, wins = cycles(rows, btc_full=sorted(px["btc"].items()))
     wf = walk_forward(rows)
     wpx, wcap = _trim(px, cap)
     st = {"version": VERSION, "built_at": time.time(), "cm_last_day": cm_last,
           "source": "Coin Metrics community data (CC BY-NC 4.0) + lumanari zilnice de pe bursa",
-          "assets": len(px), "timeline_keys": ROW_KEYS, "timeline": rows, "btc_ath": ath,
+          "assets": len(px), "timeline_keys": ROW_KEYS, "timeline": rows, "btc_ath": ath, "track": trk,
           "cycles": cyc, "altseason_windows": wins, "learn": {**wf, "matured": 0},
           "predictions": [], "window_px": wpx, "window_cap": wcap,
           "build_seconds": round(time.time() - t0, 1)}
@@ -584,14 +603,25 @@ def daily_update(st, exchange):
         return 0
     rows = st["timeline"]
     have = {R(r, "day") for r in rows}
-    ath = st.get("btc_ath") or 0.0
+    trk = dict(st.get("track") or {})
+    ba = st.get("btc_ath")
+    if isinstance(ba, dict):                      # stare in alta forma: o normalizez
+        trk = {**ba, **trk}
+        ba = ba.get("ath")
+    ath = float(trk.get("ath") or ba or 0.0)
     hist_ai = [R(r, "ai") for r in rows]
     prev = None
+    btc_days = sorted(px["btc"])
     doms = {R(r, "day"): R(r, "dom_proxy") for r in rows[-60:]}
-    for day in sorted(px["btc"]):
+    for day in btc_days:
         if day in have or day <= R(rows[-1], "day"):
             continue
-        ath = max(ath, px["btc"][day])
+        p = px["btc"][day]
+        if p >= ath:
+            ath = p
+            trk.update(ath=p, ath_day=day, low=None, low_day=None)
+        elif trk.get("low") is None or p < trk["low"]:
+            trk.update(low=p, low_day=day)
         f = day_features(day, px, cap, ath)
         if not f:
             continue
@@ -600,11 +630,14 @@ def daily_update(st, exchange):
         doms[day] = f["dom_proxy"]
         d30 = doms.get(_s(_d(day) - timedelta(days=30)))
         dom_d30 = (f["dom_proxy"] - d30) if (f["dom_proxy"] is not None and d30 is not None) else None
-        cls = classify_day(f, dom_d30, hist_ai, prev)
+        closes = [px["btc"][d] for d in btc_days if d <= day]
+        ctx = _ctx(p, ath, trk.get("ath_day") or day, trk.get("low"), trk.get("low_day"), day, closes)
+        cls = classify_day(f, dom_d30, hist_ai, prev, ctx)
         prev = cls["scores"]
         hist_ai.append(f["alt_index_90d"])
         rows.append(_row(f, dom_d30, cls))
     st["btc_ath"] = ath
+    st["track"] = trk
     st["cycles"], st["altseason_windows"] = cycles(rows)
     learn(st)
     st["window_px"], st["window_cap"] = _trim(px, cap)
@@ -644,6 +677,27 @@ def learn(st):
                                                  "pb": pb, "p": comb and round(comb, 3),
                                                  "phase": R(rows[-1], "phase")})
         st["predictions"] = st["predictions"][-400:]
+
+
+def cycle_context(live_price=None):
+    """Contextul ciclului BTC pentru scanarea live: ATH, minimul de dupa ATH si media
+    de 200 de zile din istoric, cu pretul curent. None daca istoricul lipseste."""
+    st = _load()
+    if not st or not st.get("track"):
+        return None
+    trk = dict(st["track"])
+    btc = st.get("window_px", {}).get("btc") or {}
+    days = sorted(btc)
+    if not days:
+        return None
+    closes = [btc[d] for d in days]
+    price = live_price or closes[-1]
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    if price >= trk["ath"]:
+        trk.update(ath=price, ath_day=today, low=None, low_day=None)
+    elif trk.get("low") is None or price < trk["low"]:
+        trk.update(low=price, low_day=today)
+    return _ctx(price, trk["ath"], trk["ath_day"], trk.get("low"), trk.get("low_day"), today, closes + [price])
 
 
 def update(exchange=None):
