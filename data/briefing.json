@@ -2,9 +2,9 @@
   "text": "Din 16374 planuri inchise, rata de succes e 33.4%, cu +1420.14R cumulat (+0.087R in medie pe plan) si profit factor 1.12. 22 planuri sunt inca deschise. Atentie: 16311 dintre ele sunt din backtest. LIVE, din 2026-09-22: 63 planuri inchise, castig 38.1% (IC 27.1-50.4%), R mediu -0.156R (IC95 -0.482..+0.170R), total -9.85R. Ultimele inchise: #121036 ETH/USDT +2.13R, #121037 BTC/USDT +2.07R, #121043 ADA/USDT +2.79R. Pe intervalele de scor cu destule date, cel mai bine merge 0-19 (27.5%, +0.35R mediu, n=160), iar cel mai slab 40-59 (29.8%, +0.05R, n=7803). Deciziile de a deschide sau refuza planuri se bazeaza pe aceste cifre masurate, nu pe scorul brut. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (ordonarea pe planurile LIVE nu e inca confirmata: 63/100 planuri live evaluate (AUC live 0.460 pana acum) - agentul invata, dar nu filtreaza).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-10-02 08:26 UTC",
+    "scan_time": "2026-10-02 15:45 UTC",
     "universe_size": 30,
-    "plans_total": 21616,
+    "plans_total": 21617,
     "plans_open": 22,
     "plans_closed": 16374,
     "legacy_closed": 0,
@@ -74,6 +74,12 @@
     ],
     "open_now": [
       {
+        "id": 207111,
+        "symbol": "ETH/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
         "id": 207110,
         "symbol": "POL/USDT",
         "direction": "SHORT",
@@ -95,12 +101,6 @@
         "id": 207107,
         "symbol": "MANA/USDT",
         "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 207105,
-        "symbol": "TRX/USDT",
-        "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       }
     ],
