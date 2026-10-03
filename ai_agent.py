@@ -205,14 +205,32 @@ _X_CACHE = {"ts": 0, "set": set(LIVE_ONLY_FEATURES)}
 
 
 def feature_skew(plans):
-    """{caracteristica: (% nenul live, % nenul backtest)} pe planurile inchise."""
+    """{caracteristica: (% nenul live, % nenul backtest)} pe planurile inchise.
+
+    Prezenta live se masoara doar pe planurile create DUPA prima aparitie a
+    caracteristicii in planurile live. Altfel, o evidenta noua parea "decalata":
+    ev_altseason era nenula in 20% din planurile live (11 din 55), desi in TOATE
+    cele 11 create dupa introducerea ei avea valoare - restul erau planuri mai
+    vechi decat ea. Fara minim SKEW_MIN_LIVE astfel de planuri, nu se trage nicio
+    concluzie (caracteristica ramane in model)."""
     closed = [p for p in plans if p.get("realized_r") is not None and p.get("state") != "NO_ENTRY"]
     live = [p for p in closed if p.get("source") != "backtest"][-300:]
     bt = [p for p in closed if p.get("source") == "backtest"][-5000:]
-    if len(live) < SKEW_MIN_LIVE or not bt:
+    if not live or not bt:
         return {}
-    pres = lambda ps, k: round(100 * sum(1 for p in ps if abs((p.get("components") or {}).get(k) or 0) > 1e-9) / len(ps))
-    return {k: (pres(live, k), pres(bt, k)) for k in ev_mod.FEATURE_KEYS}
+    nz = lambda ps, k: round(100 * sum(1 for p in ps if abs((p.get("components") or {}).get(k) or 0) > 1e-9) / len(ps))
+    out = {}
+    for k in ev_mod.FEATURE_KEYS:
+        since = [p.get("created_time") or "" for p in live if k in (p.get("components") or {})]
+        if not since:
+            continue
+        first = min(since)
+        lk = [p for p in live if (p.get("created_time") or "") >= first]
+        bk = [p for p in bt if k in (p.get("components") or {})]
+        if len(lk) < SKEW_MIN_LIVE or not bk:
+            continue
+        out[k] = (nz(lk, k), nz(bk, k))
+    return out
 
 
 def skew_excluded(skew):
