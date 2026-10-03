@@ -504,8 +504,14 @@ def save_plans(store):
     elif mb > SIZE_WARN_MB:
         print(f"[!] plans.json: {mb:.1f} MB - se apropie de limita GitHub de 100 MB.")
     os.makedirs(os.path.dirname(PLANS_FILE) or ".", exist_ok=True)
-    with open(PLANS_FILE, "w") as f:
+    # SCRIERE ATOMICA (fisier temporar + inlocuire): pasul de commit ruleaza cu
+    # if: always(), deci un job anulat in timpul scrierii ar fi urcat un fisier trunchiat
+    tmp = f"{PLANS_FILE}.tmp"
+    with open(tmp, "w") as f:
         f.write(payload)
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(tmp, PLANS_FILE)
 
 
 # ============================ CREARE DE PLANURI =============================
