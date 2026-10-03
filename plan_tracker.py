@@ -1002,6 +1002,33 @@ def _split_stats(closed):
     }
 
 
+DIVERGENCE_MIN_LIVE = 30
+
+
+def divergence(live, bt, n_boot=2000):
+    """ALARMA DE DIVERGENTA: diferenta de R mediu live - backtest, cu interval de
+    incredere bootstrap 95% pe DIFERENTA. Semnificativa cand intervalul exclude
+    zero. Masurat la introducere: live -0.279R (n=55) fata de backtest +0.088R,
+    diferenta -0.367R (IC95 -0.66..-0.03) - semnificativa.
+    Raspunsul automat ramane informativ: cu cateva zeci de planuri live, nicio
+    regula de filtrare nu poate fi validata statistic (o regula de regim testata
+    walk-forward a scazut R-ul pe datele nevazute)."""
+    import random as _r
+    lr = [p["realized_r"] for p in live]
+    br = [p["realized_r"] for p in bt]
+    if len(lr) < DIVERGENCE_MIN_LIVE or len(br) < 300:
+        return {"n_live": len(lr), "status": "date_insuficiente"}
+    rnd = _r.Random(11)
+    m = lambda v: sum(v) / len(v)
+    br_s = br[-5000:]
+    diffs = sorted(m([rnd.choice(lr) for _ in lr]) - m([rnd.choice(br_s) for _ in br_s]) for _ in range(n_boot))
+    lo, hi = diffs[int(0.025 * n_boot)], diffs[int(0.975 * n_boot) - 1]
+    d = m(lr) - m(br)
+    status = "sub_backtest" if hi < 0 else ("peste_backtest" if lo > 0 else "in_marja")
+    return {"n_live": len(lr), "diff": round(d, 3), "ci_low": round(lo, 3), "ci_high": round(hi, 3),
+            "status": status}
+
+
 def summarize(store):
     plans = store["plans"]
     all_closed = [p for p in plans if p["state"] in CLOSED_STATES and p.get("realized_r") is not None]
@@ -1040,6 +1067,8 @@ def summarize(store):
         # le prezentau ca rezultatul sistemului, desi live era negativ.
         "live": _split_stats([p for p in closed if p.get("source") != "backtest"]),
         "backtest": _split_stats([p for p in closed if p.get("source") == "backtest"]),
+        "divergence": divergence([p for p in closed if p.get("source") != "backtest"],
+                                 [p for p in closed if p.get("source") == "backtest"]),
         "no_entry": len(no_entry),
         "no_entry_pct": round(100 * len(no_entry) / len(current_geo), 1) if current_geo else None,
         "legacy_closed": len(legacy) + archived_closed,
