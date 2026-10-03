@@ -1379,6 +1379,16 @@ def render_plan_memory(store):
                         f' &middot; R mediu {d["avg_r"]:+.3f}R{ci} &middot; total {d["total_r"]:+.2f}R')
             head += (f'<p class="dim" style="margin:-6px 0 12px;">Totalul de mai sus include backtest-ul. '
                      f'{_ln("LIVE", lv)}<br>{_ln("BACKTEST", bt)}</p>')
+            # ALARMA DE DIVERGENTA live - backtest (test statistic pe diferenta)
+            dv = summary.get("divergence") or {}
+            if dv.get("status") == "sub_backtest":
+                head += ('<div class="plan-conflict"><strong>ALARMA: REZULTATELE LIVE SUNT SUB BACKTEST</strong> '
+                         f'&middot; diferenta {dv["diff"]:+.3f}R/plan (IC95 {dv["ci_low"]:+.3f}..{dv["ci_high"]:+.3f}) '
+                         f'pe {dv["n_live"]} planuri live - semnificativa statistic. Agentul ramane in SHADOW pana la '
+                         'confirmarea live; cauza se investigheaza pe datele live, nu prin filtre nevalidate.</div>')
+            elif dv.get("status") == "in_marja":
+                head += (f'<p class="dim" style="margin:-6px 0 12px;">Live fata de backtest: {dv["diff"]:+.3f}R/plan '
+                         f'(IC95 {dv["ci_low"]:+.3f}..{dv["ci_high"]:+.3f}) - in marja statistica.</p>')
 
     cards = []
     for p in sorted(plans, key=lambda x: x["id"], reverse=True)[:12]:
