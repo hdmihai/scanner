@@ -70,8 +70,14 @@ def load(path, default):
 def write_compact(path, data):
     os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
     payload = json.dumps(data, separators=(",", ":"))
-    with open(path, "w") as f:
+    # SCRIERE ATOMICA (fisier temporar + inlocuire): pasul de commit ruleaza cu
+    # if: always(), deci un job anulat in timpul scrierii ar fi urcat un fisier trunchiat
+    tmp = f"{path}.tmp"
+    with open(tmp, "w") as f:
         f.write(payload)
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(tmp, path)
     return len(payload.encode("utf-8")) / 1024 / 1024
 
 

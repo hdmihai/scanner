@@ -177,6 +177,9 @@ def main():
     targets = sys.argv[1:]
     if not targets:
         targets = sorted(str(p) for p in Path(".").glob("*.py"))
+        # si pachetele (dashboard/, selfrepair/, improve/): codul lor ruleaza tot pe 3.11
+        targets += sorted(str(p) for d in ("dashboard", "selfrepair", "improve")
+                          for p in Path(d).rglob("*.py") if Path(d).is_dir())
     if not targets:
         print("Niciun fisier de verificat.")
         return 0

@@ -188,6 +188,34 @@ def check_no_direct_plan_writes():
                     f"Foloseste plan_tracker.save_plans(store).")
 
 
+def check_file_identity():
+    """Continutul fiecarui fisier trebuie sa fie al LUI. Documentatia de la
+    inceputul modulelor incepe cu numele fisierului; daca numeste ALT fisier,
+    continutul a fost urcat in locul gresit. S-a intamplat la o actualizare
+    manuala: self_check.py continea codul lui generate_dashboard.py (auto-
+    diagnosticul a fost dezactivat fara nicio eroare vizibila), iar un workflow
+    a ajuns in radacina repo-ului, unde GitHub nu il ruleaza niciodata."""
+    import ast as _ast
+    import re as _re
+    for f in sorted(os.listdir(".")):
+        if not f.endswith(".py"):
+            continue
+        try:
+            doc = _ast.get_docstring(_ast.parse(read(f) or "")) or ""
+        except SyntaxError:
+            continue
+        first = next((l.strip() for l in doc.splitlines() if l.strip()), "")
+        m = _re.match(r"^([A-Za-z0-9_]+\.py)\b", first)
+        if m and m.group(1) != f and os.path.exists(m.group(1)):
+            problems.append(f"{f} contine codul lui {m.group(1)} (documentatia lui incepe cu "
+                            f"'{m.group(1)}') - continut urcat in fisierul gresit.")
+    for f in sorted(os.listdir(".")):
+        if f.endswith((".yml", ".yaml")):
+            # avertisment, nu blocare: fisierul e inofensiv acolo, doar nu ruleaza
+            print(f"[avertisment] {f} e in radacina repo-ului: GitHub ruleaza workflow-urile doar "
+                  "din .github/workflows/ - muta-l acolo.")
+
+
 def check_compaction_step():
     """Pasul de compactare trebuie sa existe si sa ruleze INAINTE de commit."""
     wf_dir = os.path.join(ROOT, ".github", "workflows")
@@ -532,6 +560,7 @@ def main():
     check_signal_block_uses_own_series()
     check_no_direct_plan_writes()
     check_compaction_step()
+    check_file_identity()
     check_self_check_step()
     check_timeframe_consistency()
     check_data_geometry_match()
