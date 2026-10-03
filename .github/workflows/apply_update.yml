@@ -12,6 +12,8 @@ name: Aplica actualizare
 #      esueaza - primesti notificare, iar repo-ul ramane exact cum era
 # Inlocuieste urcarea manuala fisier cu fisier, unde continutul ajungea in
 # fisierul gresit (s-a intamplat de trei ori).
+# EXCEPTIE: fisierele din .github/workflows/ nu pot fi modificate de un workflow
+# (regula de securitate GitHub, valabila si pe repo-uri publice) - se urca manual.
 on:
   push:
     paths:
@@ -30,6 +32,8 @@ jobs:
   apply:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      SCAN_TIMEFRAME: 4h
     steps:
       - name: Descarca repo-ul
         uses: actions/checkout@v4
@@ -70,9 +74,16 @@ jobs:
           bad = [n for n in names if n != "DELETE.txt" and (".." in n.split("/") or n.startswith("/") or not ok.match(n))]
           if bad:
               sys.exit(f"Arhiva contine cai nepermise: {bad[:5]} - nu aplic nimic.")
+          # GitHub interzice token-ului automat (GITHUB_TOKEN) sa modifice fisiere din
+          # .github/workflows/ - push-ul intreg ar fi respins. Le sar si le raportez:
+          # se urca manual (Add file -> Upload files in .github/workflows/).
+          skipped = []
           for info in z.infolist():
               n = clean(info.filename)
               if info.filename.endswith("/") or n == "DELETE.txt":
+                  continue
+              if n.startswith(".github/"):
+                  skipped.append(n)
                   continue
               os.makedirs(os.path.dirname(n) or ".", exist_ok=True)
               with open(n, "wb") as f:
@@ -85,9 +96,18 @@ jobs:
                       continue
                   if ".." in n.split("/") or not ok.match(n):
                       sys.exit(f"DELETE.txt contine o cale nepermisa: {n}")
+                  if n.startswith(".github/"):
+                      skipped.append(n)
+                      continue
                   if os.path.exists(n):
                       os.remove(n)
                       print("  sters:", n)
+          if skipped:
+              msg = ("Fisiere de workflow SARITE (GitHub nu permite workflow-urilor sa le modifice) - "
+                     "urca-le manual in .github/workflows/: " + ", ".join(skipped))
+              print(msg)
+              with open(os.environ.get("GITHUB_STEP_SUMMARY", os.devnull), "a") as fh:
+                  fh.write(msg + "\n")
           PY
           if [ $? -ne 0 ]; then git checkout -- . ; git clean -fdq -- dashboard selfrepair improve .github ; exit 1; fi
           if python3 check_py311.py && python3 check_integrity.py; then
