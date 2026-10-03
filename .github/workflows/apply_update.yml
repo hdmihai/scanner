@@ -45,13 +45,19 @@ jobs:
         run: |
           git config user.name "crypto-ai-scanner-bot"
           git config user.email "actions@users.noreply.github.com"
+          # starea CURENTA a lui main, inainte de orice: daca arhiva a fost stearsa intre
+          # timp, nu exista nimic de aplicat (si nu apare niciun conflict la push)
+          git pull --ff-only -q || true
           # fara `ls` pe cai inexistente: cu `bash -eo pipefail` (shell-ul implicit din
           # Actions) eroarea lui ls ar fi oprit scriptul la fiecare rulare
           zip=""
           for c in update.zip updates/*.zip; do
             if [ -f "$c" ]; then zip="$c"; break; fi
           done
-          if [ -z "$zip" ]; then echo "Niciun updates/*.zip - nimic de aplicat."; exit 0; fi
+          if [ -z "$zip" ]; then
+            echo "Nicio arhiva update.zip in main (posibil stearsa inainte de aplicare) - nimic de aplicat." | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
           python3 - "$zip" <<'PY'
           import os, re, sys, zipfile
           z = zipfile.ZipFile(sys.argv[1])
@@ -90,10 +96,21 @@ jobs:
             # exista (ex. selfrepair/ inainte de instalare) ar fi anulat toata comanda
             git add -A
             git commit -qm "actualizare aplicata: $(basename "$zip")"
-            for i in 1 2 3; do git pull --rebase -q && git push -q && break; sleep 5; done
-            echo "Actualizare aplicata si verificata."
+            pushed=0
+            for i in 1 2 3; do
+              if git pull --rebase -q && git push -q; then pushed=1; break; fi
+              git rebase --abort 2>/dev/null || true
+              sleep 5
+            done
+            # push esuat = job ROSU: varianta anterioara afisa "aplicata" chiar daca
+            # nimic nu ajunsese in repo (ex. arhiva stearsa in timp ce jobul rula)
+            if [ "$pushed" != "1" ]; then
+              echo "Push esuat dupa 3 incercari - actualizarea NU a ajuns in repo. Urca din nou update.zip si nu o sterge: workflow-ul o sterge singur." | tee -a "$GITHUB_STEP_SUMMARY"
+              exit 1
+            fi
+            echo "Actualizare aplicata si verificata: $(git show --stat --format= HEAD | tail -1)" | tee -a "$GITHUB_STEP_SUMMARY"
           else
-            echo "Garzile au gasit probleme - NU aplic nimic; repo-ul ramane neschimbat."
+            echo "Garzile au gasit probleme - NU aplic nimic; repo-ul ramane neschimbat (detalii mai sus in jurnal)." | tee -a "$GITHUB_STEP_SUMMARY"
             git checkout -- . ; git clean -fdq -- dashboard selfrepair improve .github
             exit 1
           fi
