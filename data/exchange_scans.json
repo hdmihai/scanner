@@ -12,7 +12,7 @@
         "DASH/USDT",
         "DOGE/USDT",
         "DOT/USDT",
-        "EGLD/USDT",
+        "EGLD/USDC",
         "ETH/USDT",
         "FET/USDT",
         "FIL/USDT",
@@ -75,19 +75,6 @@
           }
         },
         {
-          "symbol": "DOGE/USDT",
-          "direction": "SHORT",
-          "score": 45,
-          "price": 0.09278,
-          "atr": 0.0018807143,
-          "components": {
-            "trend": 0.046,
-            "momentum": 0.373,
-            "volatility": 0.986,
-            "volume": 0.4
-          }
-        },
-        {
           "symbol": "ZEC/USDT",
           "direction": "SHORT",
           "score": 45,
@@ -98,6 +85,19 @@
             "momentum": 0.57,
             "volatility": 0.245,
             "volume": 0.185
+          }
+        },
+        {
+          "symbol": "DOGE/USDT",
+          "direction": "SHORT",
+          "score": 45,
+          "price": 0.09278,
+          "atr": 0.0018807143,
+          "components": {
+            "trend": 0.046,
+            "momentum": 0.373,
+            "volatility": 0.986,
+            "volume": 0.4
           }
         },
         {
@@ -153,19 +153,6 @@
           }
         },
         {
-          "symbol": "POL/USDT",
-          "direction": "SHORT",
-          "score": 39,
-          "price": 0.10816,
-          "atr": 0.0026607143,
-          "components": {
-            "trend": 0.236,
-            "momentum": 0.438,
-            "volatility": 0.77,
-            "volume": 0.108
-          }
-        },
-        {
           "symbol": "DASH/USDT",
           "direction": "SHORT",
           "score": 39,
@@ -176,6 +163,19 @@
             "momentum": 0.394,
             "volatility": 0.581,
             "volume": 0.134
+          }
+        },
+        {
+          "symbol": "POL/USDT",
+          "direction": "SHORT",
+          "score": 39,
+          "price": 0.10816,
+          "atr": 0.0026607143,
+          "components": {
+            "trend": 0.236,
+            "momentum": 0.438,
+            "volatility": 0.77,
+            "volume": 0.108
           }
         },
         {
@@ -335,6 +335,19 @@
           }
         },
         {
+          "symbol": "EGLD/USDC",
+          "direction": "LONG",
+          "score": 25,
+          "price": 4.517,
+          "atr": 0.11128571,
+          "components": {
+            "trend": 0.139,
+            "momentum": 0.098,
+            "volatility": 0.768,
+            "volume": 0.002
+          }
+        },
+        {
           "symbol": "BTC/USDT",
           "direction": "LONG",
           "score": 24,
@@ -358,19 +371,6 @@
             "momentum": 0.109,
             "volatility": 0.626,
             "volume": 0.189
-          }
-        },
-        {
-          "symbol": "EGLD/USDT",
-          "direction": "LONG",
-          "score": 18,
-          "price": 4.538,
-          "atr": 0.14478571,
-          "components": {
-            "trend": 0.145,
-            "momentum": 0.133,
-            "volatility": 0.405,
-            "volume": 0.054
           }
         },
         {
@@ -424,15 +424,6 @@
           "macd_hist": -0.00153443,
           "position": "IN VALUE AREA"
         },
-        "DOGE/USDT": {
-          "supertrend": "BEARISH",
-          "vwap": 0.09426877333089063,
-          "poc": 0.08463042,
-          "vah": 0.09612208,
-          "val": 0.08348125,
-          "macd_hist": -0.0002262,
-          "position": "IN VALUE AREA"
-        },
         "ZEC/USDT": {
           "supertrend": "BEARISH",
           "vwap": 1477.5971658526078,
@@ -440,6 +431,15 @@
           "vah": 1406.26625,
           "val": 644.70875,
           "macd_hist": -1.65434552,
+          "position": "IN VALUE AREA"
+        },
+        "DOGE/USDT": {
+          "supertrend": "BEARISH",
+          "vwap": 0.09426877333089063,
+          "poc": 0.08463042,
+          "vah": 0.09612208,
+          "val": 0.08348125,
+          "macd_hist": -0.0002262,
           "position": "IN VALUE AREA"
         },
         "SUI/USDT": {
@@ -460,15 +460,6 @@
           "macd_hist": 0.0044362,
           "position": "PESTE VAH"
         },
-        "ADA/USDT": {
-          "supertrend": "BULLISH",
-          "vwap": 0.24045210854228113,
-          "poc": 0.21954375,
-          "vah": 0.23851875,
-          "val": 0.19424375,
-          "macd_hist": -0.00045269,
-          "position": "PESTE VAH"
-        },
         "AVAX/USDT": {
           "supertrend": "BULLISH",
           "vwap": 10.505967896421335,
@@ -476,6 +467,15 @@
           "vah": 10.8561875,
           "val": 7.0964375,
           "macd_hist": -0.01473464,
+          "position": "PESTE VAH"
+        },
+        "ADA/USDT": {
+          "supertrend": "BULLISH",
+          "vwap": 0.24045210854228113,
+          "poc": 0.21954375,
+          "vah": 0.23851875,
+          "val": 0.19424375,
+          "macd_hist": -0.00045269,
           "position": "PESTE VAH"
         },
         "DOT/USDT": {
@@ -541,24 +541,6 @@
           "macd_hist": 0.00011854,
           "position": "PESTE VAH"
         },
-        "AXS/USDT": {
-          "supertrend": "BULLISH",
-          "vwap": 1.1401010857704839,
-          "poc": 0.94405625,
-          "vah": 1.14952708,
-          "val": 0.88801875,
-          "macd_hist": 0.00567397,
-          "position": "PESTE VAH"
-        },
-        "POL/USDT": {
-          "supertrend": "BEARISH",
-          "vwap": 0.10998587719952936,
-          "poc": 0.10816417,
-          "vah": 0.1204025,
-          "val": 0.09592583,
-          "macd_hist": -0.00014833,
-          "position": "IN VALUE AREA"
-        },
         "SEI/USDT": {
           "supertrend": "BEARISH",
           "vwap": 0.06669009249002807,
@@ -568,6 +550,15 @@
           "macd_hist": -0.00017015,
           "position": "IN VALUE AREA"
         },
+        "AXS/USDT": {
+          "supertrend": "BULLISH",
+          "vwap": 1.1401010857704839,
+          "poc": 0.94405625,
+          "vah": 1.14952708,
+          "val": 0.88801875,
+          "macd_hist": 0.00567397,
+          "position": "PESTE VAH"
+        },
         "DASH/USDT": {
           "supertrend": "BEARISH",
           "vwap": 62.129429483671245,
@@ -575,6 +566,15 @@
           "vah": 72.26979167,
           "val": 48.051875,
           "macd_hist": 0.1021561,
+          "position": "IN VALUE AREA"
+        },
+        "POL/USDT": {
+          "supertrend": "BEARISH",
+          "vwap": 0.10998587719952936,
+          "poc": 0.10816417,
+          "vah": 0.1204025,
+          "val": 0.09592583,
+          "macd_hist": -0.00014833,
           "position": "IN VALUE AREA"
         },
         "ATOM/USDT": {
@@ -622,13 +622,13 @@
           "macd_hist": 7.544e-05,
           "position": "IN VALUE AREA"
         },
-        "EGLD/USDT": {
-          "supertrend": "BULLISH",
-          "vwap": 4.285358497021531,
-          "poc": 4.5995625,
-          "vah": 5.05572917,
-          "val": 3.80127083,
-          "macd_hist": -0.00478936,
+        "EGLD/USDC": {
+          "supertrend": "BEARISH",
+          "vwap": 4.298033289713265,
+          "poc": 4.6159375,
+          "vah": 4.7315625,
+          "val": 3.9221875,
+          "macd_hist": -0.0078449,
           "position": "IN VALUE AREA"
         }
       },
