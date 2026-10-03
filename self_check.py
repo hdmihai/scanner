@@ -125,13 +125,39 @@ def check_targets_vs_extreme(details):
     return _chk("ew_targets", "OK", "Tinte Elliott", "tintele sunt marcate conform extremului undei")
 
 
+def _path_vs_levels(p, path):
+    """Ce prevede prognoza pentru NIVELURILE planului (nu fata de pretul curent):
+    'stop' daca dupa atingerea intrarii ajunge la SL inaintea TP1, 'fara_intrare'
+    daca nu atinge intrarea, altfel None. Un ordin limita LONG sub pret are nevoie
+    de o scadere pana la intrare - o prognoza descendenta nu il contrazice."""
+    e, sl, t1 = p.get("entry"), p.get("sl"), p.get("tp1")
+    if None in (e, sl, t1) or len(path) < 2:
+        return None
+    up = p["direction"] == "LONG"
+    pts = [q["price"] for q in path]
+    filled = False
+    for x in pts:
+        if not filled and ((x <= e) if up else (x >= e)):
+            filled = True
+        if filled:
+            if (x <= sl) if up else (x >= sl):
+                return "stop"
+            if (x >= t1) if up else (x <= t1):
+                return None
+    return None if filled else "fara_intrare"
+
+
 def check_plan_vs_forecast(details, store):
-    """Un plan DESCHIS nu are voie sa aiba prognoza curenta integral impotriva lui.
-    Pentru un plan care inca asteapta intrarea (PENDING) e o eroare - decizia de a
-    intra e inca activa si contrazice propria analiza. Pentru unul deja intrat e
-    doar un avertisment: piata s-a schimbat dupa intrare. Planurile emise explicit
-    pentru explorare sunt excluse. Varianta initiala verifica doar planurile create
-    in ultima scanare si rata planul SEI, creat cu 1.9 ore inainte si inca PENDING."""
+    """INVARIANTUL DE LOGICA: un plan emis in scanarea CURENTA nu are voie sa fie
+    emis cand structura Elliott e in conflict cu el (prognoza 'elliott_conflict'),
+    decat ca explorare. Asta e o contradictie reala intre decizie si analiza -
+    EROARE, cu carantina evidentei Elliott.
+    Planurile mai vechi, cu analiza schimbata DUPA creare, sunt doar AVERTISMENT:
+    piata a adus informatie noua, nu e un defect de logica. Varianta anterioara le
+    trata ca eroare comparand prognoza cu pretul curent - pe MANA, un LONG limita
+    sub pret, o prognoza care cobora spre intrare a fost raportata gresit ca eroare
+    si a pus degeaba ev_elliott in carantina."""
+    ts = _scan_ts(details)
     err, warn = [], []
     for p in store.get("plans") or []:
         if p.get("source") == "backtest" or p.get("realized_r") is not None:
@@ -140,24 +166,25 @@ def check_plan_vs_forecast(details, store):
         if mode.startswith("EXPLORARE"):
             continue
         s = (details.get("symbols") or {}).get(p["symbol"]) or {}
-        path = ((s.get("forecast") or {}).get("path") or [])
-        if len(path) < 3:
+        fc = s.get("forecast") or {}
+        path = fc.get("path") or []
+        fresh = ts is not None and (p.get("created_ts") or 0) >= ts - 1800
+        if fresh and fc.get("source") == "elliott_conflict":
+            err.append(f"{p['symbol']} {p['direction']} (plan #{p['id']}, emis acum): structura Elliott e in "
+                       f"conflict, dar planul a fost emis ({mode or 'fara decizie'})")
             continue
-        now = path[0]["price"]
-        proj = [q["price"] for q in path[1:]]
-        against = (all(x < now * 0.998 for x in proj) if p["direction"] == "LONG"
-                   else all(x > now * 1.002 for x in proj))
-        if against:
-            msg = (f"{p['symbol']} {p['direction']} (plan #{p['id']}, {p.get('state')}): prognoza merge "
-                   f"integral impotriva ({now:.6g} -> {proj[-1]:.6g})")
-            (err if p.get("state") == "PENDING" else warn).append(msg)
+        verdict = _path_vs_levels(p, path)
+        if verdict == "stop":
+            warn.append(f"{p['symbol']} {p['direction']} (plan #{p['id']}, {p.get('state')}): prognoza curenta "
+                        f"atinge SL ({p.get('sl'):.6g}) inaintea TP1 ({p.get('tp1'):.6g})")
     if err:
-        return _chk("plan_forecast", "ERROR", "Planuri in asteptare contra propriei prognoze",
-                    "Planuri care inca asteapta intrarea merg impotriva prognozei afisate - "
-                    "decizia si analiza nu folosesc aceeasi logica.", err + warn, ["ev_elliott"])
+        return _chk("plan_forecast", "ERROR", "Planuri emise contra structurii Elliott",
+                    "Decizia a emis planuri in timp ce structura era in conflict cu ele - decizia si "
+                    "analiza nu folosesc aceeasi logica.", err + warn, ["ev_elliott"])
     if warn:
-        return _chk("plan_forecast", "WARN", "Planuri intrate, contrazise acum de prognoza",
-                    "Piata s-a schimbat dupa intrare; prognoza curenta merge impotriva planului.", warn)
+        return _chk("plan_forecast", "WARN", "Planuri deschise contrazise de analiza curenta",
+                    "Analiza s-a schimbat dupa crearea planului si prevede acum atingerea SL inaintea "
+                    "TP1 - informatie noua, nu defect de logica.", warn)
     return _chk("plan_forecast", "OK", "Plan vs prognoza", "planurile deschise sunt coerente cu prognoza")
 
 
