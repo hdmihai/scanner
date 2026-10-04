@@ -1,0 +1,46 @@
+name: Ceas scanare
+
+# PORNIREA ORARA, FARA PROGRAMATORUL GITHUB. Masurat in productie: GitHub nu a
+# pornit deloc workflow-urile programate (cron) pe acest repo timp de 13 ore, desi
+# scanarea si santinela functionau perfect cand rulau. Acest job verifica la 5
+# minute varsta ultimei scanari si o porneste cand depaseste 55 de minute; inainte
+# de limita de 6 ore a unui job se reporneste singur (workflow_dispatch cu
+# GITHUB_TOKEN e permis). Gratuit pe un repo public. Daca lantul se rupe vreodata,
+# santinela (heartbeat.yml) il reporneste.
+on:
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: ceas-scanare
+  cancel-in-progress: false
+
+jobs:
+  ceas:
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    steps:
+      - name: Porneste scanarea la fiecare ora, apoi se reporneste
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          end=$(( $(date +%s) + 340 * 60 ))
+          while [ "$(date +%s)" -lt "$end" ]; do
+            last=$(gh api "repos/$REPO/commits?path=data/latest_details.json&per_page=1" --jq '.[0].commit.committer.date' || echo "")
+            active=$(gh run list -R "$REPO" --workflow scan.yml --limit 5 --json status \
+              --jq '[.[] | select(.status != "completed")] | length' || echo 1)
+            if [ -n "$last" ]; then
+              age=$(( $(date +%s) - $(date -d "$last" +%s) ))
+              if [ "$age" -ge 3300 ] && [ "$active" = "0" ]; then
+                echo "$(date -u +%H:%M) pornesc scanarea (ultima acum $((age / 60)) min)"
+                gh workflow run scan.yml -R "$REPO" -f source=ceas || true
+              fi
+            fi
+            sleep 300
+          done
+          echo "Ma repornesc inainte de limita de 6 ore a unui job."
+          gh workflow run keeper.yml -R "$REPO"
