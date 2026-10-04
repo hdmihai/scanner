@@ -32,6 +32,13 @@ jobs:
             --jq '[.[] | select(.status != "completed")] | length')
           failed=$(gh run list -R "$REPO" --workflow scan.yml --limit 3 --json conclusion \
             --jq '[.[] | select(.conclusion == "failure")] | length')
+          # plasa de siguranta: daca ceasul (keeper.yml) nu ruleaza, il repornesc
+          keeper=$(gh run list -R "$REPO" --workflow keeper.yml --limit 3 --json status \
+            --jq '[.[] | select(.status != "completed")] | length' || echo 1)
+          if [ "$keeper" = "0" ]; then
+            echo "Ceasul de scanare nu ruleaza - il repornesc."
+            gh workflow run keeper.yml -R "$REPO" || true
+          fi
           if [ "$age" -le 4200 ]; then
             echo "Scanare recenta - nimic de facut."
           elif [ "$active" != "0" ]; then
