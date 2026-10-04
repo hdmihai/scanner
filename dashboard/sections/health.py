@@ -23,7 +23,7 @@ def _tile(level, title, value, detail):
             f'<span class="hl-d">{detail}</span></div>')
 
 
-def render_health(history, agent_state, plans_store, self_check, altseason):
+def render_health(history, agent_state, plans_store, self_check, altseason, runs=None):
     """STAREA SISTEMULUI. Problemele gasite pana acum doar prin verificari manuale
     - scanari care rulau la 4-7 ore in loc de orar, auto-diagnosticul dezactivat
     fara nicio eroare vizibila, agentul neconfirmat live - apar aici primele."""
@@ -46,6 +46,14 @@ def render_health(history, agent_state, plans_store, self_check, altseason):
         (f"ultima acum {age:.0f} min" if age is not None else "nicio scanare")
         + (f" &middot; interval median {med:.0f} min" if med else "")
         + ("" if lvl == "OK" else " &middot; verifica Actions &rarr; Heartbeat scanare"))
+    rr = [r for r in (runs or []) if now - (r.get("ts") or 0) <= 86400]
+    if rr:
+        bad = [r for r in rr if r.get("status") != "success"]
+        last = bad[-1] if bad else None
+        add("OK" if not bad else ("ERROR" if len(bad) * 2 >= len(rr) else "WARN"), "Rulari scanare 24h",
+            f"{len(rr) - len(bad)} reusite / {len(bad)} esuate",
+            (f'ultimul esec {last["when"]}' + (f' la pasul <strong>{last["failed"]}</strong>' if last.get("failed") else "")
+             + f' &middot; <a href="{last["url"]}">deschide rularea</a>') if last else "toate rularile au reusit")
     a = agent_state or {}
     lv = a.get("live") or {}
     conf = lv.get("n", 0) >= 100 and (lv.get("ci_low") or 0) > 0.5

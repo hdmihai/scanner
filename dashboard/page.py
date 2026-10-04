@@ -67,7 +67,8 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
     briefing_html = _safe("render_briefing", render_briefing, briefing)
     health_html = _safe("render_health", render_health, history, agent_state, plans_store,
                         load_json(os.path.join(DATA_DIR, "self_check.json"), None),
-                        load_json(ALTSEASON_FILE, None))
+                        load_json(ALTSEASON_FILE, None),
+                        load_json(os.path.join(DATA_DIR, "runs.json"), None))
     # Watchlist-ul cerut: din scanarea bursei principale, care stie si ce a
     # gasit si ce lipseste. Asa panourile N/A reflecta ce s-a cerut efectiv,
     # nu o lista fixata in dashboard care ar putea ramane in urma.
