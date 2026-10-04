@@ -9,6 +9,10 @@ on:
     - cron: '7 * * * *'
   workflow_dispatch:
     inputs:
+      source:
+        description: "Cine a pornit scanarea (manual / heartbeat)"
+        required: false
+        default: "manual"
       timeframe:
         description: "Timeframe pentru ACEASTA rulare manuala. Implicit 4h la rularile programate."
         required: true
@@ -125,18 +129,6 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python update_token_metadata.py
 
-      - name: Genereaza pagina dashboard (docs/index.html)
-        id: dashboard
-        run: python generate_dashboard.py
-
-      - name: Trimite digest pe email (doar la fiecare 4 ore)
-        env:
-          EMAIL_ADDRESS: ${{ secrets.EMAIL_ADDRESS }}
-          EMAIL_APP_PASSWORD: ${{ secrets.EMAIL_APP_PASSWORD }}
-          EMAIL_TO: ${{ secrets.EMAIL_TO }}
-          GITHUB_PAGES_URL: https://hdmihai.github.io/scanner/
-        run: python send_email_digest.py
-
       - name: Jurnalul rularii (scris si la esec - vizibil pe dashboard)
         # Un esec al scanarii nu lasa altfel nicio urma in repo: fara date noi, pasul
         # de commit nu are ce urca. Masurat: 16 ore fara nicio scanare urcata, fara
@@ -151,14 +143,26 @@ jobs:
           except Exception:
               runs = []
           steps = {"integritate": "${{ steps.integritate.outcome }}", "py311": "${{ steps.py311.outcome }}",
-                   "scaner": "${{ steps.scaner.outcome }}", "agent": "${{ steps.agent.outcome }}",
-                   "dashboard": "${{ steps.dashboard.outcome }}"}
+                   "scaner": "${{ steps.scaner.outcome }}", "agent": "${{ steps.agent.outcome }}"}
           runs.append({"ts": int(time.time()), "when": time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime()),
                        "status": "${{ job.status }}", "event": "${{ github.event_name }}",
+                       "trigger": "${{ github.event.inputs.source || github.event_name }}",
                        "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
                        "failed": next((k for k, v in steps.items() if v == "failure"), None)})
           json.dump(runs[-300:], open(p, "w"))
           PY
+
+      - name: Genereaza pagina dashboard (docs/index.html)
+        id: dashboard
+        run: python generate_dashboard.py
+
+      - name: Trimite digest pe email (doar la fiecare 4 ore)
+        env:
+          EMAIL_ADDRESS: ${{ secrets.EMAIL_ADDRESS }}
+          EMAIL_APP_PASSWORD: ${{ secrets.EMAIL_APP_PASSWORD }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+          GITHUB_PAGES_URL: https://hdmihai.github.io/scanner/
+        run: python send_email_digest.py
 
       - name: Compacteaza plans.json inainte de commit
         # ULTIMUL pas inainte de commit, si singurul care garanteaza dimensiunea.
