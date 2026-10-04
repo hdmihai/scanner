@@ -39,13 +39,24 @@ def render_health(history, agent_state, plans_store, self_check, altseason, runs
     ts = _scan_times(history)
     n24 = sum(1 for t in ts if now - t <= 86400)
     age = (now - ts[-1]) / 60 if ts else None
-    gaps = sorted(b - a for a, b in zip(ts[-25:], ts[-24:])) if len(ts) > 2 else []
-    med = gaps[len(gaps) // 2] / 60 if gaps else None
-    lvl = "OK" if n24 >= 18 and (age or 0) <= 90 else ("WARN" if n24 >= 8 else "ERROR")
-    add(lvl, "Scanari 24h", f"{n24} / {EXPECTED_SCANS_24H}",
+    # RITMUL DE ACUM, nu istoricul pe 24h: dupa o pauza, numaratoarea pe 24h ramane
+    # mica inca multe ore, desi sistemul scaneaza deja orar. Starea se judeca dupa
+    # varsta ultimei scanari si mediana ultimelor 3 intervale.
+    gaps = [(b - a) / 60 for a, b in zip(ts[-4:], ts[-3:])] if len(ts) >= 4 else []
+    med = sorted(gaps)[len(gaps) // 2] if gaps else None
+    if age is None or age > 150:
+        lvl = "ERROR"
+    elif age > 75 or med is None or med > 90:
+        lvl = "WARN"
+    else:
+        lvl = "OK"
+    hint = {"ERROR": " &middot; scanarea s-a oprit: porneste Actions &rarr; Ceas scanare",
+            "WARN": " &middot; ritmul orar nu e inca atins (ceasul il stabilizeaza in ~2-3 ore)",
+            "OK": ""}[lvl]
+    add(lvl, "Scanari", "ritm orar" if lvl == "OK" else ("oprite" if lvl == "ERROR" else "neregulate"),
         (f"ultima acum {age:.0f} min" if age is not None else "nicio scanare")
-        + (f" &middot; interval median {med:.0f} min" if med else "")
-        + ("" if lvl == "OK" else " &middot; verifica Actions &rarr; Ceas scanare"))
+        + (f" &middot; ultimele intervale: {', '.join(f'{g:.0f}' for g in gaps)} min" if gaps else "")
+        + f" &middot; {n24} in ultimele 24h{hint}")
     rr = [r for r in (runs or []) if now - (r.get("ts") or 0) <= 86400]
     if rr:
         bad = [r for r in rr if r.get("status") != "success"]
