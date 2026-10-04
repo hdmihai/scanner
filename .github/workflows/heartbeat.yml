@@ -7,7 +7,8 @@ name: Heartbeat scanare
 # urcata e mai veche de 70 de minute si nu e deja una in curs.
 on:
   schedule:
-    - cron: "*/15 * * * *"
+    # minute in afara orelor fixe: la :00/:15/:30/:45 GitHub omite cele mai multe rulari
+    - cron: "4,19,34,49 * * * *"
   workflow_dispatch:
 
 permissions:
@@ -39,5 +40,5 @@ jobs:
             echo "Ultimele 3 scanari au esuat - nu le repornesc in bucla; vezi jurnalul scanarii."
           else
             echo "Pornesc scanarea omisa de programarea GitHub."
-            gh workflow run scan.yml -R "$REPO"
+            gh workflow run scan.yml -R "$REPO" -f source=heartbeat
           fi
