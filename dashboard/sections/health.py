@@ -45,7 +45,7 @@ def render_health(history, agent_state, plans_store, self_check, altseason, runs
     add(lvl, "Scanari 24h", f"{n24} / {EXPECTED_SCANS_24H}",
         (f"ultima acum {age:.0f} min" if age is not None else "nicio scanare")
         + (f" &middot; interval median {med:.0f} min" if med else "")
-        + ("" if lvl == "OK" else " &middot; verifica Actions &rarr; Heartbeat scanare"))
+        + ("" if lvl == "OK" else " &middot; verifica Actions &rarr; Ceas scanare"))
     rr = [r for r in (runs or []) if now - (r.get("ts") or 0) <= 86400]
     if rr:
         bad = [r for r in rr if r.get("status") != "success"]
@@ -53,6 +53,7 @@ def render_health(history, agent_state, plans_store, self_check, altseason, runs
         add("OK" if not bad else ("ERROR" if len(bad) * 2 >= len(rr) else "WARN"), "Rulari scanare 24h",
             f"{len(rr) - len(bad)} reusite / {len(bad)} esuate",
             f"surse: programate {sum(1 for r in rr if r.get('trigger', r.get('event')) == 'schedule')} &middot; "
+            f"ceas {sum(1 for r in rr if r.get('trigger') == 'ceas')} &middot; "
             f"santinela {sum(1 for r in rr if r.get('trigger') == 'heartbeat')} &middot; "
             f"manuale {sum(1 for r in rr if r.get('trigger', r.get('event')) in ('manual', 'workflow_dispatch'))}<br>"
             + (
@@ -60,12 +61,18 @@ def render_health(history, agent_state, plans_store, self_check, altseason, runs
              + f' &middot; <a href="{last["url"]}">deschide rularea</a>') if last else "toate rularile au reusit"))
     a = agent_state or {}
     lv = a.get("live") or {}
-    conf = lv.get("n", 0) >= 100 and (lv.get("ci_low") or 0) > 0.5
-    add("OK" if a.get("status") == "ACTIVE" or not lv else ("OK" if conf else "WARN"),
-        "Agent AI", a.get("status") or "n/d",
-        (f"confirmare live {lv.get('n', 0)}/100 planuri"
-         + (f" &middot; AUC live {lv['auc']:.3f} (IC {lv.get('ci_low')}-{lv.get('ci_high')})" if lv.get("auc") is not None else ""))
-        if lv else "fara date live inca")
+    n_live = lv.get("n", 0)
+    conf = n_live >= 100 and (lv.get("ci_low") or 0) > 0.5
+    worse = lv.get("ci_high") is not None and lv["ci_high"] < 0.5          # semnificativ sub hazard
+    # SHADOW cat timp strange date e comportamentul CORECT, nu o problema: devine
+    # avertisment doar daca, cu 100+ planuri live, ordonarea tot nu se confirma, si
+    # problema daca e semnificativ mai slaba decat hazardul.
+    lvl = ("ERROR" if worse else "WARN" if (n_live >= 100 and not conf and a.get("status") != "ACTIVE") else "OK")
+    add(lvl, "Agent AI", a.get("status") or "n/d",
+        ((f"confirmare live {n_live}/100 planuri"
+          + (f" &middot; AUC live {lv['auc']:.3f} (IC {lv.get('ci_low')}-{lv.get('ci_high')})" if lv.get("auc") is not None else "")
+          + ("" if a.get("status") == "ACTIVE" or n_live >= 100 else " &middot; invata, normal pana la 100"))
+         if lv else "fara date live inca"))
     dv = ((plans_store or {}).get("summary") or {}).get("divergence") or {}
     if dv.get("status") in ("sub_backtest", "in_marja", "peste_backtest"):
         add("ERROR" if dv["status"] == "sub_backtest" else "OK", "Live vs backtest",
@@ -74,10 +81,15 @@ def render_health(history, agent_state, plans_store, self_check, altseason, runs
             + {"sub_backtest": "SEMNIFICATIV sub backtest", "in_marja": "in marja statistica",
                "peste_backtest": "peste backtest"}[dv["status"]])
     sc = self_check or {}
+    # avertismente INFORMATIVE: semnaleaza informatie noua, nu un defect de reparat
+    INFO_ONLY = {"plan_forecast"}
     if sc:
-        bad = [c["title"] for c in sc.get("checks") or [] if c.get("level") != "OK"]
-        add(sc.get("status") if sc.get("status") in rank else "WARN", "Auto-diagnostic", sc.get("status", "n/d"),
-            (f"{sc.get('when')} &middot; " + "; ".join(bad[:2])) if bad else f"{sc.get('when')} &middot; toate verificarile OK")
+        bad = [c for c in sc.get("checks") or [] if c.get("level") != "OK"]
+        real = [c for c in bad if not (c.get("level") == "WARN" and c.get("id") in INFO_ONLY)]
+        lvl = "ERROR" if any(c.get("level") == "ERROR" for c in real) else ("WARN" if real else "OK")
+        add(lvl, "Auto-diagnostic", {"OK": "OK", "WARN": "WARN", "ERROR": "ERROR"}[lvl],
+            f"{sc.get('when')} &middot; " + ("; ".join(c["title"] for c in real[:2]) if real else
+            ("toate verificarile OK" if not bad else f"{len(bad)} informare: " + bad[0]["title"])))
     else:
         add("WARN", "Auto-diagnostic", "lipsa", "data/self_check.json nu exista - pasul de diagnostic nu ruleaza")
     al = altseason or {}
