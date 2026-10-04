@@ -1,0 +1,63 @@
+name: Self-repair cod
+
+# Dupa fiecare scanare (si la 6 ore): daca self_check.py a gasit o EROARE de logica
+# reparabila, un model gratuit propune corectura, poarta o valideaza, iar rezultatul
+# vine ca Pull Request. Fara eroare, jobul se termina in cateva secunde.
+# O singura data: Settings -> Actions -> General -> Workflow permissions ->
+# bifeaza "Allow GitHub Actions to create and approve pull requests".
+on:
+  workflow_run:
+    workflows: ["Crypto AI Scanner"]
+    types: [completed]
+  schedule:
+    - cron: "41 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: selfrepair
+  cancel-in-progress: false
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      SCAN_TIMEFRAME: 4h
+      GH_TOKEN: ${{ github.token }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Exista o eroare reparabila?
+        id: need
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, os
+          from selfrepair.repair import REGISTRY
+          sc = json.load(open("data/self_check.json")) if os.path.exists("data/self_check.json") else {}
+          bad = [c for c in sc.get("checks") or [] if c.get("level") == "ERROR" and c.get("id") in REGISTRY]
+          print("run=" + ("true" if bad else "false"))
+          PY
+      - name: Dependinte
+        if: steps.need.outputs.run == 'true'
+        run: pip install ccxt requests
+      - name: Model local (doar fara cheie Gemini)
+        if: steps.need.outputs.run == 'true' && env.GEMINI_API_KEY == ''
+        run: |
+          curl -fsSL https://ollama.com/install.sh | sh
+          (ollama serve > /tmp/ollama.log 2>&1 &) ; sleep 5
+          ollama pull qwen2.5-coder:7b
+      - name: Repara
+        if: steps.need.outputs.run == 'true'
+        run: |
+          git config user.name "crypto-ai-scanner-bot"
+          git config user.email "actions@users.noreply.github.com"
+          python3 -m selfrepair.repair
