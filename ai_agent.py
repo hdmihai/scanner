@@ -197,7 +197,9 @@ def _quarantined():
 # backtest - modelul invata pe date fara ele, apoi decidea live cu ele.
 
 # nu pot fi reconstruite istoric (order book, fluxul de tranzactii live)
-LIVE_ONLY_FEATURES = {"ev_order_flow", "ev_book_imbalance"}
+# persistence_n: numarul de scanari live consecutive - nu exista in backtest (masurat:
+# nenula in 83% din planurile live, 0% din cele 21.530 de backtest)
+LIVE_ONLY_FEATURES = {"ev_order_flow", "ev_book_imbalance", "persistence_n"}
 SKEW_PP = 40           # decalaj de prezenta live-backtest care exclude o caracteristica
 SKEW_MIN_LIVE = 30     # planuri live necesare pentru a masura decalajul
 LIVE_MIN = 100         # planuri live inchise necesare pentru a confirma ordonarea
@@ -801,6 +803,18 @@ def main():
         print(f"[i] Excluse din model (decalaj live-backtest): {', '.join(_excl)}")
 
     state = load_json(MODEL_FILE, None)
+    # MASCA DE CARACTERISTICI (excluse + carantina). Cand se schimba, reantrenez de la
+    # zero: o caracteristica zerorizata cat timp modelul s-a antrenat ramane cu greutatea
+    # 0 si dupa ridicarea carantinei (ev_elliott: 0.0 dupa o carantina falsa de 2 zile).
+    _mask = sorted(set(_excl) | set(_quarantined()))
+    if state is not None and state.get("feature_mask") != _mask:
+        print(f"[i] Masca de caracteristici s-a schimbat ({state.get('feature_mask')} -> {_mask}) - "
+              "reantrenez de la zero pe toate planurile.")
+        state = None
+        # fara asta, modelul nou nu ar invata nimic: planurile poarta marcajul
+        # agent_trained de la antrenarea anterioara (testat: 0 planuri invatate)
+        for p in plans:
+            p.pop("agent_trained", None)
     # Daca starea salvata provine din alta sursa/geometrie de semnal (campul `outcome`),
     # o resetez: etichetele masurau altceva. Vezi nota din train_from_plans.
     source = current_source()
@@ -869,7 +883,7 @@ def main():
     if not plans:
         print("Niciun plan inca - agentul invata din planuri inchise. "
               "Ruleaza intai crypto_ai_scanner.py.")
-        state["skew"], state["skew_excluded"] = _skew, _excl
+        state["skew"], state["skew_excluded"], state["feature_mask"] = _skew, _excl, _mask
         save_json(MODEL_FILE, state)
         return
 
@@ -897,7 +911,7 @@ def main():
     state["agent_superior"] = bool(sa is not None and sb is not None and sa > sb)
     state["majority_baseline"] = majority_class_accuracy(pairs)
     state["predicted_positive_rate"] = predicted_positive_rate(pairs)
-    state["skew"], state["skew_excluded"] = _skew, _excl
+    state["skew"], state["skew_excluded"], state["feature_mask"] = _skew, _excl, _mask
     save_json(MODEL_FILE, state)
 
     acc_agent, acc_base, acc_recent = summarize(state)

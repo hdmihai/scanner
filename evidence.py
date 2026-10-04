@@ -248,10 +248,22 @@ def build_evidence(ind, price, atr, rsi=None, components=None,
                             f"({tgt['role']}, {tgt['touches']} atingeri)",
                             DIR_LONG if tgt["side"] == "BUY" else DIR_SHORT,
                             _clip(abs(liqs_bias), 0, 1), round(tgt["price"], 8)))
+        # SWEEP-UL PE O SINGURA PARTE e semnalul SMC urmarit de metoda: lichiditatea
+        # de sub minime luata si pretul revenit deasupra -> intoarcere in sus (LONG);
+        # simetric pentru maxime (SHORT). Inainte se emitea doar sweep-ul bilateral,
+        # neutru - caracteristica era 0 in 100% din planuri, iar agentul nu o vedea.
         if liqs.get("two_sided_sweep"):
             ev.append(_item("liq_sweep",
                             "Sweep bilateral - lichiditate luata sus SI jos",
                             DIR_NEUTRAL, 0.5, 1))
+        elif liqs.get("swept_sell"):
+            ev.append(_item("liq_sweep",
+                            "Sweep sell-side: lichiditatea de sub minime a fost luata, pretul a revenit deasupra",
+                            DIR_LONG, 0.6, 1))
+        elif liqs.get("swept_buy"):
+            ev.append(_item("liq_sweep",
+                            "Sweep buy-side: lichiditatea de peste maxime a fost luata, pretul a revenit dedesubt",
+                            DIR_SHORT, 0.6, 1))
 
     # FAZA ALTCOIN SEASON: context de piata, acelasi pentru toate simbolurile
     # la un moment dat, dar cu sens diferit: o faza care favorizeaza altcoins
