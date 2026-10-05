@@ -19,6 +19,9 @@ ALTSEASON_FILE = os.path.join(DATA_DIR, "altseason.json")
 ALTSEASON_HISTORY_FILE = os.path.join(DATA_DIR, "altseason_history.json")
 CHART_FILE = os.path.join(DATA_DIR, "latest_chart.json")
 OUTPUT_FILE = os.path.join(DOCS_DIR, "index.html")
+# Modulele per bursa: datele scrise de scaner si paginile generate.
+EXCHANGES_DATA_DIR = os.path.join(DATA_DIR, "exchanges")
+EXCHANGE_PAGES_DIR = os.path.join(DOCS_DIR, "exchanges")
 MIN_SAMPLES_FOR_VALIDATION = 100
 TOKEN_METADATA_FILE = os.path.join(DATA_DIR, "token_metadata.json")
 TOKEN_META_UPDATED = {}
@@ -34,4 +37,5 @@ CAP_LABELS = {
     "orderbook_live": "Adancime live",
     "trades_live": "Flux de tranzactii live",
     "orderbook_history": "Order book istoric",
+    "open_interest": "Open interest",
 }

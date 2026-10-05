@@ -1,136 +1,114 @@
 # -*- coding: utf-8 -*-
-"""dashboard.sections.exchanges - Tab-urile pe burse."""
+"""dashboard.sections.exchanges - Modulele per bursa: rezumatul de pe pagina principala si navigarea.
 
+Fiecare bursa are pagina ei (docs/exchanges/<id>.html, construita de
+dashboard.exchange_page). Pagina principala pastreaza nucleul - starea
+sistemului, altseason, agentul, planurile - plus cate un rezumat per bursa.
+"""
 
+import html as _html
 
 from dashboard.config import CAP_LABELS
-from dashboard.components import fmt_price
+from dashboard.sections.tokens import decision_label
 
 
-def render_exchange_scan(scan, label):
-    """Ce vede o bursa ACUM: lista ei de simboluri, semnalele si indicatorii.
+def page_href(eid, from_exchange_page=False):
+    """Legatura catre pagina unei burse, relativa la pagina curenta."""
+    return f"{eid}.html" if from_exchange_page else f"exchanges/{eid}.html"
 
-    Planurile se creeaza doar pe bursa activa - vezi nota din scanner. Aici e
-    strict afisare, ca sa poti compara ce arata fiecare bursa fara sa imparti
-    memoria agentului in cinci.
-    """
-    if not scan:
-        return '<p class="dim">Nicio scanare inregistrata pentru aceasta bursa.</p>'
-    if scan.get("error"):
-        return ('<div class="ex-fail">Scanarea nu a putut rula.</div>'
-                '<div class="ex-err">{}</div>'.format(scan["error"]))
 
-    res = scan.get("results") or []
-    resolved = scan.get("resolved") or []
-    missing = scan.get("missing") or []
-    head = ('<div class="scan-head"><strong>{}</strong> simboluri gasite aici'
-            '{} &middot; <strong>{}</strong> cu semnal{}</div>').format(
-        len(resolved),
-        (' &middot; <span class="dim">{} lipsesc: {}</span>'.format(
-            len(missing), ", ".join(missing[:8]) + ("..." if len(missing) > 8 else "")))
-        if missing else "",
-        len(res),
-        ' <span class="tab-used">activa - aici se creeaza planuri</span>'
-        if scan.get("primary") else
-        ' <span class="dim">(doar afisare)</span>')
+def render_nav(cards, current=None, from_exchange_page=False):
+    """Navigarea comuna: pagina principala + cate o pagina per bursa."""
+    home = "../index.html" if from_exchange_page else "index.html"
+    items = [f'<a class="nav-i{" nav-on" if current is None else ""}" href="{home}">Principal</a>']
+    for c in cards or []:
+        eid = c.get("id")
+        cls = "nav-i" + (" nav-on" if eid == current else "") + ("" if c.get("connected") else " nav-off")
+        items.append(f'<a class="{cls}" href="{page_href(eid, from_exchange_page)}">'
+                     f'{_html.escape(c.get("label", eid))}</a>')
+    return '<nav class="nav">' + "".join(items) + "</nav>"
 
-    if scan.get("truncated"):
-        head += ('<div class="ex-note">Scanare trunchiata la limita de timp - '
-                 'bursele secundare au buget fix ca sa nu intinda rularea.</div>')
-    if not res:
-        return head + '<p class="dim">Niciun semnal pe aceasta bursa acum.</p>'
 
-    det = scan.get("details") or {}
+def render_caps(card):
+    """Capabilitatile declarate ale bursei si care functioneaza efectiv acum."""
+    avail = set(card.get("available") or [])
     rows = []
-    for r in res[:20]:
-        d = det.get(r["symbol"]) or {}
-        st = d.get("supertrend")
-        rows.append(
-            '<div class="scan-row">'
-            '<span class="scan-sym">{}</span>'
-            '<span class="badge badge-{}">{}</span>'
-            '<span class="scan-score">{}</span>'
-            '<span class="scan-px">{}</span>'
-            '<span class="tag tag-{}">{}</span>'
-            '<span class="dim scan-pos">{}</span>'
-            '</div>'.format(
-                r["symbol"], "bull" if r["direction"] == "LONG" else "bear",
-                r["direction"], r["score"], fmt_price(r["price"]),
-                "bull" if st == "BULLISH" else ("bear" if st == "BEARISH" else "info"),
-                st or "-", d.get("position") or ""))
-    return head + '<div class="scan-list">' + "".join(rows) + "</div>"
+    for cap in card.get("declared") or []:
+        has = cap in avail
+        rows.append('<span class="cap-chip cap-{}">{}</span>'.format(
+            "ok" if has else "no", CAP_LABELS.get(cap, cap)))
+    missing = [CAP_LABELS.get(cap, cap) for cap in card.get("declared") or [] if cap not in avail]
+    note = ""
+    if missing and card.get("connected"):
+        note = ('<p class="dim exm-note">Evidentele care depind de: {} sunt omise pe aceasta '
+                'bursa - nu inlocuite cu valori neutre, care ar minti modelul.</p>').format(
+                    ", ".join(missing))
+    return '<div class="cap-chips">' + "".join(rows) + "</div>" + note
 
 
-def render_exchange_tabs(store, scans_store=None):
-    """Tab-uri per bursa, cu starea fiecareia.
+def proposal_counts(props, trained):
+    """'16 propuneri: 15 emise, 1 asteapta corectia' (sau la conditional)."""
+    if not props:
+        return "nicio propunere"
+    by = {}
+    for p in props.values():
+        _cls, txt = decision_label(p, trained)
+        by[txt] = by.get(txt, 0) + 1
+    parts = ", ".join(f"{n} {t}" for t, n in sorted(by.items(), key=lambda kv: -kv[1]))
+    return f"{len(props)} propuneri: {parts}"
 
-    Fara JavaScript: radio ascuns + label, cu selectorul :checked din CSS. Merge
-    in orice browser si pe telefon, si nu depinde de niciun CDN.
-    """
+
+def render_exchange_modules(store, scans_store=None, proposals_by_ex=None):
+    """Cate un modul per bursa pe pagina principala: rolul (invata / neantrenat /
+    indisponibila), acoperirea, semnalele, propunerile si legatura spre pagina ei."""
     cards = (store or {}).get("exchanges") or []
     if not cards:
         return '<p class="dim">Bursele apar dupa prima scanare.</p>'
-
-    active_sig = (store or {}).get("active_signature")
-    used = (store or {}).get("used")
-
-    tabs, panels = [], []
-    for i, c in enumerate(cards):
-        eid = c.get("id", f"ex{i}")
-        ok = c.get("connected")
-        checked = " checked" if i == 0 else ""
-        dot = "ok" if ok else "bad"
-        badge = ' <span class="tab-used">activa</span>' if eid == used else ""
-        tabs.append(
-            '<input type="radio" name="extab" id="tab-{0}" class="tab-radio"{1}>'
-            '<label for="tab-{0}" class="tab-label"><i class="dot-{2}"></i>{3}{4}</label>'.format(
-                eid, checked, dot, c.get("label", eid), badge))
-
-        if not ok:
-            body = ('<div class="ex-fail">Nu m-am putut conecta.</div>'
-                    '<div class="ex-err">{}</div>'.format(c.get("error") or "motiv necunoscut"))
-        else:
-            avail = set(c.get("available") or [])
-            rows = []
-            for cap in c.get("declared") or []:
-                has = cap in avail
-                rows.append(
-                    '<div class="cap-row"><span class="tag tag-{}">{}</span>'
-                    '<span>{}</span></div>'.format(
-                        "bull" if has else "bear",
-                        "disponibil" if has else "indisponibil",
-                        CAP_LABELS.get(cap, cap)))
-            missing = [CAP_LABELS.get(cap, cap) for cap in c.get("declared") or []
-                       if cap not in avail]
-            note = ""
-            if missing:
-                note = ('<div class="ex-note">Evidentele care depind de: {} '
-                        'sunt OMISE pentru aceasta bursa - nu inlocuite cu valori '
-                        'neutre, care ar minti modelul despre ce a vazut.</div>').format(
-                            ", ".join(missing))
-            body = ('<div class="ex-meta"><div><span class="dim">PIETE</span><br>{}</div>'
-                    '<div><span class="dim">VERIFICAT</span><br>{}</div></div>'
-                    '<div class="cap-list">{}</div>{}').format(
-                        c.get("markets", 0), c.get("checked_at", "-"), "".join(rows), note)
-        # scanul bursei, sub fisa de capabilitati
-        scan = ((scans_store or {}).get("scans") or {}).get(eid)
-        body += ('<h4 class="scan-h">Ce vede aceasta bursa acum</h4>'
-                 + render_exchange_scan(scan, c.get("label", eid)))
-        panels.append('<div class="tab-panel tab-panel-{}">{}</div>'.format(eid, body))
-    # Regula CSS care leaga fiecare radio de panoul lui. Generata dinamic, ca
-    # sa nu depinda de o lista fixa de burse.
-    rules = "".join(
-        "#tab-{0}:checked ~ .tab-panel-{0}{{display:block;}}".format(c.get("id", f"ex{i}"))
-        for i, c in enumerate(cards))
-    panels.append("<style>" + rules + "</style>")
-
-    sig = ""
-    if active_sig:
-        # Textul vechi ("se invata separat") descria comportamentul de dinainte de
-        # familia de geometrie. Acum planurile cu capabilitati diferite se invata
-        # IMPREUNA; evidentele indisponibile sunt doar omise din vector.
-        sig = ('<div class="ex-sig">Semnatura activa: <strong>{}</strong> '
-               '&middot; planurile cu capabilitati diferite se invata impreuna, pe '
-               'aceeasi familie de geometrie; evidentele indisponibile sunt omise, '
-               'nu inlocuite</div>').format(active_sig)
-    return '<div class="tabs">' + "".join(tabs) + "".join(panels) + "</div>" + sig
+    scans = (scans_store or {}).get("scans") or {}
+    primary = (scans_store or {}).get("primary") or (store or {}).get("used")
+    out = []
+    for c in cards:
+        eid = c.get("id")
+        label = _html.escape(c.get("label", eid))
+        sc = scans.get(eid) or {}
+        if not c.get("connected"):
+            out.append(f'''<div class="exm exm-off">
+      <div class="exm-head"><i class="dot-bad"></i><strong>{label}</strong>
+        <span class="tag tag-bear">indisponibila</span></div>
+      <p class="exm-err">{_html.escape(str(c.get("error") or "motiv necunoscut"))[:200]}</p>
+    </div>''')
+            continue
+        trained = eid == primary
+        role = ('<span class="tag tag-learn">aici invata agentul</span>' if trained else
+                '<span class="tag tag-shadow">neantrenat</span>')
+        res = sc.get("results") or []
+        nl = sum(1 for r in res if r.get("direction") == "LONG")
+        props = ((proposals_by_ex or {}).get(eid) or {}).get("proposals") or {}
+        top = sorted(res, key=lambda r: -(r.get("score") or 0))[:3]
+        chips = "".join(
+            '<span class="exm-sig"><b>{}</b> <span class="badge badge-{}">{}</span> {}</span>'.format(
+                _html.escape(str(r["symbol"]).split("/")[0]),
+                "long" if r["direction"] == "LONG" else "short", r["direction"], r.get("score"))
+            for r in top)
+        miss = sc.get("missing") or []
+        meta = []
+        if miss:
+            meta.append("lipsesc: " + ", ".join(miss))
+        if sc.get("duration_s"):
+            meta.append(f"analiza {sc['duration_s']}s")
+        if sc.get("truncated"):
+            meta.append("trunchiata la limita de timp")
+        err = (f'<p class="exm-err">Analiza de acum a esuat: {_html.escape(str(sc["error"]))[:180]}</p>'
+               if sc.get("error") else "")
+        out.append(f'''<div class="exm{" exm-learn" if trained else ""}">
+      <div class="exm-head"><i class="dot-ok"></i><strong>{label}</strong>{role}
+        <a class="exm-link" href="{page_href(eid)}">Deschide modulul {label}</a></div>
+      <div class="exm-stats">{len(sc.get("resolved") or [])} token-uri &middot; {len(res)} cu semnal
+        ({nl} long, {len(res) - nl} short) &middot; {proposal_counts(props, trained)}</div>
+      <div class="exm-top">{chips}</div>
+      {err}<p class="dim exm-meta">{" &middot; ".join(meta)}</p>
+    </div>''')
+    return ('<div class="exm-grid">' + "".join(out) + "</div>"
+            '<p class="dim exm-foot">Fiecare bursa e analizata complet, cu acelasi nucleu. Agentul '
+            'invata doar de pe bursa activa: acelasi token are practic acelasi pret peste tot, iar '
+            'invatarea din mai multe burse ar numara fiecare rezultat de mai multe ori.</p>')

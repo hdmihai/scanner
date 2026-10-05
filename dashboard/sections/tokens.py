@@ -3,7 +3,112 @@
 
 
 
+import html as _html
+
 from dashboard.components import fmt_price, honest_probability, render_rich_chart, render_sparkline
+
+# Decizia agentului, in cuvinte. Pe bursa care invata, ISSUE inseamna plan emis;
+# pe celelalte, doar ce AR face agentul (propunere simulata, neantrenata).
+DECISION_TEXT = {
+    "POARTA_DEZACTIVATA": ("ok", "emis", "ar emite"),
+    "EXPLORARE": ("ok", "emis (explorare)", "ar emite (explorare)"),
+    "EXPLORARE_FILTRU": ("warn", "emis (explorare)", "ar emite (explorare)"),
+    "EXPLORARE_ELLIOTT": ("warn", "emis (explorare)", "ar emite (explorare)"),
+    "ASTEAPTA_CORECTIA": ("bad", "asteapta corectia", "ar astepta corectia"),
+    "FILTRU_AGENT": ("bad", "filtrat de agent", "ar filtra semnalul"),
+    "MOD_SIGURANTA": ("bad", "mod de siguranta", "ar refuza (mod de siguranta)"),
+}
+
+
+def token_anchor(sym):
+    """Ancora HTML a panoului unui token (BTC/USDT -> tok-BTC-USDT)."""
+    return "tok-" + "".join(ch if ch.isalnum() else "-" for ch in str(sym))
+
+
+def decision_label(prop, trained):
+    """(clasa, text) pentru decizia unei propuneri."""
+    if not prop:
+        return None, None
+    if prop.get("open_plan"):
+        return "info", "plan deschis"
+    mode = (prop.get("decision") or {}).get("mode") or ""
+    cls, done, would = DECISION_TEXT.get(mode, ("info", mode.lower() or "-", mode.lower() or "-"))
+    if not mode and (prop.get("decision") or {}).get("action") == "ISSUE":
+        cls, done, would = "ok", "emis", "ar emite"
+    return cls, (done if trained else would)
+
+
+def render_proposal(prop, trained=True, learn_label=None, ready=True):
+    """Propunerea de intrare a agentului pentru un token, la fel de detaliata pe
+    orice bursa: decizia, probabilitatea masurata si a agentului, verdictul
+    intrarilor comparabile, evidentele si conflictul Elliott.
+
+    Pe bursele care nu invata, totul e calculat la fel, dar decizia e SIMULATA:
+    agentul nu deschide plan si nu invata din ea (acelasi token are practic
+    acelasi pret pe toate bursele - invatarea ar numara fiecare rezultat de mai
+    multe ori)."""
+    if not prop:
+        if not ready:
+            return ('<p class="dim">Propunerile agentului apar dupa prima scanare cu modulele '
+                    'per bursa.</p>')
+        return ('<p class="dim">Fara propunere: semnalul nu e in topul pe directie al '
+                'acestei scanari (8 pe LONG, 8 pe SHORT).</p>')
+    if prop.get("open_plan"):
+        return ('<div class="prop-head prop-info"><strong>Plan deschis</strong> &middot; agentul '
+                'urmareste deja un plan pe acest token si directie - vezi istoricul de mai jos.</div>')
+    dec = prop.get("decision") or {}
+    cls, txt = decision_label(prop, trained)
+    who = ("" if trained else
+           f' <span class="tag tag-shadow">neantrenat</span>')
+    reason = _html.escape(str(dec.get("reason") or ""))
+    out = [f'<div class="prop-head prop-{cls}"><strong>{txt.capitalize()}</strong>{who}'
+           f'<div class="prop-why">{reason}</div></div>']
+    lp = prop.get("learning_open_plan")
+    if not trained and lp:
+        out.append(f'<p class="dim prop-note">Pe {learn_label or "bursa care invata"} agentul are deja '
+                   f'planul #{lp.get("id")} ({lp.get("symbol")}, {str(lp.get("state", "")).lower()}) '
+                   f'pe acest token si directie.</p>')
+    cal, agp = dec.get("calibrated_prob"), dec.get("agent_prob")
+    cells = []
+    cells.append('<div><span class="dim">PROBABILITATE MASURATA</span><br>{}</div>'.format(
+        f"{cal}%" if cal is not None else "necalibrat"))
+    cells.append('<div><span class="dim">AGENT{}</span><br>{}</div>'.format(
+        "" if (prop.get("agent") or {}).get("active") else " (SHADOW)",
+        f"{agp * 100:.1f}%" if isinstance(agp, (int, float)) else "-"))
+    lv = prop.get("levels") or {}
+    if lv.get("expected_r") is not None:
+        cells.append(f'<div><span class="dim">R LA TP2</span><br>{lv["expected_r"]}R</div>')
+    n = prop.get("neighbors") or {}
+    if n.get("verdict"):
+        cells.append(f'<div><span class="dim">COMPARABILE</span><br>{n["verdict"].lower()} '
+                     f'({n.get("win_rate")}% din {n.get("n")})</div>')
+    out.append('<div class="tok-meta prop-meta">' + "".join(cells) + "</div>")
+    ec = prop.get("elliott_conflict") or {}
+    if ec.get("bias") is not None and ec["bias"] <= -0.1:
+        nxt = ec.get("next_entry")
+        out.append('<div class="plan-conflict">Elliott contrazice directia ({}).{}</div>'.format(
+            _html.escape(str(ec.get("headline") or ec.get("text") or "structura curenta")),
+            f' Nivel urmarit pentru intrare: <strong>{fmt_price(nxt)}</strong>.' if nxt else ""))
+    f = prop.get("fusion") or {}
+    ev = prop.get("evidence") or []
+    if ev:
+        d = prop.get("direction")
+        rows = []
+        for e in ev:
+            ecls = "ok" if e.get("direction") == d else ("neu" if e.get("direction") == "NEUTRU" else "bad")
+            mark = {"ok": "sustine", "neu": "context", "bad": "contrazice"}[ecls]
+            rows.append('<div class="ev-row ev-{}"><span class="ev-mark">{}</span>'
+                        '<span class="ev-label">{}</span><span class="ev-bar"><i style="width:{}%">'
+                        '</i></span></div>'.format(ecls, mark, _html.escape(str(e.get("label", ""))),
+                                                   int(round((e.get("strength") or 0) * 100))))
+        head = ""
+        if f.get("score") is not None:
+            head = ('<div class="ev-fusion">Evidente: <strong>{}</strong> sustin, <strong>{}</strong> '
+                    'contrazic, {} context &middot; aliniere <strong>{}%</strong></div>').format(
+                        f.get("support"), f.get("oppose"), f.get("neutral"), f.get("score"))
+        out.append(head + '<details class="ev-more"><summary>Toate evidentele ({})</summary>'
+                   '<div class="ev-list">{}</div></details>'.format(len(ev), "".join(rows)))
+    return "".join(out)
 
 
 def render_elliott(ew):
@@ -231,10 +336,16 @@ def render_token_chart(sym, d, plans_by_symbol):
             f'preserveAspectRatio="xMidYMid meet">{"".join(body)}</svg>')
 
 
-def render_token_details(details, plans_store, watchlist=None):
+def render_token_details(details, plans_store, watchlist=None, proposals=None,
+                         trained=True, learn_label=None, proposals_ready=True):
     """Un panou pliabil per simbol scanat. Foloseste <details>/<summary> nativ:
     zero JavaScript, merge in orice browser, se deschide cu un tap pe telefon,
-    si ramane inchis implicit ca pagina sa nu devina grea."""
+    si ramane inchis implicit ca pagina sa nu devina grea.
+
+    Aceeasi functie deseneaza modulul ORICAREI burse: `proposals` sunt propunerile
+    agentului pe acea bursa, `trained` spune daca agentul invata de aici, iar
+    `learn_label` e bursa care invata (istoricul planurilor e al ei)."""
+    proposals = proposals or {}
     symbols = (details or {}).get("symbols") or {}
     if not symbols and not watchlist:
         return '<p class="dim">Detaliile apar dupa prima scanare cu semnale.</p>'
@@ -242,7 +353,10 @@ def render_token_details(details, plans_store, watchlist=None):
     # istoricul de planuri pe simbol, ca sa vezi ce a facut agentul pe fiecare
     by_symbol = {}
     for p in (plans_store or {}).get("plans", []):
-        by_symbol.setdefault(p["symbol"], []).append(p)
+        # pe bursele care nu invata, istoricul e al TOKEN-ului pe bursa care invata
+        # (perechea poate diferi: BTC/USD pe Kraken, BTC/USDT pe OKX)
+        key = p["symbol"] if trained else str(p["symbol"]).split("/")[0]
+        by_symbol.setdefault(key, []).append(p)
 
     blocks = []
     for sym, d in sorted(symbols.items(), key=lambda kv: -(kv[1].get("score") or 0)):
@@ -254,6 +368,11 @@ def render_token_details(details, plans_store, watchlist=None):
         macd = ind.get("macd") or {}
         plan = d.get("plan") or {}
         prob_txt, prob_note = honest_probability(d.get("score"), plans_store)
+        if not trained and learn_label and prob_txt != "-":
+            prob_note += f", calibrat pe {learn_label}"
+        prop = proposals.get(sym)
+        pcls, ptxt = decision_label(prop, trained)
+        prop_tag = f'<span class="tag tag-{pcls} tok-dec">{ptxt}</span>' if ptxt else ""
         # Grafic BOGAT pentru fiecare token cu semnal, nu doar pentru cel mai
         # bun candidat: aceleasi lumanari, niveluri, unde Elliott si lichiditate.
         # Cade inapoi pe graficul mic din sparkline daca lumanarile lipsesc -
@@ -326,9 +445,11 @@ def render_token_details(details, plans_store, watchlist=None):
           TP2 la {abs(plan["tp2"]-plan["entry"])/risk:.2f}R
         </div>'''
 
-        hist = by_symbol.get(sym, [])
+        hist = by_symbol.get(sym if trained else sym.split("/")[0], [])
         closed = [p for p in hist if p.get("realized_r") is not None]
         hist_html = '<p class="dim">Niciun plan inca pe acest simbol.</p>'
+        hist_title = ("Istoricul planurilor pe acest simbol" if trained else
+                      f"Istoricul planurilor pe {learn_label or 'bursa care invata'} (aici agentul nu invata)")
         if hist:
             tot = sum(p["realized_r"] for p in closed)
             wins = [p for p in closed if p["realized_r"] > 0]
@@ -353,10 +474,11 @@ def render_token_details(details, plans_store, watchlist=None):
             hist_html = f'<div class="dim" style="margin-bottom:6px;">{summary_h}</div>' \
                         f'<div class="liq-list">{rows_h}</div>'
 
-        blocks.append(f'''<details class="tok">
+        blocks.append(f'''<details class="tok" id="{token_anchor(sym)}">
       <summary>
         <span class="tok-sym">{sym}</span>
         <span class="badge badge-{dcls}">{direction}</span>
+        {prop_tag}
         <span class="tok-score">{d.get("score")}/100</span>
         <span class="tok-spark">{render_sparkline(d.get("sparkline"))}</span>
       </summary>
@@ -372,10 +494,11 @@ def render_token_details(details, plans_store, watchlist=None):
         <h4>Structura de piata</h4>{struct_html}
         <h4>Zone de lichidare</h4>{liq_html}
         <h4>Plan propus</h4>{plan_html}
+        <h4>Propunerea agentului</h4>{render_proposal(prop, trained, learn_label, proposals_ready)}
         <h4>Indicatori</h4>{ind_html}
         <div class="ema-line dim">{ema_html}</div>
         <h4>Componentele scorului</h4><div class="fib-list">{comp_html}</div>
-        <h4>Istoricul planurilor pe acest simbol</h4>{hist_html}
+        <h4>{hist_title}</h4>{hist_html}
       </div>
     </details>''')
 

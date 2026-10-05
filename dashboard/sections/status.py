@@ -1,8 +1,17 @@
 # -*- coding: utf-8 -*-
 """dashboard.sections.status - Auto-diagnosticul si proiectele similare."""
 
+import os
 
 
+
+
+
+def _self_repair_installed():
+    """Auto-repararea de cod exista doar daca modulul ei e in repo. Textul paginii
+    promitea patch-uri automate si dupa ce self_repair.py fusese sters (semnalat de
+    monitorul zilnic) - acum spune ce se intampla efectiv."""
+    return os.path.exists("self_repair.py") or os.path.isdir("selfrepair")
 
 
 def render_self_check(diag, repairs):
@@ -54,7 +63,10 @@ def render_self_check(diag, repairs):
                f'<div class="sc-tl">{chips}</div>' if chips else "")
             + '<p class="dim as-note">Agentul invata PONDERI din rezultate; logica de calcul o verifica '
               'aceste invariante la fiecare scanare. O eroare noua deschide automat un Issue, iar '
-              'auto-repararea propune un patch validat automat - merge-ul ramane al tau.</p>')
+              + ('auto-repararea propune un patch validat automat - merge-ul ramane al tau.</p>'
+                 if _self_repair_installed() else
+                 'atenuarile de mai sus se aplica automat; repararea codului e manuala (modulul de '
+                 'auto-reparare nu e instalat).</p>'))
 
 
 def render_similar_projects(token_meta, narrative, symbol=None, updated=None):

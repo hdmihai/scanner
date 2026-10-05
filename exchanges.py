@@ -25,6 +25,11 @@ si unul creat fara au vectori de caracteristici diferiti. Fara semnatura,
 agentul ar invata din amandoua ca si cum ar fi acelasi lucru - exact greseala
 pe care versionarea geometriei o previne la schimbarile de timeframe.
 
+ARHITECTURA
+-----------
+Implementarea per bursa e in adapters/exchanges/<bursa>.py (cate un modul per
+bursa); acest fisier pastreaza interfata folosita de scaner.
+
 CAPABILITATI
 ------------
   ohlcv             lumanari istorice - obligatoriu, toate bursele
@@ -35,39 +40,24 @@ CAPABILITATI
                     nefolosibile la scara noastra - declarat pentru corectitudine)
 """
 
-import time
+# Capabilitatile si registrul traiesc acum in adaptoarele per bursa
+# (adapters/exchanges/). Modulul acesta ramane fatada compatibila: scanerul si
+# celelalte module il folosesc la fel ca inainte.
+from adapters import exchanges as _adapters
+from adapters.exchanges.base import (ALL_CAPS, CAP_OHLCV, CAP_OPEN_INTEREST,  # noqa: F401
+                                     CAP_ORDERBOOK_HISTORY, CAP_ORDERBOOK_LIVE,
+                                     CAP_TRADES_LIVE)
 
-CAP_OHLCV = "ohlcv"
-CAP_ORDERBOOK_LIVE = "orderbook_live"
-CAP_TRADES_LIVE = "trades_live"
-CAP_ORDERBOOK_HISTORY = "orderbook_history"
-# Open interest curent (ccxt fetch_open_interest). Rafineaza harta de lichidari
-# scaland densitatile cu expunerea reala. NU e obligatoriu: harta se construieste
-# din profilul de volum si nivelurile de levier, iar deciziile se iau pe densitate
-# RELATIVA. Lipsa lui schimba magnitudinea, nu forma.
-CAP_OPEN_INTEREST = "open_interest"
+# Capabilitatile DECLARATE, construite din adaptoare - o singura sursa de adevar.
+REGISTRY = {a.id: {"label": a.label, "declared": list(a.declared)}
+            for a in _adapters.all_adapters()}
 
-ALL_CAPS = [CAP_OHLCV, CAP_ORDERBOOK_LIVE, CAP_TRADES_LIVE,
-            CAP_ORDERBOOK_HISTORY, CAP_OPEN_INTEREST]
+DEFAULT_ORDER = _adapters.ids()
 
-# Capabilitatile DECLARATE. Sunt un punct de plecare; `probe_exchange` le
-# verifica efectiv, pentru ca o bursa poate declara o metoda in ccxt si totusi
-# sa o blocheze pe IP-uri de cloud sau sa o limiteze pe regiune.
-REGISTRY = {
-    "okx":    {"label": "OKX",     "declared": [CAP_OHLCV, CAP_ORDERBOOK_LIVE, CAP_TRADES_LIVE, CAP_OPEN_INTEREST]},
-    "kucoin": {"label": "KuCoin",  "declared": [CAP_OHLCV, CAP_ORDERBOOK_LIVE, CAP_TRADES_LIVE, CAP_OPEN_INTEREST]},
-    "gate":   {"label": "Gate.io", "declared": [CAP_OHLCV, CAP_ORDERBOOK_LIVE, CAP_TRADES_LIVE, CAP_OPEN_INTEREST]},
-    "mexc":   {"label": "MEXC",    "declared": [CAP_OHLCV, CAP_ORDERBOOK_LIVE, CAP_TRADES_LIVE, CAP_OPEN_INTEREST]},
-    "kraken": {"label": "Kraken",  "declared": [CAP_OHLCV, CAP_ORDERBOOK_LIVE, CAP_TRADES_LIVE, CAP_OPEN_INTEREST]},
-    # Bybit publica arhive L2 gratuite la public.bybit.com. Declarat ca sa fie
-    # vizibil in dashboard, dar NEFOLOSIT: pentru 59 de simboluri pe 5 ani ar
-    # insemna zeci de mii de GB, adica sute de ore de descarcare.
-    "bybit":  {"label": "Bybit",   "declared": [CAP_OHLCV, CAP_ORDERBOOK_LIVE,
-                                                CAP_TRADES_LIVE, CAP_ORDERBOOK_HISTORY,
-                                                CAP_OPEN_INTEREST]},
-}
 
-DEFAULT_ORDER = ["okx", "kucoin", "gate", "mexc", "kraken", "bybit"]
+def adapter(exchange_id):
+    """Adaptorul bursei (modulul ei din adapters/exchanges/)."""
+    return _adapters.get(exchange_id)
 
 
 def probe_exchange(ccxt_mod, exchange_id, probe_symbol=None, timeout_note=""):
@@ -75,66 +65,9 @@ def probe_exchange(ccxt_mod, exchange_id, probe_symbol=None, timeout_note=""):
 
     Returneaza o fisa de stare folosita si de logica de scanare, si de dashboard.
     Nu arunca exceptii: o bursa care nu raspunde e o stare valida, nu o eroare.
+    Implementarea e in adaptorul bursei.
     """
-    info = REGISTRY.get(exchange_id, {"label": exchange_id, "declared": [CAP_OHLCV]})
-    card = {
-        "id": exchange_id, "label": info["label"],
-        "declared": list(info["declared"]),
-        "available": [], "connected": False, "markets": 0,
-        "error": None, "checked_at": time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime()),
-    }
-
-    cls = getattr(ccxt_mod, exchange_id, None)
-    if cls is None:
-        card["error"] = f"'{exchange_id}' nu exista in ccxt (redenumit sau eliminat)"
-        return card, None
-
-    try:
-        ex = cls({"enableRateLimit": True})
-        markets = ex.load_markets()
-    except Exception as exc:
-        card["error"] = str(exc)[:180]
-        return card, None
-
-    card["connected"] = True
-    card["markets"] = len(markets)
-    card["available"].append(CAP_OHLCV)
-
-    sym = probe_symbol
-    if not sym:
-        for cand in markets:
-            if cand.endswith("/USDT") and markets[cand].get("active", True):
-                sym = cand
-                break
-    if not sym:
-        card["error"] = "conectat, dar nicio pereche USDT activa"
-        return card, ex
-
-    if CAP_ORDERBOOK_LIVE in info["declared"]:
-        try:
-            ob = ex.fetch_order_book(sym, limit=20)
-            if ob and (ob.get("bids") or ob.get("asks")):
-                card["available"].append(CAP_ORDERBOOK_LIVE)
-        except Exception:
-            pass
-
-    if CAP_OPEN_INTEREST in info["declared"]:
-        try:
-            oi = ex.fetch_open_interest(sym)
-            if oi and (oi.get("openInterestAmount") or oi.get("openInterestValue")):
-                card["available"].append(CAP_OPEN_INTEREST)
-        except Exception:
-            pass
-
-    if CAP_TRADES_LIVE in info["declared"]:
-        try:
-            tr = ex.fetch_trades(sym, limit=50)
-            if tr and any(t.get("side") for t in tr):
-                card["available"].append(CAP_TRADES_LIVE)
-        except Exception:
-            pass
-
-    return card, ex
+    return adapter(exchange_id).probe(ccxt_mod, probe_symbol)
 
 
 def capability_signature(caps):

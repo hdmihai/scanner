@@ -235,3 +235,30 @@ def render_altseason(state, history):
                 'construieste; faza de mai jos e doar din metrici relative.</div>')
     return (head + reg + ladder + grid + analysis + render_altseason_history(state.get("history"))
             + cands + tl + note)
+
+
+def render_altseason_strip(state, full_href="../index.html#altseason"):
+    """Altseason pe scurt, afisat SUS pe fiecare pagina de bursa: faza si increderea,
+    regimul ciclului BTC, indicele, dominanta si pretul BTC, plus prospetimea
+    datelor. Modulul complet ramane separat, primul card de pe pagina principala -
+    asa pagina bursei incepe cu bursa, nu cu doua ecrane de altseason."""
+    if not state or not state.get("classification"):
+        return ('<p class="dim">Evaluarea altseason apare dupa prima scanare cu acces la '
+                'CoinGecko.</p>')
+    c, ind = state["classification"], state.get("indicators") or {}
+    ai, bd, bp = ind.get("alt_index_90d"), ind.get("btc_d"), ind.get("btc_price")
+    parts = []
+    if c.get("regime_name"):
+        parts.append(f'regim ciclu BTC: {c["regime_name"].lower()}')
+    if ai is not None:
+        parts.append(f"indice altseason {ai:.0f}/100")
+    if bd is not None:
+        parts.append(f"dominanta BTC {bd:.2f}%")
+    if bp is not None:
+        parts.append(f"BTC ${bp:,.0f}")
+    stale = (' <span class="tag tag-bear">date vechi</span>' if state.get("stale") else "")
+    return (f'<div class="as-strip"><div class="as-phase">FAZA {c["phase"]}</div>'
+            f'<div class="as-strip-t"><strong>{c["name"]}</strong> &middot; incredere '
+            f'{c.get("confidence", 0) * 100:.0f}%{stale}'
+            f'<div class="as-strip-m">{" &middot; ".join(parts)} &middot; evaluat {state.get("when") or "-"}</div></div>'
+            f'<a class="exm-link" href="{full_href}">Analiza completa</a></div>')

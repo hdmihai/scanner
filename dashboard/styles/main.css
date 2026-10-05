@@ -415,3 +415,85 @@ footer{margin-top:26px;color:var(--text-dim);font-size:11px;line-height:1.6;}
 .hl-tile.hl-ok{border-left-color:#089981;} .hl-tile.hl-warn{border-left-color:#E67E22;} .hl-tile.hl-err{border-left-color:#F23645;}
 .hl-t{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-dim);}
 .hl-d{font-size:10.5px;color:var(--text-dim);}
+
+/* ===== MODULELE PER BURSA (Etapa 1) =====
+   Navigarea comuna, rezumatele de pe pagina principala si pagina fiecarei burse.
+   Bursa care invata e marcata cu accentul amber al brandului; celelalte cu un
+   albastru discret: aceeasi analiza, doar fara invatare. */
+.nav{display:flex;flex-wrap:wrap;gap:6px;margin:-6px 0 16px;}
+.nav-i{font-size:12px;font-weight:600;color:var(--text-dim);text-decoration:none;padding:6px 11px;
+  border:1px solid var(--border);border-radius:7px;background:var(--panel);}
+.nav-i:hover,.nav-i:focus-visible{color:var(--text);border-color:var(--text-dim);outline:none;}
+.nav-on{color:var(--amber);border-color:var(--amber);}
+.nav-off{opacity:.55;text-decoration:line-through;}
+.tag-ok{background:rgba(52,211,153,.15);color:var(--bull);}
+.tag-bad{background:rgba(251,122,108,.15);color:var(--bear);}
+.tag-learn{background:rgba(230,180,80,.18);color:var(--amber);}
+.tag-shadow{background:#EEF4FF;color:#1E5AA8;}
+.exm-grid{display:grid;gap:10px;grid-template-columns:1fr;}
+@media(min-width:760px){.exm-grid{grid-template-columns:1fr 1fr;}}
+.exm{background:var(--panel-2);border-radius:9px;padding:12px 14px;border-left:3px solid #9DB7DA;}
+.exm-learn{border-left-color:var(--amber);}
+.exm-off{border-left-color:var(--bear);opacity:.85;}
+.exm-head{display:flex;flex-wrap:wrap;align-items:center;gap:8px;}
+.exm-head strong{font-size:15px;}
+.exm-link{margin-left:auto;font-size:12px;font-weight:600;color:var(--info);text-decoration:none;}
+.exm-link:hover,.exm-link:focus-visible{text-decoration:underline;outline:none;}
+.exm-stats{font-size:12.5px;margin-top:8px;line-height:1.5;}
+.exm-top{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.exm-sig{font-family:var(--font-mono);font-size:11.5px;background:var(--panel);border-radius:6px;padding:3px 7px;}
+.exm-sig .badge{font-size:10px;padding:1px 5px;}
+.exm-err{font-size:12px;color:var(--bear);margin:8px 0 0;}
+.exm-meta{margin:8px 0 0;text-transform:none;letter-spacing:0;}
+.exm-note,.exm-foot{text-transform:none;letter-spacing:0;font-size:12px;margin:10px 0 0;}
+.cap-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+.cap-chip{font-size:11px;padding:3px 8px;border-radius:5px;}
+.cap-ok{background:rgba(52,211,153,.13);color:var(--bull);}
+.cap-no{background:var(--panel-2);color:var(--text-dim);text-decoration:line-through;}
+.ex-role{font-size:13px;line-height:1.55;padding:10px 12px;border-radius:7px;background:#EEF4FF;color:#0B3B78;}
+.ex-role-learn{background:rgba(230,180,80,.13);color:#6B3B00;}
+.ex-role-off{background:#FDECEE;color:#8A1C27;}
+.ex-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:12px;font-size:13px;}
+@media(min-width:620px){.ex-stats{grid-template-columns:repeat(4,1fr);}}
+.ex-stats > div{background:var(--panel-2);border-radius:7px;padding:8px 10px;}
+.ex-stats .dim{text-transform:none;letter-spacing:0;}
+.prop-list{display:flex;flex-direction:column;gap:4px;}
+.prop-row{display:grid;grid-template-columns:110px 58px 32px minmax(0,1fr);gap:8px;align-items:center;
+  padding:7px 9px;border-radius:7px;background:var(--panel-2);color:var(--text);text-decoration:none;font-size:12.5px;}
+.prop-row:hover,.prop-row:focus-visible{background:#E9EEF5;outline:none;}
+.prop-row .tag{justify-self:start;}
+.prop-sym{font-family:var(--font-mono);font-weight:700;}
+.prop-score{font-family:var(--font-mono);color:var(--text-dim);}
+.prop-num{display:none;font-family:var(--font-mono);font-size:12px;}
+@media(min-width:720px){.prop-row{grid-template-columns:120px 62px 34px 150px 1fr 1fr;}.prop-num{display:block;}}
+.tok-list{background:var(--panel);}
+.tok-list > summary{cursor:pointer;font-weight:600;font-size:14px;padding:10px 12px;border-radius:8px;
+  background:var(--panel-2);list-style:none;}
+.tok-list > summary::-webkit-details-marker{display:none;}
+.tok-list > summary::before{content:"+";display:inline-block;width:16px;color:var(--amber);font-weight:700;}
+.tok-list[open] > summary::before{content:"-";}
+.tok-list-body{margin-top:10px;}
+.tok-dec{flex:none;}
+.tok-moved{font-size:13px;line-height:1.6;margin:0;}
+.tok-moved a,.exm-foot a{color:var(--info);}
+.prop-head{padding:9px 11px;border-radius:7px;font-size:13px;border-left:3px solid var(--border);background:var(--panel);}
+.prop-ok{border-left-color:var(--bull);}
+.prop-warn{border-left-color:#1E88E5;}
+.prop-bad{border-left-color:var(--bear);}
+.prop-info{border-left-color:var(--text-dim);}
+.prop-head .tag{margin-left:6px;vertical-align:middle;}
+.prop-why{font-size:12px;color:var(--text-dim);margin-top:4px;line-height:1.45;}
+.prop-note{text-transform:none;letter-spacing:0;font-size:12px;margin:8px 0 0;}
+.prop-meta{margin-top:10px;}
+.ev-more{margin-top:8px;}
+.ev-more > summary{cursor:pointer;font-size:12px;color:var(--info);}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto !important;}}
+.as-strip{display:flex;flex-wrap:wrap;align-items:center;gap:12px;}
+.as-strip .as-phase{flex:none;}
+.as-strip-t{flex:1 1 220px;font-size:14px;}
+.as-strip-m{font-size:12px;color:var(--text-dim);margin-top:4px;line-height:1.5;}
+.badge-bull{background:rgba(52,211,153,.15);color:var(--bull);}
+.badge-bear{background:rgba(251,122,108,.15);color:var(--bear);}
+.tok summary{flex-wrap:wrap;row-gap:6px;}
+.prop-row .tag,.tok-dec{white-space:nowrap;}
+@media(max-width:520px){.tok-body .plan-grid{grid-template-columns:repeat(2,1fr);}}

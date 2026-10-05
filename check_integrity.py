@@ -400,19 +400,98 @@ def check_signal_block_uses_own_series():
     Ichimoku, regimul, Elliott si lichiditatea combinau astfel maximele unui
     token cu inchiderile altuia (NEAR aparea "SUB NOR" desi era peste), iar
     agentul invata din caracteristici corupte. Compila si rula fara nicio eroare.
+
+    Blocul traieste acum in functia build_signal_context (folosita pe TOATE
+    bursele). Verificarea cauta functia; daca nu o gaseste, raporteaza - o garda
+    care nu mai gaseste ce verifica nu are voie sa treaca in tacere.
     """
     import re as _re
     src = read("crypto_ai_scanner.py") or ""
-    a = src.find('candles = ohlcv_cache.get(sig["symbol"])')
-    b = src.find("sig_evidence = ev_mod.build_evidence(", a)
-    if a < 0 or b < 0:
+    a = src.find("def build_signal_context(")
+    if a < 0:
+        problems.append("crypto_ai_scanner.py nu mai are build_signal_context - garda seriei proprii "
+                        "per semnal nu mai poate verifica blocul de evidente.")
         return
-    b = src.find("liqs=sig_liqs", b)
-    stray = _re.findall(r"(?<![\w.])closes(?![\w])", src[a:b])
+    b = src.find("\ndef ", a + 10)
+    body = src[a:b if b > 0 else len(src)]
+    doc_end = body.find('"""', body.find('"""') + 3) + 3
+    stray = _re.findall(r"(?<![\w.])(closes|highs|lows)(?![\w])", body[doc_end:])
     if stray:
         problems.append(
-            f"blocul de evidente per semnal foloseste `closes` ({len(stray)}x) in loc "
-            f"de `closes_s`: indicatorii s-ar calcula cu inchiderile altui token.")
+            f"build_signal_context foloseste {sorted(set(stray))} ({len(stray)}x) in loc de "
+            f"closes_s / highs_s / lows_s: indicatorii s-ar calcula cu seria altui token.")
+    if "book_levels" not in body[doc_end:]:
+        problems.append("build_signal_context nu mai primeste order book-ul propriu al semnalului "
+                        "(book_levels).")
+
+
+def check_exchange_adapters():
+    """Fiecare bursa din registru are modulul ei in adapters/exchanges/, cu acelasi id,
+    iar fatada exchanges.py declara exact capabilitatile adaptoarelor. Verificat prin
+    import real, intr-un proces separat - un modul urcat in fisierul gresit sau lipsa
+    ar opri altfel scanarea abia la rulare."""
+    import subprocess
+    probe = (
+        "import json, os, sys\n"
+        "sys.path.insert(0, os.getcwd())\n"
+        "import exchanges as E\n"
+        "from adapters import exchanges as A\n"
+        "out = {'ids': A.ids(), 'files': {}, 'reg': E.REGISTRY == {a.id: {'label': a.label, "
+        "'declared': list(a.declared)} for a in A.all_adapters()}, 'order': E.DEFAULT_ORDER == A.ids()}\n"
+        "for a in A.all_adapters():\n"
+        "    out['files'][a.id] = (type(a).__module__ == 'adapters.exchanges.' + a.id)\n"
+        "print(json.dumps(out))\n")
+    import json as _json
+    try:
+        r = subprocess.run([sys.executable, "-B", "-c", probe], cwd=ROOT, capture_output=True,
+                           text=True, timeout=60)
+    except Exception as exc:
+        problems.append(f"adaptoarele de bursa nu au putut fi verificate: {exc}")
+        return
+    if r.returncode != 0 or not (r.stdout or "").strip():
+        last = ((r.stderr or "").strip().splitlines() or ["eroare necunoscuta"])[-1]
+        problems.append(f"adaptoarele de bursa nu se pot importa ({last[:160]}) - scanarea ar esua "
+                        f"la pornire. Verifica fisierele din adapters/exchanges/.")
+        return
+    out = _json.loads(r.stdout.strip().splitlines()[-1])
+    for eid, ok in out["files"].items():
+        if not ok:
+            problems.append(f"adaptorul '{eid}' nu e definit in adapters/exchanges/{eid}.py")
+    if not out["reg"] or not out["order"]:
+        problems.append("exchanges.py nu mai reflecta registrul adaptoarelor (capabilitati sau ordine).")
+
+
+def check_package_identity():
+    """Ca check_file_identity, pentru modulele din pachete: documentatia unui modul
+    din dashboard/ sau adapters/ incepe cu numele lui complet (ex. `dashboard.page`).
+    Daca numeste ALT modul existent, continutul a fost urcat in fisierul gresit."""
+    import ast as _ast
+    import re as _re
+    for pkg in ("dashboard", "adapters"):
+        base = os.path.join(ROOT, pkg)
+        if not os.path.isdir(base):
+            continue
+        for dirpath, _dirs, files in os.walk(base):
+            for f in sorted(files):
+                if not f.endswith(".py"):
+                    continue
+                full = os.path.join(dirpath, f)
+                rel = os.path.relpath(full, ROOT)
+                mod = rel[:-3].replace(os.sep, ".")
+                if mod.endswith(".__init__"):
+                    mod = mod[: -len(".__init__")]
+                try:
+                    doc = _ast.get_docstring(_ast.parse(read(rel) or "")) or ""
+                except SyntaxError:
+                    continue
+                first = next((l.strip() for l in doc.splitlines() if l.strip()), "")
+                m = _re.match(r"^((?:dashboard|adapters)(?:\.[A-Za-z0-9_]+)+)\b", first)
+                if not m or m.group(1) == mod:
+                    continue
+                other = os.path.join(ROOT, *m.group(1).split(".")) + ".py"
+                if os.path.exists(other):
+                    problems.append(f"{rel} contine codul lui {m.group(1)} (documentatia lui incepe cu "
+                                    f"'{m.group(1)}') - continut urcat in fisierul gresit.")
 
 
 def check_family_preservation():
@@ -558,6 +637,8 @@ def main():
     check_family_preservation()
     check_feature_extension()
     check_signal_block_uses_own_series()
+    check_exchange_adapters()
+    check_package_identity()
     check_no_direct_plan_writes()
     check_compaction_step()
     check_file_identity()

@@ -10,14 +10,18 @@ from dashboard.config import ALTSEASON_FILE, ALTSEASON_HISTORY_FILE, DATA_DIR, T
 from dashboard.components import load_json, render_weight_bars
 from dashboard.sections.agent import render_agent_card, render_learning_curve
 from dashboard.sections.altseason import render_altseason
-from dashboard.sections.exchanges import render_exchange_tabs
+from dashboard.sections.exchanges import page_href, render_exchange_modules, render_nav
 from dashboard.sections.market import render_briefing, render_evidence, render_indicators, render_levels, render_liquidity, render_opportunity_rows
 from dashboard.sections.plan import elliott_outcome_stats, render_calibration, render_plan, render_plan_memory
 from dashboard.sections.health import render_health
 from dashboard.sections.status import render_self_check, render_similar_projects
-from dashboard.sections.tokens import render_token_details
 
 _STYLES = os.path.join(os.path.dirname(os.path.abspath(__file__)), "styles", "main.css")
+
+
+def css():
+    """CSS-ul complet al paginilor (refolosit si de paginile burselor)."""
+    return _css()
 
 
 def _css():
@@ -40,7 +44,7 @@ def _safe(name, fn, *a, **k):
 
 
 def build_html(scan, best, deep, chart, health, weights, session, token_meta, narrative, history, weights_history, agent_state, plans_store, briefing, details, exchanges_store,
-               exchange_scans=None):
+               exchange_scans=None, ex_proposals=None):
     _dec = (load_json(os.path.join(DATA_DIR, "decisions.json"), {}).get("decisions") or {})
     plan_html = _safe("render_plan", render_plan, best, deep, (plans_store or {}).get("calibration"),
                             _dec.get((best or {}).get("symbol")),
@@ -60,7 +64,16 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
     _all = (plans_store or {}).get("plans") or []
     _latest = max(_all, key=lambda p: p.get("id", 0)) if _all else None
     evidence_html = _safe("render_evidence", render_evidence, _latest)
-    exchanges_html = _safe("render_exchange_tabs", render_exchange_tabs, exchanges_store, exchange_scans)
+    exchanges_html = _safe("render_exchange_modules", render_exchange_modules, exchanges_store,
+                           exchange_scans, ex_proposals)
+    _cards = (exchanges_store or {}).get("exchanges") or []
+    nav_html = _safe("render_nav", render_nav, _cards)
+    # Detaliile per token traiesc acum in modulul fiecarei burse (docs/exchanges/).
+    tokens_html = ('<p class="tok-moved">Graficele detaliate si propunerile agentului pentru fiecare token '
+                   'sunt in modulul fiecarei burse: '
+                   + " &middot; ".join(f'<a href="{page_href(c.get("id"))}">{c.get("label", c.get("id"))}</a>'
+                                       for c in _cards if c.get("connected"))
+                   + ".</p>")
     evidence_symbol = (_latest or {}).get("symbol", "-")
     calibration_html = _safe("render_calibration", render_calibration, plans_store)
     indicators_html = _safe("render_indicators", render_indicators, deep)
@@ -69,14 +82,6 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
                         load_json(os.path.join(DATA_DIR, "self_check.json"), None),
                         load_json(ALTSEASON_FILE, None),
                         load_json(os.path.join(DATA_DIR, "runs.json"), None))
-    # Watchlist-ul cerut: din scanarea bursei principale, care stie si ce a
-    # gasit si ce lipseste. Asa panourile N/A reflecta ce s-a cerut efectiv,
-    # nu o lista fixata in dashboard care ar putea ramane in urma.
-    _pri = (exchange_scans or {}).get("primary")
-    _pscan = ((exchange_scans or {}).get("scans") or {}).get(_pri) or {}
-    watchlist = sorted({s_.split("/")[0] for s_ in (_pscan.get("resolved") or [])}
-                       | set(_pscan.get("missing") or []))
-    tokens_html = _safe("render_token_details", render_token_details, details, plans_store, watchlist)
     chart_svg = chart_render.render_components(chart, "main")
     weight_bars = _safe("render_weight_bars", render_weight_bars, weights)
     long_rows = _safe("render_opportunity_rows", render_opportunity_rows, scan.get("top_long", []))
@@ -103,14 +108,20 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
     <div class="brand">SCANLINE<small>AI market scanner &middot; self-learning</small></div>
     <div class="meta">{scan_time}<br>universe {universe}</div>
   </header>
+  {nav_html}
 
   <div class="card">
     <h2>Starea sistemului</h2>
     {health_html}
   </div>
 
+  <div class="card" id="altseason">
+    <h2>Altcoin season &middot; faza ciclului (date reale de piata)</h2>
+    {altseason_html}
+  </div>
+
   <div class="card">
-    <h2>Burse &middot; <span class="dim">capabilitati si stare</span></h2>
+    <h2>Burse &middot; <span class="dim">cate un modul per bursa</span></h2>
     {exchanges_html}
   </div>
 
@@ -149,7 +160,7 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
       </div>
 
       <div class="card">
-        <h2>Detalii per token &middot; <span class="dim">apasa pentru a deschide</span></h2>
+        <h2>Detalii per token</h2>
         {tokens_html}
       </div>
 
@@ -172,11 +183,6 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
       <div class="card">
         <h2>Auto-diagnostic &middot; auto-reparare agent</h2>
         {selfcheck_html}
-      </div>
-
-      <div class="card">
-        <h2>Altcoin season &middot; faza ciclului (date reale de piata)</h2>
-        {altseason_html}
       </div>
 
       <div class="card">
