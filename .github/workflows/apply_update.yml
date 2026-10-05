@@ -3,8 +3,10 @@ name: Aplica actualizare
 # LIVRAREA DINTR-UN SINGUR FISIER. Urci update.zip in radacina repo-ului (Add file
 # -> Upload files - merge si din browserul telefonului), iar acest workflow:
 #   1. despacheteaza arhiva DOAR in caile permise (module .py din radacina,
-#      dashboard/, selfrepair/, improve/, .github/workflows/*.yml, *.md) -
-#      niciodata in data/ sau docs/, niciodata in afara repo-ului
+#      dashboard/, selfrepair/, improve/, adapters/, core/, ports/, tests/,
+#      .github/workflows/*.yml, *.md) - niciodata in data/ sau docs/, niciodata
+#      in afara repo-ului. adapters/ = cate un modul per bursa (Etapa 1);
+#      core/, ports/ si tests/ = arhitectura hexagonala (Etapele 2 si 3)
 #   2. sterge fisierele listate in DELETE.txt din arhiva (aceleasi reguli)
 #   3. ruleaza garzile: check_py311.py (sintaxa 3.11, nume nedefinite) si
 #      check_integrity.py (coerenta, continut urcat in fisierul gresit)
@@ -65,7 +67,7 @@ jobs:
           python3 - "$zip" <<'PY'
           import os, re, sys, zipfile
           z = zipfile.ZipFile(sys.argv[1])
-          ok = re.compile(r"^([A-Za-z0-9_]+\.(py|md)|(dashboard|selfrepair|improve)/[A-Za-z0-9_./-]+"
+          ok = re.compile(r"^([A-Za-z0-9_]+\.(py|md)|(dashboard|selfrepair|improve|adapters|core|ports|tests)/[A-Za-z0-9_./-]+"
                           r"|\.github/workflows/[A-Za-z0-9_-]+\.ya?ml)$")
           def clean(n):
               n = n.replace("\\", "/")
@@ -109,7 +111,7 @@ jobs:
               with open(os.environ.get("GITHUB_STEP_SUMMARY", os.devnull), "a") as fh:
                   fh.write(msg + "\n")
           PY
-          if [ $? -ne 0 ]; then git checkout -- . ; git clean -fdq -- dashboard selfrepair improve .github ; exit 1; fi
+          if [ $? -ne 0 ]; then git checkout -- . ; git clean -fdq -- dashboard selfrepair improve adapters core ports tests .github ; exit 1; fi
           if python3 check_py311.py && python3 check_integrity.py; then
             git rm -q --cached "$zip" 2>/dev/null; rm -f "$zip"
             # tot repo-ul: workflow-ul nu atinge data/ sau docs/, iar caile care nu
@@ -131,6 +133,6 @@ jobs:
             echo "Actualizare aplicata si verificata: $(git show --stat --format= HEAD | tail -1)" | tee -a "$GITHUB_STEP_SUMMARY"
           else
             echo "Garzile au gasit probleme - NU aplic nimic; repo-ul ramane neschimbat (detalii mai sus in jurnal)." | tee -a "$GITHUB_STEP_SUMMARY"
-            git checkout -- . ; git clean -fdq -- dashboard selfrepair improve .github
+            git checkout -- . ; git clean -fdq -- dashboard selfrepair improve adapters core ports tests .github
             exit 1
           fi
