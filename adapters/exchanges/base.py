@@ -23,16 +23,9 @@ exceptie: o bursa care nu raspunde nu are voie sa opreasca scanarea.
 
 import time
 
-CAP_OHLCV = "ohlcv"
-CAP_ORDERBOOK_LIVE = "orderbook_live"
-CAP_TRADES_LIVE = "trades_live"
-CAP_ORDERBOOK_HISTORY = "orderbook_history"
-# Open interest curent (ccxt fetch_open_interest). Rafineaza harta de lichidari;
-# lipsa lui schimba magnitudinea, nu forma.
-CAP_OPEN_INTEREST = "open_interest"
-
-ALL_CAPS = [CAP_OHLCV, CAP_ORDERBOOK_LIVE, CAP_TRADES_LIVE,
-            CAP_ORDERBOOK_HISTORY, CAP_OPEN_INTEREST]
+# Vocabularul capabilitatilor e al portului (comun nucleului si adaptoarelor).
+from ports.market_data import (ALL_CAPS, CAP_OHLCV, CAP_OPEN_INTEREST,  # noqa: F401,E402
+                               CAP_ORDERBOOK_HISTORY, CAP_ORDERBOOK_LIVE, CAP_TRADES_LIVE)
 
 
 class ExchangeAdapter:

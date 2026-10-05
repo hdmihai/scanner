@@ -1,174 +1,34 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-ai_agent.py
-============
-Agent cu invatare ONLINE (incrementala): invata din fiecare semnal evaluat,
-unul cate unul, si devine mai bun pe masura ce se acumuleaza scanari.
+ai_agent.py - adaptorul de stocare al agentului, jobul de antrenare si fatada nucleului core/agent.py.
 
-Diferenta fata de ce exista deja in proiect:
-  - `evaluate_and_learn` din scanner ajusteaza 4 ponderi cu +/-5% - o
-    euristica, nu invatare din date.
-  - Agentul asta invata efectiv relatia (caracteristici -> rezultat) din
-    istoric, prin regresie logistica antrenata cu SGD. E model statistic
-    real, cu greutati invatate din date, nu setate de mine.
-
-CE INVATA
----------
-Intrari (deja calculate de scanner pentru fiecare semnal):
-  trend, momentum, volatility, volume, is_long, persistence
-Iesire: probabilitatea ca semnalul sa fie "hit" (pretul s-a miscat in
-directia prezisa cu cel putin hit_threshold_atr x ATR in lookahead_hours).
-
-MEMORIE IN CLOUD
-----------------
-Starea (greutatile invatate + statistici) se salveaza in
-data/agent_model.json, comis pe git la fiecare rulare de catre workflow.
-Asta E memoria in cloud: gratuita, versionata, si poti vedea literal in
-`git log` cum s-au schimbat greutatile in timp.
-
-EVALUARE CORECTA (prequential / test-then-train)
-------------------------------------------------
-Pentru fiecare exemplu nou: intai PREZICE (si notez daca a nimerit), abia
-apoi INVATA din el. Asa acuratetea raportata e onesta - masurata mereu pe
-date pe care modelul nu le vazuse inca. E standardul in invatarea online.
-
-MOD SHADOW
-----------
-Agentul NU influenteaza deciziile pana nu demonstreaza ca bate euristica
-existenta, pe minim MIN_SAMPLES_TO_ACTIVATE exemple. Pana atunci doar
-observa si isi masoara performanta. Nu vreau ca un model neantrenat sa
-strice semnalele care deja functioneaza.
-
-Ruleaza dupa scanner:
-    python3 crypto_ai_scanner.py && python3 ai_agent.py
+Modelul, caracteristicile, antrenarea si predictia sunt in nucleu, fara fisiere.
+Aici raman: citirea si scrierea modelului (agent_model.json), carantina citita din
+self_check.json, excluderile salvate, si antrenarea ca job (`python ai_agent.py`,
+pasul din scan.yml). Celelalte nume (ai_agent.predict_for_signal,
+ai_agent.comparable_entries, ...) se citesc si se scriu direct in nucleu - vezi
+adapters/compat.py.
 """
 
 import json
-import math
 import os
 
-import evidence as ev_mod
 import plan_tracker
+from adapters import compat
+from core import agent as _core
+from core import evidence as ev_mod
 
 DATA_DIR = "data"
+
+
 HISTORY_FILE = os.path.join(DATA_DIR, "scan_history.json")
+
+
 PLANS_FILE = os.path.join(DATA_DIR, "plans.json")
-# Legata de geometria planurilor: v2 intra la piata, v3 intra pe pullback.
-# Acelasi vector de caracteristici duce la rezultate diferite sub cele doua
-# sisteme, deci antrenarea pe amandoua ar invata media a doua functii diferite.
-# La schimbarea geometriei, agentul reporneste - costa exemplele acumulate, dar
-# oricum ramane in SHADOW pana la 300, deci pierderea e doar contabila.
-# Legata de GEOMETRIA curenta, care include timeframe-ul. Era fixa ("plans-v4"),
-# deci la trecerea de la 1h la 4h calibrarea se separa corect, dar agentul ramanea
-# antrenat pe greutatile invatate din celalalt sistem - prezicea folosind relatii
-# invatate pe miscari de 1h, aplicate unor planuri de 4h. Acum orice schimbare de
-# timeframe declanseaza automat resetul si reinvatarea din geometria potrivita.
-def current_source():
-    """Sursa se calculeaza la APEL, nu la import: geometria se stabileste abia
-    dupa sondarea bursei, iar o valoare fixata la import ar fi ramas in urma."""
-    # DOAR geometria, NU si versiunea de caracteristici. Adaugarea unei
-    # evidente noi nu schimba rezultatul planurilor deja inchise, deci nu e
-    # motiv sa arunc ce a invatat modelul. Caracteristicile noi se adauga cu
-    # greutate zero si se invata din planurile urmatoare.
-    # FAMILIA, nu semnatura exacta: scanerul (cu capabilitati) si agentul (proces
-    # separat, fara ele) calculau surse diferite - "v6-4h-obf" fata de
-    # "v6-4h-o" - deci nu vedeau aceleasi planuri.
-    return "plans-" + plan_tracker.GEOMETRY_FAMILY
 
 
-STATE_SOURCE = current_source()
-# Versiunea urcata odata cu adaugarea metricilor pentru date dezechilibrate
-# (AUC, prag de clasa majoritara, rata de predictii pozitive). Perechile
-# (predictie, rezultat) pe care se calculeaza se acumuleaza doar la invatare,
-# deci fara reset noile praguri n-ar avea pe ce lucra. Reinvatarea nu costa
-# nimic: agentul e oricum in SHADOW pana la 300 de exemple.
 MODEL_FILE = os.path.join(DATA_DIR, "agent_model.json")
 
-# Caracteristicile de baza plus EVIDENTELE orientate dupa directie.
-# `is_long` a fost SCOS intentionat: orientarea face fiecare evidenta sa spuna
-# "sustine sau contrazice planul", deci directia nu mai trebuie invatata separat.
-# Masurat inainte: greutatea `is_long` ajunsese -1.93 si domina tot restul -
-# modelul memorase regimul de piata, nu o relatie reala.
-BASE_FEATURES = ["trend", "momentum", "volatility", "volume", "persistence_n"]
-FEATURES = BASE_FEATURES + ev_mod.FEATURE_KEYS
-
-LEARNING_RATE = 0.05
-L2 = 1e-4
-MIN_SAMPLES_TO_ACTIVATE = 300   # sub atat, agentul ramane in mod shadow
-MIN_DAYS_TO_ACTIVATE = 21       # ...si trebuie sa acopere si destul timp calendaristic
-MIN_AUC = 0.55                  # sub atat, modelul nu ordoneaza mai bine decat hazardul
-# Cat de mult trebuie sa castige treimea de sus fata de toate semnalele, in R
-# per plan, ca filtrul sa merite. 0.05R e mic dar peste zgomot la sute de planuri.
-MIN_RANK_EDGE_R = 0.05
-AUC_WINDOW = 3000               # perechi (predictie, rezultat, R) pastrate pentru evaluare.
-                                # 500 era prea putin pentru a compara treimi de semnale:
-                                # ~167 pe treime, cu zgomot mare pe media R.
-RECENT_WINDOW = 200             # fereastra pentru acuratetea "recenta"
-CURVE_EVERY = 25                # la cate exemple salvez un punct pe curba
-
-# DE CE MIN_DAYS_TO_ACTIVATE, pe langa numarul de exemple:
-# Pe datele reale din acest proiect, 634 de exemple stranse in doar 41 de ore
-# au dat o acuratete aparenta de 76% - dar LONG avea 19.7% hit si SHORT 77.7%.
-# Piata pur si simplu scazuse in acea fereastra. Modelul invatase "prezice
-# SHORT" - memorare de regim, nu avantaj real, si s-ar intoarce complet la
-# prima inversare de trend. 634 de exemple din 41 de ore NU sunt 634 de
-# observatii independente. De aceea activarea cere si acoperire in timp
-# (mai multe regimuri de piata), si acuratete ECHILIBRATA, nu bruta.
-
-
-# ======================= MODEL: REGRESIE LOGISTICA ONLINE ==================
-
-class OnlineLogisticRegression:
-    """Regresie logistica antrenata cu SGD, un exemplu pe rand.
-
-    Implementata direct (~40 de linii) in loc de o librarie externa - vezi
-    nota din raspuns. Serializeaza in JSON curat, deci greutatile invatate
-    sunt lizibile si urmaribile in git diff, si nu adauga nicio dependinta
-    de instalat la fiecare rulare de GitHub Actions.
-    """
-
-    def __init__(self, lr=LEARNING_RATE, l2=L2):
-        self.lr = lr
-        self.l2 = l2
-        self.weights = {f: 0.0 for f in FEATURES}
-        self.bias = 0.0
-
-    @staticmethod
-    def _sigmoid(z):
-        # forma numeric stabila, evita overflow pe exponent mare
-        if z >= 0:
-            return 1.0 / (1.0 + math.exp(-z))
-        e = math.exp(z)
-        return e / (1.0 + e)
-
-    def predict_proba(self, x):
-        z = self.bias + sum(self.weights.get(f, 0.0) * x.get(f, 0.0) for f in FEATURES)
-        return self._sigmoid(z)
-
-    def learn_one(self, x, y):
-        """Un pas de SGD pe gradientul log-loss, cu regularizare L2."""
-        p = self.predict_proba(x)
-        error = p - y
-        for f in FEATURES:
-            grad = error * x.get(f, 0.0) + self.l2 * self.weights.get(f, 0.0)
-            self.weights[f] = self.weights.get(f, 0.0) - self.lr * grad
-        self.bias -= self.lr * error
-        return p
-
-    def to_dict(self):
-        return {"weights": {k: round(v, 6) for k, v in self.weights.items()},
-                "bias": round(self.bias, 6)}
-
-    @classmethod
-    def from_dict(cls, d):
-        m = cls()
-        m.weights = {f: float(d.get("weights", {}).get(f, 0.0)) for f in FEATURES}
-        m.bias = float(d.get("bias", 0.0))
-        return m
-
-
-# ============================ CARACTERISTICI ==============================
 
 _Q_CACHE = {"ts": 0, "set": set()}
 
@@ -188,55 +48,7 @@ def _quarantined():
     return _Q_CACHE["set"]
 
 
-# ---------------------------------------------------------------------------
-# DECALAJUL ANTRENARE-UTILIZARE si CONFIRMAREA LIVE.
-# Masurat in productie (55 de planuri live inchise): AUC-ul real al agentului pe
-# planurile LIVE era 0.459 - sub hazard - in timp ce dashboard-ul afisa 0.674,
-# din evaluarea dominata de backtest (>99% din exemple). Cauza principala: patru
-# evidente erau nenule in 93-100% din planurile live si in 0% din cele de
-# backtest - modelul invata pe date fara ele, apoi decidea live cu ele.
-
-# nu pot fi reconstruite istoric (order book, fluxul de tranzactii live)
-# persistence_n: numarul de scanari live consecutive - nu exista in backtest (masurat:
-# nenula in 83% din planurile live, 0% din cele 21.530 de backtest)
-LIVE_ONLY_FEATURES = {"ev_order_flow", "ev_book_imbalance", "persistence_n"}
-SKEW_PP = 40           # decalaj de prezenta live-backtest care exclude o caracteristica
-SKEW_MIN_LIVE = 30     # planuri live necesare pentru a masura decalajul
-LIVE_MIN = 100         # planuri live inchise necesare pentru a confirma ordonarea
-_X_CACHE = {"ts": 0, "set": set(LIVE_ONLY_FEATURES)}
-
-
-def feature_skew(plans):
-    """{caracteristica: (% nenul live, % nenul backtest)} pe planurile inchise.
-
-    Prezenta live se masoara doar pe planurile create DUPA prima aparitie a
-    caracteristicii in planurile live. Altfel, o evidenta noua parea "decalata":
-    ev_altseason era nenula in 20% din planurile live (11 din 55), desi in TOATE
-    cele 11 create dupa introducerea ei avea valoare - restul erau planuri mai
-    vechi decat ea. Fara minim SKEW_MIN_LIVE astfel de planuri, nu se trage nicio
-    concluzie (caracteristica ramane in model)."""
-    closed = [p for p in plans if p.get("realized_r") is not None and p.get("state") != "NO_ENTRY"]
-    live = [p for p in closed if p.get("source") != "backtest"][-300:]
-    bt = [p for p in closed if p.get("source") == "backtest"][-5000:]
-    if not live or not bt:
-        return {}
-    nz = lambda ps, k: round(100 * sum(1 for p in ps if abs((p.get("components") or {}).get(k) or 0) > 1e-9) / len(ps))
-    out = {}
-    for k in ev_mod.FEATURE_KEYS:
-        since = [p.get("created_time") or "" for p in live if k in (p.get("components") or {})]
-        if not since:
-            continue
-        first = min(since)
-        lk = [p for p in live if (p.get("created_time") or "") >= first]
-        bk = [p for p in bt if k in (p.get("components") or {})]
-        if len(lk) < SKEW_MIN_LIVE or not bk:
-            continue
-        out[k] = (nz(lk, k), nz(bk, k))
-    return out
-
-
-def skew_excluded(skew):
-    return sorted(LIVE_ONLY_FEATURES | {k for k, (pl, pb) in skew.items() if abs(pl - pb) >= SKEW_PP})
+_X_CACHE = {"ts": 0, "set": set(_core.LIVE_ONLY_FEATURES)}
 
 
 def excluded_features():
@@ -246,77 +58,12 @@ def excluded_features():
     if _t.time() - _X_CACHE["ts"] > 60:
         try:
             with open(MODEL_FILE) as f:
-                _X_CACHE["set"] = set(json.load(f).get("skew_excluded") or []) | LIVE_ONLY_FEATURES
+                _X_CACHE["set"] = set(json.load(f).get("skew_excluded") or []) | _core.LIVE_ONLY_FEATURES
         except Exception:
-            _X_CACHE["set"] = set(LIVE_ONLY_FEATURES)
+            _X_CACHE["set"] = set(_core.LIVE_ONLY_FEATURES)
         _X_CACHE["ts"] = _t.time()
     return _X_CACHE["set"]
 
-
-def live_ranking(plans, n_boot=1000):
-    """Ordonarea REALA pe planurile live: probabilitatea data de agent la momentul
-    deciziei, fata de rezultat. AUC cu interval de incredere bootstrap 95%."""
-    import random as _r
-    pairs = [((p.get("decision") or {}).get("agent_prob"), 1.0 if p["realized_r"] > 0 else 0.0, p["realized_r"])
-             for p in plans if p.get("source") != "backtest" and p.get("realized_r") is not None
-             and p.get("state") != "NO_ENTRY" and (p.get("decision") or {}).get("agent_prob") is not None]
-    out = {"n": len(pairs)}
-    if len(pairs) < 10:
-        return out
-    auc = auc_score(pairs)
-    if auc is None:
-        return out
-    rnd = _r.Random(0)
-    boots = sorted(a for a in (auc_score([rnd.choice(pairs) for _ in pairs]) for _ in range(n_boot)) if a is not None)
-    out.update(auc=round(auc, 3), ci_low=round(boots[int(0.025 * len(boots))], 3),
-               ci_high=round(boots[int(0.975 * len(boots)) - 1], 3),
-               avg_r=round(sum(r for *_, r in pairs) / len(pairs), 3))
-    return out
-
-
-def extract_features(result):
-    """Accepta atat un rezultat de scanare cat si un plan - planurile pastreaza
-    contextul de la momentul deschiderii sub alte nume de campuri."""
-    """Transforma un rezultat de scanare in vectorul de intrare al modelului.
-    Componentele sunt deja 0-1; persistenta o normalizez si o plafonez, ca sa
-    nu domine restul doar pentru ca e un numar mai mare."""
-    comp = result.get("components") or {}
-    feats = {
-        "trend": float(comp.get("trend", 0.0)),
-        "momentum": float(comp.get("momentum", 0.0)),
-        "volatility": float(comp.get("volatility", 0.0)),
-        "volume": float(comp.get("volume", 0.0)),
-        "persistence_n": min(float(
-            result.get("persistence", result.get("persistence_at_entry", 0)) or 0) / 10.0, 1.0),
-    }
-    # Evidentele: fie deja calculate si salvate pe plan, fie derivate din lista
-    # de evidente. Planurile vechi nu le au - primesc 0, ceea ce inseamna
-    # "evidenta absenta", nu "evidenta contra".
-    stored = {k: comp[k] for k in ev_mod.FEATURE_KEYS if k in comp}
-    if not stored and result.get("evidence"):
-        stored = ev_mod.evidence_features(result["evidence"], result.get("direction"))
-    for k in ev_mod.FEATURE_KEYS:
-        feats[k] = float(stored.get(k, 0.0))
-    # CARANTINA decisa de modulul selfrepair (data/self_check.json): o caracteristica al carei calcul a fost
-    # gasit incoerent valoreaza 0 - la antrenare SI la predictie, deci agentul
-    # nici nu invata din ea, nici nu decide pe baza ei, pana iese din carantina.
-    for f in _quarantined():
-        if f in feats:
-            feats[f] = 0.0
-    # DECALAJUL ANTRENARE-UTILIZARE: caracteristicile care nu exista (sau au alta
-    # distributie) in backtest valoreaza 0 - la antrenare si la predictie
-    for f in excluded_features():
-        if f in feats:
-            feats[f] = 0.0
-    return feats
-
-
-def heuristic_proba(result):
-    """Ce ar fi prezis sistemul euristic existent - baseline-ul de batut."""
-    return float(result.get("probability", 50.0)) / 100.0
-
-
-# ============================== PERSISTENTA ================================
 
 def load_json(path, default):
     if not os.path.exists(path):
@@ -339,465 +86,19 @@ def save_json(path, data):
     os.replace(tmp, path)
 
 
-def default_state():
-    return {
-        "model": OnlineLogisticRegression().to_dict(),
-        "samples_trained": 0,
-        "last_trained_scan_ts": 0.0,
-        "agent": {"correct": 0, "total": 0},
-        "baseline": {"correct": 0, "total": 0},
-        # defalcat pe directie - ca sa se vada daca modelul doar calareste
-        # un regim de piata (ex: numai shorturile castiga) in loc sa invete
-        "by_direction": {
-            "LONG": {"agent": 0, "baseline": 0, "total": 0},
-            "SHORT": {"agent": 0, "baseline": 0, "total": 0},
-        },
-        "first_scan_ts": 0.0,
-        "pairs": [],           # (probabilitate, rezultat) - pentru AUC si clasa majoritara
-        "recent": [],          # 1/0 pentru ultimele predictii ale agentului
-        "recent_baseline": [],
-        "curve": [],           # puncte pentru graficul learning curve
-        "status": "SHADOW",
-    }
-
-
-def auc_score(pairs):
-    """Aria sub curba ROC, calculata prin numararea perechilor concordante.
-
-    DE CE E NECESARA: pe date dezechilibrate, acuratetea insala. Cu 13.3% rata de
-    castig, un model care spune MEREU "pierde" obtine 86.7% acuratete fara sa fi
-    invatat nimic. Exact asta s-a intamplat: agentul nu prezicea castig in niciun
-    caz, iar acuratetea lui (83.3%) era chiar SUB regula triviala. AUC masoara
-    altceva - daca modelul ORDONEAZA corect: 0.5 = hazard, 1.0 = separare perfecta.
-    """
-    pos = [p for p, y, *_ in pairs if y == 1.0]
-    neg = [p for p, y, *_ in pairs if y == 0.0]
-    if not pos or not neg:
-        return None
-    concordant = 0.0
-    for a_ in pos:
-        for b_ in neg:
-            concordant += 1.0 if a_ > b_ else (0.5 if a_ == b_ else 0.0)
-    return concordant / (len(pos) * len(neg))
-
-
-def ranking_edge(pairs, frac=1/3, min_top=100):
-    """Cat castigi urmand agentul, fata de a lua toate semnalele.
-
-    Aceasta e intrebarea care conteaza pentru tranzactionare. Sortez exemplele
-    dupa probabilitatea agentului si compar R-ul mediu al treimii de sus cu
-    R-ul mediu al tuturor. Daca treimea de sus da mai mult, agentul ORDONEAZA
-    util - exact ce poate face un model antrenat pe date dezechilibrate.
-
-    Evaluarea e prequentiala: fiecare predictie a fost facuta INAINTE ca
-    modelul sa invete din acel exemplu, deci e in afara esantionului.
-
-    Returneaza (r_top, r_toate, n_top, prag) sau None fara date suficiente.
-    `prag` e probabilitatea agentului la limita treimii - folosita ca filtru.
-    """
-    rated = [pp for pp in pairs if len(pp) >= 3]
-    if len(rated) < min_top * 3:
-        return None
-    ordered = sorted(rated, key=lambda pp: -pp[0])
-    k = max(1, int(len(ordered) * frac))
-    top = ordered[:k]
-    r_top = sum(pp[2] for pp in top) / len(top)
-    r_all = sum(pp[2] for pp in rated) / len(rated)
-    # pragul de jos: sub el sunt cele mai slab ordonate semnale
-    bottom_cut = ordered[len(ordered) - k][0]
-    return round(r_top, 4), round(r_all, 4), len(top), round(bottom_cut, 5)
-
-
-def majority_class_accuracy(pairs):
-    """Acuratetea pe care o obtii prezicand mereu clasa majoritara. E pragul REAL
-    pe care un model trebuie sa-l depaseasca; formula veche nu era suficienta."""
-    if not pairs:
-        return None
-    ones = sum(1 for _, y, *_ in pairs if y == 1.0)
-    return 100 * max(ones, len(pairs) - ones) / len(pairs)
-
-
-def predicted_positive_rate(pairs):
-    """Cat de des prezice modelul 'castig'. Aproape de 0 sau 1 = model degenerat."""
-    if not pairs:
-        return None
-    return 100 * sum(1 for p, *_ in pairs if p >= 0.5) / len(pairs)
-
-
-def balanced_accuracy(by_direction, which, min_per_direction=30):
-    """Media acuratetii pe LONG si pe SHORT, nu acuratetea bruta.
-    Un model care prezice mereu SHORT intr-o piata in scadere are acuratete
-    bruta mare, dar acuratete echilibrata ~50% - exact ce vreau sa expun.
-
-    Returneaza (valoare, directii_incluse). Daca o directie nu are destule
-    exemple e exclusa - dar atunci rezultatul NU mai e echilibrat, si apelantul
-    trebuie sa stie asta. Inainte se raporta valoarea unei singure directii sub
-    eticheta "echilibrat", ceea ce era inselator."""
-    accs, used = [], []
-    for d in ("LONG", "SHORT"):
-        stats = by_direction.get(d, {})
-        if stats.get("total", 0) >= min_per_direction:
-            accs.append(stats[which] / stats["total"])
-            used.append(d)
-    if not accs:
-        return None, []
-    return 100 * sum(accs) / len(accs), used
-
-
-def days_covered(state, plans=None):
-    """Acoperirea calendaristica reala a datelor din care a invatat agentul.
-
-    BUG FIX: `first` se lua din starea salvata si nu cobora niciodata. Dupa ce
-    au fost adaugate 5510 planuri de backtest, vechi de pana la 180 de zile,
-    acoperirea raportata a ramas 7.8 zile - valoarea fixata la prima rulare
-    live. Agentul era blocat pe nedrept sub pragul de 21 de zile, desi avea
-    172 de zile de date. Acum se ia MINIMUL peste tot ce exista, nu prima
-    valoare intalnita.
-    """
-    candidates_first = [t for t in [state.get("first_scan_ts")] if t]
-    candidates_last = [t for t in [state.get("last_event_ts")] if t]
-    if plans:
-        candidates_first += [p["created_ts"] for p in plans if p.get("created_ts")]
-        candidates_last += [p["closed_ts"] for p in plans if p.get("closed_ts")]
-    if not candidates_first or not candidates_last:
-        return 0.0
-    first, last = min(candidates_first), max(candidates_last)
-    return (last - first) / 86400 if last > first else 0.0
-
-
 def load_agent():
     """Folosita si de scanner ca sa obtina predictii, fara sa reantreneze."""
-    state = load_json(MODEL_FILE, default_state())
-    model = OnlineLogisticRegression.from_dict(state.get("model", {}))
+    state = load_json(MODEL_FILE, _core.default_state())
+    model = _core.OnlineLogisticRegression.from_dict(state.get("model", {}))
     return model, state
-
-
-def agent_is_active(state, plans=None):
-    """Agentul influenteaza deciziile doar daca trece TOATE conditiile:
-      1. a vazut destule exemple
-      2. acopera destule zile (mai multe regimuri de piata, nu doar unul)
-      3. bate euristica la acuratete ECHILIBRATA (media pe LONG si SHORT)
-    Returneaza (activ, motiv) - motivul e afisat in dashboard."""
-    # CONFIRMAREA LIVE, inaintea oricarei alte conditii: filtrul se aplica pe
-    # semnale live, deci trebuie sa ordoneze bine LIVE - nu doar pe backtest.
-    lv = live_ranking(plans or [])
-    state["live"] = lv
-    if lv.get("n", 0) < LIVE_MIN:
-        return False, (f"ordonarea pe planurile LIVE nu e inca confirmata: {lv.get('n', 0)}/{LIVE_MIN} planuri "
-                       f"live evaluate" + (f" (AUC live {lv['auc']:.3f} pana acum)" if lv.get("auc") is not None else "")
-                       + " - agentul invata, dar nu filtreaza")
-    if lv.get("ci_low") is None or lv["ci_low"] <= 0.5:
-        return False, (f"AUC live {lv.get('auc')} (IC95 {lv.get('ci_low')}-{lv.get('ci_high')}) pe {lv['n']} planuri "
-                       f"live nu e peste hazard - filtrul nu se aplica")
-    a = state.get("agent", {})
-    if a.get("total", 0) < MIN_SAMPLES_TO_ACTIVATE:
-        return False, f"are nevoie de {MIN_SAMPLES_TO_ACTIVATE} exemple (are {a.get('total', 0)})"
-
-    days = days_covered(state, plans or [])
-    if days < MIN_DAYS_TO_ACTIVATE:
-        return False, (f"acopera doar {days:.1f} zile din {MIN_DAYS_TO_ACTIVATE} necesare "
-                       f"(prea putine regimuri de piata)")
-
-    bd = state.get("by_direction", {})
-    bal_agent, used_a = balanced_accuracy(bd, "agent")
-    bal_base, used_b = balanced_accuracy(bd, "baseline")
-    if bal_agent is None or bal_base is None or len(used_a) < 2:
-        return False, ("inca nu am destule exemple pe AMBELE directii "
-                       f"(am: {', '.join(used_a) if used_a else 'niciuna'})")
-
-    # PRAGURI PENTRU DATE DEZECHILIBRATE. Fara ele, un model care spune mereu
-    # "pierde" pare excelent: la 13.3% rata de castig obtine 86.7% acuratete.
-    # Exact asta se intampla - agentul nu prezicea castig in niciun caz.
-    pairs = state.get("pairs") or []
-    # CRITERIUL DE UTILITATE, inlocuind "acuratete peste clasa majoritara".
-    #
-    # DE CE AM SCHIMBAT: acuratetea la pragul 0.5 e metrica gresita pentru
-    # tranzactionare pe date dezechilibrate. Cu ~32% castiguri, regula "prezice
-    # mereu pierdere" nimereste ~68-73% - iar un model care ORDONEAZA bine
-    # semnalele aproape niciodata nu o bate la pragul 0.5, fiindca nu prezice
-    # "castig" decat rar. Masurat in productie: AUC 0.680, adica ordonare clar
-    # peste scorul brut (0.537), dar blocat de acuratete 72.1% vs 72.6%.
-    # Un filtru util era refuzat pentru o metrica irelevanta.
-    #
-    # Intrebarea care conteaza: daca iau doar semnalele pe care agentul le pune
-    # sus, castig mai mult decat daca le iau pe toate? Asta masoara direct
-    # ranking_edge, pe evaluare prequentiala (in afara esantionului).
-    edge = ranking_edge(pairs)
-    if edge is None:
-        rated = sum(1 for pp in pairs if len(pp) >= 3)
-        return False, (f"inca nu am destule exemple cu R masurat pentru a evalua "
-                       f"utilitatea filtrului ({rated}, necesare 300)")
-    r_top, r_all, n_top, _cut = edge
-    if r_top - r_all < MIN_RANK_EDGE_R:
-        return False, (f"treimea de sus a agentului da {r_top:+.3f}R vs {r_all:+.3f}R "
-                       f"pe toate - avantaj {r_top - r_all:+.3f}R, sub pragul de "
-                       f"{MIN_RANK_EDGE_R:+.2f}R. Filtrul nu adauga destula valoare.")
-
-    ppr = predicted_positive_rate(pairs)
-    if ppr is not None and (ppr < 5 or ppr > 95):
-        return False, (f"model degenerat: prezice 'castig' in {ppr:.0f}% din cazuri "
-                       f"- nu discrimineaza, doar reproduce clasa dominanta")
-
-    auc = auc_score(pairs)
-    if auc is None:
-        return False, "inca nu am ambele clase (castig si pierdere) in fereastra"
-    if auc < MIN_AUC:
-        return False, (f"AUC {auc:.3f} sub pragul {MIN_AUC} - modelul nu ordoneaza "
-                       f"semnalele mai bine decat hazardul (0.5)")
-    if bal_agent <= bal_base:
-        return False, (f"acuratete echilibrata {bal_agent:.1f}% nu bate inca "
-                       f"euristica ({bal_base:.1f}%)")
-    # MOTIVUL AFISAT spune ce a masurat de fapt poarta. Varianta veche,
-    # "acuratete echilibrata 69.6% vs euristica 33.4%", compara cu formula
-    # min(50 + 0.35*scor, 88)% - care e MEREU >= 50%, deci prezice mereu
-    # "castig" si nimereste exact rata de castig (~33%). Pragul trivial real e
-    # clasa majoritara ("mereu pierdere", ~67%), iar dovada utilitatii e
-    # ordonarea (AUC fata de scorul brut) si R-ul treimii de sus.
-    auc_sc = auc_score(state.get("score_pairs") or [])
-    maj = majority_class_accuracy(pairs)
-    # acuratetea agentului pe ACELEASI exemple ca pragul majoritar (fereastra
-    # `pairs`), nu pe tot istoricul - altfel s-ar compara numitori diferiti
-    acc_w = (100 * sum(1 for pp in pairs if (pp[0] >= 0.5) == (pp[1] == 1.0)) / len(pairs)
-             if pairs else None)
-    return True, (f"ordoneaza mai bine decat scorul brut: AUC {auc:.3f} vs {auc_sc:.3f}"
-                  if auc_sc is not None else f"AUC {auc:.3f}") + (
-                  f"; treimea de sus {r_top:+.3f}R vs toate {r_all:+.3f}R (prequential)"
-                  f"; acuratete {acc_w:.1f}% vs {maj:.1f}% prezicand mereu pierdere "
-                  f"(ultimele {len(pairs)} exemple)"
-                  if maj is not None and acc_w is not None else "")
-
-
-# ============================== ANTRENARE =================================
-
-def train_from_plans(plans, model, state):
-    """Invata din PLANURI INCHISE, nu din campul `outcome` al scanarilor.
-
-    DE CE AM SCHIMBAT SEMNALUL DE INVATARE:
-    `outcome` (hit/miss) compara pretul de intrare cu pretul dintr-un singur
-    moment, la 24h. Nu spune daca tranzactia a functionat - un semnal care a
-    atins TP si apoi a revenit conta "miss", iar unul care a trecut prin SL si
-    si-a revenit conta "hit". Agentul e chemat sa decida daca merita deschis un
-    plan, deci trebuie sa invete exact din ce inseamna "planul a mers": R
-    realizat, masurat bara cu bara.
-
-    Consecinta onesta: contorul de exemple reporneste de la zero cand se
-    schimba sursa de semnal. Datele vechi masurau altceva; amestecarea lor ar
-    fi produs un model antrenat pe doua definitii diferite ale succesului.
-
-    Fiecare plan e invatat exact o data (marcat cu `agent_trained`).
-
-    BUG FIX 1: filtrul era scris hardcodat "v2". Cand geometria a trecut la v3,
-    agentul a continuat sa invete din planurile VECHI si sa le ignore pe cele
-    curente - exact pe dos. Acum se leaga de plan_tracker.GEOMETRY_VERSION.
-
-    BUG FIX 2: planurile NO_ENTRY (pretul nu a revenit la zona de intrare) sunt
-    excluse complet. Au realized_r = 0.0, iar regula `y = 1 daca r > 0` le
-    transforma in exemple NEGATIVE - agentul invata ca acele configuratii esueaza,
-    cand de fapt nicio tranzactie nu a avut loc. E o eticheta falsa, nu un rezultat.
-    """
-    closed = [p for p in plans
-              if p.get("realized_r") is not None and not p.get("agent_trained")
-              and plan_tracker.same_family(p.get("geometry", "v1"))
-              and p.get("state") != plan_tracker.STATE_NO_ENTRY]
-    closed.sort(key=lambda p: p.get("closed_ts") or 0)
-
-    new_samples = 0
-    for p in closed:
-        y = 1.0 if p["realized_r"] > 0 else 0.0
-        x = extract_features(p)
-
-        # 1) INTAI prezic (pe date nevazute) - acuratete onesta
-        p_agent = model.predict_proba(x)
-        # baseline: formula pe care o afisa sistemul inainte de calibrare
-        score = p.get("score_at_entry") or 0
-        p_base = min(50 + score * 0.35, 88) / 100.0
-
-        agent_ok = 1 if (p_agent >= 0.5) == (y == 1.0) else 0
-        base_ok = 1 if (p_base >= 0.5) == (y == 1.0) else 0
-
-        state["agent"]["correct"] += agent_ok
-        state["agent"]["total"] += 1
-        state["baseline"]["correct"] += base_ok
-        state["baseline"]["total"] += 1
-
-        d = p.get("direction")
-        if d in state["by_direction"]:
-            state["by_direction"][d]["agent"] += agent_ok
-            state["by_direction"][d]["baseline"] += base_ok
-            state["by_direction"][d]["total"] += 1
-
-        # R-ul realizat intra in evaluare alaturi de eticheta. Eticheta binara
-        # (castig/pierdere) arunca marimea: un +24R si un +0.1R arata la fel.
-        # Pentru tranzactionare conteaza cat castigi, nu doar daca castigi.
-        state["pairs"] = (state.get("pairs", []) +
-                          [[round(p_agent, 5), y, round(p["realized_r"], 3)]])[-AUC_WINDOW:]
-        # perechi paralele pentru SCORUL brut, ca sa pot compara ordonarea:
-        # nu e de-ajuns ca agentul sa bata hazardul, trebuie sa bata euristica
-        # pe care ar urma sa o inlocuiasca.
-        state["score_pairs"] = (state.get("score_pairs", []) +
-                                [[round((score or 0) / 100.0, 5), y]])[-AUC_WINDOW:]
-        state["recent"] = (state.get("recent", []) + [agent_ok])[-RECENT_WINDOW:]
-        state["recent_baseline"] = (state.get("recent_baseline", []) + [base_ok])[-RECENT_WINDOW:]
-
-        # 2) ABIA APOI invat din el
-        model.learn_one(x, y)
-        p["agent_trained"] = True
-        new_samples += 1
-
-        total = state["agent"]["total"]
-        if total % CURVE_EVERY == 0:
-            state["curve"].append({
-                "n": total,
-                "agent": round(100 * state["agent"]["correct"] / total, 2),
-                "baseline": round(100 * state["baseline"]["correct"] / state["baseline"]["total"], 2),
-                "agent_recent": round(100 * sum(state["recent"]) / len(state["recent"]), 2),
-            })
-
-    if closed:
-        first = min((p.get("created_ts") or 0) for p in plans if p.get("created_ts"))
-        last = max((p.get("closed_ts") or 0) for p in plans if p.get("closed_ts"))
-        prev_first = state.get("first_scan_ts")
-        state["first_scan_ts"] = min(prev_first, first) if prev_first else first
-        state["last_event_ts"] = last
-
-    state["samples_trained"] = state.get("samples_trained", 0) + new_samples
-    return new_samples
-
-
-def comparable_entries(features, closed_plans, k=60, min_n=20):
-    """Verdictul planurilor COMPARABILE - mecanismul "favors X from N comparable
-    completed entries" din sistemul de referinta.
-
-    Cauta cele mai apropiate k planuri INCHISE in spatiul caracteristicilor si
-    se uita la ce au facut. E o a doua sursa de invatare, independenta de
-    regresia logistica si complementara ei: modelul liniar invata o relatie
-    globala, vecinii surprind tipare locale pe care o dreapta nu le poate prinde.
-
-    Si, spre deosebire de greutatile modelului, verdictul e VERIFICABIL: poti
-    arata exact din cate intrari comparabile provine.
-    """
-    pool = []
-    for p in closed_plans:
-        if p.get("realized_r") is None:
-            continue
-        f = extract_features(p)
-        d = sum((f.get(key, 0.0) - features.get(key, 0.0)) ** 2 for key in FEATURES)
-        pool.append((d, p["realized_r"]))
-    if len(pool) < min_n:
-        return {"n": len(pool), "verdict": None,
-                "reason": f"doar {len(pool)} intrari comparabile (prag {min_n})"}
-
-    pool.sort(key=lambda t: t[0])
-    near = pool[:k]
-    rs = [r for _, r in near]
-    wins = sum(1 for r in rs if r > 0)
-    avg_r = sum(rs) / len(rs)
-    base = [r for _, r in pool]
-    base_avg = sum(base) / len(base)
-    # "puncte" = cu cat e mai bun grupul apropiat fata de media generala,
-    # exprimat pe o scala 0-100 ca sa fie citibil
-    points = round(100 * (avg_r - base_avg), 1)
-    return {
-        "n": len(near), "pool": len(pool),
-        "win_rate": round(100 * wins / len(near), 1),
-        "avg_r": round(avg_r, 4), "base_avg_r": round(base_avg, 4),
-        "points": points,
-        "verdict": "FAVORABIL" if points > 0 else ("NEFAVORABIL" if points < 0 else "NEUTRU"),
-        "reason": (f"intrarile comparabile inclina {'favorabil' if points > 0 else 'nefavorabil'} "
-                   f"cu {abs(points):.1f} puncte, din {len(near)} intrari similare inchise"),
-    }
-
-
-def predict_for_signal(model, state, signal):
-    """Probabilitatea agentului pentru un semnal nou, plus daca are voie sa
-    influenteze decizia (doar cand e ACTIVE)."""
-    x = extract_features(signal)
-    return {
-        "probability": round(model.predict_proba(x), 4),
-        "active": state.get("status") == "ACTIVE",
-        # Agentul influenteaza EV doar daca ordoneaza mai bine decat scorul brut.
-        "superior": bool(state.get("agent_superior")),
-        # Pragul treimii de jos: semnalele sub el sunt cele mai slab ordonate.
-        # decide() il foloseste ca FILTRU, nu probabilitatea bruta.
-        "rank_cut": (ranking_edge(state.get("pairs") or []) or (None,) * 4)[3],
-    }
-
-
-def train_incremental(history, model, state):
-    """Parcurge doar scanarile netreantrenate inca, in ordine cronologica.
-    Fiecare exemplu e folosit exact o data - altfel modelul ar vedea aceleasi
-    date de zeci de ori si s-ar supraantrena pe ele."""
-    last_ts = state.get("last_trained_scan_ts", 0.0)
-    new_samples = 0
-    max_ts = last_ts
-
-    for scan in sorted(history, key=lambda s: s.get("scan_id_ts", 0)):
-        ts = scan.get("scan_id_ts", 0)
-        if ts <= last_ts:
-            continue
-        for r in scan.get("results", []):
-            outcome = r.get("outcome")
-            if outcome not in ("hit", "miss"):
-                continue  # inca neevaluat - nu am eticheta, deci nu pot invata
-            y = 1.0 if outcome == "hit" else 0.0
-            x = extract_features(r)
-
-            # 1) INTAI prezic (pe date nevazute) - asta da acuratetea onesta
-            p_agent = model.predict_proba(x)
-            p_base = heuristic_proba(r)
-            agent_ok = 1 if (p_agent >= 0.5) == (y == 1.0) else 0
-            base_ok = 1 if (p_base >= 0.5) == (y == 1.0) else 0
-
-            state["agent"]["correct"] += agent_ok
-            state["agent"]["total"] += 1
-            state["baseline"]["correct"] += base_ok
-            state["baseline"]["total"] += 1
-
-            d = r.get("direction")
-            if d in state["by_direction"]:
-                state["by_direction"][d]["agent"] += agent_ok
-                state["by_direction"][d]["baseline"] += base_ok
-                state["by_direction"][d]["total"] += 1
-
-            state["pairs"] = (state.get("pairs", []) + [[round(p_agent, 5), y]])[-AUC_WINDOW:]
-            state["recent"] = (state.get("recent", []) + [agent_ok])[-RECENT_WINDOW:]
-            state["recent_baseline"] = (state.get("recent_baseline", []) + [base_ok])[-RECENT_WINDOW:]
-
-            # 2) ABIA APOI invat din el
-            model.learn_one(x, y)
-            new_samples += 1
-
-            total = state["agent"]["total"]
-            if total % CURVE_EVERY == 0:
-                state["curve"].append({
-                    "n": total,
-                    "agent": round(100 * state["agent"]["correct"] / total, 2),
-                    "baseline": round(100 * state["baseline"]["correct"] / state["baseline"]["total"], 2),
-                    "agent_recent": round(100 * sum(state["recent"]) / len(state["recent"]), 2),
-                })
-
-        max_ts = max(max_ts, ts)
-
-    state["last_trained_scan_ts"] = max_ts
-    state["samples_trained"] = state.get("samples_trained", 0) + new_samples
-    return new_samples
-
-
-def summarize(state):
-    a, b = state["agent"], state["baseline"]
-    acc_agent = 100 * a["correct"] / a["total"] if a["total"] else None
-    acc_base = 100 * b["correct"] / b["total"] if b["total"] else None
-    recent = state.get("recent", [])
-    acc_recent = 100 * sum(recent) / len(recent) if recent else None
-    return acc_agent, acc_base, acc_recent
 
 
 def main():
     plans_store = load_json(PLANS_FILE, {"plans": []})
     plans = plans_store.get("plans", [])
     import time as _t
-    _skew = feature_skew(plans)
-    _excl = skew_excluded(_skew)
+    _skew = _core.feature_skew(plans)
+    _excl = _core.skew_excluded(_skew)
     _X_CACHE.update(ts=_t.time() + 10 ** 9, set=set(_excl))     # fix pentru aceasta rulare
     if _excl:
         print(f"[i] Excluse din model (decalaj live-backtest): {', '.join(_excl)}")
@@ -817,7 +118,7 @@ def main():
             p.pop("agent_trained", None)
     # Daca starea salvata provine din alta sursa/geometrie de semnal (campul `outcome`),
     # o resetez: etichetele masurau altceva. Vezi nota din train_from_plans.
-    source = current_source()
+    source = _core.current_source()
 
     # EXTINDEREA SETULUI DE CARACTERISTICI, fara reset.
     # Cand apar caracteristici noi (ex. ichimoku, mtf_align), le adaug in model
@@ -835,7 +136,7 @@ def main():
         # greutati si caracteristicile noi erau ignorate tacut.
         mw = (state.get("model") or {}).get("weights")
         if isinstance(mw, dict):
-            fresh = [f for f in FEATURES if f not in mw]
+            fresh = [f for f in _core.FEATURES if f not in mw]
             if fresh:
                 for f in fresh:
                     mw[f] = 0.0
@@ -875,10 +176,10 @@ def main():
             if cleared:
                 print(f"[i] Am eliberat {cleared} planuri {plan_tracker.GEOMETRY_VERSION} "
                       f"pentru reinvatare.")
-        state = default_state()
+        state = _core.default_state()
         state["source"] = source
         state["feature_version"] = fv
-    model = OnlineLogisticRegression.from_dict(state.get("model", {}))
+    model = _core.OnlineLogisticRegression.from_dict(state.get("model", {}))
 
     if not plans:
         print("Niciun plan inca - agentul invata din planuri inchise. "
@@ -887,7 +188,7 @@ def main():
         save_json(MODEL_FILE, state)
         return
 
-    new_samples = train_from_plans(plans, model, state)
+    new_samples = _core.train_from_plans(plans, model, state)
     # Prin plan_tracker.save_plans, nu save_json direct: aceeasi garda de
     # dimensiune si aceeasi compactare ca peste tot unde se scrie plans.json.
     # Nu adauga planuri noi aici, deci riscul e mai mic decat la merge, dar
@@ -896,25 +197,25 @@ def main():
     plan_tracker.save_plans(plans_store)
 
     state["model"] = model.to_dict()
-    active, reason = agent_is_active(state, plans)
+    active, reason = _core.agent_is_active(state, plans)
     state["status"] = "ACTIVE" if active else "SHADOW"
     state["status_reason"] = reason
-    state["days_covered"] = round(days_covered(state, plans), 2)
-    ba, used = balanced_accuracy(state["by_direction"], "agent")
-    bb, _ = balanced_accuracy(state["by_direction"], "baseline")
+    state["days_covered"] = round(_core.days_covered(state, plans), 2)
+    ba, used = _core.balanced_accuracy(state["by_direction"], "agent")
+    bb, _ = _core.balanced_accuracy(state["by_direction"], "baseline")
     state["balanced_agent"], state["balanced_baseline"] = ba, bb
     state["balanced_directions"] = used
     pairs = state.get("pairs") or []
-    state["auc"] = auc_score(pairs)
-    state["auc_score_baseline"] = auc_score(state.get("score_pairs") or [])
+    state["auc"] = _core.auc_score(pairs)
+    state["auc_score_baseline"] = _core.auc_score(state.get("score_pairs") or [])
     sa, sb = state["auc"], state["auc_score_baseline"]
     state["agent_superior"] = bool(sa is not None and sb is not None and sa > sb)
-    state["majority_baseline"] = majority_class_accuracy(pairs)
-    state["predicted_positive_rate"] = predicted_positive_rate(pairs)
+    state["majority_baseline"] = _core.majority_class_accuracy(pairs)
+    state["predicted_positive_rate"] = _core.predicted_positive_rate(pairs)
     state["skew"], state["skew_excluded"], state["feature_mask"] = _skew, _excl, _mask
     save_json(MODEL_FILE, state)
 
-    acc_agent, acc_base, acc_recent = summarize(state)
+    acc_agent, acc_base, acc_recent = _core.summarize(state)
     print(f"Planuri noi invatate acum: {new_samples}")
     print(f"Total planuri invatate: {state['agent']['total']} pe {state['days_covered']} zile")
     if acc_agent is not None:
@@ -942,9 +243,16 @@ def main():
         extra = f" | AUC scor brut: {sb:.3f}" if sb is not None else ""
         verdict = ("agentul ordoneaza mai bine" if state.get("agent_superior")
                    else "scorul brut ordoneaza cel putin la fel de bine")
-        print(f"AUC: {auc:.3f} (0.5 = hazard, prag {MIN_AUC}){extra} -> {verdict}")
+        print(f"AUC: {auc:.3f} (0.5 = hazard, prag {_core.MIN_AUC}){extra} -> {verdict}")
     print(f"Status: {state['status']} - {reason}")
     print("Greutati invatate:", json.dumps(state["model"]["weights"]))
+
+
+# Porturile de citire ale nucleului, legate la fisierele de mai sus.
+_core.QUARANTINE_SOURCE = lambda: _quarantined()
+_core.EXCLUDED_SOURCE = lambda: excluded_features()
+
+compat.bind(__name__, _core)
 
 
 if __name__ == "__main__":

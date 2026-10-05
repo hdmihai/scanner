@@ -69,6 +69,7 @@ def check_geometry_versioning():
     if pt is None:
         problems.append("plan_tracker.py lipseste")
         return
+    pt += read(os.path.join("core", "plans.py")) or ""      # logica e in nucleu (Etapa 2)
     # Verific COMPORTAMENTUL, nu textul sursei. Verificarea pe sir dadea alarme
     # false dupa ce logica a fost mutata intr-o functie: `GEOMETRY_VERSION =
     # _build_geometry()` nu contine literal "SCAN_TIMEFRAME", desi il foloseste.
@@ -82,7 +83,7 @@ def check_geometry_versioning():
         "res=[]\n"
         "for tf in ('1h','4h'):\n"
         "    os.environ['SCAN_TIMEFRAME']=tf\n"
-        "    sys.modules.pop('plan_tracker',None)\n"
+        "    for m in [k for k in sys.modules if k == 'plan_tracker' or k.startswith('core')]: sys.modules.pop(m,None)\n"
         "    import plan_tracker as p; res.append(p.GEOMETRY_VERSION)\n"
         "print('|'.join(res))\n")
     try:
@@ -105,6 +106,7 @@ def check_agent_source_follows_geometry():
     if ag is None:
         problems.append("ai_agent.py lipseste")
         return
+    ag += read(os.path.join("core", "agent.py")) or ""      # logica e in nucleu (Etapa 2)
     # Tot pe comportament: sursa trebuie sa se schimbe odata cu geometria.
     if "STATE_SOURCE" not in ag and "current_source" not in ag:
         problems.append("ai_agent.py nu defineste sursa de invatare")
@@ -115,7 +117,7 @@ def check_agent_source_follows_geometry():
         "res=[]\n"
         "for tf in ('1h','4h'):\n"
         "    os.environ['SCAN_TIMEFRAME']=tf\n"
-        "    for m in ('plan_tracker','ai_agent'): sys.modules.pop(m,None)\n"
+        "    for m in [k for k in sys.modules if k in ('plan_tracker','ai_agent') or k.startswith('core')]: sys.modules.pop(m,None)\n"
         "    import ai_agent as a\n"
         "    res.append(a.current_source() if hasattr(a,'current_source') else a.STATE_SOURCE)\n"
         "print('|'.join(res))\n")
@@ -135,7 +137,7 @@ def check_agent_source_follows_geometry():
 def check_decision_gate():
     """Poarta trebuie sa fie comutabila si implicit dezactivata - walk-forward
     a aratat ca inrautateste rezultatul in 2 din 3 rulari."""
-    pt = read("plan_tracker.py") or ""
+    pt = (read("plan_tracker.py") or "") + (read(os.path.join("core", "plans.py")) or "")
     if "USE_DECISION_GATE" not in pt:
         problems.append(
             "plan_tracker.py nu are USE_DECISION_GATE. Poarta filtreaza mereu, "
@@ -345,7 +347,7 @@ def check_feature_extension():
     import importlib
     sys.path.insert(0, ROOT)
     try:
-        for m in ("plan_tracker", "ai_agent"):
+        for m in ("core.plans", "core.agent", "plan_tracker", "ai_agent"):
             if m in sys.modules:
                 importlib.reload(sys.modules[m])
         import plan_tracker as pt
@@ -372,7 +374,7 @@ def check_feature_extension():
     # acestui mecanism scria in `model.weights`, un obiect construit mai jos in
     # main() - deci extinderea nu se aplica NICIODATA, iar caracteristicile noi
     # erau ignorate tacut. Codul parea corect si testul pe logica izolata trecea.
-    src_txt = read("ai_agent.py") or ""
+    src_txt = (read("ai_agent.py") or "") + (read(os.path.join("core", "agent.py")) or "")
     if "Caracteristici noi adaugate fara reset" in src_txt:
         if "state.get(\"model\")" not in src_txt and "state[\"model\"]" not in src_txt:
             problems.append(
@@ -406,11 +408,16 @@ def check_signal_block_uses_own_series():
     care nu mai gaseste ce verifica nu are voie sa treaca in tacere.
     """
     import re as _re
-    src = read("crypto_ai_scanner.py") or ""
-    a = src.find("def build_signal_context(")
+    # functia traieste in nucleu (Etapa 2); o caut acolo, apoi in locurile vechi
+    src, a = "", -1
+    for cand in (os.path.join("core", "analysis.py"), os.path.join("core", "scan.py"), "crypto_ai_scanner.py"):
+        src = read(cand) or ""
+        a = src.find("def build_signal_context(")
+        if a >= 0:
+            break
     if a < 0:
-        problems.append("crypto_ai_scanner.py nu mai are build_signal_context - garda seriei proprii "
-                        "per semnal nu mai poate verifica blocul de evidente.")
+        problems.append("nucleul nu mai are build_signal_context - garda seriei proprii per semnal "
+                        "nu mai poate verifica blocul de evidente.")
         return
     b = src.find("\ndef ", a + 10)
     body = src[a:b if b > 0 else len(src)]
@@ -461,13 +468,74 @@ def check_exchange_adapters():
         problems.append("exchanges.py nu mai reflecta registrul adaptoarelor (capabilitati sau ordine).")
 
 
+def check_core_is_pure():
+    """Regulile arhitecturii hexagonale, verificate pe sursa, la fiecare scanare.
+
+    1. NUCLEUL (core/) nu face I/O: fara retea (ccxt, requests, urllib, socket,
+       smtplib, subprocess), fara fisiere (open, os.makedirs/replace/remove,
+       os.path.exists, json.load/json.dump pe fisiere, shutil). Datele intra prin
+       porturi; adaptoarele le aduc de la burse, din fisiere sau din Telegram.
+    2. Nucleul importa DOAR din nucleu, din porturi si din biblioteca standard -
+       niciodata un adaptor sau un modul vechi din radacina (plan_tracker, ...).
+    3. PORTURILE (ports/) nu depind de nimic din proiect.
+
+    DE CE: o dependenta ascunsa (un open() uitat intr-o functie de calcul, un
+    import de ccxt "doar pentru un apel") rupe separarea in tacere - codul merge,
+    dar nucleul nu mai poate fi testat izolat si o bursa cazuta il poate opri.
+    """
+    import ast as _ast
+    net = {"ccxt", "requests", "urllib", "urllib3", "http", "socket", "smtplib", "subprocess", "sqlite3", "shutil"}
+    root_mods = ({f[:-3] for f in os.listdir(ROOT) if f.endswith(".py")}
+                 | {"adapters", "dashboard", "selfrepair", "improve", "tests", "core", "ports"})
+    file_calls = {("os", "makedirs"), ("os", "replace"), ("os", "remove"), ("os", "unlink"), ("os", "rename"),
+                  ("os", "fsync"), ("os", "listdir"), ("os", "walk"), ("os", "rmdir"), ("path", "exists"),
+                  ("path", "isfile"), ("path", "isdir"), ("path", "getsize"), ("path", "getmtime"),
+                  ("json", "load"), ("json", "dump")}
+    for pkg, allowed_pkgs in (("core", {"core", "ports"}), ("ports", {"ports"})):
+        base = os.path.join(ROOT, pkg)
+        if not os.path.isdir(base):
+            continue
+        for f in sorted(os.listdir(base)):
+            if not f.endswith(".py"):
+                continue
+            rel = os.path.join(pkg, f)
+            try:
+                tree = _ast.parse(read(rel) or "")
+            except SyntaxError:
+                continue
+            for n in _ast.walk(tree):
+                mods = []
+                if isinstance(n, _ast.Import):
+                    mods = [a.name for a in n.names]
+                elif isinstance(n, _ast.ImportFrom) and n.module and not n.level:
+                    mods = [n.module]
+                for m in mods:
+                    top = m.split(".")[0]
+                    if top in net:
+                        problems.append(f"{rel}:{n.lineno} importa {m} - {pkg}/ nu are voie sa faca retea sau "
+                                        f"procese externe; foloseste un port.")
+                    elif top in root_mods and top not in allowed_pkgs:
+                        problems.append(f"{rel}:{n.lineno} importa {m} - {pkg}/ poate importa doar "
+                                        f"{sorted(allowed_pkgs) or 'biblioteca standard'} (regula dependentelor).")
+                if pkg != "core" or not isinstance(n, _ast.Call):
+                    continue
+                fn = n.func
+                if isinstance(fn, _ast.Name) and fn.id == "open":
+                    problems.append(f"{rel}:{n.lineno} deschide un fisier - nucleul citeste si scrie doar prin porturi.")
+                elif isinstance(fn, _ast.Attribute) and isinstance(fn.value, (_ast.Name, _ast.Attribute)):
+                    owner = fn.value.id if isinstance(fn.value, _ast.Name) else fn.value.attr
+                    if (owner, fn.attr) in file_calls:
+                        problems.append(f"{rel}:{n.lineno} apeleaza {owner}.{fn.attr} - I/O pe disc in nucleu; "
+                                        f"foloseste portul de stocare.")
+
+
 def check_package_identity():
     """Ca check_file_identity, pentru modulele din pachete: documentatia unui modul
     din dashboard/ sau adapters/ incepe cu numele lui complet (ex. `dashboard.page`).
     Daca numeste ALT modul existent, continutul a fost urcat in fisierul gresit."""
     import ast as _ast
     import re as _re
-    for pkg in ("dashboard", "adapters"):
+    for pkg in ("dashboard", "adapters", "core", "ports"):
         base = os.path.join(ROOT, pkg)
         if not os.path.isdir(base):
             continue
@@ -485,7 +553,7 @@ def check_package_identity():
                 except SyntaxError:
                     continue
                 first = next((l.strip() for l in doc.splitlines() if l.strip()), "")
-                m = _re.match(r"^((?:dashboard|adapters)(?:\.[A-Za-z0-9_]+)+)\b", first)
+                m = _re.match(r"^((?:dashboard|adapters|core|ports)(?:\.[A-Za-z0-9_]+)+)\b", first)
                 if not m or m.group(1) == mod:
                     continue
                 other = os.path.join(ROOT, *m.group(1).split(".")) + ".py"
@@ -639,6 +707,7 @@ def main():
     check_signal_block_uses_own_series()
     check_exchange_adapters()
     check_package_identity()
+    check_core_is_pure()
     check_no_direct_plan_writes()
     check_compaction_step()
     check_file_identity()
