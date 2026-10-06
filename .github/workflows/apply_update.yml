@@ -2,6 +2,7 @@ name: Aplica actualizare
 
 # LIVRAREA DINTR-UN SINGUR FISIER. Urci update.zip in radacina repo-ului (Add file
 # -> Upload files - merge si din browserul telefonului), iar acest workflow:
+#   0. salveaza versiunea curenta (cod + date) pentru poarta de echivalenta
 #   1. despacheteaza arhiva DOAR in caile permise (module .py din radacina,
 #      dashboard/, selfrepair/, improve/, adapters/, core/, ports/, tests/,
 #      .github/workflows/*.yml, *.md) - niciodata in data/ sau docs/, niciodata
@@ -33,7 +34,8 @@ concurrency:
 jobs:
   apply:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # poarta de echivalenta ruleaza scanarea de 2 x 3 ori pe date reale (circa 5-10 minute)
+    timeout-minutes: 40
     env:
       SCAN_TIMEFRAME: 4h
     steps:
@@ -64,6 +66,11 @@ jobs:
             echo "Nicio arhiva update.zip in main (posibil stearsa inainte de aplicare) - nimic de aplicat." | tee -a "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
+          # Instantaneul versiunii CURENTE (cod + date), inainte de despachetare: poarta de
+          # echivalenta ruleaza aceeasi scanare pe el si pe versiunea noua si le compara.
+          rm -rf /tmp/baseline && mkdir -p /tmp/baseline
+          git archive HEAD | tar -x -C /tmp/baseline
+          rm -f /tmp/expected_changes.txt
           python3 - "$zip" <<'PY'
           import os, re, sys, zipfile
           z = zipfile.ZipFile(sys.argv[1])
@@ -73,7 +80,8 @@ jobs:
               n = n.replace("\\", "/")
               return n[len("livrare/"):] if n.startswith("livrare/") else n
           names = [clean(n) for n in z.namelist() if not n.endswith("/")]
-          bad = [n for n in names if n != "DELETE.txt" and (".." in n.split("/") or n.startswith("/") or not ok.match(n))]
+          special = ("DELETE.txt", "EXPECTED_CHANGES.txt")
+          bad = [n for n in names if n not in special and (".." in n.split("/") or n.startswith("/") or not ok.match(n))]
           if bad:
               sys.exit(f"Arhiva contine cai nepermise: {bad[:5]} - nu aplic nimic.")
           # GitHub interzice token-ului automat (GITHUB_TOKEN) sa modifice fisiere din
@@ -82,7 +90,7 @@ jobs:
           skipped = []
           for info in z.infolist():
               n = clean(info.filename)
-              if info.filename.endswith("/") or n == "DELETE.txt":
+              if info.filename.endswith("/") or n in special:
                   continue
               if n.startswith(".github/"):
                   skipped.append(n)
@@ -104,6 +112,13 @@ jobs:
                   if os.path.exists(n):
                       os.remove(n)
                       print("  sters:", n)
+          if "EXPECTED_CHANGES.txt" in names:
+              # schimbarile de comportament ASUMATE: tiparele fisierelor care au voie sa difere
+              # in poarta de echivalenta (cu motivul in comentarii); nu se scrie in repo
+              raw = z.read(next(i for i in z.infolist() if clean(i.filename) == "EXPECTED_CHANGES.txt"))
+              with open("/tmp/expected_changes.txt", "wb") as fh:
+                  fh.write(raw)
+              print("  schimbari asumate declarate:", [l for l in raw.decode().splitlines() if l.strip()][:8])
           if skipped:
               msg = ("Fisiere de workflow SARITE (GitHub nu permite workflow-urilor sa le modifice) - "
                      "urca-le manual in .github/workflows/: " + ", ".join(skipped))
@@ -112,7 +127,16 @@ jobs:
                   fh.write(msg + "\n")
           PY
           if [ $? -ne 0 ]; then git checkout -- . ; git clean -fdq -- dashboard selfrepair improve adapters core ports tests .github ; exit 1; fi
-          if python3 check_py311.py && python3 check_integrity.py; then
+          # POARTA DE ECHIVALENTA (tests/): gărzile se verifica pe cod stricat intentionat,
+          # apoi scanarea si pasii de dupa ea ruleaza pe versiunea veche si pe cea noua, cu
+          # aceleasi date si acelasi timp; orice diferenta nedeclarata in EXPECTED_CHANGES.txt
+          # sau orice pas care esueaza doar pe versiunea noua respinge actualizarea.
+          gate() {
+            if [ ! -f tests/equivalence.py ]; then echo "(fara tests/: poarta de echivalenta sarita)"; return 0; fi
+            python3 -B -m tests.guards && python3 -B -m tests.equivalence --baseline /tmp/baseline --candidate . \
+              --allow /tmp/expected_changes.txt --summary "$GITHUB_STEP_SUMMARY"
+          }
+          if python3 check_py311.py && python3 check_integrity.py && gate; then
             git rm -q --cached "$zip" 2>/dev/null; rm -f "$zip"
             # tot repo-ul: workflow-ul nu atinge data/ sau docs/, iar caile care nu
             # exista (ex. selfrepair/ inainte de instalare) ar fi anulat toata comanda
@@ -132,7 +156,7 @@ jobs:
             fi
             echo "Actualizare aplicata si verificata: $(git show --stat --format= HEAD | tail -1)" | tee -a "$GITHUB_STEP_SUMMARY"
           else
-            echo "Garzile au gasit probleme - NU aplic nimic; repo-ul ramane neschimbat (detalii mai sus in jurnal)." | tee -a "$GITHUB_STEP_SUMMARY"
+            echo "Garzile sau poarta de echivalenta au respins actualizarea - NU aplic nimic; repo-ul ramane neschimbat (detalii mai sus in jurnal). O schimbare de comportament voita se declara in EXPECTED_CHANGES.txt, in arhiva." | tee -a "$GITHUB_STEP_SUMMARY"
             git checkout -- . ; git clean -fdq -- dashboard selfrepair improve adapters core ports tests .github
             exit 1
           fi
