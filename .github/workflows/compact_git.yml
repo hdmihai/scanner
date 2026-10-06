@@ -1,0 +1,78 @@
+# Compacteaza istoricul git: pastreaza istoria codului, elimina versiunile vechi ale datelor.
+#
+# DE CE: scanarile orare rescriu data/ si docs/, iar GitHub pastreaza periodic copii
+# complete ale fisierelor mari (plans.json, backtest_plans.json) - repo-ul crestea cu
+# ~18 MB pe zi. Compactarea il readuce la ~14 MB (masurat pe copia repo-ului),
+# fara sa atinga codul sau starea curenta: arborele final e verificat bit cu bit
+# inainte de publicare (compact_git.py).
+#
+# SIGURANTA
+#   - acelasi grup de concurenta ca scanarea, metadata, backtest-ul si aplicarea
+#     actualizarilor: nu ruleaza niciodata in paralel cu ele;
+#   - --force-with-lease: daca main s-a miscat intre timp, nu suprascrie nimic;
+#   - modul "masoara" doar raporteaza, fara sa publice.
+#
+# CERINTA: secretul HISTORY_TOKEN - un token personal "fine-grained", doar pentru acest
+# repo, cu Contents: Read and write si Workflows: Read and write. GITHUB_TOKEN nu poate
+# rescrie commit-urile care ating workflow-uri, deci compactarea nu poate rula fara el.
+name: Compacteaza istoricul git
+
+on:
+  workflow_dispatch:
+    inputs:
+      mod:
+        description: "masoara = doar raport; compacteaza = rescrie istoricul datelor si publica"
+        type: choice
+        options: [masoara, compacteaza]
+        default: masoara
+  schedule:
+    # duminica, 03:41 UTC - compacteaza doar daca istoricul a trecut de 80 MB
+    - cron: "41 3 * * 0"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: scanner-data
+  cancel-in-progress: false
+
+jobs:
+  compact:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Verifica tokenul
+        env:
+          HISTORY_TOKEN: ${{ secrets.HISTORY_TOKEN }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          if [ -z "$HISTORY_TOKEN" ]; then
+            msg="Lipseste secretul HISTORY_TOKEN (token fine-grained doar pentru acest repo: Contents si Workflows = Read and write). Fara el, istoricul nu poate fi rescris."
+            echo "$msg" | tee -a "$GITHUB_STEP_SUMMARY"
+            if [ "$EVENT" = "schedule" ]; then echo "SKIP=1" >> "$GITHUB_ENV"; exit 0; fi
+            exit 1
+          fi
+
+      - name: Descarca tot istoricul
+        if: env.SKIP != '1'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.HISTORY_TOKEN }}
+
+      - name: Python 3.11
+        if: env.SKIP != '1'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instaleaza git-filter-repo
+        if: env.SKIP != '1'
+        run: pip install -q git-filter-repo
+
+      - name: Compacteaza
+        if: env.SKIP != '1'
+        env:
+          MODE: ${{ github.event.inputs.mod || 'compacteaza' }}
+          MIN_MB: ${{ github.event_name == 'schedule' && '80' || '0' }}
+        run: python3 compact_git.py --mode "$MODE" --min-mb "$MIN_MB" --summary "$GITHUB_STEP_SUMMARY"
