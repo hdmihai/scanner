@@ -315,20 +315,49 @@ def feature_health(store):
 
 
 def live_vs_backtest(store):
+    """Live fata de backtest, pe ACEEASI perioada (aceeasi functie ca alarma din
+    dashboard: plan_tracker.divergence). Comparatia cu media 2018-azi amesteca piata
+    de acum cu ani in care strategia castiga mai mult si raporta o divergenta care
+    venea din piata, nu din calcul."""
+    import plan_tracker
     closed = [p for p in store.get("plans") or []
               if p.get("realized_r") is not None and p.get("state") != "NO_ENTRY"]
-    live = [p["realized_r"] for p in closed if p.get("source") != "backtest"]
-    bt = [p["realized_r"] for p in closed if p.get("source") == "backtest"]
-    if len(live) < 30 or len(bt) < 300:
+    live = [p for p in closed if p.get("source") != "backtest"]
+    bt = [p for p in closed if p.get("source") == "backtest"]
+    dv = plan_tracker.divergence(live, bt)
+    if dv.get("status") == "date_insuficiente":
         return _chk("live_bt", "OK", "Live vs backtest",
                     f"prea putine planuri live inchise pentru comparatie ({len(live)})")
-    (ml, sl), (mb, _sb) = _mean_se(live), _mean_se(bt)
-    if ml < mb - 2 * sl:
-        return _chk("live_bt", "WARN", "Rezultatele live sub backtest",
-                    f"live {ml:+.3f}R/plan (n={len(live)}) fata de backtest {mb:+.3f}R - diferenta "
-                    "depaseste zgomotul statistic.")
-    return _chk("live_bt", "OK", "Live vs backtest",
-                f"live {ml:+.3f}R/plan (n={len(live)}), backtest {mb:+.3f}R - in marja statistica")
+    win = dv.get("window") or ["?", "?"]
+    basis = (f"in aceeasi perioada ({win[0]} - {win[1]}: {dv['n_live_window']} live, {dv['n_bt_window']} backtest)"
+             if dv.get("basis") == "aceeasi_perioada" else
+             "fata de tot istoricul (fereastra comuna e prea mica pentru o comparatie corecta)")
+    txt = (f"live {dv['live_r']:+.3f}R/plan fata de backtest {dv['bt_r']:+.3f}R {basis}; diferenta "
+           f"{dv['diff']:+.3f}R (IC95 {dv['ci_low']:+.3f}..{dv['ci_high']:+.3f})")
+    if dv["status"] == "sub_backtest":
+        return _chk("live_bt", "WARN", "Rezultatele live sub backtest", txt + " - depaseste zgomotul statistic.")
+    return _chk("live_bt", "OK", "Live vs backtest", txt + " - in marja statistica.")
+
+
+def backtest_edge(store):
+    """Edge-ul strategiei in timp, pe backtest: castiga ACUM, nu doar in medie?
+    Avertisment cand ultimele 12 luni nu sunt distinct pozitive."""
+    import plan_tracker
+    bt = [p for p in store.get("plans") or [] if p.get("source") == "backtest"
+          and p.get("realized_r") is not None and p.get("state") != "NO_ENTRY"]
+    e = plan_tracker.edge_by_period(bt)
+    rec = e.get("recent")
+    if e.get("status") == "date_insuficiente" or not rec:
+        return _chk("edge", "OK", "Edge backtest", "prea putine planuri de backtest pentru o masurare pe perioade")
+    years = " &middot; ".join(f"{y} {v['r']:+.3f}" for y, v in list(e["by_year"].items())[-4:])
+    txt = (f"ultimele {e['recent_days']} zile (pana la {e['until']}): {rec['r']:+.3f}R/plan "
+           f"(IC95 {rec['ci_low']:+.3f}..{rec['ci_high']:+.3f}, n={rec['n']}); pe ani: {years}")
+    if e["status"] == "negativ":
+        return _chk("edge", "WARN", "Edge-ul recent e negativ", txt)
+    if e["status"] == "neconcludent":
+        return _chk("edge", "WARN", "Edge-ul recent nu e distinct de zero",
+                    txt + " - planurile au un avantaj masurat mai mic decat sugereaza media istorica.")
+    return _chk("edge", "OK", "Edge backtest pozitiv", txt)
 
 
 def elliott_filter_decision(store, previous):
@@ -382,7 +411,7 @@ def run():
               check_evidence_vs_panel(details, store), check_plan_geometry(store),
               check_calibration_coverage(store)] + check_freshness(details)
     fh_checks, fh_table = feature_health(store)
-    checks += fh_checks + [live_vs_backtest(store)]
+    checks += fh_checks + [live_vs_backtest(store), backtest_edge(store)]
 
     # CARANTINA: caracteristicile legate de verificari esuate. Iese din carantina
     # dupa RELEASE_AFTER rulari consecutive curate.

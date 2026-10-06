@@ -863,28 +863,96 @@ def _split_stats(closed):
 DIVERGENCE_MIN_LIVE = 30
 
 
-def divergence(live, bt, n_boot=2000):
-    """ALARMA DE DIVERGENTA: diferenta de R mediu live - backtest, cu interval de
-    incredere bootstrap 95% pe DIFERENTA. Semnificativa cand intervalul exclude
-    zero. Masurat la introducere: live -0.279R (n=55) fata de backtest +0.088R,
-    diferenta -0.367R (IC95 -0.66..-0.03) - semnificativa.
-    Raspunsul automat ramane informativ: cu cateva zeci de planuri live, nicio
-    regula de filtrare nu poate fi validata statistic (o regula de regim testata
-    walk-forward a scazut R-ul pe datele nevazute)."""
+def _ts(p):
+    v = p.get("created_ts") or 0
+    return v / 1000 if v > 1e11 else v
+
+
+def _boot_diff(lr, br, n_boot, seed=11):
     import random as _r
-    lr = [p["realized_r"] for p in live]
-    br = [p["realized_r"] for p in bt]
-    if len(lr) < DIVERGENCE_MIN_LIVE or len(br) < 300:
-        return {"n_live": len(lr), "status": "date_insuficiente"}
-    rnd = _r.Random(11)
+    rnd = _r.Random(seed)
     m = lambda v: sum(v) / len(v)
     br_s = br[-5000:]
     diffs = sorted(m([rnd.choice(lr) for _ in lr]) - m([rnd.choice(br_s) for _ in br_s]) for _ in range(n_boot))
     lo, hi = diffs[int(0.025 * n_boot)], diffs[int(0.975 * n_boot) - 1]
-    d = m(lr) - m(br)
     status = "sub_backtest" if hi < 0 else ("peste_backtest" if lo > 0 else "in_marja")
-    return {"n_live": len(lr), "diff": round(d, 3), "ci_low": round(lo, 3), "ci_high": round(hi, 3),
-            "status": status}
+    return {"diff": round(m(lr) - m(br), 3), "ci_low": round(lo, 3), "ci_high": round(hi, 3), "status": status,
+            "live_r": round(m(lr), 3), "bt_r": round(m(br), 3)}
+
+
+DIVERGENCE_MIN_WINDOW_BT = 30
+
+
+def divergence(live, bt, n_boot=2000):
+    """ALARMA DE DIVERGENTA: diferenta de R mediu live - backtest, cu interval de
+    incredere bootstrap 95% pe DIFERENTA. Semnificativa cand intervalul exclude zero.
+
+    COMPARATIA CORECTA E PE ACEEASI PERIOADA. Prima versiune compara planurile live
+    (cateva saptamani) cu media backtest-ului pe 2018-azi - si raporta "live
+    semnificativ sub backtest". Masurat pe datele din 6 oct 2026: live -0.207R/plan
+    (n=92) fata de +0.087R pe tot istoricul, dar backtest-ul pe ACELEASI saptamani da
+    -0.045R (n=81), in marja; short-urile au pierdut in ambele (12 din 12 live, 8 din 8
+    in backtest). Diferenta venea din piata, nu din implementare - iar edge-ul
+    backtest-ului s-a erodat in timp (vezi edge_by_period).
+
+    Acum alarma decide pe fereastra comuna: planurile live create cat timp exista
+    si backtest, fata de planurile de backtest din aceleasi zile. Comparatia cu tot
+    istoricul ramane informativa (vs_all). Daca fereastra comuna e prea mica,
+    comparatia cade pe tot istoricul, marcata ca atare (basis)."""
+    lr = [p["realized_r"] for p in live]
+    br = [p["realized_r"] for p in bt]
+    if len(lr) < DIVERGENCE_MIN_LIVE or len(br) < 300:
+        return {"n_live": len(lr), "status": "date_insuficiente"}
+    vs_all = _boot_diff(lr, br, n_boot)
+    lo_t = min(_ts(p) for p in live)
+    hi_t = min(max(_ts(p) for p in live), max(_ts(p) for p in bt))
+    lw = [p["realized_r"] for p in live if _ts(p) <= hi_t]
+    bw = [p["realized_r"] for p in bt if lo_t <= _ts(p) <= hi_t]
+    out = {"n_live": len(lr), "vs_all": vs_all, "n_live_window": len(lw), "n_bt_window": len(bw),
+           "window": [time.strftime("%Y-%m-%d", time.gmtime(lo_t)), time.strftime("%Y-%m-%d", time.gmtime(hi_t))]}
+    if len(lw) >= DIVERGENCE_MIN_LIVE and len(bw) >= DIVERGENCE_MIN_WINDOW_BT:
+        out.update(_boot_diff(lw, bw, n_boot))
+        out["basis"] = "aceeasi_perioada"
+    else:
+        out.update(vs_all)
+        out["basis"] = "tot_istoricul"
+    return out
+
+
+EDGE_RECENT_DAYS = 365
+
+
+def edge_by_period(bt):
+    """EDGE-UL IN TIMP, masurat pe backtest: R mediu pe plan pe fiecare an si pe
+    ultimele 365 de zile, cu interval de incredere 95%.
+
+    Raspunde la intrebarea pe care media pe tot istoricul o ascunde: strategia mai
+    castiga ACUM? Masurat la introducere (6 oct 2026): 2018-2024 intre +0.09 si
+    +0.13R/plan, 2025 +0.035R, 2026 +0.012R - edge-ul s-a erodat, iar pe ultimele
+    luni nu mai e distinct de zero. Starea "neconcludent" inseamna exact asta."""
+    rows = [(_ts(p), p["realized_r"]) for p in bt if isinstance(p.get("realized_r"), (int, float))]
+    if len(rows) < 100:
+        return {"status": "date_insuficiente"}
+
+    def stat(vals):
+        n = len(vals)
+        mean = sum(vals) / n
+        var = sum((v - mean) ** 2 for v in vals) / (n - 1) if n > 1 else 0.0
+        se = (var / n) ** 0.5
+        return {"n": n, "r": round(mean, 3), "ci_low": round(mean - 1.96 * se, 3),
+                "ci_high": round(mean + 1.96 * se, 3)}
+
+    years = {}
+    for t, r in rows:
+        years.setdefault(time.strftime("%Y", time.gmtime(t)), []).append(r)
+    last = max(t for t, _ in rows)
+    recent = [r for t, r in rows if t >= last - EDGE_RECENT_DAYS * 86400]
+    rec = stat(recent) if len(recent) >= 30 else None
+    status = ("date_insuficiente" if rec is None else "pozitiv" if rec["ci_low"] > 0
+              else "negativ" if rec["ci_high"] < 0 else "neconcludent")
+    return {"by_year": {y: stat(v) for y, v in sorted(years.items()) if len(v) >= 30},
+            "recent": rec, "recent_days": EDGE_RECENT_DAYS,
+            "until": time.strftime("%Y-%m-%d", time.gmtime(last)), "status": status}
 
 
 def summarize(store):
@@ -927,6 +995,7 @@ def summarize(store):
         "backtest": _split_stats([p for p in closed if p.get("source") == "backtest"]),
         "divergence": divergence([p for p in closed if p.get("source") != "backtest"],
                                  [p for p in closed if p.get("source") == "backtest"]),
+        "edge": edge_by_period([p for p in closed if p.get("source") == "backtest"]),
         "no_entry": len(no_entry),
         "no_entry_pct": round(100 * len(no_entry) / len(current_geo), 1) if current_geo else None,
         "legacy_closed": len(legacy) + archived_closed,

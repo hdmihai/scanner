@@ -84,13 +84,29 @@ def render_health(history, agent_state, plans_store, self_check, altseason, runs
           + (f" &middot; AUC live {lv['auc']:.3f} (IC {lv.get('ci_low')}-{lv.get('ci_high')})" if lv.get("auc") is not None else "")
           + ("" if a.get("status") == "ACTIVE" or n_live >= 100 else " &middot; invata, normal pana la 100"))
          if lv else "fara date live inca"))
-    dv = ((plans_store or {}).get("summary") or {}).get("divergence") or {}
+    summ = (plans_store or {}).get("summary") or {}
+    dv = summ.get("divergence") or {}
     if dv.get("status") in ("sub_backtest", "in_marja", "peste_backtest"):
-        add("ERROR" if dv["status"] == "sub_backtest" else "OK", "Live vs backtest",
+        same = dv.get("basis") == "aceeasi_perioada"
+        lvl = ("ERROR" if same else "WARN") if dv["status"] == "sub_backtest" else "OK"
+        win = dv.get("window") or ["?", "?"]
+        add(lvl, "Live vs backtest" + (" &middot; aceeasi perioada" if same else ""),
             f"{dv['diff']:+.3f}R/plan",
-            f"IC95 {dv['ci_low']:+.3f}..{dv['ci_high']:+.3f} pe {dv['n_live']} planuri &middot; "
+            f"IC95 {dv['ci_low']:+.3f}..{dv['ci_high']:+.3f} &middot; "
             + {"sub_backtest": "SEMNIFICATIV sub backtest", "in_marja": "in marja statistica",
-               "peste_backtest": "peste backtest"}[dv["status"]])
+               "peste_backtest": "peste backtest"}[dv["status"]]
+            + (f" &middot; {win[0]} - {win[1]}, {dv.get('n_live_window')} live / {dv.get('n_bt_window')} backtest"
+               if same else (" &middot; fata de tot istoricul (fereastra comuna prea mica)"
+                             if dv.get("basis") else "")))
+    ed = summ.get("edge") or {}
+    rec = ed.get("recent")
+    if rec:
+        lvl = {"pozitiv": "OK", "neconcludent": "WARN", "negativ": "ERROR"}.get(ed.get("status"), "OK")
+        add(lvl, "Edge backtest &middot; 12 luni", f"{rec['r']:+.3f}R/plan",
+            f"IC95 {rec['ci_low']:+.3f}..{rec['ci_high']:+.3f} pe {rec['n']} planuri &middot; "
+            + {"pozitiv": "distinct pozitiv", "neconcludent": "nu e distinct de zero",
+               "negativ": "negativ"}.get(ed.get("status"), "")
+            + " &middot; pe ani: " + " ".join(f"{y} {v['r']:+.2f}" for y, v in list((ed.get("by_year") or {}).items())[-3:]))
     sc = self_check or {}
     # avertismente INFORMATIVE: semnaleaza informatie noua, nu un defect de reparat
     INFO_ONLY = {"plan_forecast"}

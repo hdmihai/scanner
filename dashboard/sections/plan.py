@@ -120,14 +120,31 @@ def render_plan_memory(store):
                      f'{_ln("LIVE", lv)}<br>{_ln("BACKTEST", bt)}</p>')
             # ALARMA DE DIVERGENTA live - backtest (test statistic pe diferenta)
             dv = summary.get("divergence") or {}
-            if dv.get("status") == "sub_backtest":
-                head += ('<div class="plan-conflict"><strong>ALARMA: REZULTATELE LIVE SUNT SUB BACKTEST</strong> '
-                         f'&middot; diferenta {dv["diff"]:+.3f}R/plan (IC95 {dv["ci_low"]:+.3f}..{dv["ci_high"]:+.3f}) '
-                         f'pe {dv["n_live"]} planuri live - semnificativa statistic. Agentul ramane in SHADOW pana la '
-                         'confirmarea live; cauza se investigheaza pe datele live, nu prin filtre nevalidate.</div>')
-            elif dv.get("status") == "in_marja":
-                head += (f'<p class="dim" style="margin:-6px 0 12px;">Live fata de backtest: {dv["diff"]:+.3f}R/plan '
-                         f'(IC95 {dv["ci_low"]:+.3f}..{dv["ci_high"]:+.3f}) - in marja statistica.</p>')
+            same = dv.get("basis") == "aceeasi_perioada"
+            win = dv.get("window") or ["?", "?"]
+            if dv.get("status") == "sub_backtest" and same:
+                head += ('<div class="plan-conflict"><strong>ALARMA: REZULTATELE LIVE SUNT SUB BACKTEST IN ACEEASI PERIOADA</strong> '
+                         f'&middot; diferenta {dv["diff"]:+.3f}R/plan (IC95 {dv["ci_low"]:+.3f}..{dv["ci_high"]:+.3f}), '
+                         f'{win[0]} - {win[1]} - semnificativa statistic. Aceleasi zile de piata dau rezultate diferite: '
+                         'cauza e in executie sau in calcul, nu in piata.</div>')
+            elif dv.get("status") in ("sub_backtest", "in_marja", "peste_backtest"):
+                basis = (f'pe aceeasi perioada ({win[0]} - {win[1]})' if same else
+                         ('fata de tot istoricul - fereastra comuna e prea mica pentru o comparatie corecta'
+                          if dv.get("basis") else 'fata de tot istoricul'))
+                head += (f'<p class="dim" style="margin:-6px 0 12px;">Live fata de backtest {basis}: '
+                         f'{dv["diff"]:+.3f}R/plan (IC95 {dv["ci_low"]:+.3f}..{dv["ci_high"]:+.3f}) - '
+                         + {"sub_backtest": "sub backtest", "in_marja": "in marja statistica",
+                            "peste_backtest": "peste backtest"}[dv["status"]] + '.</p>')
+            ed = summary.get("edge") or {}
+            if ed.get("recent") and ed.get("status") in ("neconcludent", "negativ"):
+                rec = ed["recent"]
+                yrs = " &middot; ".join(f'{y} {v["r"]:+.3f}R' for y, v in (ed.get("by_year") or {}).items())
+                head += ('<div class="plan-conflict explore"><strong>EDGE-UL S-A ERODAT</strong> &middot; '
+                         f'backtest-ul pe ultimele {ed["recent_days"]} zile: {rec["r"]:+.3f}R/plan '
+                         f'(IC95 {rec["ci_low"]:+.3f}..{rec["ci_high"]:+.3f}, n={rec["n"]}) - '
+                         + ("negativ" if ed["status"] == "negativ" else "nu e distinct de zero")
+                         + f'. Pe ani: {yrs}. Probabilitatile si R-ul asteptat din planuri sunt calibrate pe tot '
+                         'istoricul, deci supraestimeaza avantajul de acum.</div>')
 
     cards = []
     for p in sorted(plans, key=lambda x: x["id"], reverse=True)[:12]:
