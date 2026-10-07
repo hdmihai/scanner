@@ -1,11 +1,11 @@
 {
-  "text": "Din 16449 planuri inchise, rata de succes e 33.4%, cu +1394.70R cumulat (+0.085R in medie pe plan) si profit factor 1.12. 18 planuri sunt inca deschise. Atentie: 16340 dintre ele sunt din backtest. LIVE, din 2026-09-22: 109 planuri inchise, castig 33.0% (IC 24.9-42.3%), R mediu -0.238R (IC95 -0.497..+0.020R), total -26.00R. Ultimele inchise: #293317 FLOW/USDT -1.03R, #207120 THETA/USDT +0.67R, #228658 DOT/USDT -1.03R. Pe intervalele de scor cu destule date, cel mai bine merge 0-19 (27.5%, +0.35R mediu, n=160), iar cel mai slab 40-59 (29.8%, +0.05R, n=7849). Deciziile de a deschide sau refuza planuri se bazeaza pe aceste cifre masurate, nu pe scorul brut. Agentul cu invatare online e ACTIV si contribuie la decizii (ordoneaza mai bine decat scorul brut: AUC 0.676 vs 0.566; treimea de sus +0.330R vs toate +0.048R (prequential); acuratete 68.0% vs 67.2% prezicand mereu pierdere (ultimele 3000 exemple)), pe 16363 planuri invatate.",
+  "text": "Din 16449 planuri inchise, rata de succes e 33.4%, cu +1394.70R cumulat (+0.085R in medie pe plan) si profit factor 1.12. 19 planuri sunt inca deschise. Atentie: 16340 dintre ele sunt din backtest. LIVE, din 2026-09-22: 109 planuri inchise, castig 33.0% (IC 24.9-42.3%), R mediu -0.238R (IC95 -0.497..+0.020R), total -26.00R. Ultimele inchise: #293317 FLOW/USDT -1.03R, #207120 THETA/USDT +0.67R, #228658 DOT/USDT -1.03R. Pe intervalele de scor cu destule date, cel mai bine merge 0-19 (27.5%, +0.35R mediu, n=160), iar cel mai slab 40-59 (29.8%, +0.05R, n=7849). Deciziile de a deschide sau refuza planuri se bazeaza pe aceste cifre masurate, nu pe scorul brut. Agentul cu invatare online e ACTIV si contribuie la decizii (ordoneaza mai bine decat scorul brut: AUC 0.676 vs 0.566; treimea de sus +0.330R vs toate +0.048R (prequential); acuratete 68.0% vs 67.2% prezicand mereu pierdere (ultimele 3000 exemple)), pe 16363 planuri invatate.",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-10-07 15:58 UTC",
+    "scan_time": "2026-10-07 17:04 UTC",
     "universe_size": 30,
-    "plans_total": 21717,
-    "plans_open": 18,
+    "plans_total": 21718,
+    "plans_open": 19,
     "plans_closed": 16449,
     "legacy_closed": 0,
     "legacy_total_r": null,
@@ -74,6 +74,12 @@
     ],
     "open_now": [
       {
+        "id": 293327,
+        "symbol": "FLOW/USDT",
+        "direction": "LONG",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
         "id": 293326,
         "symbol": "CHZ/USDT",
         "direction": "SHORT",
@@ -95,13 +101,7 @@
         "id": 293323,
         "symbol": "ADA/USDT",
         "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 293322,
-        "symbol": "XRP/USDT",
-        "direction": "SHORT",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
+        "state": "INTRARE ATINSA - pozitie activa"
       }
     ],
     "best_bucket": {
