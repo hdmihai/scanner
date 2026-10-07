@@ -1,22 +1,13 @@
 {
-  "scan_time": "2026-10-07 17:47 UTC",
+  "scan_time": "2026-10-07 18:49 UTC",
   "decisions": {
     "AXS/USDT": {
       "action": "SKIP",
       "mode": "FILTRU_AGENT",
-      "reason": "agentul pune semnalul in treimea de jos (0.169 < 0.210); masurat in afara esantionului, acea treime pierde in medie",
+      "reason": "agentul pune semnalul in treimea de jos (0.167 < 0.210); masurat in afara esantionului, acea treime pierde in medie",
       "calibrated_prob": 29.8,
-      "agent_prob": 0.1688,
+      "agent_prob": 0.1673,
       "elliott_bias": 0.102,
-      "next_entry": null
-    },
-    "ALGO/USDT": {
-      "action": "ISSUE",
-      "mode": "EXPLORARE_FILTRU",
-      "reason": "semnal din treimea de jos (0.124 < 0.210), emis pentru explorare (15% din cele filtrate) - pastreaza evaluarea agentului nedeformata",
-      "calibrated_prob": 42.5,
-      "agent_prob": 0.1242,
-      "elliott_bias": 0.2,
       "next_entry": null
     }
   }
