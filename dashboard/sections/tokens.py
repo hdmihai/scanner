@@ -17,6 +17,8 @@ DECISION_TEXT = {
     "ASTEAPTA_CORECTIA": ("bad", "asteapta corectia", "ar astepta corectia"),
     "FILTRU_AGENT": ("bad", "filtrat de agent", "ar filtra semnalul"),
     "MOD_SIGURANTA": ("bad", "mod de siguranta", "ar refuza (mod de siguranta)"),
+    "REGULA_CERCETARE": ("bad", "exclus de o regula", "ar exclude (regula din cercetare)"),
+    "EXPLORARE_REGULA": ("warn", "emis (explorare)", "ar emite (explorare)"),
 }
 
 

@@ -14,6 +14,7 @@ from dashboard.sections.exchanges import page_href, render_exchange_modules, ren
 from dashboard.sections.market import render_briefing, render_evidence, render_indicators, render_levels, render_liquidity, render_opportunity_rows
 from dashboard.sections.plan import elliott_outcome_stats, render_calibration, render_plan, render_plan_memory
 from dashboard.sections.health import render_health
+from dashboard.sections.research import render_research
 from dashboard.sections.status import render_self_check, render_similar_projects
 
 _STYLES = os.path.join(os.path.dirname(os.path.abspath(__file__)), "styles", "main.css")
@@ -53,6 +54,7 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
     liquidity_html = _safe("render_liquidity", render_liquidity, deep)
     selfcheck_html = _safe("render_self_check", render_self_check, load_json(os.path.join(DATA_DIR, "self_check.json"), None),
                                        load_json(os.path.join(DATA_DIR, "repair_log.json"), []))
+    research_html = _safe("render_research", render_research, load_json(os.path.join(DATA_DIR, "research.json"), None))
     altseason_html = _safe("render_altseason", render_altseason, load_json(ALTSEASON_FILE, None),
                                       load_json(ALTSEASON_HISTORY_FILE, []))
     similar_html = _safe("render_similar_projects", render_similar_projects, 
@@ -183,6 +185,11 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
       <div class="card">
         <h2>Auto-diagnostic &middot; auto-reparare agent</h2>
         {selfcheck_html}
+      </div>
+
+      <div class="card">
+        <h2>Cercetare autonoma &middot; reguli testate pe date nevazute</h2>
+        {research_html}
       </div>
 
       <div class="card">

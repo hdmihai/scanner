@@ -738,6 +738,27 @@ def decide(calibration, signal, agent_pred=None, bucket_size=20):
                 "calibrated_prob": cal["win_rate"] if cal else None,
                 "agent_prob": agent_p0, "agent_used": True}
 
+    # REGULI DIN CERCETAREA AUTONOMA (core/research.py): doar cele ACTIVE - trecute de
+    # cautare, de perioada rezervata si de confirmarea live. Fara reguli active, nimic
+    # nu se schimba. O parte din semnalele excluse se emit totusi (explorare), ca efectul
+    # regulii sa ramana masurat live si regula sa poata fi retrasa daca nu mai ajuta.
+    from core import research as _research
+    for _rule in auto.get("research_rules") or []:
+        if not _research.matches(_rule, signal):
+            continue
+        key = f"rr|{_rule.get('id')}|{signal.get('symbol', '')}|{signal.get('price')}"
+        if (int(hashlib.sha256(key.encode()).hexdigest(), 16) % 1000) < AGENT_EXPLORE_RATE * 1000:
+            return {"action": "ISSUE", "mode": "EXPLORARE_REGULA",
+                    "reason": f"regula din cercetare ({_rule.get('text')}) - emis pentru explorare, "
+                              "ca efectul regulii sa ramana masurat live",
+                    "expected_value_r": None, "calibrated_prob": cal["win_rate"] if cal else None,
+                    "agent_prob": (agent_pred or {}).get("probability"), "agent_used": False}
+        return {"action": "SKIP", "mode": "REGULA_CERCETARE",
+                "reason": f"regula din cercetarea autonoma: {_rule.get('text')} (confirmata pe backtest, "
+                          "pe perioada rezervata si pe planuri live)",
+                "expected_value_r": None, "calibrated_prob": cal["win_rate"] if cal else None,
+                "agent_prob": (agent_pred or {}).get("probability"), "agent_used": False}
+
     ec = signal.get("elliott_conflict") or {}
     if (USE_ELLIOTT_FILTER and auto.get("elliott_filter", True) and ec.get("bias") is not None
             and ec["bias"] <= ELLIOTT_CONFLICT_MAX):

@@ -401,6 +401,88 @@ def open_issue(title, body):
         return False
 
 
+RESEARCH_FILE = "research.json"
+RESEARCH_EVERY_DAYS = 7      # investigatie noua, cel mult o data pe saptamana...
+RESEARCH_MAX_DAYS = 30       # ...si oricum o data pe luna (reverifica regulile existente)
+
+
+def research_cycle(store, now=None):
+    """CERCETAREA AUTONOMA (core/research.py), cu ciclul de viata al regulilor:
+
+      investigatie -> regula acceptata -> SHADOW (calculata pe planurile live, nu filtreaza)
+                   -> ACTIVA dupa confirmarea live (filtreaza, cu explorare)
+                   -> RETRASA daca live o infirma sau o investigatie noua n-o mai accepta.
+
+    Investigatia porneste cand edge-ul recent nu e distinct pozitiv sau exista reguli de
+    urmarit, cel mult o data la RESEARCH_EVERY_DAYS zile, si oricum o data la
+    RESEARCH_MAX_DAYS. Pe planurile existente dureaza cateva secunde: nu are nevoie de
+    o scanare noua, doar de planurile de backtest deja salvate.
+    Intoarce (regulile ACTIVE pentru decizie, verificarea pentru auto-diagnostic)."""
+    import plan_tracker
+    from core import research as R
+    now = now or time.time()
+    st = _load(RESEARCH_FILE, {}) or {}
+    rules = st.get("rules") or {}
+    plans = store.get("plans") or []
+    closed = [p for p in plans if p.get("realized_r") is not None and p.get("state") != "NO_ENTRY"]
+    bt = [p for p in closed if p.get("source") == "backtest"]
+    live = [p for p in closed if p.get("source") != "backtest"]
+    edge = plan_tracker.edge_by_period(bt)
+    tracked = [r for r in rules.values() if r.get("state") in ("shadow", "activa")]
+    age_days = (now - (st.get("last_run_ts") or 0)) / 86400
+    due = (age_days >= RESEARCH_MAX_DAYS
+           or (age_days >= RESEARCH_EVERY_DAYS and (edge.get("status") in ("neconcludent", "negativ") or tracked)))
+    stamp = time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime(now))
+    if due:
+        rep = R.investigate(plans)
+        st["report"] = {k: v for k, v in rep.items()}
+        st["last_run_ts"], st["last_run"] = now, stamp
+        st["trigger"] = (f"edge recent {edge.get('status')}" if edge.get("status") in ("neconcludent", "negativ")
+                         else ("reguli de urmarit" if tracked else "verificare lunara"))
+        if rep.get("status") == "ok":
+            ok_ids = {a["id"] for a in rep["accepted"]}
+            for a in rep["accepted"]:
+                r = rules.get(a["id"])
+                if not r or r.get("state") == "retrasa":
+                    rules[a["id"]] = {"id": a["id"], "text": a["text"], "rule": a["rule"], "state": "shadow",
+                                      "since_ts": now, "since": stamp, "evidence": a}
+                else:
+                    r["evidence"] = a
+            for rid, r in rules.items():
+                if r.get("state") in ("shadow", "activa") and rid not in ok_ids:
+                    r.update(state="retrasa", retired=stamp,
+                             retired_reason="o investigatie noua nu o mai accepta pe datele actualizate")
+    for r in rules.values():
+        if r.get("state") not in ("shadow", "activa"):
+            continue
+        verdict, info = R.live_verdict({**r["rule"]}, live, r.get("since_ts") or now)
+        r["live"] = {**info, "verdict": verdict, "when": stamp}
+        if r["state"] == "shadow" and verdict == "confirma":
+            r.update(state="activa", activated=stamp)
+        elif verdict == "infirma":
+            r.update(state="retrasa", retired=stamp,
+                     retired_reason="planurile live potrivite regulii au castigat mai mult decat restul")
+    st["rules"] = rules
+    st["edge_status"] = edge.get("status")
+    out_path = os.path.join(DATA, RESEARCH_FILE)
+    os.makedirs(DATA, exist_ok=True)
+    with open(out_path + ".tmp", "w") as f:
+        json.dump(st, f, separators=(",", ":"))
+    os.replace(out_path + ".tmp", out_path)
+    active = [{"id": r["id"], "text": r["text"], **r["rule"]} for r in rules.values() if r.get("state") == "activa"]
+    rep = st.get("report") or {}
+    n_sh = sum(1 for r in rules.values() if r.get("state") == "shadow")
+    if rep.get("status") != "ok":
+        chk = _chk("research", "OK", "Cercetare autonoma",
+                   f"nicio investigatie inca ({rep.get('status') or 'neprogramata'})")
+    else:
+        chk = _chk("research", "OK", "Cercetare autonoma",
+                   f"ultima investigatie {st.get('last_run')}: {rep['n_rules']} reguli testate pe "
+                   f"{rep['n_plans']} planuri, {len(rep['accepted'])} acceptate; "
+                   f"{len(active)} active, {n_sh} in shadow")
+    return active, chk
+
+
 def run():
     details = _load("latest_details.json", {}) or {}
     store = _load("plans.json", {}) or {}
@@ -430,7 +512,14 @@ def run():
 
     ew_on, ew_why = elliott_filter_decision(store, pm.get("elliott_filter", True))
     geo_err = any(c["id"] == "plan_geometry" and c["level"] == "ERROR" for c in checks)
+    try:
+        research_rules, research_chk = research_cycle(store)
+    except Exception as e:                              # cercetarea nu are voie sa opreasca diagnosticul
+        research_rules = list((pm.get("research_rules") or []))
+        research_chk = _chk("research", "WARN", "Cercetarea autonoma a esuat", f"{type(e).__name__}: {e}")
+    checks.append(research_chk)
     mitig = {"quarantine": quarantine, "elliott_filter": ew_on, "elliott_filter_reason": ew_why,
+             "research_rules": research_rules,
              "safe_mode": geo_err,
              "safe_reason": "niveluri de plan imposibile - vezi auto-diagnosticul" if geo_err else None}
 
