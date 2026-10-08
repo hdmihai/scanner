@@ -1,4 +1,14 @@
 {
-  "scan_time": "2026-10-08 07:42 UTC",
-  "decisions": {}
+  "scan_time": "2026-10-08 08:42 UTC",
+  "decisions": {
+    "SOL/USDT": {
+      "action": "SKIP",
+      "mode": "FILTRU_AGENT",
+      "reason": "agentul pune semnalul in treimea de jos (0.090 < 0.210); masurat in afara esantionului, acea treime pierde in medie",
+      "calibrated_prob": 42.5,
+      "agent_prob": 0.0899,
+      "elliott_bias": 0.5053,
+      "next_entry": null
+    }
+  }
 }

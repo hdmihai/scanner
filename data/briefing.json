@@ -1,27 +1,27 @@
 {
-  "text": "Din 16450 planuri inchise, rata de succes e 33.4%, cu +1393.67R cumulat (+0.085R in medie pe plan) si profit factor 1.12. 20 planuri sunt inca deschise. Atentie: 16340 dintre ele sunt din backtest. LIVE, din 2026-09-22: 110 planuri inchise, castig 32.7% (IC 24.7-41.9%), R mediu -0.246R (IC95 -0.502..+0.011R), total -27.02R. Ultimele inchise: #293316 FIL/USDT -1.03R, #293317 FLOW/USDT -1.03R, #207120 THETA/USDT +0.67R. Pe intervalele de scor cu destule date, cel mai bine merge 0-19 (27.5%, +0.35R mediu, n=160), iar cel mai slab 40-59 (29.8%, +0.05R, n=7850). Deciziile de a deschide sau refuza planuri se bazeaza pe aceste cifre masurate, nu pe scorul brut. Agentul cu invatare online e ACTIV si contribuie la decizii (ordoneaza mai bine decat scorul brut: AUC 0.677 vs 0.567; treimea de sus +0.330R vs toate +0.046R (prequential); acuratete 68.0% vs 67.2% prezicand mereu pierdere (ultimele 3000 exemple)), pe 16364 planuri invatate.",
+  "text": "Din 16451 planuri inchise, rata de succes e 33.4%, cu +1392.63R cumulat (+0.085R in medie pe plan) si profit factor 1.12. 19 planuri sunt inca deschise. Atentie: 16340 dintre ele sunt din backtest. LIVE, din 2026-09-22: 111 planuri inchise, castig 32.4% (IC 24.4-41.6%), R mediu -0.253R (IC95 -0.507..+0.001R), total -28.07R. Ultimele inchise: #293328 ALGO/USDT -1.04R, #293316 FIL/USDT -1.03R, #293317 FLOW/USDT -1.03R. Pe intervalele de scor cu destule date, cel mai bine merge 0-19 (27.5%, +0.35R mediu, n=160), iar cel mai slab 40-59 (29.8%, +0.05R, n=7850). Deciziile de a deschide sau refuza planuri se bazeaza pe aceste cifre masurate, nu pe scorul brut. Agentul cu invatare online e ACTIV si contribuie la decizii (ordoneaza mai bine decat scorul brut: AUC 0.677 vs 0.567; treimea de sus +0.330R vs toate +0.045R (prequential); acuratete 68.0% vs 67.3% prezicand mereu pierdere (ultimele 3000 exemple)), pe 16365 planuri invatate.",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-10-08 07:42 UTC",
+    "scan_time": "2026-10-08 08:42 UTC",
     "universe_size": 30,
     "plans_total": 21720,
-    "plans_open": 20,
-    "plans_closed": 16450,
+    "plans_open": 19,
+    "plans_closed": 16451,
     "legacy_closed": 0,
     "legacy_total_r": null,
     "win_rate": 33.4,
-    "total_r": 1393.67,
+    "total_r": 1392.63,
     "avg_r": 0.085,
     "profit_factor": 1.12,
     "live": {
-      "closed": 110,
-      "win_rate": 32.7,
-      "wr_ci_low": 24.7,
-      "wr_ci_high": 41.9,
-      "avg_r": -0.246,
-      "avg_r_ci_low": -0.502,
-      "avg_r_ci_high": 0.011,
-      "total_r": -27.02,
+      "closed": 111,
+      "win_rate": 32.4,
+      "wr_ci_low": 24.4,
+      "wr_ci_high": 41.6,
+      "avg_r": -0.253,
+      "avg_r_ci_low": -0.507,
+      "avg_r_ci_high": 0.001,
+      "total_r": -28.07,
       "since": "2026-09-22"
     },
     "backtest": {
@@ -36,6 +36,13 @@
       "since": "2018-02-13"
     },
     "recent_closed": [
+      {
+        "id": 293328,
+        "symbol": "ALGO/USDT",
+        "direction": "SHORT",
+        "state": "SL HIT - INVALIDATED",
+        "r": -1.044
+      },
       {
         "id": 293316,
         "symbol": "FIL/USDT",
@@ -63,13 +70,6 @@
         "direction": "LONG",
         "state": "SL HIT - INVALIDATED",
         "r": -1.031
-      },
-      {
-        "id": 228659,
-        "symbol": "DASH/USDT",
-        "direction": "SHORT",
-        "state": "TP2 HIT - CLOSED",
-        "r": 5.664
       }
     ],
     "open_now": [
@@ -80,16 +80,10 @@
         "state": "INTRARE ATINSA - pozitie activa"
       },
       {
-        "id": 293328,
-        "symbol": "ALGO/USDT",
-        "direction": "SHORT",
-        "state": "INTRARE ATINSA - pozitie activa"
-      },
-      {
         "id": 293327,
         "symbol": "FLOW/USDT",
         "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
+        "state": "INTRARE ATINSA - pozitie activa"
       },
       {
         "id": 293326,
@@ -100,6 +94,12 @@
       {
         "id": 293325,
         "symbol": "GRAM/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 293324,
+        "symbol": "ETH/USDT",
         "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       }
@@ -127,38 +127,38 @@
       "reliable": true
     },
     "agent_status": "ACTIVE",
-    "agent_reason": "ordoneaza mai bine decat scorul brut: AUC 0.677 vs 0.567; treimea de sus +0.330R vs toate +0.046R (prequential); acuratete 68.0% vs 67.2% prezicand mereu pierdere (ultimele 3000 exemple)",
-    "agent_samples": 16364,
-    "agent_balanced": 69.71045285378568,
-    "baseline_balanced": 33.350156587048154,
+    "agent_reason": "ordoneaza mai bine decat scorul brut: AUC 0.677 vs 0.567; treimea de sus +0.330R vs toate +0.045R (prequential); acuratete 68.0% vs 67.3% prezicand mereu pierdere (ultimele 3000 exemple)",
+    "agent_samples": 16365,
+    "agent_balanced": 69.71226288792795,
+    "baseline_balanced": 33.34815424595322,
     "agent_weights": {
-      "trend": -0.156929,
-      "momentum": -0.281854,
-      "volatility": -0.181978,
-      "volume": -0.26261,
+      "trend": -0.157483,
+      "momentum": -0.287476,
+      "volatility": -0.187298,
+      "volume": -0.267911,
       "persistence_n": 0.0,
-      "ev_ema_fast": -0.064749,
-      "ev_ema_stack": 0.46492,
-      "ev_supertrend": -0.05667,
-      "ev_macd": 0.687878,
-      "ev_vwap": 0.122347,
-      "ev_poc": -0.344251,
+      "ev_ema_fast": -0.068466,
+      "ev_ema_stack": 0.469028,
+      "ev_supertrend": -0.062836,
+      "ev_macd": 0.681709,
+      "ev_vwap": 0.11618,
+      "ev_poc": -0.338083,
       "ev_value_area": 0.009629,
-      "ev_rsi": -0.344788,
+      "ev_rsi": -0.344058,
       "ev_volume": 0.0,
       "ev_volatility": 0.0,
       "ev_order_flow": 0.0,
       "ev_book_imbalance": 0.0,
       "ev_liq_magnet": 0.0,
-      "ev_ichimoku": -0.221925,
-      "ev_ma_cross": 0.251783,
-      "ev_regime": 0.102087,
-      "ev_mtf_align": -0.147696,
-      "ev_elliott": 0.059211,
-      "ev_liq_struct": 0.264775,
-      "ev_liq_sweep": 0.107009,
-      "ev_altseason": -0.2095,
-      "ev_fusion": -0.286244
+      "ev_ichimoku": -0.22672,
+      "ev_ma_cross": 0.257948,
+      "ev_regime": 0.101347,
+      "ev_mtf_align": -0.147695,
+      "ev_elliott": 0.060444,
+      "ev_liq_struct": 0.27094,
+      "ev_liq_sweep": 0.107008,
+      "ev_altseason": -0.212039,
+      "ev_fusion": -0.286502
     }
   },
   "llm_error": "GEMINI_API_KEY lipseste"

@@ -1,45 +1,45 @@
 {
   "model": {
     "weights": {
-      "trend": -0.156929,
-      "momentum": -0.281854,
-      "volatility": -0.181978,
-      "volume": -0.26261,
+      "trend": -0.157483,
+      "momentum": -0.287476,
+      "volatility": -0.187298,
+      "volume": -0.267911,
       "persistence_n": 0.0,
-      "ev_ema_fast": -0.064749,
-      "ev_ema_stack": 0.46492,
-      "ev_supertrend": -0.05667,
-      "ev_macd": 0.687878,
-      "ev_vwap": 0.122347,
-      "ev_poc": -0.344251,
+      "ev_ema_fast": -0.068466,
+      "ev_ema_stack": 0.469028,
+      "ev_supertrend": -0.062836,
+      "ev_macd": 0.681709,
+      "ev_vwap": 0.11618,
+      "ev_poc": -0.338083,
       "ev_value_area": 0.009629,
-      "ev_rsi": -0.344788,
+      "ev_rsi": -0.344058,
       "ev_volume": 0.0,
       "ev_volatility": 0.0,
       "ev_order_flow": 0.0,
       "ev_book_imbalance": 0.0,
       "ev_liq_magnet": 0.0,
-      "ev_ichimoku": -0.221925,
-      "ev_ma_cross": 0.251783,
-      "ev_regime": 0.102087,
-      "ev_mtf_align": -0.147696,
-      "ev_elliott": 0.059211,
-      "ev_liq_struct": 0.264775,
-      "ev_liq_sweep": 0.107009,
-      "ev_altseason": -0.2095,
-      "ev_fusion": -0.286244
+      "ev_ichimoku": -0.22672,
+      "ev_ma_cross": 0.257948,
+      "ev_regime": 0.101347,
+      "ev_mtf_align": -0.147695,
+      "ev_elliott": 0.060444,
+      "ev_liq_struct": 0.27094,
+      "ev_liq_sweep": 0.107008,
+      "ev_altseason": -0.212039,
+      "ev_fusion": -0.286502
     },
-    "bias": -1.309714
+    "bias": -1.31588
   },
-  "samples_trained": 16364,
+  "samples_trained": 16365,
   "last_trained_scan_ts": 0.0,
   "agent": {
-    "correct": 11408,
-    "total": 16364
+    "correct": 11409,
+    "total": 16365
   },
   "baseline": {
     "correct": 5457,
-    "total": 16364
+    "total": 16365
   },
   "by_direction": {
     "LONG": {
@@ -48,18 +48,13 @@
       "total": 8111
     },
     "SHORT": {
-      "agent": 5787,
+      "agent": 5788,
       "baseline": 2728,
-      "total": 8253
+      "total": 8254
     }
   },
   "first_scan_ts": 1518537600.0,
   "pairs": [
-    [
-      0.16677,
-      1.0,
-      3.531
-    ],
     [
       0.17438,
       0.0,
@@ -15054,10 +15049,14 @@
       0.17872,
       0.0,
       -1.026
+    ],
+    [
+      0.12332,
+      0.0,
+      -1.044
     ]
   ],
   "recent": [
-    0,
     1,
     1,
     1,
@@ -15245,6 +15244,7 @@
     1,
     0,
     0,
+    1,
     1,
     1,
     1,
@@ -15259,7 +15259,6 @@
     1
   ],
   "recent_baseline": [
-    1,
     0,
     0,
     0,
@@ -15447,6 +15446,7 @@
     0,
     1,
     1,
+    0,
     0,
     0,
     0,
@@ -19390,10 +19390,6 @@
   "source": "plans-v6-4h",
   "feature_version": "f7",
   "score_pairs": [
-    [
-      0.45,
-      1.0
-    ],
     [
       0.73,
       0.0
@@ -31389,28 +31385,32 @@
     [
       0.45,
       0.0
+    ],
+    [
+      0.68,
+      0.0
     ]
   ],
-  "last_event_ts": 1791388800.0,
+  "last_event_ts": 1791432000.0,
   "live": {
-    "n": 110,
-    "auc": 0.618,
-    "ci_low": 0.512,
-    "ci_high": 0.727,
-    "avg_r": -0.246
+    "n": 111,
+    "auc": 0.622,
+    "ci_low": 0.517,
+    "ci_high": 0.732,
+    "avg_r": -0.253
   },
-  "status_reason": "ordoneaza mai bine decat scorul brut: AUC 0.677 vs 0.567; treimea de sus +0.330R vs toate +0.046R (prequential); acuratete 68.0% vs 67.2% prezicand mereu pierdere (ultimele 3000 exemple)",
-  "days_covered": 3158.0,
-  "balanced_agent": 69.71045285378568,
-  "balanced_baseline": 33.350156587048154,
+  "status_reason": "ordoneaza mai bine decat scorul brut: AUC 0.677 vs 0.567; treimea de sus +0.330R vs toate +0.045R (prequential); acuratete 68.0% vs 67.3% prezicand mereu pierdere (ultimele 3000 exemple)",
+  "days_covered": 3158.5,
+  "balanced_agent": 69.71226288792795,
+  "balanced_baseline": 33.34815424595322,
   "balanced_directions": [
     "LONG",
     "SHORT"
   ],
-  "auc": 0.6766336596710262,
-  "auc_score_baseline": 0.5665588681355982,
+  "auc": 0.6771444978896651,
+  "auc_score_baseline": 0.5666375330780612,
   "agent_superior": true,
-  "majority_baseline": 67.23333333333333,
+  "majority_baseline": 67.26666666666667,
   "predicted_positive_rate": 18.366666666666667,
   "skew": {
     "ev_ema_fast": [
@@ -31438,7 +31438,7 @@
       100
     ],
     "ev_value_area": [
-      73,
+      72,
       76
     ],
     "ev_rsi": [
@@ -31466,7 +31466,7 @@
       41
     ],
     "ev_ichimoku": [
-      76,
+      77,
       75
     ],
     "ev_ma_cross": [
@@ -31478,7 +31478,7 @@
       100
     ],
     "ev_mtf_align": [
-      87,
+      86,
       83
     ],
     "ev_elliott": [
