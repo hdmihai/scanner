@@ -12,7 +12,8 @@ from dashboard.sections.agent import render_agent_card, render_learning_curve
 from dashboard.sections.altseason import render_altseason
 from dashboard.sections.exchanges import page_href, render_exchange_modules, render_nav
 from dashboard.sections.market import render_briefing, render_evidence, render_indicators, render_levels, render_liquidity, render_opportunity_rows
-from dashboard.sections.plan import elliott_outcome_stats, render_calibration, render_plan, render_plan_memory
+from dashboard.sections.plan import (elliott_outcome_stats, recent_calibration, render_calibration, render_plan,
+                                     render_plan_memory, tracked_plan)
 from dashboard.sections.health import render_health
 from dashboard.sections.research import render_research
 from dashboard.sections.status import render_self_check, render_similar_projects
@@ -47,9 +48,14 @@ def _safe(name, fn, *a, **k):
 def build_html(scan, best, deep, chart, health, weights, session, token_meta, narrative, history, weights_history, agent_state, plans_store, briefing, details, exchanges_store,
                exchange_scans=None, ex_proposals=None):
     _dec = (load_json(os.path.join(DATA_DIR, "decisions.json"), {}).get("decisions") or {})
+    # planul deja urmarit pentru candidatul principal: cand exista, scanarea nu scrie
+    # nicio decizie pentru el, iar cardul trebuie sa arate planul real, nu semnalul curent
     plan_html = _safe("render_plan", render_plan, best, deep, (plans_store or {}).get("calibration"),
                             _dec.get((best or {}).get("symbol")),
-                            elliott_outcome_stats(plans_store))
+                            elliott_outcome_stats(plans_store),
+                            open_plan=tracked_plan(plans_store, (best or {}).get("symbol"),
+                                                   (best or {}).get("direction")),
+                            recent=recent_calibration(plans_store))
     levels_html = _safe("render_levels", render_levels, deep)
     liquidity_html = _safe("render_liquidity", render_liquidity, deep)
     selfcheck_html = _safe("render_self_check", render_self_check, load_json(os.path.join(DATA_DIR, "self_check.json"), None),

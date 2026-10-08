@@ -368,15 +368,28 @@ def _strip_display_fields(store):
 
 # ============================ CREARE DE PLANURI =============================
 
+def open_plan_for(store, symbol, direction):
+    """Planul ACTIV deja urmarit pe simbol+directie (cel mai recent), sau None.
+
+    O SINGURA regula, folosita de scanare (has_open_plan), de dashboard si de
+    emailul digest. Inainte, scanarea sarea peste semnalul cu plan activ fara sa
+    scrie vreo decizie, iar cardul "AI plan" afisa nivelurile semnalului curent ca
+    si cum ar fi fost planul agentului (8 oct 2026: DASH SHORT entry 54.945, desi
+    planul real #293318 avea entry 54.52)."""
+    found = None
+    for p in (store or {}).get("plans") or []:
+        if (p.get("symbol") == symbol and p.get("direction") == direction
+                and p.get("state") not in CLOSED_STATES
+                and (found is None or (p.get("id") or 0) > (found.get("id") or 0))):
+            found = p
+    return found
+
+
 def has_open_plan(store, symbol, direction):
     """Nu deschid un plan nou pentru acelasi simbol+directie daca deja am unul
     activ. Fara asta, un semnal persistent ar genera zeci de planuri identice
     si ar umple istoricul cu duplicate corelate."""
-    return any(
-        p["symbol"] == symbol and p["direction"] == direction
-        and p["state"] not in CLOSED_STATES
-        for p in store["plans"]
-    )
+    return open_plan_for(store, symbol, direction) is not None
 
 
 def create_plan(store, signal, plan_levels, decision):
@@ -976,6 +989,54 @@ def edge_by_period(bt):
             "until": time.strftime("%Y-%m-%d", time.gmtime(last)), "status": status}
 
 
+def _cal_slim(e):
+    return {k: e[k] for k in ("total", "win_rate", "ci_low", "ci_high", "avg_r", "reliable")}
+
+
+def calibration_by_period(store, days=EDGE_RECENT_DAYS, bucket_size=20):
+    """CALIBRAREA PE ULTIMELE `days` ZILE, langa cea pe tot istoricul.
+
+    Probabilitatea afisata pentru un semnal e rata de castig a intervalului lui de
+    scor pe TOT istoricul (backtest 2018-azi + live). Edge-ul s-a erodat
+    (edge_by_period), iar media pe 8 ani ascunde asta. Masurat pe data/plans.json la
+    8 oct 2026, intervalul 60-79: tot istoricul 42.5%; ultimele 365 de zile 38.0%
+    (IC 34.9-41.3%, n=865, R mediu -0.049R) fata de perioada ANTERIOARA ferestrei
+    43.5% (IC 42.0-45.1%, n=3906, +0.135R) - intervalele nu se suprapun.
+
+    Aceleasi reguli ca build_calibration (aceeasi functie, aplicata pe doua
+    subseturi): planuri inchise, fara NO_ENTRY, familia de geometrie curenta.
+    Fereastra se termina la cel mai recent plan inchis (ca edge_by_period).
+    Comparatia e cu perioada ANTERIOARA ferestrei (esantioane disjuncte), nu cu
+    totalul care o contine. Verdictul `vs_prior` e "sub"/"peste" doar cand
+    intervalele Wilson 95% nu se suprapun - test conservator, potrivit pentru 5
+    intervale comparate deodata.
+
+    Doar pentru afisare: decide() ramane pe tot istoricul. O calibrare ponderata
+    spre perioada recenta a fost RESPINSA de validarea walk-forward (Brier mai slab
+    decat pe tot istoricul), deci nu inlocuieste probabilitatea folosita la decizie."""
+    closed = [p for p in store.get("plans") or []
+              if p.get("state") in CLOSED_STATES and p.get("state") != STATE_NO_ENTRY
+              and p.get("realized_r") is not None and p.get("score_at_entry") is not None
+              and same_family(p.get("geometry", "v1"))]
+    if not closed:
+        return {"status": "date_insuficiente"}
+    last = max(_ts(p) for p in closed)
+    cut = last - days * 86400
+    recent = build_calibration({"plans": [p for p in closed if _ts(p) >= cut]}, bucket_size)
+    prior = build_calibration({"plans": [p for p in closed if _ts(p) < cut]}, bucket_size)
+    buckets = {}
+    for b in sorted(recent, key=int):
+        e, q = _cal_slim(recent[b]), prior.get(b)
+        e["prior"] = _cal_slim(q) if q else None
+        e["vs_prior"] = None
+        if q and e["reliable"] and q["reliable"]:
+            e["vs_prior"] = ("sub" if e["ci_high"] < q["ci_low"] else
+                             "peste" if e["ci_low"] > q["ci_high"] else "in_marja")
+        buckets[b] = e
+    return {"days": days, "since": time.strftime("%Y-%m-%d", time.gmtime(cut)),
+            "until": time.strftime("%Y-%m-%d", time.gmtime(last)), "buckets": buckets}
+
+
 def summarize(store):
     plans = store["plans"]
     all_closed = [p for p in plans if p["state"] in CLOSED_STATES and p.get("realized_r") is not None]
@@ -1017,6 +1078,7 @@ def summarize(store):
         "divergence": divergence([p for p in closed if p.get("source") != "backtest"],
                                  [p for p in closed if p.get("source") == "backtest"]),
         "edge": edge_by_period([p for p in closed if p.get("source") == "backtest"]),
+        "calibration_recent": calibration_by_period(store),
         "no_entry": len(no_entry),
         "no_entry_pct": round(100 * len(no_entry) / len(current_geo), 1) if current_geo else None,
         "legacy_closed": len(legacy) + archived_closed,

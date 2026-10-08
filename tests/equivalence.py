@@ -16,6 +16,18 @@ scriu in data/ si docs/. Scenarii:
 Rezultat: cod 0 daca iesirile sunt identice - sau difera doar in fisierele declarate in
 --allow (o schimbare de comportament ASUMATA, cu motiv) - si daca niciun pas nu esueaza doar
 pe versiunea noua. Altfel cod 1: actualizarea nu se aplica.
+
+Fisierul --allow (EXPECTED_CHANGES.txt din arhiva) are cate un tipar pe linie:
+  docs/*                                     tot fisierul poate sa difere
+  data/plans.json#/summary/calibration_recent  DOAR acea cale JSON poate sa difere; restul
+                                             fisierului trebuie sa fie identic
+Calea dupa "#" e un JSON Pointer (RFC 6901: "~1" = "/", "~0" = "~"), cu "*" = orice cheie sau
+element pe un nivel si "**" = oricate niveluri (ex. data/exchanges/*/proposals.json#/proposals/*/neighbors).
+DE CE: declararea unui fisier intreg (ex. data/plans.json, pentru un camp nou de afisare)
+lasa poarta oarba la orice alta schimbare din el - inclusiv la deciziile de plan. Calea
+precisa pastreaza verificarea pe tot restul. Inainte de orice comparatie, poarta isi
+verifica singura logica de excludere (_self_test): o excludere care ar ascunde mai mult
+decat calea declarata respinge actualizarea.
 """
 
 import argparse
@@ -98,16 +110,148 @@ def hashes(root):
                     raw = f.read()
                 if fn == "exchange_scans.json":
                     try:
-                        d = json.loads(raw)
-                        for v in (d.get("scans") or {}).values():
-                            v.pop("duration_s", None)
-                        raw = json.dumps(d, sort_keys=True).encode()
+                        raw = json.dumps(_normalize(fn, json.loads(raw)), sort_keys=True).encode()
                     except ValueError:
                         pass
                 elif fn.endswith(".html"):
                     raw = re.sub(rb"analiza [0-9.]+s", b"analiza Xs", raw)
                 out[os.path.relpath(p, root).replace(os.sep, "/")] = hashlib.sha256(raw).hexdigest()
     return out
+
+
+def _normalize(fn, d):
+    """Ce e timp real, nu comportament: durata analizei per bursa."""
+    if fn == "exchange_scans.json" and isinstance(d, dict):
+        for v in (d.get("scans") or {}).values():
+            if isinstance(v, dict):
+                v.pop("duration_s", None)
+    return d
+
+
+def _segments(ptr):
+    if not ptr.startswith("/"):
+        raise ValueError(f"calea JSON trebuie sa inceapa cu '/': {ptr!r}")
+    return [s.replace("~1", "/").replace("~0", "~") for s in ptr[1:].split("/")]
+
+
+def _children(node):
+    if isinstance(node, dict):
+        return list(node.values())
+    if isinstance(node, list):
+        return list(node)
+    return []
+
+
+def _prune(node, segs):
+    """Sterge din `node` valorile de la calea `segs` ("*" = un nivel, "**" = oricate)."""
+    if not segs:
+        return
+    head, rest = segs[0], segs[1:]
+    if head == "**":
+        if not rest:                                   # "/x/**": tot ce e sub x
+            if isinstance(node, dict):
+                node.clear()
+            elif isinstance(node, list):
+                del node[:]
+            return
+        _prune(node, rest)                             # zero niveluri
+        for child in _children(node):                  # unul sau mai multe
+            _prune(child, segs)
+        return
+    if isinstance(node, dict):
+        keys = [k for k in list(node) if fnmatch.fnmatchcase(str(k), head)]
+        for k in keys:
+            if rest:
+                _prune(node[k], rest)
+            else:
+                del node[k]
+    elif isinstance(node, list):
+        if head == "*":
+            idx = list(range(len(node)))
+        elif head.isdigit() and int(head) < len(node):
+            idx = [int(head)]
+        else:
+            idx = []
+        if rest:
+            for i in idx:
+                _prune(node[i], rest)
+        else:
+            for i in sorted(idx, reverse=True):
+                del node[i]
+
+
+def split_allow(allow):
+    """(tipare de fisier intreg, [(tipar de fisier, cale JSON)])."""
+    plain, scoped = [], []
+    for p in allow:
+        if "#" in p:
+            f, ptr = p.split("#", 1)
+            scoped.append((f.strip(), ptr.strip()))
+        else:
+            plain.append(p)
+    return plain, scoped
+
+
+def scoped_equal(base_dir, cand_dir, rel, ptrs):
+    """(True, None) daca fisierul JSON difera DOAR la caile declarate; altfel
+    (False, prima diferenta din afara lor)."""
+    pa, pb = os.path.join(base_dir, rel), os.path.join(cand_dir, rel)
+    if not os.path.exists(pa) or not os.path.exists(pb) or not rel.endswith(".json"):
+        return False, explain(base_dir, cand_dir, rel)
+    try:
+        with open(pa) as fa, open(pb) as fb:
+            a = _normalize(os.path.basename(rel), json.load(fa))
+            b = _normalize(os.path.basename(rel), json.load(fb))
+    except ValueError:
+        return False, "JSON invalid"
+    for ptr in ptrs:
+        _prune(a, _segments(ptr))
+        _prune(b, _segments(ptr))
+    if a == b:
+        return True, None
+    return False, "in afara cailor declarate: " + (first_diff(a, b) or "?")
+
+
+def _self_test():
+    """Poarta isi verifica logica de excludere inainte sa judece o actualizare: o
+    cale declarata trebuie sa ascunda EXACT acea cale, nimic altceva."""
+    import copy
+    base = {"summary": {"edge": 1, "x": {"a": 1}}, "plans": [
+        {"id": 1, "state": "OPEN", "neighbors": {"v": "A"}},
+        {"id": 2, "state": "SL_HIT", "neighbors": {"v": "B"}, "deep": {"neighbors": 1, "keep": 1}}],
+        "decisions": {"SOL/USDT": {"reason": "r", "action": "SKIP"}}}
+
+    def same_after(mutate, ptrs):
+        a, b = copy.deepcopy(base), copy.deepcopy(base)
+        mutate(b)
+        for ptr in ptrs:
+            _prune(a, _segments(ptr))
+            _prune(b, _segments(ptr))
+        return a == b
+
+    def m_nb(d): d["plans"][0]["neighbors"]["v"] = "Z"
+    def m_state(d): d["plans"][1]["state"] = "TP2_HIT"
+    def m_sumx(d): d["summary"]["x"]["a"] = 2
+    def m_edge(d): d["summary"]["edge"] = 2
+    def m_deep(d): d["plans"][1]["deep"]["neighbors"] = 2
+    def m_keep(d): d["plans"][1]["deep"]["keep"] = 2
+    def m_reason(d): d["decisions"]["SOL/USDT"]["reason"] = "s"
+    def m_action(d): d["decisions"]["SOL/USDT"]["action"] = "ISSUE"
+    def m_count(d): d["plans"].append({"id": 3})
+    cases = [
+        (m_nb, ["/plans/*/neighbors"], True),
+        (m_state, ["/plans/*/neighbors"], False),       # decizia unui plan NU e ascunsa
+        (m_count, ["/plans/*/neighbors"], False),       # un plan in plus NU e ascuns
+        (m_sumx, ["/summary/x"], True),
+        (m_edge, ["/summary/x"], False),
+        (m_deep, ["/**/neighbors"], True),
+        (m_deep, ["/plans/*/neighbors"], False),        # "*" e UN nivel, nu oricate
+        (m_keep, ["/**/neighbors"], False),
+        (m_reason, ["/decisions/SOL~1USDT/reason"], True),
+        (m_action, ["/decisions/SOL~1USDT/reason"], False),
+    ]
+    bad = [f"{m.__name__} {ptrs}" for m, ptrs, expect in cases if same_after(m, ptrs) != expect]
+    return bad
 
 
 def first_diff(a, b, path=""):
@@ -163,9 +307,20 @@ def main():
     ap.add_argument("--workdir", default=None)
     ap.add_argument("--keep", action="store_true", help="pastreaza copiile scenariilor (pentru depanare)")
     a = ap.parse_args()
+    bad = _self_test()
+    if bad:
+        print("POARTA DE ECHIVALENTA: RESPINS - logica de excludere pe cai JSON e gresita: " + "; ".join(bad))
+        return 1
     base, cand = os.path.abspath(a.baseline), os.path.abspath(a.candidate)
     data_src = os.path.abspath(a.data or a.candidate)
     allow = load_allow(a.allow)
+    plain, scoped = split_allow(allow)
+    try:
+        for _f, ptr in scoped:
+            _segments(ptr)
+    except ValueError as e:
+        print(f"POARTA DE ECHIVALENTA: RESPINS - EXPECTED_CHANGES.txt: {e}")
+        return 1
     work = a.workdir or tempfile.mkdtemp(prefix="echivalenta-")
     logs = os.path.join(work, "jurnale")
     os.makedirs(logs, exist_ok=True)
@@ -200,7 +355,18 @@ def main():
                         break                          # fara scanare, pasii urmatori n-au sens
         ha, hb = hashes(dirs["vechi"]), hashes(dirs["nou"])
         diffs = sorted(k for k in set(ha) | set(hb) if ha.get(k) != hb.get(k))
-        unexpected = [d for d in diffs if not any(fnmatch.fnmatch(d, p) for p in allow)]
+        unexpected, notes = [], {}
+        for d in diffs:
+            if any(fnmatch.fnmatch(d, p) for p in plain):
+                continue
+            ptrs = [ptr for f, ptr in scoped if fnmatch.fnmatch(d, f)]
+            if ptrs:
+                same, why = scoped_equal(dirs["vechi"], dirs["nou"], d, ptrs)
+                if same:
+                    notes[d] = "doar " + ", ".join(ptrs)
+                    continue
+                notes[d] = why
+            unexpected.append(d)
         regress = {k: v for k, v in fails["nou"].items() if k not in fails["vechi"]}
         # scanarea trebuie sa mearga pe versiunea noua: altfel poarta n-a verificat nimic
         # (doua rulari esuate lasa datele neschimbate - "identic" ar fi o minciuna)
@@ -211,9 +377,9 @@ def main():
         verdict = ("IDENTIC" if not diffs else "DIFERENTE ASUMATE") if ok else "DIFERIT"
         print(f"\n[{sc}] {desc}: {verdict} - {len(ha)} fisiere comparate, {len(diffs)} diferite")
         lines.append(f"| {sc} | {desc} | **{verdict}** | {len(ha)} | {len(diffs)} |")
-        for d in diffs[:15]:
+        for d in sorted(diffs, key=lambda x: x not in unexpected)[:15]:   # cele neasteptate primele
             tag = "asumat" if d not in unexpected else "NEASTEPTAT"
-            print(f"    {tag:10s} {d}: {explain(dirs['vechi'], dirs['nou'], d)}")
+            print(f"    {tag:10s} {d}: {notes.get(d) or explain(dirs['vechi'], dirs['nou'], d)}")
         for st, tail in regress.items():
             print(f"    ESUEAZA DOAR PE VERSIUNEA NOUA: {st}: {tail}")
         for st, tail in fails["vechi"].items():

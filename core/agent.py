@@ -665,14 +665,50 @@ def comparable_entries(features, closed_plans, k=60, min_n=20):
     # "puncte" = cu cat e mai bun grupul apropiat fata de media generala,
     # exprimat pe o scala 0-100 ca sa fie citibil
     points = round(100 * (avg_r - base_avg), 1)
+    # INCERTITUDINEA DIFERENTEI. Verdictul era doar semnul diferentei, fara niciun
+    # interval: "FAVORABIL +21.7 puncte" (FLOW #293327, 7 oct) venea din 60 de planuri
+    # al caror R variaza intre -1.3 si +27 (abatere standard ~2.2R) - la n=60 eroarea
+    # standard a mediei e ~0.28R, adica +/-55 de puncte la 95%. Masurat pe cele 12
+    # planuri deschise la 8 oct: 11 verdicte erau in marja zgomotului; singurul care
+    # iese din ea e LINK #293321 (-89 puncte, IC95 -144..-34). Acum verdictul e
+    # FAVORABIL/NEFAVORABIL doar cand intervalul de incredere 95% al diferentei exclude
+    # zero; altfel NEUTRU (in marja zgomotului). Diferenta fata de media generala e
+    # (m/N)*(media vecinilor - media restului), cu m = N - k.
+    # VARIANTA: cea mai mare dintre varianta vecinilor si cea a restului. Doar varianta
+    # vecinilor nu merge: R-ul are o coada lunga la dreapta, iar 60 de planuri luate la
+    # intamplare de obicei rateaza castigurile mari - media iese mica SI varianta iese
+    # mica, deci intervalul prea ingust. Masurat pe 20.000 de esantioane aleatoare din
+    # planurile reale (fara nicio legatura cu caracteristicile): 8.4% verdicte false
+    # (7.6% "NEFAVORABIL"); cu varianta restului 5.1%; cu maximul celor doua 2.1% - un
+    # verdict iese din marja doar cand e clar peste zgomot, in ambele directii.
+    rest = [r for _, r in pool[k:]]
+    ci_low = ci_high = None
+    if len(rs) >= 2 and len(rest) >= 2:
+        m_rest = sum(rest) / len(rest)
+        var_n = sum((r - avg_r) ** 2 for r in rs) / (len(rs) - 1)
+        var_r = sum((r - m_rest) ** 2 for r in rest) / (len(rest) - 1)
+        se = (len(rest) / len(pool)) * math.sqrt(max(var_n, var_r) / len(rs) + var_r / len(rest))
+        ci_low = round(points - 196 * se, 1)
+        ci_high = round(points + 196 * se, 1)
+    significant = ci_low is not None and (ci_low > 0 or ci_high < 0)
+    verdict = ("FAVORABIL" if significant and points > 0 else
+               "NEFAVORABIL" if significant and points < 0 else "NEUTRU")
+    if ci_low is None:
+        reason = f"{len(near)} intrari similare inchise - prea putine in afara lor pentru o comparatie"
+    elif significant:
+        reason = (f"intrarile comparabile inclina {'favorabil' if points > 0 else 'nefavorabil'} cu "
+                  f"{abs(points):.1f} puncte (IC95 {ci_low:+.1f}..{ci_high:+.1f}), din {len(near)} "
+                  f"intrari similare inchise")
+    else:
+        reason = (f"{len(near)} intrari similare inchise: {points:+.1f} puncte fata de media generala, "
+                  f"dar IC95 {ci_low:+.1f}..{ci_high:+.1f} include zero - in marja zgomotului, nu e un semnal")
     return {
         "n": len(near), "pool": len(pool),
         "win_rate": round(100 * wins / len(near), 1),
         "avg_r": round(avg_r, 4), "base_avg_r": round(base_avg, 4),
-        "points": points,
-        "verdict": "FAVORABIL" if points > 0 else ("NEFAVORABIL" if points < 0 else "NEUTRU"),
-        "reason": (f"intrarile comparabile inclina {'favorabil' if points > 0 else 'nefavorabil'} "
-                   f"cu {abs(points):.1f} puncte, din {len(near)} intrari similare inchise"),
+        "points": points, "ci_low": ci_low, "ci_high": ci_high, "significant": significant,
+        "verdict": verdict,
+        "reason": reason,
     }
 
 

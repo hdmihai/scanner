@@ -3,7 +3,8 @@
 
 
 
-from dashboard.config import STATE_STYLE
+from core.plans import open_plan_for
+from dashboard.config import SL_AFTER_TP1_LABEL, STATE_STYLE
 from dashboard.components import fmt_price
 
 
@@ -25,21 +26,102 @@ def elliott_outcome_stats(plans_store):
             "n_rest": len(rest), "r_rest": sum(rest) / len(rest)}
 
 
-def render_plan(best, deep, calibration=None, decision=None, ew_stats=None):
+def tracked_plan(plans_store, symbol, direction):
+    """Planul ACTIV deja urmarit pentru simbol+directie - aceeasi functie pe care o
+    foloseste scanarea (core.plans.open_plan_for, prin has_open_plan). Cand exista,
+    scanarea NU emite plan nou si nu scrie nicio decizie pentru simbol."""
+    if not symbol or not direction:
+        return None
+    try:
+        return open_plan_for(plans_store or {}, symbol, direction)
+    except (AttributeError, TypeError) as e:       # date stricate: cardul ramane ca inainte
+        print(f"[!] tracked_plan: {e}")
+        return None
+
+
+def recent_calibration(plans_store):
+    """Calibrarea pe ultimele 12 luni, calculata de nucleu la fiecare scanare
+    (core.plans.calibration_by_period, in summary). {} daca lipseste sau e stricata."""
+    try:
+        rc = ((plans_store or {}).get("summary") or {}).get("calibration_recent") or {}
+        return rc if isinstance(rc.get("buckets"), dict) and rc["buckets"] else {}
+    except AttributeError:
+        return {}
+
+
+def _bucket(score):
+    return str(int((score or 0) // 20) * 20)
+
+
+def _recent_note(recent, b):
+    """Rata aceluiasi interval de scor pe ultimele N zile, cu verdictul fata de
+    perioada ANTERIOARA ferestrei (esantioane disjuncte; "sub"/"peste" doar cand
+    intervalele Wilson nu se suprapun - calculat in nucleu)."""
+    rec = ((recent or {}).get("buckets") or {}).get(b) or {}
+    if not rec.get("reliable"):
+        return ""
+    pr = rec.get("prior") or {}
+    verdict = {
+        "sub": (f' &middot; <strong>semnificativ SUB perioada anterioara</strong> '
+                f'({pr.get("win_rate")}%, IC {pr.get("ci_low")}-{pr.get("ci_high")}%, n={pr.get("total")})'),
+        "peste": (f' &middot; semnificativ peste perioada anterioara '
+                  f'({pr.get("win_rate")}%, IC {pr.get("ci_low")}-{pr.get("ci_high")}%, n={pr.get("total")})'),
+        "in_marja": " &middot; in marja perioadei anterioare",
+    }.get(rec.get("vs_prior"), "")
+    return (f'ultimele {recent.get("days")} zile: {rec["win_rate"]}% (IC {rec["ci_low"]}-{rec["ci_high"]}%, '
+            f'n={rec["total"]}, R mediu {rec["avg_r"]:+.3f}R){verdict}')
+
+
+def _r_line(r_tp2, cal):
+    """"Expected R" era |TP2 - entry| / risc (core/geometry.py): raportul castig/risc
+    DACA se atinge TP2, nu o valoare asteptata. La DASH (8 oct) cardul arata
+    "Expected R 4.5R", in timp ce R-ul mediu MASURAT pe intervalul de scor e
+    +0.156R. Le afisez pe amandoua, fiecare cu numele lui."""
+    parts = []
+    if r_tp2 is not None:
+        parts.append(f'R la TP2 &middot; <strong>{r_tp2}R</strong> '
+                     '<span class="dim">(castig/risc daca atinge TP2, nu valoare asteptata)</span>')
+    if cal.get("reliable") and cal.get("avg_r") is not None:
+        parts.append(f'R mediu masurat pe interval &middot; <strong>{cal["avg_r"]:+.3f}R</strong> '
+                     f'<span class="dim">(n={cal["total"]}, tot istoricul)</span>')
+    return f'<div class="expected-r">{"<br>".join(parts)}</div>' if parts else ""
+
+
+def _r_tp2(lv):
+    try:
+        risk = abs(lv["entry"] - lv["sl"])
+        return round(abs(lv["tp2"] - lv["entry"]) / risk, 2) if risk else None
+    except (KeyError, TypeError):
+        return None
+
+
+def render_plan(best, deep, calibration=None, decision=None, ew_stats=None, open_plan=None, recent=None):
     """Cardul "AI plan". CONFIDENCE afisa formula din scor (ex. 76.2%), desi
     probabilitatea MASURATA pe acelasi interval de scor era mult mai mica - iar
     cardul nu spunea nimic cand Elliott contrazicea planul. Acum: probabilitatea
-    masurata, decizia efectiva a agentului si conflictul, cu nivelul urmarit."""
+    masurata, decizia efectiva a agentului si conflictul, cu nivelul urmarit.
+
+    PLAN DEJA URMARIT (`open_plan`): cand candidatul principal are deja un plan
+    activ pe aceeasi directie, scanarea nu emite nimic nou (has_open_plan) si nu
+    scrie nicio decizie. Cardul afisa totusi nivelurile si probabilitatea
+    SEMNALULUI CURENT ca si cum ar fi fost planul agentului (8 oct: DASH SHORT,
+    49.9% la scor 80, entry 54.945), desi planul real #293318 avea entry 54.52 si
+    SL 55.88. Acum cardul arata planul urmarit, iar semnalul curent doar ca
+    informatie. `recent` = calibrarea pe ultimele 12 luni (recent_calibration)."""
     if not best or not deep:
         return '<p class="dim">Niciun candidat cu semnal clar in scanarea curenta.</p>'
     plan = deep["plan"]
     direction_cls = "long" if best["direction"] == "LONG" else "short"
-    b = str(int((best.get("risk_adjusted") or best.get("score") or 0) // 20) * 20)
+    b = _bucket(best.get("risk_adjusted") or best.get("score"))
     cal = (calibration or {}).get(b) or {}
+    if open_plan and not decision:
+        return _render_tracked(best, plan, open_plan, calibration or {}, b, cal, direction_cls, ew_stats, recent)
+    rn = _recent_note(recent, b)
     if cal.get("reliable"):
         conf_html = (f'<span class="confidence-value">{cal["win_rate"]}%</span>'
                      f'<div class="dim conf-note">masurat pe {cal["total"]} planuri cu scor {b}-{int(b)+19} '
-                     f'(IC {cal["ci_low"]}-{cal["ci_high"]}%) &middot; formula din scor: {best["probability"]}%</div>')
+                     f'(IC {cal["ci_low"]}-{cal["ci_high"]}%, tot istoricul) &middot; formula din scor: '
+                     f'{best["probability"]}%' + (f'<br>{rn}' if rn else "") + '</div>')
     else:
         conf_html = (f'<span class="confidence-value">{best["probability"]}%</span>'
                      f'<div class="dim conf-note">formula din scor - necalibrat inca pe acest interval</div>')
@@ -60,11 +142,6 @@ def render_plan(best, deep, calibration=None, decision=None, ew_stats=None):
                         f'{decision.get("reason") or ""}</div>')
         else:
             dec_html = '<div class="plan-ok">Plan emis &middot; nicio contradictie Elliott</div>'
-    stats_html = ""
-    if ew_stats:
-        stats_html = (f'<div class="dim conf-note">Istoric masurat: contra Elliott '
-                      f'{ew_stats["r_con"]:+.3f}R/plan (n={ew_stats["n_con"]}) &middot; fara conflict '
-                      f'{ew_stats["r_rest"]:+.3f}R/plan (n={ew_stats["n_rest"]})</div>')
     return f'''
     <div class="plan-head">
       <span class="symbol">{best["symbol"]}</span>
@@ -81,8 +158,71 @@ def render_plan(best, deep, calibration=None, decision=None, ew_stats=None):
       <div><span class="dim">TP1</span><br>{fmt_price(plan["tp1"])}</div>
       <div><span class="dim">TP2</span><br>{fmt_price(plan["tp2"])}</div>
     </div>
-    <div class="expected-r">Expected R &middot; <strong>{plan["expected_r"]}R</strong></div>
-    {stats_html}
+    {_r_line(plan.get("expected_r"), cal)}
+    {_ew_stats_html(ew_stats)}
+    '''
+
+
+def _ew_stats_html(ew_stats):
+    if not ew_stats:
+        return ""
+    return (f'<div class="dim conf-note">Istoric masurat: contra Elliott '
+            f'{ew_stats["r_con"]:+.3f}R/plan (n={ew_stats["n_con"]}) &middot; fara conflict '
+            f'{ew_stats["r_rest"]:+.3f}R/plan (n={ew_stats["n_rest"]})</div>')
+
+
+def _render_tracked(best, cur, op, calibration, b_now, cal_now, direction_cls, ew_stats, recent):
+    """Cardul cand candidatul principal are deja un plan activ (vezi render_plan):
+    nivelurile si probabilitatea PLANULUI REAL, de la emitere; semnalul curent e
+    doar informativ."""
+    _, label = STATE_STYLE.get(op.get("state"), ("open", op.get("state") or "?"))
+    s0 = op.get("score_at_entry")
+    b0 = _bucket(s0)
+    c0 = (calibration.get(b0) or {}) if s0 is not None else {}
+    if c0.get("reliable"):
+        rn = _recent_note(recent, b0)
+        prob = (f'<span class="confidence-value">{c0["win_rate"]}%</span>'
+                f'<div class="dim conf-note">la emitere: masurat pe {c0["total"]} planuri cu scor '
+                f'{b0}-{int(b0)+19} (IC {c0["ci_low"]}-{c0["ci_high"]}%, tot istoricul); planul a fost '
+                f'deschis la scor {s0}' + (f'<br>{rn}' if rn else "") + '</div>')
+    else:
+        prob = ('<span class="confidence-value">&mdash;</span>'
+                '<div class="dim conf-note">fara calibrare sigura pentru scorul de la emitere</div>')
+    note_state = (" Jumatate din pozitie e inchisa la TP1, iar SL-ul restului e mutat la intrare (breakeven)."
+                  if op.get("state") == "TP1_HIT" else "")
+    cur_txt = ""
+    if cur:
+        cur_p = (f'{cal_now["win_rate"]}% masurat (IC {cal_now["ci_low"]}-{cal_now["ci_high"]}%, '
+                 f'n={cal_now["total"]})' if cal_now.get("reliable") else "necalibrat")
+        rn_now = _recent_note(recent, b_now)
+        if rn_now:
+            cur_p += f"; {rn_now}"
+        cur_txt = (f'<div class="dim conf-note">Semnalul curent (scor {best.get("risk_adjusted")}, interval '
+                   f'{b_now}-{int(b_now)+19}: {cur_p}) ar propune entry {fmt_price(cur.get("entry"))} &middot; '
+                   f'SL {fmt_price(cur.get("sl"))} &middot; TP1 {fmt_price(cur.get("tp1"))} &middot; '
+                   f'TP2 {fmt_price(cur.get("tp2"))} - NU se emite: un singur plan activ pe simbol si '
+                   f'directie.</div>')
+    return f'''
+    <div class="plan-head">
+      <span class="symbol">{best["symbol"]}</span>
+      <span class="badge badge-{direction_cls}">{best["direction"]}</span>
+    </div>
+    <div class="plan-ok"><strong>PLAN URMARIT #{op.get("id")}</strong> &middot; {label}
+      &middot; emis {op.get("created_time") or "-"}.{note_state}
+      Nivelurile de mai jos sunt ale planului urmarit, nu ale semnalului curent.</div>
+    <div class="confidence-row">
+      <span class="dim">PROBABILITATE</span>
+      <div>{prob}</div>
+    </div>
+    <div class="plan-grid">
+      <div><span class="dim">ENTRY</span><br>{fmt_price(op.get("entry"))}</div>
+      <div><span class="dim">{"SL INITIAL" if op.get("state") == "TP1_HIT" else "SL"}</span><br class="sl">{fmt_price(op.get("sl"))}</div>
+      <div><span class="dim">TP1</span><br>{fmt_price(op.get("tp1"))}</div>
+      <div><span class="dim">TP2</span><br>{fmt_price(op.get("tp2"))}</div>
+    </div>
+    {_r_line(_r_tp2(op), c0)}
+    {cur_txt}
+    {_ew_stats_html(ew_stats)}
     '''
 
 
@@ -149,6 +289,8 @@ def render_plan_memory(store):
     cards = []
     for p in sorted(plans, key=lambda x: x["id"], reverse=True)[:12]:
         cls, label = STATE_STYLE.get(p["state"], ("open", p["state"]))
+        if p["state"] == "SL_HIT" and p.get("tp1_hit_ts") is not None:
+            label = SL_AFTER_TP1_LABEL
         r = p.get("realized_r")
         # Un plan care a atins TP1 si a iesit la breakeven are starea SL_HIT dar
         # R POZITIV. Colorarea dupa stare il arata rosu desi a facut bani - deci
@@ -167,17 +309,27 @@ def render_plan_memory(store):
 
 
 def render_calibration(store):
-    """Probabilitatea MASURATA pe intervale de scor, nu formula."""
+    """Probabilitatea MASURATA pe intervale de scor, nu formula. Sub fiecare rata pe
+    tot istoricul apare rata aceluiasi interval pe ultimele 12 luni, cu verdictul fata
+    de perioada anterioara (core.plans.calibration_by_period) - edge-ul s-a erodat,
+    iar media 2018-azi singura supraestima probabilitatea de acum."""
     cal = (store or {}).get("calibration") or {}
     if not cal:
         return '<p class="dim">Se calibreaza dupa primele planuri inchise.</p>'
+    rec = recent_calibration(store)
     rows = []
     for b in sorted(cal, key=int):
         e = cal[b]
         badge = "reliable" if e["reliable"] else "thin"
         txt = (f'{e["win_rate"]}% <span class="dim">(IC {e["ci_low"]}-{e["ci_high"]}%)</span>'
                if e["reliable"] else f'<span class="dim">n={e["total"]}, prea putine date</span>')
+        rn = _recent_note(rec, b)
+        if rn:
+            txt += f'<br><span class="dim">{rn}</span>'
         rows.append(f'''<div class="cal-row cal-{badge}">
       <span>scor {b}-{int(b)+19}</span><span>{txt}</span>
       <span class="dim">{e["avg_r"]:+.2f}R</span></div>''')
-    return '<div class="cal-list">' + "".join(rows) + "</div>"
+    note = (f'<p class="dim" style="margin:6px 0 0;">Rata principala si R-ul din dreapta sunt pe tot istoricul '
+            f'(backtest 2018-azi + live); randul al doilea e acelasi interval pe ultimele {rec["days"]} de zile '
+            f'({rec.get("since")} - {rec.get("until")}), comparat cu perioada de dinainte.</p>' if rec else "")
+    return '<div class="cal-list">' + "".join(rows) + "</div>" + note

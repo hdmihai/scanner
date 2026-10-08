@@ -135,11 +135,16 @@ def render_evidence(plan):
     n = plan.get("neighbors") or {}
     nb = ""
     if n.get("verdict"):
+        # Verdictele salvate inainte de intervalul de incredere (fara "ci_low") erau doar
+        # semnul diferentei - le arat neutru colorat, cu mentiunea asta, nu ca semnal.
+        old = "ci_low" not in n
         nb = ('<div class="ev-neighbors nb-{}">Intrari comparabile: <strong>{}</strong> '
-              '&middot; {}</div>').format(
-                  "ok" if n["verdict"] == "FAVORABIL" else
-                  ("bad" if n["verdict"] == "NEFAVORABIL" else "neu"),
-                  n["verdict"], n["reason"])
+              '&middot; {}{}</div>').format(
+                  "neu" if old else ("ok" if n["verdict"] == "FAVORABIL" else
+                                     ("bad" if n["verdict"] == "NEFAVORABIL" else "neu")),
+                  n["verdict"], n["reason"],
+                  ' <span class="dim">(verdict salvat inainte de intervalul de incredere: doar semnul '
+                  'diferentei, nu un semnal)</span>' if old else "")
     elif n.get("reason"):
         nb = '<div class="ev-neighbors nb-neu dim">{}</div>'.format(n["reason"])
 
