@@ -22,7 +22,8 @@ def render_research(state):
         return f'<p class="dim">Investigatia nu a rulat: {_html.escape(str(rep.get("status")))}.</p>'
     hd, sr = rep.get("holdout") or {}, rep.get("search") or {}
     out = [f'<p class="res-head">Ultima investigatie: <strong>{_html.escape(str(state.get("last_run")))}</strong> '
-           f'({_html.escape(str(state.get("trigger") or ""))}) &middot; {rep["n_rules"]} reguli testate pe '
+           f'(la fiecare scanare, {state.get("runs") or 1} pana acum) '
+           f'&middot; {rep["n_rules"]} reguli testate pe '
            f'{rep["n_plans"]} planuri de backtest &middot; <strong>{len(rep.get("accepted") or [])} acceptate</strong></p>',
            f'<p class="dim res-note">Cautare: {sr.get("n")} planuri, {_num(sr.get("r"))}R/plan. Perioada rezervata '
            f'(ultimele {hd.get("days")} zile, nefolosita la cautare): {hd.get("n")} planuri, {_num(hd.get("r"))}R/plan. '

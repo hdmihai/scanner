@@ -94,9 +94,32 @@ def main():
         print(f"  {'OK ' if ok else 'ERR'} decizia filtreaza tokenul, cu explorare ({sorted(modes)}); alt token: {other}")
         if not ok:
             fails.append("decizie")
-        lv2 = [live("ADA/USDT", 1.6, 100 + i) for i in range(40)]
+        # HISTEREZIS: o investigatie care nu mai accepta regula (date fara tokenul care pierde)
+        # nu o retrage imediat - doar dupa RETIRE_AFTER_DAYS zile fara acceptare
+        clean = [p for p in inj if not str(p.get("symbol", "")).startswith("ADA/")] + lv
+        self_check.research_cycle({"plans": clean}, now=last + 4 * 86400 + 3600)
+        st = json.load(open("data/research.json"))
+        kept = st["rules"][ada["id"]]["state"] == "activa"
+        self_check.research_cycle({"plans": clean}, now=last + 12 * 86400)
+        st = json.load(open("data/research.json"))
+        gone = st["rules"][ada["id"]]["state"] == "retrasa"
+        ok = kept and gone
+        print(f"  {'OK ' if ok else 'ERR'} histerezis: pastrata la o respingere izolata, retrasa dupa "
+              f"{self_check.RETIRE_AFTER_DAYS} zile fara acceptare ({st['rules'][ada['id']].get('retired_reason')})")
+        if not ok:
+            fails.append("histerezis")
+        store["plans"] = inj + lv
+        active, _ = self_check.research_cycle(store, now=last + 12 * 86400 + 3600)
+        st = json.load(open("data/research.json"))
+        ok = st["rules"][ada["id"]]["state"] == "shadow"
+        print(f"  {'OK ' if ok else 'ERR'} reacceptata dupa retragere -> din nou shadow (confirmare live de la zero)")
+        if not ok:
+            fails.append("reacceptare")
+        active, _ = self_check.research_cycle(store, now=last + 16 * 86400)
+        lv2 = [live("ADA/USDT", 1.6, 2000 + i) for i in range(40)]
+        lv2 += [live("BTC/USDT", 0.4 if i % 2 else -0.2, 2100 + i) for i in range(40)]
         store["plans"] = inj + lv + lv2
-        active, _ = self_check.research_cycle(store, now=last + 5 * 86400)
+        active, _ = self_check.research_cycle(store, now=last + 30 * 86400)
         st = json.load(open("data/research.json"))
         ok = st["rules"][ada["id"]]["state"] == "retrasa" and not any(a["id"] == ada["id"] for a in active)
         print(f"  {'OK ' if ok else 'ERR'} infirmata live -> retrasa ({st['rules'][ada['id']].get('retired_reason')})")
