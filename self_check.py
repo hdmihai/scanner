@@ -402,8 +402,14 @@ def open_issue(title, body):
 
 
 RESEARCH_FILE = "research.json"
-RESEARCH_EVERY_DAYS = 7      # investigatie noua, cel mult o data pe saptamana...
-RESEARCH_MAX_DAYS = 30       # ...si oricum o data pe luna (reverifica regulile existente)
+# Investigatia ruleaza la FIECARE scanare (cateva secunde, pe planurile deja salvate).
+# Repetarea nu creste riscul de reguli false: pe aceleasi date rezultatul e identic, iar
+# o regula acceptata intra oricum in SHADOW si devine activa doar dupa confirmarea live.
+# Singurul efect nedorit al rularii orare ar fi "palpairea" unei reguli aflate exact la
+# prag (acceptata intr-o ora, respinsa in urmatoarea) - de aceea o regula in shadow sau
+# activa e retrasa pe motiv de investigatie doar daca n-a mai fost acceptata de
+# RETIRE_AFTER_DAYS zile (histerezis).
+RETIRE_AFTER_DAYS = 7
 
 
 def research_cycle(store, now=None):
@@ -413,10 +419,9 @@ def research_cycle(store, now=None):
                    -> ACTIVA dupa confirmarea live (filtreaza, cu explorare)
                    -> RETRASA daca live o infirma sau o investigatie noua n-o mai accepta.
 
-    Investigatia porneste cand edge-ul recent nu e distinct pozitiv sau exista reguli de
-    urmarit, cel mult o data la RESEARCH_EVERY_DAYS zile, si oricum o data la
-    RESEARCH_MAX_DAYS. Pe planurile existente dureaza cateva secunde: nu are nevoie de
-    o scanare noua, doar de planurile de backtest deja salvate.
+    Investigatia ruleaza la fiecare scanare (vezi RETIRE_AFTER_DAYS). Pe planurile
+    existente dureaza cateva secunde: nu are nevoie de o scanare de backtest, doar de
+    planurile de backtest deja salvate.
     Intoarce (regulile ACTIVE pentru decizie, verificarea pentru auto-diagnostic)."""
     import plan_tracker
     from core import research as R
@@ -429,16 +434,15 @@ def research_cycle(store, now=None):
     live = [p for p in closed if p.get("source") != "backtest"]
     edge = plan_tracker.edge_by_period(bt)
     tracked = [r for r in rules.values() if r.get("state") in ("shadow", "activa")]
-    age_days = (now - (st.get("last_run_ts") or 0)) / 86400
-    due = (age_days >= RESEARCH_MAX_DAYS
-           or (age_days >= RESEARCH_EVERY_DAYS and (edge.get("status") in ("neconcludent", "negativ") or tracked)))
+    due = True                                          # la fiecare scanare
     stamp = time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime(now))
     if due:
         rep = R.investigate(plans)
         st["report"] = {k: v for k, v in rep.items()}
         st["last_run_ts"], st["last_run"] = now, stamp
-        st["trigger"] = (f"edge recent {edge.get('status')}" if edge.get("status") in ("neconcludent", "negativ")
-                         else ("reguli de urmarit" if tracked else "verificare lunara"))
+        st["trigger"] = (f"scanare; edge recent {edge.get('status')}" if edge.get("status") in ("neconcludent", "negativ")
+                         else ("scanare; reguli de urmarit" if tracked else "scanare"))
+        st["runs"] = int(st.get("runs") or 0) + 1
         if rep.get("status") == "ok":
             ok_ids = {a["id"] for a in rep["accepted"]}
             for a in rep["accepted"]:
@@ -448,10 +452,13 @@ def research_cycle(store, now=None):
                                       "since_ts": now, "since": stamp, "evidence": a}
                 else:
                     r["evidence"] = a
+                rules[a["id"]]["last_accepted_ts"] = now
             for rid, r in rules.items():
                 if r.get("state") in ("shadow", "activa") and rid not in ok_ids:
-                    r.update(state="retrasa", retired=stamp,
-                             retired_reason="o investigatie noua nu o mai accepta pe datele actualizate")
+                    gone = (now - (r.get("last_accepted_ts") or r.get("since_ts") or now)) / 86400
+                    if gone >= RETIRE_AFTER_DAYS:
+                        r.update(state="retrasa", retired=stamp,
+                                 retired_reason=f"investigatiile nu o mai accepta de {gone:.0f} zile")
     for r in rules.values():
         if r.get("state") not in ("shadow", "activa"):
             continue
