@@ -82,8 +82,12 @@ def render_proposal(prop, trained=True, learn_label=None, ready=True):
         cells.append(f'<div><span class="dim">R LA TP2</span><br>{lv["expected_r"]}R</div>')
     n = prop.get("neighbors") or {}
     if n.get("verdict"):
+        # cu intervalul de incredere al diferentei fata de media generala (core.agent.
+        # comparable_entries): "neutru" = in marja zgomotului, nu "usor favorabil"
+        ci = (f', {n["points"]:+.1f} pct, IC95 {n["ci_low"]:+.0f}..{n["ci_high"]:+.0f}'
+              if isinstance(n.get("ci_low"), (int, float)) and isinstance(n.get("points"), (int, float)) else "")
         cells.append(f'<div><span class="dim">COMPARABILE</span><br>{n["verdict"].lower()} '
-                     f'({n.get("win_rate")}% din {n.get("n")})</div>')
+                     f'({n.get("win_rate")}% din {n.get("n")}{ci})</div>')
     out.append('<div class="tok-meta prop-meta">' + "".join(cells) + "</div>")
     ec = prop.get("elliott_conflict") or {}
     if ec.get("bias") is not None and ec["bias"] <= -0.1:
