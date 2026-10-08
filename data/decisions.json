@@ -1,30 +1,21 @@
 {
-  "scan_time": "2026-10-08 22:51 UTC",
+  "scan_time": "2026-10-08 23:17 UTC",
   "decisions": {
     "FIL/USDT": {
       "action": "SKIP",
       "mode": "FILTRU_AGENT",
       "reason": "agentul pune semnalul in treimea de jos (0.170 < 0.210); masurat in afara esantionului, acea treime pierde in medie",
       "calibrated_prob": 26.3,
-      "agent_prob": 0.1695,
+      "agent_prob": 0.1697,
       "elliott_bias": null,
-      "next_entry": null
-    },
-    "XRP/USDT": {
-      "action": "ISSUE",
-      "mode": "EXPLORARE_FILTRU",
-      "reason": "semnal din treimea de jos (0.172 < 0.210), emis pentru explorare (15% din cele filtrate) - pastreaza evaluarea agentului nedeformata",
-      "calibrated_prob": 49.9,
-      "agent_prob": 0.1718,
-      "elliott_bias": 0.5136,
       "next_entry": null
     },
     "SUI/USDT": {
       "action": "SKIP",
       "mode": "FILTRU_AGENT",
-      "reason": "agentul pune semnalul in treimea de jos (0.110 < 0.210); masurat in afara esantionului, acea treime pierde in medie",
+      "reason": "agentul pune semnalul in treimea de jos (0.112 < 0.210); masurat in afara esantionului, acea treime pierde in medie",
       "calibrated_prob": 42.5,
-      "agent_prob": 0.1101,
+      "agent_prob": 0.1117,
       "elliott_bias": 0.6142,
       "next_entry": null
     }
