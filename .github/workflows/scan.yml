@@ -202,12 +202,22 @@ jobs:
           git add data/ docs/
           git diff --staged --quiet || git commit -m "scan $(date -u +'%Y-%m-%d %H:%M UTC')"
           # pull --rebase inainte de push: un commit facut intre timp (de exemplu,
-          # fisiere urcate manual) respingea push-ul si se pierdea scanarea orei
+          # fisiere urcate manual) respingea push-ul si se pierdea scanarea orei.
+          # --autostash: un fisier urmarit modificat in afara data/ si docs/ (asa au
+          # blocat .pyc-urile comise, 3-4 oct) nu mai opreste rebase-ul.
+          # PUSH ESUAT = JOB ROSU. Bucla veche se termina cu `sleep 5` (cod 0), deci
+          # pasul aparea "Success" desi nimic nu ajunsese in repo - 3-4 oct, ~20 de ore
+          # de scanari pierdute fara niciun semnal. Acum primesti notificarea de esec.
+          pushed=0
           for i in 1 2 3; do
-            git pull --rebase && git push && break
+            if git pull --rebase --autostash && git push; then pushed=1; break; fi
             git rebase --abort 2>/dev/null || true
-            sleep 5
+            sleep $((5 * i))
           done
+          if [ "$pushed" != "1" ]; then
+            echo "::error::Push esuat dupa 3 incercari - scanarea NU a ajuns in repo (vezi mesajele git de mai sus)."
+            exit 1
+          fi
 
       - name: Curata istoricul de rulari (pastreaza ultimele 3 zile)
         # Sterge inregistrarile de executie din tab-ul Actions - loguri, status,
