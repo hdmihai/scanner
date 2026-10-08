@@ -1,22 +1,31 @@
 {
-  "scan_time": "2026-10-08 15:34 UTC",
+  "scan_time": "2026-10-08 16:34 UTC",
   "decisions": {
-    "FIL/USDT": {
+    "SUI/USDT": {
       "action": "SKIP",
       "mode": "FILTRU_AGENT",
-      "reason": "agentul pune semnalul in treimea de jos (0.187 < 0.210); masurat in afara esantionului, acea treime pierde in medie",
-      "calibrated_prob": 26.4,
-      "agent_prob": 0.1867,
-      "elliott_bias": null,
+      "reason": "agentul pune semnalul in treimea de jos (0.100 < 0.210); masurat in afara esantionului, acea treime pierde in medie",
+      "calibrated_prob": 42.5,
+      "agent_prob": 0.0996,
+      "elliott_bias": 0.6142,
       "next_entry": null
     },
-    "SOL/USDT": {
+    "SEI/USDT": {
       "action": "SKIP",
       "mode": "FILTRU_AGENT",
-      "reason": "agentul pune semnalul in treimea de jos (0.131 < 0.210); masurat in afara esantionului, acea treime pierde in medie",
+      "reason": "agentul pune semnalul in treimea de jos (0.036 < 0.210); masurat in afara esantionului, acea treime pierde in medie",
       "calibrated_prob": 42.5,
-      "agent_prob": 0.1307,
-      "elliott_bias": 0.5272,
+      "agent_prob": 0.0364,
+      "elliott_bias": 0.469,
+      "next_entry": null
+    },
+    "ICP/USDT": {
+      "action": "SKIP",
+      "mode": "FILTRU_AGENT",
+      "reason": "agentul pune semnalul in treimea de jos (0.065 < 0.210); masurat in afara esantionului, acea treime pierde in medie",
+      "calibrated_prob": 42.5,
+      "agent_prob": 0.0653,
+      "elliott_bias": 0.6535,
       "next_entry": null
     }
   }
