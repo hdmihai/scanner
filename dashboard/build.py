@@ -4,7 +4,7 @@
 import os
 
 
-from dashboard.config import ALTSEASON_FILE, EXCHANGES_DATA_DIR, EXCHANGE_PAGES_DIR
+from dashboard.config import ALTSEASON_FILE, DATA_DIR, EXCHANGES_DATA_DIR, EXCHANGE_PAGES_DIR
 from dashboard.config import AGENT_MODEL_FILE, BRIEFING_FILE, CHART_FILE, DETAILS_FILE, DOCS_DIR, EXCHANGES_FILE, EXCHANGE_SCANS_FILE, HISTORY_FILE, OUTPUT_FILE, PLANS_FILE, TOKEN_METADATA_FILE, TOKEN_META_UPDATED, WEIGHTS_FILE, WEIGHTS_HISTORY_FILE
 from dashboard.page import _safe, build_html, css
 from dashboard.exchange_page import build_exchange_page
@@ -78,6 +78,8 @@ def write_exchange_pages(cards, primary, exchange_scans, primary_details, ex_pro
     page_css = css()
     alt_html = _safe("render_altseason_strip", render_altseason_strip, load_json(ALTSEASON_FILE, None))
     primary_label = next((c.get("label") for c in cards if c.get("id") == primary), primary or "bursa activa")
+    # pasii 1-4 ai analistului per token (data/analyst.json), pe cardul fiecarui token
+    analyst_tokens = (load_json(os.path.join(DATA_DIR, "analyst.json"), {}) or {}).get("tokens")
     for c in cards:
         eid = c.get("id")
         card = {**c, "note": ex_mod.adapter(eid).note}
@@ -87,7 +89,7 @@ def write_exchange_pages(cards, primary, exchange_scans, primary_details, ex_pro
             details = load_json(os.path.join(EXCHANGES_DATA_DIR, eid, "details.json"), {})
         html = _safe(f"pagina {eid}", build_exchange_page, card, cards, scans.get(eid), details,
                      ex_proposals.get(eid), plans_store, alt_html, page_css, primary, primary_label,
-                     scan_time)
+                     scan_time, analyst_tokens)
         if not html.lstrip().startswith("<!doctype"):
             # pagina a esuat: o pagina minimala cu eroarea, nu una lipsa
             html = (f'<!doctype html><html lang="ro"><head><meta charset="utf-8"><title>{eid}</title>'

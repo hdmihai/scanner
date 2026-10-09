@@ -516,3 +516,22 @@ footer{margin-top:26px;color:var(--text-dim);font-size:11px;line-height:1.6;}
 .an-sp75{stroke:#CBD5E1;stroke-dasharray:3 3;} .an-spl{stroke:#7E57C2;stroke-width:1.6;}
 .an-spd{fill:#7E57C2;} .an-spt{font:8px var(--font-mono);fill:#94A3B8;}
 .an-legend{flex-wrap:wrap;gap:6px 14px;}
+/* Analistul per token: pasii 1-4 pe cardul tokenului si lista din raportul de piata */
+.an-tok{border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin:4px 0 10px;background:var(--panel-2);}
+.an-tok-h{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;margin-bottom:4px;font-size:12px;}
+.an-steps{margin:4px 0 0 18px;padding:0;font-size:12.5px;line-height:1.5;}
+.an-steps>li{margin:4px 0;}
+.an-tokens{margin:12px 0 4px;border-top:1px solid var(--border);padding-top:8px;}
+.an-tokens>summary{cursor:pointer;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;list-style:none;}
+.an-tokens>summary::-webkit-details-marker{display:none;}
+.an-tokens>summary::before{content:"▸";color:#64748B;font-size:11px;}
+.an-tokens[open]>summary::before{content:"▾";}
+.an-tokens>summary .an-h{margin:0;}
+.an-tlist{display:flex;flex-direction:column;gap:3px;margin:8px 0;}
+.an-trow{display:grid;grid-template-columns:62px 78px 1fr auto auto;gap:6px 10px;align-items:center;font-size:12px;
+  padding:3px 6px;border-radius:4px;background:var(--panel-2);}
+.an-tk{font-weight:700;font-family:var(--font-mono);}
+.an-tc{color:var(--text-dim);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.an-tn{font-family:var(--font-mono);font-size:11.5px;white-space:nowrap;}
+.tok-an{font-size:10px;}
+@media (max-width:560px){.an-trow{grid-template-columns:54px 70px 1fr;}.an-trow .an-tn:last-child{grid-column:3;}}

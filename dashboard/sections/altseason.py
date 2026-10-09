@@ -12,7 +12,7 @@ def render_altseason_history(h):
     if not h or not h.get("position"):
         return ('<h4 class="scan-h">Context istoric &middot; 10 ani</h4><p class="dim">Istoricul se construieste '
                 'la urmatoarea scanare (Coin Metrics + bursa, ~1 minut, o singura data).</p>')
-    import altseason as _A
+    from core import altseason as _A
     pos, lr, pred = h["position"], h.get("learn") or {}, h.get("prediction") or {}
     pn = lambda k: _A.PHASES[k][1] if isinstance(k, int) and 0 <= k <= 8 else "?"
     pct = lambda v: "n/d" if v is None else f"{v * 100:.0f}%"
@@ -128,7 +128,7 @@ def render_altseason(state, history):
     if not state or not state.get("classification"):
         return ('<p class="dim">Evaluarea apare dupa prima scanare cu acces la CoinGecko '
                 '(dominanta BTC, top 250, lumanari zilnice pentru indicele pe 90 de zile).</p>')
-    import altseason as _A
+    from core import altseason as _A
     c, ind = state["classification"], state.get("indicators") or {}
     f1 = lambda v, suf="", nd=1, sign=False: ("n/d" if v is None else
                                               (f"{v:+.{nd}f}{suf}" if sign else f"{v:.{nd}f}{suf}"))

@@ -73,6 +73,9 @@ CASES = [
     ("un port importa nucleul",
      lambda d: _sub(f"{d}/ports/store.py", "from typing import Protocol\n",
                     "from typing import Protocol\n\nfrom core import plans  # noqa\n"), "regula dependentelor"),
+    ("prezentarea importa un adaptor de date",
+     lambda d: _sub(f"{d}/dashboard/sections/analyst.py", "import chart_render\n",
+                    "import altseason  # noqa\nimport chart_render\n"), "prezentarea (dashboard/)"),
 ]
 
 
