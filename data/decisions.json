@@ -1,23 +1,50 @@
 {
-  "scan_time": "2026-10-09 03:17 UTC",
+  "scan_time": "2026-10-09 04:17 UTC",
   "decisions": {
+    "ATOM/USDT": {
+      "action": "SKIP",
+      "mode": "FILTRU_AGENT",
+      "reason": "agentul pune semnalul in treimea de jos (0.134 < 0.210); masurat in afara esantionului, acea treime pierde in medie",
+      "calibrated_prob": 29.8,
+      "agent_prob": 0.134,
+      "elliott_bias": null,
+      "next_entry": null
+    },
     "FIL/USDT": {
       "action": "SKIP",
       "mode": "FILTRU_AGENT",
-      "reason": "agentul pune semnalul in treimea de jos (0.164 < 0.210); masurat in afara esantionului, acea treime pierde in medie",
+      "reason": "agentul pune semnalul in treimea de jos (0.202 < 0.210); masurat in afara esantionului, acea treime pierde in medie",
       "calibrated_prob": 26.4,
-      "agent_prob": 0.1639,
+      "agent_prob": 0.2019,
       "elliott_bias": null,
+      "next_entry": null
+    },
+    "SOL/USDT": {
+      "action": "SKIP",
+      "mode": "FILTRU_AGENT",
+      "reason": "agentul pune semnalul in treimea de jos (0.176 < 0.210); masurat in afara esantionului, acea treime pierde in medie",
+      "calibrated_prob": 49.9,
+      "agent_prob": 0.1764,
+      "elliott_bias": 0.2771,
       "next_entry": null
     },
     "ETH/USDT": {
       "action": "SKIP",
       "mode": "FILTRU_AGENT",
-      "reason": "agentul pune semnalul in treimea de jos (0.161 < 0.210); masurat in afara esantionului, acea treime pierde in medie",
+      "reason": "agentul pune semnalul in treimea de jos (0.109 < 0.210); masurat in afara esantionului, acea treime pierde in medie",
       "calibrated_prob": 42.5,
-      "agent_prob": 0.1605,
+      "agent_prob": 0.109,
       "elliott_bias": -0.0577,
-      "next_entry": 2597.53572
+      "next_entry": 2633.4293399999997
+    },
+    "GRAM/USDT": {
+      "action": "SKIP",
+      "mode": "FILTRU_AGENT",
+      "reason": "agentul pune semnalul in treimea de jos (0.089 < 0.210); masurat in afara esantionului, acea treime pierde in medie",
+      "calibrated_prob": 29.8,
+      "agent_prob": 0.0889,
+      "elliott_bias": 0.2,
+      "next_entry": null
     }
   }
 }
