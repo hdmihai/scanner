@@ -66,6 +66,7 @@
 .zl.zsc{stroke-dasharray:5 3;stroke-width:.9;}
 .pill-zsup{fill:#089981;} .pill-zres{fill:#E67E22;} .pill-zsup2{fill:#6CB8AA;} .pill-zres2{fill:#EFA868;}
 .pill-now{fill:#2962FF;} .lvl-now{stroke:#2962FF;stroke-dasharray:2 2;opacity:.9;}
+.pill-invsoft{fill:#C62828;} .lvl-invsoft{stroke:#C62828;stroke-dasharray:6 3;opacity:.85;}
 .zrow{font-size:12px;padding:5px 8px;border-left:3px solid;margin:4px 0;border-radius:4px;background:#F8FAFC;}
 .zrow-s{border-left-color:#089981;} .zrow-r{border-left-color:#E67E22;}
 .zstat{font-size:11px;margin:6px 0 0;}
@@ -587,19 +588,38 @@ footer{margin-top:26px;color:var(--text-dim);font-size:11px;line-height:1.6;}
 .an-sp75{stroke:#CBD5E1;stroke-dasharray:3 3;} .an-spl{stroke:#7E57C2;stroke-width:1.6;}
 .an-spd{fill:#7E57C2;} .an-spt{font:8px var(--font-mono);fill:#94A3B8;}
 .an-legend{flex-wrap:wrap;gap:6px 14px;}
+/* Analistul per token: pasii 1-4 pe cardul tokenului si lista din raportul de piata */
+.an-tok{border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin:4px 0 10px;background:var(--panel-2);}
+.an-tok-h{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;margin-bottom:4px;font-size:12px;}
+.an-steps{margin:4px 0 0 18px;padding:0;font-size:12.5px;line-height:1.5;}
+.an-steps>li{margin:4px 0;}
+.an-tokens{margin:12px 0 4px;border-top:1px solid var(--border);padding-top:8px;}
+.an-tokens>summary{cursor:pointer;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;list-style:none;}
+.an-tokens>summary::-webkit-details-marker{display:none;}
+.an-tokens>summary::before{content:"▸";color:#64748B;font-size:11px;}
+.an-tokens[open]>summary::before{content:"▾";}
+.an-tokens>summary .an-h{margin:0;}
+.an-tlist{display:flex;flex-direction:column;gap:3px;margin:8px 0;}
+.an-trow{display:grid;grid-template-columns:62px 78px 1fr auto auto;gap:6px 10px;align-items:center;font-size:12px;
+  padding:3px 6px;border-radius:4px;background:var(--panel-2);}
+.an-tk{font-weight:700;font-family:var(--font-mono);}
+.an-tc{color:var(--text-dim);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.an-tn{font-family:var(--font-mono);font-size:11.5px;white-space:nowrap;}
+.tok-an{font-size:10px;}
+@media (max-width:560px){.an-trow{grid-template-columns:54px 70px 1fr;}.an-trow .an-tn:last-child{grid-column:3;}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
     <div class="brand">SCANLINE<small>Modulul bursei Bybit</small></div>
-    <div class="meta">2026-10-09 20:32 UTC<br>4h</div>
+    <div class="meta">2026-10-09 21:33 UTC<br>4h</div>
   </header>
   <nav class="nav"><a class="nav-i" href="../index.html">Principal</a><a class="nav-i" href="okx.html">OKX</a><a class="nav-i" href="kucoin.html">KuCoin</a><a class="nav-i" href="gate.html">Gate.io</a><a class="nav-i" href="mexc.html">MEXC</a><a class="nav-i" href="kraken.html">Kraken</a><a class="nav-i nav-on nav-off" href="bybit.html">Bybit</a></nav>
 
   <div class="card">
     <h2>Altcoin season &middot; modul separat, acelasi pe toate bursele</h2>
-    <div class="as-strip"><div class="as-phase">FAZA 1</div><div class="as-strip-t"><strong>Acumulare / recuperare BTC</strong> &middot; incredere 83%<div class="as-strip-m">regim ciclu BTC: acumulare / recuperare &middot; indice altseason 55/100 &middot; dominanta BTC 59.20% &middot; BTC $82,329 &middot; evaluat 2026-10-09 20:31 UTC</div></div><a class="exm-link" href="../index.html#altseason">Analiza completa</a></div>
+    <div class="as-strip"><div class="as-phase">FAZA 1</div><div class="as-strip-t"><strong>Acumulare / recuperare BTC</strong> &middot; incredere 83%<div class="as-strip-m">regim ciclu BTC: acumulare / recuperare &middot; indice altseason 54/100 &middot; dominanta BTC 59.19% &middot; BTC $82,520 &middot; evaluat 2026-10-09 21:33 UTC</div></div><a class="exm-link" href="../index.html#altseason">Analiza completa</a></div>
   </div>
 
   <div class="card">
