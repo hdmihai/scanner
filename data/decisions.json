@@ -1,48 +1,48 @@
 {
-  "scan_time": "2026-10-09 04:17 UTC",
+  "scan_time": "2026-10-09 05:18 UTC",
   "decisions": {
     "ATOM/USDT": {
       "action": "SKIP",
       "mode": "FILTRU_AGENT",
-      "reason": "agentul pune semnalul in treimea de jos (0.134 < 0.210); masurat in afara esantionului, acea treime pierde in medie",
+      "reason": "agentul pune semnalul in treimea de jos (0.131 < 0.210); masurat in afara esantionului, acea treime pierde in medie",
       "calibrated_prob": 29.8,
-      "agent_prob": 0.134,
+      "agent_prob": 0.1313,
       "elliott_bias": null,
       "next_entry": null
     },
     "FIL/USDT": {
       "action": "SKIP",
       "mode": "FILTRU_AGENT",
-      "reason": "agentul pune semnalul in treimea de jos (0.202 < 0.210); masurat in afara esantionului, acea treime pierde in medie",
-      "calibrated_prob": 26.4,
-      "agent_prob": 0.2019,
+      "reason": "agentul pune semnalul in treimea de jos (0.206 < 0.210); masurat in afara esantionului, acea treime pierde in medie",
+      "calibrated_prob": 27.5,
+      "agent_prob": 0.2058,
       "elliott_bias": null,
       "next_entry": null
     },
     "SOL/USDT": {
-      "action": "SKIP",
-      "mode": "FILTRU_AGENT",
-      "reason": "agentul pune semnalul in treimea de jos (0.176 < 0.210); masurat in afara esantionului, acea treime pierde in medie",
+      "action": "ISSUE",
+      "mode": "EXPLORARE_FILTRU",
+      "reason": "semnal din treimea de jos (0.179 < 0.210), emis pentru explorare (15% din cele filtrate) - pastreaza evaluarea agentului nedeformata",
       "calibrated_prob": 49.9,
-      "agent_prob": 0.1764,
+      "agent_prob": 0.1786,
       "elliott_bias": 0.2771,
       "next_entry": null
     },
     "ETH/USDT": {
       "action": "SKIP",
       "mode": "FILTRU_AGENT",
-      "reason": "agentul pune semnalul in treimea de jos (0.109 < 0.210); masurat in afara esantionului, acea treime pierde in medie",
+      "reason": "agentul pune semnalul in treimea de jos (0.112 < 0.210); masurat in afara esantionului, acea treime pierde in medie",
       "calibrated_prob": 42.5,
-      "agent_prob": 0.109,
+      "agent_prob": 0.112,
       "elliott_bias": -0.0577,
       "next_entry": 2633.4293399999997
     },
     "GRAM/USDT": {
       "action": "SKIP",
       "mode": "FILTRU_AGENT",
-      "reason": "agentul pune semnalul in treimea de jos (0.089 < 0.210); masurat in afara esantionului, acea treime pierde in medie",
+      "reason": "agentul pune semnalul in treimea de jos (0.084 < 0.210); masurat in afara esantionului, acea treime pierde in medie",
       "calibrated_prob": 29.8,
-      "agent_prob": 0.0889,
+      "agent_prob": 0.0844,
       "elliott_bias": 0.2,
       "next_entry": null
     }
