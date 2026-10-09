@@ -10,6 +10,7 @@ from dashboard.config import ALTSEASON_FILE, ALTSEASON_HISTORY_FILE, DATA_DIR, T
 from dashboard.components import load_json, render_weight_bars
 from dashboard.sections.agent import render_agent_card, render_learning_curve
 from dashboard.sections.altseason import render_altseason
+from dashboard.sections.analyst import render_analyst
 from dashboard.sections.exchanges import page_href, render_exchange_modules, render_nav
 from dashboard.sections.market import render_briefing, render_evidence, render_indicators, render_levels, render_liquidity, render_opportunity_rows
 from dashboard.sections.plan import (elliott_outcome_stats, recent_calibration, render_calibration, render_plan,
@@ -63,6 +64,7 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
     research_html = _safe("render_research", render_research, load_json(os.path.join(DATA_DIR, "research.json"), None))
     altseason_html = _safe("render_altseason", render_altseason, load_json(ALTSEASON_FILE, None),
                                       load_json(ALTSEASON_HISTORY_FILE, []))
+    analyst_html = _safe("render_analyst", render_analyst, load_json(os.path.join(DATA_DIR, "analyst.json"), None))
     similar_html = _safe("render_similar_projects", render_similar_projects, 
         token_meta, narrative, symbol=(best or {}).get("symbol"),
         updated=(TOKEN_META_UPDATED or {}).get("when"))
@@ -121,6 +123,11 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
   <div class="card">
     <h2>Starea sistemului</h2>
     {health_html}
+  </div>
+
+  <div class="card" id="analist">
+    <h2>Analist Web3 &middot; rotatia capitalului si risc (la fiecare scanare)</h2>
+    {analyst_html}
   </div>
 
   <div class="card" id="altseason">

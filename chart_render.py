@@ -39,10 +39,14 @@ MAX_LABEL = 44     # etichete mai lungi se scurteaza (cea mai lunga eticheta
 # Straturile disponibile. Fiecare componenta foloseste un subset.
 ALL_LAYERS = {"ema", "plan", "locked", "ew_primary", "ew_all", "ew_levels",
               "ew_inv_primary", "projection", "indicators", "liq_heat",
-              "liq_struct", "price_axis"}
+              "liq_struct", "price_axis", "zones", "marks"}
 
+# ZONELE de suport (verde) si rezistenta (portocaliu) sunt pe graficul principal si pe graficul
+# fiecarui token: dreptunghiuri de la formarea zonei pana in prezent, cu marginile ca linii
+# orizontale pe toata latimea - cea mai apropiata zona de fiecare parte incadreaza pretul.
 MAIN_LAYERS = {"ema", "plan", "ew_primary", "ew_inv_primary", "projection",
-               "price_axis"}
+               "price_axis", "zones"}
+ZONE_KEEP_PCT = 8.0   # a doua zona de pe o parte intinde axa doar daca e la cel mult 8% de pret
 
 
 def fmt(v):
@@ -134,7 +138,40 @@ def _collect_levels(chart, layers):
             side = "BUY" if l["side"] == "BUY" else "SELL"
             lv.append((l["price"], f"{side}-SIDE LIQ · {l['kind']} · {l['role']}",
                        "liqb" if side == "BUY" else "liqs", 5))
+
+    marks = [m for m in (chart.get("marks") or []) if m.get("price")] if "marks" in layers else []
+    if "zones" in layers:
+        # o singura pastila pe pret: doua zone alaturate au o margine comuna, iar un marcaj
+        # (invalidarea) pe marginea unei zone o inlocuieste. La margine comuna ramane rolul
+        # potrivit pozitiei fata de pretul curent - deasupra rezistenta, dedesubt suportul.
+        px = chart.get("price") or ((chart.get("candles") or [[0] * 5])[-1])[4]
+        taken = {fmt(m["price"]) for m in marks}
+        best = {}
+        for z in _zone_frame(chart):
+            sup = z["side"] == "S"
+            tf = str(z.get("tf") or "").upper()
+            name = "SUPORT" if sup else "REZISTENTA"
+            for price, label, kind, pri in (
+                    (z["hi"] if sup else z["lo"], f"{name} {tf} · forta {z.get('strength', 0)}",
+                     "zsup" if sup else "zres", 9),
+                    (z["lo"] if sup else z["hi"], f"{name} {tf} · {'baza' if sup else 'varf'}",
+                     "zsup2" if sup else "zres2", 4)):
+                key = fmt(price)
+                if key in taken:
+                    continue
+                rank = ((price <= px) == sup, pri)
+                if key not in best or rank > best[key][0]:
+                    best[key] = (rank, (price, label, kind, pri))
+        lv += [v for _r, v in best.values()]
+    for m in marks:
+        lv.append((m["price"], m.get("label", ""), m.get("kind", "inv"), 10))
     return lv
+
+
+def _zone_frame(chart):
+    """Zonele desenate: cadrul calculat de nucleu (core/zones.bundle), doar cele valide."""
+    return [z for z in (((chart or {}).get("zones") or {}).get("frame") or [])
+            if z.get("lo") and z.get("hi") and z.get("side") in ("S", "R")]
 
 
 # ---------------------------------------------------------------------------
@@ -194,8 +231,20 @@ def render_chart(chart, layers=None, height=300, fullscreen_id=None, show_head=T
 
     # intervalul de pret: lumanari + niveluri + proiectie. Nivelurile foarte
     # departate (peste 60% de pret) nu intind axa - le-ar turti lumanarile.
-    px = candles[-1][4]
-    near = [l[0] for l in levels if abs(l[0] - px) / px < 0.6]
+    px = chart.get("price") or candles[-1][4]
+    near = [l[0] for l in levels if abs(l[0] - px) / px < 0.6 and not str(l[2]).startswith("z")]
+    # ZONELE: cea mai apropiata de fiecare parte intra intreaga in axa (incadreaza pretul); din
+    # urmatoarele intra doar marginea dinspre pret, si doar daca e aproape - zona apare ca banda
+    # care continua dincolo de marginea graficului, fara sa turteasca lumanarile
+    zframe = _zone_frame(chart) if "zones" in layers else []
+    for side in ("S", "R"):
+        zs = [z for z in zframe if z["side"] == side]
+        for k, z in enumerate(zs):
+            edge = z["hi"] if side == "S" else z["lo"]
+            if k == 0:
+                near += [z["lo"], z["hi"]]
+            elif abs(edge - px) / px * 100 <= ZONE_KEEP_PCT:
+                near.append(edge)
     lo = min(lows + near + [p["price"] for p in ppath] + [p["price"] for p in solid])
     hi = max(highs + near + [p["price"] for p in ppath] + [p["price"] for p in solid])
     rng = (hi - lo) or (abs(hi) or 1)
@@ -227,6 +276,24 @@ def render_chart(chart, layers=None, height=300, fullscreen_id=None, show_head=T
             b.append(f'<text class="axis-t" x="{W - 4}" y="{yy + 3:.0f}" '
                      f'text-anchor="end">{fmt(v)}</text>')
 
+    # ZONELE: dreptunghi de la lumanarea de formare (sau marginea stanga) pana in prezent, plus
+    # marginile ca linii orizontale pe toata latimea graficului - ca in capturile de referinta
+    if zframe:
+        ts = [c[0] for c in candles]
+        for z in zframe:
+            y1, y2 = y(z["hi"]), y(z["lo"])
+            if y2 < 0 or y1 > H:
+                continue
+            y1, y2 = max(0.0, y1), min(float(H), y2)
+            i0 = next((i for i, t in enumerate(ts) if t >= (z.get("t0") or 0)), 0)
+            x0 = x(i0) if z.get("t0") and z["t0"] > ts[0] else 0.0
+            cls = "zs" if z["side"] == "S" else "zr"
+            tfc = "z1d" if z.get("tf") == "1d" else "zsc"
+            b.append(f'<rect class="zone {cls} {tfc}" x="{x0:.0f}" y="{y1:.1f}" width="{max(xmax - x0, 2):.0f}" '
+                     f'height="{max(y2 - y1, 1.5):.1f}"/>')
+            for yy in (y1, y2):
+                b.append(f'<line class="zl {cls} {tfc}" x1="0" y1="{yy:.1f}" x2="{plot_w}" y2="{yy:.1f}"/>')
+
     # heatmap-ul de lichidare: fundal, sub lumanari
     for c in heat:
         cy = y(c["price"])
@@ -236,10 +303,10 @@ def render_chart(chart, layers=None, height=300, fullscreen_id=None, show_head=T
             b.append(f'<rect class="{cls}" x="0" y="{cy - 2.5:.0f}" width="{xmax:.0f}" '
                      f'height="5" opacity="{op:.2f}"/>')
 
-    # liniile nivelurilor, tot sub lumanari, ca sa nu acopere pretul
+    # liniile nivelurilor, tot sub lumanari, ca sa nu acopere pretul (zonele au liniile lor)
     for price, _lbl, kind, _p in levels:
         ly = y(price)
-        if 0 <= ly <= H:
+        if 0 <= ly <= H and not str(kind).startswith("z"):
             b.append(f'<line class="lvl lvl-{kind}" x1="0" y1="{ly:.0f}" '
                      f'x2="{plot_w}" y2="{ly:.0f}"/>')
 
@@ -374,11 +441,17 @@ def render_chart(chart, layers=None, height=300, fullscreen_id=None, show_head=T
     if len(pills) > max_pills:
         pills = sorted(pills, key=lambda p: -p[3])[:max_pills]
     pills.sort(key=lambda p: -p[0])
-    last_y = -99
-    for price, label, kind, _p in pills:
-        ty = max(y(price) - PILL_H / 2, last_y + PILL_H + 1.5)
-        ty = min(ty, H - PILL_H)
-        last_y = ty
+    # POZITIILE: fiecare pastila cat mai aproape de pretul ei, fara suprapuneri si in interiorul
+    # graficului - intai de sus in jos (distanta minima), apoi de jos in sus (marginea de jos).
+    # Intr-o singura trecere, pastilele impinse sub marginea de jos se asezau una peste alta.
+    gap = PILL_H + 1.5
+    pys = []
+    for price, *_rest in pills:
+        want = y(price) - PILL_H / 2
+        pys.append(max(want, pys[-1] + gap) if pys else max(want, 0.0))
+    for k in range(len(pys) - 1, -1, -1):
+        pys[k] = min(pys[k], pys[k + 1] - gap if k + 1 < len(pys) else H - PILL_H)
+    for (price, label, kind, _p), ty in zip(pills, pys):
         text = label if kind in ("ewh", "ewa") else _short(label)
         lw = len(text) * CHAR_W + 8
         lx = plot_w - 2 - lw
@@ -465,6 +538,62 @@ def render_subpanels(chart, height=150):
 # ---------------------------------------------------------------------------
 # componentele: fiecare zona de interes, pliabila
 # ---------------------------------------------------------------------------
+def zone_stats_text(zs):
+    """Rata masurata de respectare a zonelor la prima retestare, fata de benzi-placebo, pe fiecare
+    timeframe - textul afisat langa zone, ca ele sa nu para mai mult decat sunt."""
+    out = []
+    for key, name in (("scan", (zs or {}).get("tf") or "scanare"), ("d1", "1D")):
+        s = (zs or {}).get(key) or {}
+        z, p = s.get("zones") or {}, s.get("placebo") or {}
+        if not z.get("n"):
+            continue
+        verdict = {"peste_placebo": "PESTE benzile aleatoare - zonele aduc informatie",
+                   "sub_placebo": "SUB benzile aleatoare", "in_marja": "in marja benzilor aleatoare - fara avantaj masurat"
+                   }.get(s.get("verdict"), "esantion prea mic pentru un verdict")
+        out.append(f"{name}: zonele au tinut la prima retestare in {z['rate']}% din cazuri (IC {z['ci_low']}-"
+                   f"{z['ci_high']}%, n={z['n']}) fata de {p.get('rate')}% pentru benzi aleatoare de aceeasi latime "
+                   f"(n={p.get('n')}) - {verdict}")
+    return out
+
+
+def _zone_meta(chart):
+    frame = _zone_frame(chart)
+    n_s = len([z for z in frame if z["side"] == "S"])
+    return f"{n_s} suport · {len(frame) - n_s} rezistenta"
+
+
+def render_zone_list(chart):
+    """Zonele desenate pe grafic, cu de ce sunt acolo: timeframe, interval, forta, atingeri,
+    confluente, distanta - si rata lor masurata de respectare."""
+    rows = []
+    for z in _zone_frame(chart):
+        sup = z["side"] == "S"
+        src = ", ".join(z.get("sources") or []) or "fara confluente"
+        state = "proaspata" if z.get("fresh") else f"{z.get('touches', 0)} atingeri"
+        kind = {"cerere": "cerere", "oferta": "oferta", "flip": "flip (zona sparta, rol inversat)"}.get(
+            z.get("kind"), z.get("kind") or "")
+        rows.append(f'<div class="zrow {"zrow-s" if sup else "zrow-r"}"><strong>{"SUPORT" if sup else "REZISTENTA"} '
+                    f'{_esc(str(z.get("tf") or "").upper())}</strong> {fmt(z["lo"])} – {fmt(z["hi"])} '
+                    f'<span class="dim">· {z.get("dist_pct", 0):+.1f}% · forta {z.get("strength", 0)}/100 · {state} · '
+                    f'{_esc(kind)}{" · confirmata si pe timeframe-ul mic" if z.get("confirmed") else ""}'
+                    f'{" · rol inversat in asteptare: pretul a trecut de zona fara inchidere dincolo de ea" if z.get("pending") else ""}'
+                    f' · {_esc(src)}</span></div>')
+    if not rows:
+        rows.append('<p class="dim">Nicio zona activa la cel mult 25% de pret pe istoricul disponibil.</p>')
+    else:
+        sides = {z["side"] for z in _zone_frame(chart)}
+        # o parte goala are o cauza concreta, nu e o eroare: pretul e la extrema seriei, iar un
+        # minim/maxim devine pivot (deci zona) abia dupa 5 bare de fiecare parte
+        if "S" not in sides:
+            rows.append('<p class="dim">Niciun suport confirmat sub pret: pretul e sub toate zonele active sau la '
+                        'minimul seriei - un minim devine zona abia dupa 5 bare de confirmare.</p>')
+        if "R" not in sides:
+            rows.append('<p class="dim">Nicio rezistenta confirmata deasupra pretului: pretul e peste toate zonele '
+                        'active sau la maximul seriei - un maxim devine zona abia dupa 5 bare de confirmare.</p>')
+    stats = "".join(f'<p class="dim zstat">{_esc(t)}</p>' for t in zone_stats_text(chart.get("zone_stats")))
+    return "".join(rows) + stats
+
+
 def _component(title, meta, body, open_=False):
     return (f'<details class="cc"{" open" if open_ else ""}><summary>'
             f'<span class="cc-title">{_esc(title)}</span>'
@@ -505,6 +634,9 @@ def render_components(chart, uid="main"):
                     + (" · sweep bilateral" if ls.get("two_sided_sweep") else "")),
                    render_chart(chart, {"liq_heat", "liq_struct", "price_axis"}, 280,
                                 show_head=False)),
+        _component("Zone de suport / rezistenta", _zone_meta(chart),
+                   render_chart(chart, {"zones", "price_axis"}, 280, show_head=False)
+                   + render_zone_list(chart)),
         _component("Indicatori · VWAP, Volume Profile, SuperTrend",
                    f"SuperTrend {st.get('direction', 'N/A')}",
                    render_chart(chart, {"ema", "indicators", "price_axis"}, 280,
@@ -571,5 +703,14 @@ CSS = """
 .proj-t{font:700 8.5px var(--font-mono);fill:#7E57C2;}
 .proj-tag{font:600 8px var(--font-mono);fill:#7E57C2;}
 .rsi{stroke:#7E57C2;stroke-width:1.2;}
+.zone.zs{fill:#089981;opacity:.08;} .zone.zr{fill:#F57C00;opacity:.10;}
+.zone.zs.z1d{opacity:.15;} .zone.zr.z1d{opacity:.17;}
+.zl{stroke-width:1;} .zl.zs{stroke:#089981;opacity:.8;} .zl.zr{stroke:#E67E22;opacity:.85;}
+.zl.zsc{stroke-dasharray:5 3;stroke-width:.9;}
+.pill-zsup{fill:#089981;} .pill-zres{fill:#E67E22;} .pill-zsup2{fill:#6CB8AA;} .pill-zres2{fill:#EFA868;}
+.pill-now{fill:#2962FF;} .lvl-now{stroke:#2962FF;stroke-dasharray:2 2;opacity:.9;}
+.zrow{font-size:12px;padding:5px 8px;border-left:3px solid;margin:4px 0;border-radius:4px;background:#F8FAFC;}
+.zrow-s{border-left-color:#089981;} .zrow-r{border-left-color:#E67E22;}
+.zstat{font-size:11px;margin:6px 0 0;}
 .sub-t{font:600 8px var(--font-mono);fill:#64748B;}
 """

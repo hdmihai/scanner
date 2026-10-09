@@ -12,6 +12,7 @@ from core import liquidity_structure as ls_mod
 from core import market as mkt
 from core import market_structure as struct_mod
 from core import plans as plan_tracker
+from core import zones as zones_mod
 from core.config import CHART_BARS, CHART_BARS_MAX, CONFIG, SPARKLINE_BARS
 from core.geometry import compute_fibonacci, compute_structure_levels, compute_trade_plan
 from core.scoring import ema_series_full, round_price, rsi
@@ -53,13 +54,52 @@ def fetch_liquidity_levels(exchange, symbol, depth=100, top_n=3, attempts=None):
     return {"bids": normalize(ob.get("bids")), "asks": normalize(ob.get("asks"))}
 
 
-def build_symbol_details(r, candles, hist_tab):
+def zone_levels(ind, fib, liq_struct, liq_map):
+    """Confluentele zonelor de pe timeframe-ul scanarii: nivelurile pe care scanerul le
+    calculeaza deja (profil de volum, VWAP, EMA, Fibonacci, lichiditate egala, lichidari)."""
+    ind = ind or {}
+    vp = ind.get("volume_profile") or {}
+    em = ind.get("emas") or {}
+    rt = (fib or {}).get("retracement") or {}
+    lv = [("POC", vp.get("poc")), ("VAL", vp.get("val")), ("VAH", vp.get("vah")), ("VWAP", ind.get("vwap")),
+          ("EMA50", em.get("ema50")), ("EMA200", em.get("ema200")),
+          ("FIB 0.618", rt.get("0.618")), ("FIB 0.786", rt.get("0.786"))]
+    for lvl in (liq_struct or {}).get("levels") or []:
+        lv.append(("LICHIDITATE " + str(lvl.get("kind") or "").strip(), lvl.get("price")))
+    for k in ("above", "below"):
+        c = (liq_map or {}).get(k) or {}
+        if c.get("price"):
+            lv.append(("LICHIDARI", c["price"]))
+    return lv
+
+
+def daily_zones(daily, price):
+    """Zonele 1D din lumanarile zilnice INCHISE, cu mediile de 50 si 200 de zile si profilul
+    de volum zilnic drept confluente. {} daca seria e prea scurta. Doar afisare si analiza:
+    nicio decizie de plan nu le citeste."""
+    if not daily or len(daily) < 30:
+        return {}
+    closes = [c[4] for c in daily]
+    lv = []
+    if len(closes) >= 200:
+        lv.append(("MA200 1D", sum(closes[-200:]) / 200))
+    if len(closes) >= 50:
+        lv.append(("MA50 1D", sum(closes[-50:]) / 50))
+    vp = indicators.volume_profile(daily[-120:]) or {}
+    lv += [("POC 1D", vp.get("poc")), ("VAL 1D", vp.get("val")), ("VAH 1D", vp.get("vah"))]
+    return zones_mod.find_zones(daily, lv, price=price)
+
+
+def build_symbol_details(r, candles, hist_tab, daily=None, htf=None):
     """Detaliile complete ale unui simbol pentru dashboard: indicatori, structura,
     Fibonacci, plan, prognoza, lumanari pentru grafic, Elliott, lichiditate si
     lichidari - ACELASI calcul pe orice bursa. Doar CPU, zero apeluri API.
 
     `r` e rezultatul scorarii (cu persistenta), `candles` seria INCHISA a simbolului,
-    `hist_tab` istoricul masurat pentru prognoza (plan_tracker.history_table)."""
+    `hist_tab` istoricul masurat pentru prognoza (plan_tracker.history_table).
+    ZONELE de suport/rezistenta: din `candles` (timeframe-ul scanarii) si din lumanarile
+    zilnice `daily`; pe bursele secundare, `htf` aduce zonele 1D deja calculate pe bursa
+    activa (acelasi token, practic acelasi pret)."""
     d_highs = [c[2] for c in candles]
     d_lows = [c[3] for c in candles]
     d_closes = [c[4] for c in candles]
@@ -81,6 +121,14 @@ def build_symbol_details(r, candles, hist_tab):
     _nb = min(_nb, len(candles))
 
     _plan_tok = compute_trade_plan(r["direction"], r["price"], r["atr"], d_struct, d_fib)
+    _ind = indicators.compute_all(candles)
+    _liqs = ls_mod.build([c[2] for c in candles], [c[3] for c in candles], d_closes,
+                         r["atr"], r["price"], CONFIG["timeframe"])
+    _liqmap = liq_mod.build_map(candles, r["price"])
+    _zones = zones_mod.bundle(
+        zones_mod.find_zones(candles, zone_levels(_ind, d_fib, _liqs, _liqmap), price=r["price"]),
+        htf if htf is not None else daily_zones(daily, r["price"]), scan_tf=CONFIG["timeframe"],
+        keep_d1=htf is None)
     return {
         "direction": r["direction"],
         "score": r["risk_adjusted"],
@@ -90,7 +138,7 @@ def build_symbol_details(r, candles, hist_tab):
         "atr": r["atr"],
         "persistence": r["persistence"],
         "age_minutes": r["age_minutes"],
-        "indicators": indicators.compute_all(candles),
+        "indicators": _ind,
         "structure": d_struct,
         "fibonacci": d_fib,
         "plan": _plan_tok,
@@ -119,9 +167,7 @@ def build_symbol_details(r, candles, hist_tab):
         # 28 x 3 apeluri in plus la fiecare scanare. Timeframe-urile de
         # confirmare se descarca doar pentru simbolul afisat pe graficul
         # principal, unde chiar sunt privite.
-        "liq_structure": ls_mod.build([c[2] for c in candles],
-                                      [c[3] for c in candles], d_closes,
-                                      r["atr"], r["price"], CONFIG["timeframe"]),
+        "liq_structure": _liqs,
         # `offset` aliniaza indicii punctelor (calculati pe seria completa)
         # cu cele CHART_BARS lumanari pastrate pentru grafic. Fara el,
         # punctele cele mai VECHI erau desenate peste barele cele mai NOI.
@@ -131,11 +177,13 @@ def build_symbol_details(r, candles, hist_tab):
             r["atr"], base_tf=CONFIG["timeframe"], price=r["price"]),
         # harta de lichidari si pentru simbolurile din detalii, nu doar
         # pentru cel mai bun candidat - dashboard-ul le arata pe toate
-        "liquidation": (lambda mp, bs: {"above": mp.get("above"),
-                                        "below": mp.get("below"), "bias": bs,
-                                        "oi_scaled": mp.get("oi_scaled")})(
-            *(lambda mp: (mp, liq_mod.magnet_bias(mp, r["price"], r["direction"])))(
-                liq_mod.build_map(candles, r["price"]))),
+        "liquidation": {"above": _liqmap.get("above"), "below": _liqmap.get("below"),
+                        "bias": liq_mod.magnet_bias(_liqmap, r["price"], r["direction"]),
+                        "oi_scaled": _liqmap.get("oi_scaled")},
+        # ZONELE DE SUPORT / REZISTENTA (core/zones.py): pe timeframe-ul scanarii si pe 1D,
+        # plus cadrul desenat pe grafic - cele mai apropiate zone de o parte si de alta a
+        # pretului. Doar afisare si analiza; deciziile de plan nu le citesc.
+        "zones": _zones,
     }
 
 

@@ -49,6 +49,7 @@ from core import liquidity_structure as ls_mod
 from core import market as mkt
 from core import market_structure as struct_mod
 from core import plans as plan_tracker
+from core import zones as zones_mod
 from ports.market_data import CAP_OHLCV, CAP_ORDERBOOK_LIVE
 from core.analysis import (_open_plan_for_base, build_signal_context, build_symbol_details,
                            fetch_liquidity_levels, light_details, proposal_record)
@@ -86,6 +87,20 @@ VENUES = _Unbound("VENUES")            # ports.market_data.Venues (bursele, prin
 NOTIFIER = _Unbound("NOTIFIER")        # ports.notifier.Notifier (Telegram)
 ALTSEASON = _Unbound("ALTSEASON")      # (conexiune, rezultate) -> starea altseason
 TOP_SYMBOLS = _Unbound("TOP_SYMBOLS")  # (n) -> simbolurile din top-n CoinGecko
+ANALYST = _Unbound("ANALYST")          # (conexiune, altseason, detalii, rezultate, statistici zone,
+                                       #  lumanari zilnice) -> raportul analistului (data/analyst.json)
+
+# Lumanari zilnice per simbol, pentru zonele de suport/rezistenta 1D si analist: ~10 luni.
+DAILY_ZONE_BARS = 300
+
+
+def _canon_base(symbol):
+    """Tokenul canonic din watchlist pentru o pereche (aliasurile, ex. MATIC -> POL)."""
+    base = symbol.split("/")[0]
+    for b in (CONFIG.get("watchlist") or []):
+        if base in CONFIG.get("aliases", {}).get(b, [b]):
+            return b
+    return base
 
 
 def load_json(path, default):
@@ -224,8 +239,10 @@ def analyze_exchange(adapter, handle, card, ctx):
                         else f"nicio serie de lumanari descarcata din {len(resolved)} simboluri")
         out["duration_s"] = round(time.monotonic() - t0, 1)
         return out
+    htf = ctx.get("htf_zones") or {}
     for r in results:
-        out["details"][r["symbol"]] = build_symbol_details(r, cache[r["symbol"]], ctx["hist_tab"])
+        out["details"][r["symbol"]] = build_symbol_details(r, cache[r["symbol"]], ctx["hist_tab"],
+                                                           htf=htf.get(_canon_base(r["symbol"])))
     results.sort(key=lambda r: -r["risk_adjusted"])
     out["results"] = results
     top = ([r for r in results if r["direction"] == "LONG"][: CONFIG["top_n_per_direction"]]
@@ -514,14 +531,45 @@ def main():
         print(f"[!] istoric indisponibil pentru prognoza: {_e}")
         _hist_tab = {}
 
+    # LUMANARI ZILNICE (1D) pentru zonele de suport/rezistenta pe timeframe mare: cu doar
+    # 260 de bare de 4h (~43 de zile), un pret aflat la minimul seriei nu are niciun suport
+    # dedesubt - cele 1D (~10 luni) il incadreaza. Un apel per simbol; doar afisare si
+    # analiza, deciziile de plan nu le citesc.
+    daily_cache = {}
+    for r in results:
+        try:
+            o = exchange.fetch_ohlcv(r["symbol"], timeframe="1d", limit=DAILY_ZONE_BARS)
+        except Exception as e:
+            print(f"[!] zone 1D {r['symbol']}: {str(e)[:120]}")
+            continue
+        if o and len(o) > 1:
+            daily_cache[r["symbol"]] = o[:-1]          # fara ziua curenta, neinchisa
+
     for r in results:
         candles = ohlcv_cache.get(r["symbol"])
         if not candles:
             continue
-        details[r["symbol"]] = build_symbol_details(r, candles, _hist_tab)
+        details[r["symbol"]] = build_symbol_details(r, candles, _hist_tab, daily=daily_cache.get(r["symbol"]))
+    # CAT DE DES AU TINUT ZONELE, masurat pe lumanarile reale ale acestei scanari, fata de
+    # benzi-placebo de aceeasi latime (core/zones.hold_stats) - afisat langa zone si in raportul
+    # analistului, ca zonele sa nu para mai mult decat sunt.
+    try:
+        zone_stats = {"scan": zones_mod.hold_stats({s: ohlcv_cache[s] for s in details}),
+                      "d1": zones_mod.hold_stats(daily_cache), "tf": CONFIG["timeframe"]}
+    except Exception as _e:
+        print(f"[!] statistici zone: {_e}")
+        zone_stats = None
     save_json(DETAILS_FILE, {"scan_time": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
                               "timeframe": CONFIG["timeframe"],
-                             "exchange": exchange_id, "symbols": details})
+                             "exchange": exchange_id, "symbols": details, "zone_stats": zone_stats})
+
+    # ANALISTUL DE ROTATIE A CAPITALULUI: diagnosticul macro (altseason, fata de 10 ani de
+    # istoric), sectoarele cu momentum, proiectele cu R:R asimetric si strategia - la fiecare
+    # scanare, din datele de mai sus. Nu opreste niciodata scanarea si nu atinge planurile.
+    try:
+        ANALYST(exchange, alt_state, details, results, zone_stats, daily_cache)
+    except Exception as _e:
+        print(f"[!] analist: {_e}")
 
     # SCANARE PER BURSA, doar pentru afisare. Bursa activa refoloseste datele
     # deja descarcate, deci nu costa nimic in plus; celelalte se scaneaza in
@@ -677,6 +725,10 @@ def main():
                     liq_mod.build_map(best_ohlcv, best["price"])),
             "structure": best_struct,
             "timeframe": CONFIG["timeframe"],
+            # zonele de suport/rezistenta ale simbolului (4h + 1D), din detalii - aceleasi
+            # lumanari, deci aceleasi zone ca pe graficul tokenului
+            "zones": (details.get(best["symbol"]) or {}).get("zones"),
+            "zone_stats": zone_stats,
         })
 
     # 1) evaluez planurile deschise pe lumanarile proaspete
@@ -811,6 +863,7 @@ def main():
             "scope": coingecko_scope, "weights": weights, "hist_tab": _hist_tab,
             "alt_state": alt_state, "calibration": calibration, "agent_model": agent_model,
             "agent_state": agent_state, "closed": closed_for_neighbors, "plan_store": plan_store,
+            "htf_zones": {_canon_base(s): (d.get("zones") or {}).get("d1") for s, d in details.items()},
             "now_ts": now_ts, "budget": EXCHANGE_TIME_BUDGET,
             "limit": max(SECONDARY_SCAN_LIMIT, len(CONFIG.get("watchlist") or []))})
     except Exception as _e:

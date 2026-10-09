@@ -44,8 +44,31 @@ CG = "https://api.coingecko.com/api/v3"
 CG_KEY = os.environ.get("COINGECKO_API_KEY", "")
 STATE_FILE = os.path.join("data", "altseason.json")
 HISTORY_FILE = os.path.join("data", "altseason_history.json")
-PERF90_TTL = 6 * 3600          # randamentele pe 90 de zile se reimprospateaza la 6 ore
 HISTORY_KEEP = 720             # ~30 de zile la o scanare pe ora
+DAILY_KEEP = 400               # seriile zilnice (dominanta BTC, indicele) pastrate in stare
+MIN_PERF90 = 40                # sub atatea randamente pe 90 de zile, indicele nu se calculeaza
+
+# SECTOARELE (naratiunile) urmarite pentru rotatia capitalului: categoriile CoinGecko, cate
+# o cerere /coins/markets?category=... (gratuit, fara cheie). Nu toate la fiecare scanare:
+# cel mult SECTOR_PER_SCAN, fiecare reimprospatat dupa SECTOR_TTL - pentru a ramane mult sub
+# limita API-ului gratuit. Randamentele pe 7/30/200 de zile se schimba lent.
+SECTORS = [
+    ("artificial-intelligence", "AI"),
+    ("layer-1", "Layer 1"),
+    ("layer-2", "Layer 2"),
+    ("decentralized-finance-defi", "DeFi"),
+    ("meme-token", "Meme"),
+    ("real-world-assets-rwa", "RWA"),
+    ("gaming", "Gaming"),
+    ("depin", "DePIN"),
+    ("privacy-coins", "Privacy"),
+    ("decentralized-exchange", "DEX"),
+    ("exchange-based-tokens", "Exchange tokens"),
+    ("oracle", "Oracle"),
+]
+SECTOR_TTL = 3 * 3600
+SECTOR_PER_SCAN = 4
+SECTOR_COINS = 30
 
 STABLE = {"usdt", "usdc", "dai", "fdusd", "tusd", "usde", "usds", "pyusd", "usdd",
           "frax", "eurc", "eurt", "busd", "gusd", "usdp", "lusd", "crvusd", "susd",
@@ -125,6 +148,17 @@ def _get(url, retries=2):
         return _get_once(url, 1, use_key=False)
 
 
+def _get_light(url):
+    """O singura incercare (cu cheia, apoi fara, daca e refuzata), FARA asteptare la 429: pentru
+    datele de sector, care pot astepta scanarea urmatoare - nu au voie sa intinda scanarea."""
+    try:
+        return _get_once(url, 0, use_key=True)
+    except urllib.error.HTTPError as e:
+        if not CG_KEY or e.code not in (400, 401, 403):
+            raise
+        return _get_once(url, 0, use_key=False)
+
+
 def _load(path, default):
     try:
         with open(path) as f:
@@ -199,14 +233,19 @@ def alt_universe(markets):
 
 
 def perf_90d(exchange, bases, cache):
-    """Randamentul exact pe 90 de zile, din lumanari zilnice de pe exchange.
-    Cache de 6 ore: indicatorul pe 90 de zile se misca lent, nu merita
-    ~100 de apeluri la fiecare scanare orara."""
-    if cache and time.time() - cache.get("ts", 0) < PERF90_TTL and cache.get("perf"):
+    """Randamentul exact pe 90 de zile, din lumanari zilnice INCHISE de pe exchange.
+
+    Se schimba o singura data pe zi (la inchiderea zilei UTC), deci se recalculeaza la prima
+    scanare dupa inchidere - nu la 6 ore: cu cache-ul de 6 ore, indicele putea ramane pana la
+    6 ore pe ziua precedenta (monitorizare 8 oct: "perf90 din cache 21:50 UTC"). Asa e mereu pe
+    ultima zi inchisa, fara ~100 de apeluri la fiecare scanare orara. O recalculare incompleta
+    (limite de rata) NU inlocuieste una completa: se reincearca la scanarea urmatoare."""
+    today = time.strftime("%Y-%m-%d", time.gmtime())
+    if cache and cache.get("day") == today and cache.get("perf"):
         return cache
     perf = {}
     if exchange is None:
-        return cache or {"ts": 0, "perf": {}}
+        return cache or {"ts": 0, "day": None, "perf": {}}
     markets = getattr(exchange, "markets", None) or {}
     for b in bases:
         sym = f"{b.upper()}/USDT"
@@ -221,7 +260,63 @@ def perf_90d(exchange, bases, cache):
         closes = [c[4] for c in o[:-1]]           # fara bara zilnica neinchisa
         if len(closes) >= 91 and closes[-91] > 0:
             perf[b.lower()] = round((closes[-1] / closes[-91] - 1) * 100, 3)
-    return {"ts": time.time(), "perf": perf}
+    prev = (cache or {}).get("perf") or {}
+    if len(perf) < max(MIN_PERF90, int(0.7 * len(prev))) or "btc" not in perf:
+        print(f"[!] altseason: doar {len(perf)} randamente pe 90 de zile (anterior {len(prev)}) - "
+              "pastrez calculul precedent si reincerc la scanarea urmatoare")
+        return cache or {"ts": time.time(), "day": None, "perf": perf}
+    return {"ts": time.time(), "day": today, "perf": perf}
+
+
+def _compact(c):
+    """Campurile unei monede din /coins/markets folosite de analist: pret, capitalizare,
+    FDV si oferta (diluarea viitoare), volum (lichiditatea), randamente."""
+    r = lambda k: c.get(f"price_change_percentage_{k}_in_currency")
+    return {"id": c.get("id"), "symbol": (c.get("symbol") or "").upper(), "name": c.get("name"),
+            "rank": c.get("market_cap_rank"), "price": c.get("current_price"), "mcap": c.get("market_cap"),
+            "fdv": c.get("fully_diluted_valuation"), "vol": c.get("total_volume"),
+            "circ": c.get("circulating_supply"), "total": c.get("total_supply"), "max": c.get("max_supply"),
+            "r7": r("7d"), "r30": r("30d"), "r200": r("200d")}
+
+
+def fetch_sectors(cache, now=None):
+    """Monedele fiecarui sector (top SECTOR_COINS dupa capitalizare), reimprospatate prin
+    rotatie: cel mult SECTOR_PER_SCAN cereri pe scanare, fiecare sector la cel mult SECTOR_TTL.
+    Un sector care esueaza isi pastreaza datele anterioare, cu eroarea notata."""
+    now = now or time.time()
+    items = dict((cache or {}).get("items") or {})
+    # un sector care a esuat se reincearca dupa o ora (`retry`), nu la fiecare scanare - altfel ar
+    # ocupa mereu primul loc din rotatie si celelalte s-ar reimprospata mai rar
+    due = [s for s in SECTORS if now - (items.get(s[0]) or {}).get("ts", 0) >= SECTOR_TTL
+           and (items.get(s[0]) or {}).get("retry", 0) <= now]
+    due.sort(key=lambda s: (items.get(s[0]) or {}).get("ts", 0))
+    for cid, name in due[:SECTOR_PER_SCAN]:
+        try:
+            rows = _get_light(f"{CG}/coins/markets?vs_currency=usd&category={cid}&order=market_cap_desc"
+                              f"&per_page={SECTOR_COINS}&page=1&price_change_percentage=7d,30d,200d")
+        except Exception as e:
+            prev = dict(items.get(cid) or {"name": name, "coins": [], "ts": 0})
+            prev["error"], prev["retry"] = str(e)[:120], now + 3600
+            items[cid] = prev
+            continue
+        coins = [_compact(c) for c in (rows or []) if (c.get("symbol") or "").lower() not in STABLE
+                 and (c.get("symbol") or "").lower() not in WRAPPED and c.get("id") != "bitcoin"]
+        items[cid] = {"name": name, "ts": now, "when": time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime(now)),
+                      "coins": coins}
+    return {"items": items, "total": len(SECTORS)}
+
+
+def _daily_series(prev, hourly, key, value):
+    """Seria zilnica (ultima valoare a zilei) a unei metrici, pastrata DAILY_KEEP zile. La
+    prima rulare porneste din istoricul orar (~30 de zile), apoi creste cu fiecare zi."""
+    ser = dict(prev or {})
+    if not ser:
+        for h in hourly or []:
+            if h.get(key) is not None and h.get("ts"):
+                ser[time.strftime("%Y-%m-%d", time.gmtime(h["ts"]))] = h[key]
+    if value is not None:
+        ser[time.strftime("%Y-%m-%d", time.gmtime())] = value
+    return {d: ser[d] for d in sorted(ser)[-DAILY_KEEP:]}
 
 
 def indicators(glob, markets, perf90):
@@ -628,12 +723,30 @@ def update(exchange=None, scan_results=None):
         print("[!] altseason: regimul ciclului indisponibil (istoric lipsa) - clasificare doar pe metrici relative")
     cls = classify(ind, history, (state.get("classification") or {}).get("scores"), cycle=ctx)
     cands = growth_candidates(markets, perf90, cls["phase"], scan_results)
+    # PENTRU ANALIST: sectoarele (rotatie de cereri, vezi fetch_sectors), monedele de interes
+    # cu oferta/FDV/volum (candidatii, tokenii scanati, liderii sectoarelor) si seriile zilnice
+    # ale dominantei BTC si ale indicelui - din care se masoara trendul si nivelurile cheie.
+    try:
+        sectors = fetch_sectors(state.get("sectors"))
+    except Exception as _e:
+        print(f"[!] sectoare: {_e}")
+        sectors = state.get("sectors")
+    want = {c["symbol"].upper() for c in cands}
+    want |= {str(s.get("symbol", "")).split("/")[0].upper() for s in (scan_results or [])}
+    subset = {}
+    for c in markets or []:
+        sym = (c.get("symbol") or "").upper()
+        if (sym in want or c.get("id") in ("bitcoin", "ethereum")) and sym not in subset:
+            subset[sym] = _compact(c)
 
     state = {"ts": time.time(), "when": time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime()),
              "stale": False, "last_error": None,
              "key_note": (f"cheia CoinGecko a fost refuzata ({KEY_NOTE[-1]}); datele vin din API-ul "
                           f"public gratuit" if KEY_NOTE else None), "indicators": ind, "classification": cls,
-             "candidates": cands, "perf90": perf90,
+             "candidates": cands, "perf90": perf90, "sectors": sectors, "markets": subset,
+             "btc_d_daily": _daily_series(state.get("btc_d_daily"), history, "btc_d", ind.get("btc_d")),
+             "alt_index_daily": _daily_series(state.get("alt_index_daily"), history, "ai",
+                                              ind.get("alt_index_90d")),
              "alt_bias": round(ALT_BIAS[cls["phase"]] * cls["confidence"], 3),
              "btc_bias": round(BTC_BIAS[cls["phase"]] * cls["confidence"], 3)}
     # CONTEXTUL ISTORIC PE 10 ANI (altseason_history.py): ciclurile, pozitia de

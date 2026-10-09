@@ -442,6 +442,20 @@ def position(rows, cyc, live=None):
                                                                          if c["altseasons"] else None)})
     ai_hist = sorted(R(r, "ai") for r in rows)
     pos["ai_percentile"] = round(100 * sum(1 for x in ai_hist if x <= R(last, "ai")) / len(ai_hist))
+    # TRENDUL INDICELUI PE ULTIMELE 90 DE ZILE, pe seria zilnica reconstruita (aceeasi pe care
+    # e calculata percentila): de unde vine valoarea de acum. Puncte la 7 zile + ziua de ieri.
+    tail = rows[-91:]
+    pts = tail[::7] + ([tail[-1]] if (len(tail) - 1) % 7 else [])
+    pos["ai_trend90"] = [[R(r, "day"), R(r, "ai")] for r in pts]
+    pos["ai_90d_ago"], pos["ai_now_hist"] = R(tail[0], "ai"), R(tail[-1], "ai")
+    # DOMINANTA BTC IN ALTSEASON-URILE DIN 10 ANI. Seria reconstruita e de incredere doar ca
+    # DIRECTIE (vezi antetul), deci se compara directia pe 30 de zile in zilele cu indicele
+    # >= 75 fata de restul zilelor - nu nivelul.
+    def _falling(sel):
+        v = [R(r, "dom_d30") for r in sel if R(r, "dom_d30") is not None]
+        return (round(100 * sum(1 for x in v if x < 0) / len(v)), len(v)) if v else (None, 0)
+    pos["alt_days_btcd_falling_pct"], pos["alt_days"] = _falling([r for r in rows if R(r, "ai") >= ALT_SEASON])
+    pos["other_days_btcd_falling_pct"], _ = _falling([r for r in rows if R(r, "ai") < ALT_SEASON])
     st = _zstats(rows)
     an = analogs(rows, _cur(last), upto=len(rows) - 90, st=st)
     pos["analogs"] = []

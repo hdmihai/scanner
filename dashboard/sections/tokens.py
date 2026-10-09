@@ -398,7 +398,9 @@ def render_token_details(details, plans_store, watchlist=None, proposals=None,
                    "macd": (d.get("indicators") or {}).get("macd"),
                    "elliott": d.get("elliott"),
                    "forecast": d.get("forecast"),
-                   "liq_structure": d.get("liq_structure")}
+                   "liq_structure": d.get("liq_structure"),
+                   # zonele de suport/rezistenta (timeframe-ul scanarii + 1D) - desenate pe grafic
+                   "zones": d.get("zones")}
             # FARA maximizare pe graficele per token: suprapunerea duplica
             # intregul SVG, iar la 30 de tokenuri asta inseamna ~2.4 MB de
             # pagina, descarcati chiar daca panourile sunt pliate. Graficul
