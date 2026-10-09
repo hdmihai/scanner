@@ -1,11 +1,11 @@
 {
-  "text": "Din 16459 planuri inchise, rata de succes e 33.3%, cu +1391.38R cumulat (+0.085R in medie pe plan) si profit factor 1.12. 16 planuri sunt inca deschise. Atentie: 16340 dintre ele sunt din backtest. LIVE, din 2026-09-22: 119 planuri inchise, castig 31.9% (IC 24.2-40.8%), R mediu -0.246R (IC95 -0.497..+0.004R), total -29.31R. Ultimele inchise: #164078 ZEN/USDT +4.16R, #293330 ATOM/USDT -1.05R, #164081 NEAR/USDT +0.78R. Pe intervalele de scor cu destule date, cel mai bine merge 0-19 (27.5%, +0.35R mediu, n=160), iar cel mai slab 40-59 (29.8%, +0.05R, n=7853). Deciziile de a deschide sau refuza planuri se bazeaza pe aceste cifre masurate, nu pe scorul brut. Agentul cu invatare online e ACTIV si contribuie la decizii (ordoneaza mai bine decat scorul brut: AUC 0.677 vs 0.567; treimea de sus +0.335R vs toate +0.045R (prequential); acuratete 68.1% vs 67.3% prezicand mereu pierdere (ultimele 3000 exemple)), pe 16373 planuri invatate.",
+  "text": "Din 16459 planuri inchise, rata de succes e 33.3%, cu +1391.38R cumulat (+0.085R in medie pe plan) si profit factor 1.12. 17 planuri sunt inca deschise. Atentie: 16340 dintre ele sunt din backtest. LIVE, din 2026-09-22: 119 planuri inchise, castig 31.9% (IC 24.2-40.8%), R mediu -0.246R (IC95 -0.497..+0.004R), total -29.31R. Ultimele inchise: #164078 ZEN/USDT +4.16R, #293330 ATOM/USDT -1.05R, #164081 NEAR/USDT +0.78R. Pe intervalele de scor cu destule date, cel mai bine merge 0-19 (27.5%, +0.35R mediu, n=160), iar cel mai slab 40-59 (29.8%, +0.05R, n=7853). Deciziile de a deschide sau refuza planuri se bazeaza pe aceste cifre masurate, nu pe scorul brut. Agentul cu invatare online e ACTIV si contribuie la decizii (ordoneaza mai bine decat scorul brut: AUC 0.677 vs 0.567; treimea de sus +0.335R vs toate +0.045R (prequential); acuratete 68.1% vs 67.3% prezicand mereu pierdere (ultimele 3000 exemple)), pe 16373 planuri invatate.",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-10-09 09:04 UTC",
+    "scan_time": "2026-10-09 10:04 UTC",
     "universe_size": 30,
-    "plans_total": 21729,
-    "plans_open": 16,
+    "plans_total": 21730,
+    "plans_open": 17,
     "plans_closed": 16459,
     "legacy_closed": 0,
     "legacy_total_r": null,
@@ -74,6 +74,12 @@
     ],
     "open_now": [
       {
+        "id": 293339,
+        "symbol": "GRAM/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
         "id": 293338,
         "symbol": "FIL/USDT",
         "direction": "LONG",
@@ -95,12 +101,6 @@
         "id": 293335,
         "symbol": "ATOM/USDT",
         "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 293334,
-        "symbol": "SOL/USDT",
-        "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       }
     ],
