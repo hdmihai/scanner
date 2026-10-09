@@ -21,7 +21,7 @@ import math
 import os
 import random
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
@@ -222,6 +222,23 @@ def check_report(fails):
         fails.append(f"raport: faza 1 in recuperare nu da Neutru + asteptare breakout peste rezistenta ({s_wait})")
     if "76,000" not in s_wait["invalidation"] or "59.30%" not in s_wait["invalidation"]:
         fails.append(f"raport: invalidarea nu foloseste suportul 1D si maximul BTC.D ({s_wait['invalidation']})")
+    # BTC.D fara 30 de zile masurate: directia din seria masurata pe 7 zile, estimarea doar context
+    short = {f"2026-09-{d:02d}": 59.0 + 0.01 * d for d in range(27, 31)}
+    short.update({f"2026-10-{d:02d}": 59.3 - 0.01 * d for d in range(1, 9)})
+    b7 = AN.btc_dominance({"btc_d": 59.2, "btc_d_delta30": 0.9}, short)
+    if b7.get("basis") != "7z" or b7["status"] != "Consolidare" or "doar context" not in b7["text"]:
+        fails.append(f"raport: cu serie scurta, directia BTC.D nu vine din seria masurata ({b7.get('basis')}, {b7['status']})")
+    # calendarul ciclului: fereastra istorica a minimului, din ciclurile proprii (fara corectia scurta din 2021)
+    cyc = [{"top": "2017-12-16", "days_top_to_low": 364}, {"top": "2021-04-13", "days_top_to_low": 98},
+           {"top": "2021-11-08", "days_top_to_low": 366}, {"top": "2025-10-06", "days_top_to_low": 267}]
+    cal = AN.cycle_calendar(cyc, 368)
+    if not cal or not cal["active"] or cal["until"] != "2026-11-21" or cal["past_days"] != [364, 366]:
+        fails.append(f"raport: calendarul ciclului e gresit ({cal})")
+    if AN.cycle_calendar(cyc, 420)["active"]:
+        fails.append("raport: fereastra calendarului ramane deschisa dupa marja ei")
+    ph_def = AN.rotation_phase({"phase": 1, "name": "x", "confidence": 0.8}, {"btc_r7": -2.8, "btc_r30": 4.6})
+    if "defensivă" not in ph_def["text"]:
+        fails.append("raport: faza 1 cu BTC in scadere pe 7 zile nu e marcata defensiva")
     # trendul indicelui: din seria live cand acopera 90 de zile, altfel din indicele istoric (marcat)
     hist = {"position": {"ai_90d_ago": 30.0, "ai_now_hist": 58.0, "ai_trend90": [["2026-07-10", 30.0]], "ai_percentile": 80}}
     short = AN.alt_index({"alt_index_90d": 52.0}, hist, {"2026-10-01": 50.0, "2026-10-08": 52.0})
@@ -280,12 +297,100 @@ def check_render(fails, rep):
           f"{len(vals)} pastile de pret distincte pe graficul BTC 1D")
 
 
+def check_tokens(fails):
+    """Pasii 1-4 per token: regulile de sentiment, limita de 10 cuvinte, invalidarea la baza
+    suportului 1D, BTC ca referinta, si verificarea masurata a verdictelor."""
+    from dashboard.sections.analyst import render_analyst, render_token_steps
+    from dashboard.sections.tokens import render_token_details
+    alt = _alt_fixture()
+    t0 = 1_766_000_000_000
+    btc_px = [60000 + 60 * i for i in range(260)]
+    up = [1.0 + 0.004 * i for i in range(230)] + [1.92 - 0.004 * i for i in range(20)] + [1.84 + 0.01 * i for i in range(10)]
+    down = [3.0 - 0.006 * i for i in range(260)]
+    daily = {"BTC": _series(btc_px, t0), "UPC": _series(up, t0), "DNC": _series(down, t0)}
+    ind = alt["indicators"]
+    back = lambda rs, rb: ((1 + rs / 100) * (1 + (rb or 0) / 100) - 1) * 100
+    alt["markets"].update({
+        "UPC": {"symbol": "UPC", "name": "Up", "rank": 40, "price": up[-1], "mcap": 1e9, "fdv": 1.1e9, "vol": 5e7,
+                "circ": 900, "total": 1000, "r7": back(4, ind["btc_r7"]), "r30": back(12, ind["btc_r30"]),
+                "r200": back(30, ind.get("btc_r200"))},
+        "DNC": {"symbol": "DNC", "name": "Down", "rank": 150, "price": down[-1], "mcap": 2e8, "fdv": 2.2e8, "vol": 1e6,
+                "circ": 900, "total": 1000, "r7": back(-3, ind["btc_r7"]), "r30": back(-15, ind["btc_r30"]),
+                "r200": back(-40, ind.get("btc_r200"))}})
+    alt["sectors"]["items"]["artificial-intelligence"]["coins"].append(dict(alt["markets"]["UPC"], symbol="UPC"))
+    det = {"UPC/USDT": {"price": up[-1], "direction": "LONG", "score": 70,
+                        "zones": {"d1": AN.daily_zones(daily["UPC"], up[-1])}},
+           "DNC/USDT": {"price": down[-1], "direction": "SHORT", "score": 55,
+                        "zones": {"d1": AN.daily_zones(daily["DNC"], down[-1])}},
+           "BTC/USDT": {"price": btc_px[-1], "direction": "LONG", "score": 50, "zones": {}}}
+    rep = AN.build_report(alt, det, daily, None, 1_791_510_000, calls=[])
+    toks = rep.get("tokens") or {}
+    if set(toks) != {"UPC", "DNC", "BTC"}:
+        fails.append(f"tokeni: lipsesc rapoarte per token ({sorted(toks)})")
+        return
+    up_t, dn_t, bt = toks["UPC"], toks["DNC"], toks["BTC"]
+    macro_bear = rep["strategy"]["sentiment"] == "Bearish"
+    if not macro_bear and up_t["strategy"]["sentiment"] != "Bullish":
+        fails.append(f"tokeni: peste MA200 si bate BTC pe 7 si 30 de zile, dar nu e Bullish ({up_t['strategy']})")
+    if dn_t["strategy"]["sentiment"] != "Bearish":
+        fails.append(f"tokeni: sub MA200 si pierde fata de BTC, dar nu e Bearish ({dn_t['strategy']})")
+    for b, t in toks.items():
+        for txt in (t["sector"]["catalyst"], t["alpha"]["argument"], t["alpha"]["risk"]):
+            if len(str(txt).split()) > AN.WORDS:
+                fails.append(f"tokeni: {b} are un text de peste 10 cuvinte: {txt}")
+    sup = up_t["alpha"].get("support")
+    if sup and up_t["strategy"].get("inv_price") != sup["lo"]:
+        fails.append("tokeni: invalidarea nu e baza suportului 1D")
+    if up_t["sector"]["name"] != "AI" or "AI" not in up_t["sector"]["catalyst"]:
+        fails.append(f"tokeni: sectorul cu momentum al tokenului nu e recunoscut ({up_t['sector']})")
+    if "aliniat" not in (up_t["strategy"].get("alignment") or ""):
+        fails.append(f"tokeni: alinierea cu semnalul scanerului lipseste ({up_t['strategy'].get('alignment')})")
+    if bt["sector"]["text"].find("referința") < 0 or bt["strategy"]["sentiment"] != rep["strategy"]["sentiment"]:
+        fails.append("tokeni: BTC nu e tratat ca referinta pietei")
+    # piata Bearish -> toti tokenii Bearish
+    bear_strat = dict(rep["strategy"], sentiment="Bearish")
+    t_bear = AN.token_report("UPC", det["UPC/USDT"], alt["markets"]["UPC"], ind, rep["sectors"]["all"], {"artificial-intelligence"},
+                             daily["UPC"], daily["BTC"], rep["macro"], bear_strat)
+    if t_bear["strategy"]["sentiment"] != "Bearish":
+        fails.append("tokeni: cu piata Bearish, un token a primit alt sentiment")
+    # verificarea masurata: un verdict Bullish urmat de +10% fata de BTC se puncteaza corect
+    day0 = "2026-01-01"
+    t_ms = lambda d: int(datetime.strptime(d, "%Y-%m-%d").replace(tzinfo=timezone.utc).timestamp() * 1000)
+    days = [(datetime(2026, 1, 1) + timedelta(days=i)).strftime("%Y-%m-%d") for i in range(40)]
+    btc_c = [[t_ms(d), 100, 100, 100, 100.0, 1] for d in days]
+    tok_c = [[t_ms(d), 10, 10, 10, 10.0 * (1 + 0.1 * min(i, 30) / 30), 1] for i, d in enumerate(days)]
+    calls = AN.record_calls([], day0, {"UPC": {"price": 10.0, "strategy": {"sentiment": "Bullish"}, "alpha": {"rr": 2.0}}}, 100.0)
+    sc = AN.score_calls(calls, {"BTC": btc_c, "UPC": tok_c})
+    h30 = (sc["horizons"].get("30") or {}).get("Bullish") or {}
+    if h30.get("n") != 1 or abs((h30.get("mean_rel") or 0) - 10.0) > 0.01 or h30.get("hit") != 100.0:
+        fails.append(f"tokeni: verificarea verdictelor la 30 de zile e gresita ({sc})")
+    again = AN.record_calls(calls, day0, {"UPC": {"price": 11.0, "strategy": {"sentiment": "Neutru"}, "alpha": {}}}, 101.0)
+    if len(again) != 1 or again[0]["calls"]["UPC"][0] != "Neutru":
+        fails.append("tokeni: verdictul zilei nu e inlocuit la scanarile din aceeasi zi")
+    # afisare: pasii 1-4 pe card, lista in raport, invalidarea pe grafic
+    html = render_token_steps(up_t)
+    for lbl in ("Diagnostic", "Sector", "Catalizator", "Sustenabilitate", "Filtrare alfa", "Argument", "Risc Critic",
+                "Strategie", "Ghid de Intrare", "Trigger de Invalidare"):
+        if lbl not in html:
+            fails.append(f"tokeni: lipseste eticheta '{lbl}' pe cardul tokenului")
+    full = render_analyst(rep, {"UPC": "exchanges/okx.html#tok-UPC-USDT"})
+    if "PAȘII 1–4 PENTRU FIECARE TOKEN" not in full or 'href="exchanges/okx.html#tok-UPC-USDT"' not in full:
+        fails.append("tokeni: lista tokenilor sau legatura spre card lipseste din raport")
+    cands = {"symbols": {"UPC/USDT": dict(det["UPC/USDT"], candles=daily["UPC"][-80:], score=70)}}
+    page = render_token_details(cands, {}, None, {}, True, "OKX", analyst_tokens=toks)
+    if "Analist &middot; pașii 1–4" not in page or "analist Bullish" not in page:
+        fails.append("tokeni: pasii 1-4 lipsesc de pe cardul tokenului din pagina bursei")
+    print(f"  5. tokeni: {len(toks)} rapoarte (UPC {up_t['strategy']['sentiment']}, DNC {dn_t['strategy']['sentiment']}, "
+          f"BTC referinta), invalidare la baza suportului, verdicte verificate la 30 de zile, afisare pe card")
+
+
 def main():
     fails = []
     check_zones(fails)
     check_placebo(fails)
     rep = check_report(fails)
     check_render(fails, rep)
+    check_tokens(fails)
     print("\nANALIST: " + ("RESPINS - " + "; ".join(fails) if fails else "TRECUT"))
     return 1 if fails else 0
 

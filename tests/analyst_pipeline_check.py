@@ -63,6 +63,7 @@ def main():
     AH.STATE_FILE = os.path.join(tmp, "altseason_cycles.json")
     AH.daily_update = lambda st, ex: False      # fara retea: istoricul pe 10 ani ramane cel copiat
     AN.REPORT_FILE = os.path.join(tmp, "analyst.json")
+    AN.CALLS_FILE = os.path.join(tmp, "analyst_calls.json")
     fails = []
     try:
         cy = json.load(open(AH.STATE_FILE))
@@ -160,6 +161,12 @@ def main():
                 for p in rep["alpha"]:
                     if p["ticker"] in odd and (not p.get("other_asset") or p.get("rr") is not None):
                         fails.append(f"{p['ticker']}: activul diferit de pe bursa a primit R:R")
+                toks = rep.get("tokens") or {}
+                if len(toks) < max(1, len(details) // 2):
+                    fails.append(f"pasii 1-4 per token lipsesc: {len(toks)} rapoarte pentru {len(details)} tokeni")
+                logged = json.load(open(AN.CALLS_FILE)) if os.path.exists(AN.CALLS_FILE) else []
+                if not logged or len(logged[-1].get("calls") or {}) < len(toks) - 1:
+                    fails.append("verdictele zilei per token nu au fost inregistrate")
                 html = render_analyst(json.load(open(AN.REPORT_FILE)))
                 for lbl in ("1. DIAGNOSTIC MACRO", "2. SECTOARE MOMENTUM", "3. FILTRARE ALFA",
                             "4. STRATEGIE EXECUTIVĂ", "PRET ACUM"):
@@ -168,7 +175,8 @@ def main():
                 print(f"  altseason x3: {len(sec['items'])} sectoare, {calls['cg']} cereri CoinGecko + "
                       f"{calls['sector']} de sector; BTC.D {len(st['btc_d_daily'])} zile")
                 print(f"  analist: BTC.D {rep['macro']['btc_d']['status']}, sectoare {names}, alfa "
-                      f"{[(p['ticker'], p['rr']) for p in rep['alpha']]}, sentiment {rep['strategy']['sentiment']}")
+                      f"{[(p['ticker'], p['rr']) for p in rep['alpha']]}, sentiment {rep['strategy']['sentiment']}, "
+                      f"{len(toks)} tokeni cu pasii 1-4, {len(logged[-1]['calls']) if logged else 0} verdicte inregistrate")
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     print("\nLANTUL ANALISTULUI: " + ("RESPINS - " + "; ".join(fails) if fails else "TRECUT"))

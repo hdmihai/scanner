@@ -5,8 +5,9 @@ analyst.py - adaptorul analistului de rotatie a capitalului.
 
 La fiecare scanare (portul ANALYST din core/scan.py, legat in crypto_ai_scanner.py): aduce
 lumanarile zilnice care lipsesc - BTC si candidatii din afara listei scanate (cel mult
-MAX_FETCH) -, cere raportul nucleului (core/analyst.py) si il salveaza in data/analyst.json,
-de unde il afiseaza dashboard-ul.
+MAX_FETCH) -, cere raportul nucleului (core/analyst.py: piata in 4 pasi si aceiasi 4 pasi pentru
+fiecare token scanat), il salveaza in data/analyst.json, de unde il afiseaza dashboard-ul, si
+inregistreaza verdictele per token ale zilei in data/analyst_calls.json, pentru verificarea lor.
 
 Datele vin din ce scanarea are deja: starea altseason (CoinGecko + istoricul pe 10 ani),
 detaliile tokenilor (cu zonele de suport/rezistenta), statisticile zonelor. Singurele apeluri
@@ -21,6 +22,9 @@ import time
 from core import analyst as _core
 
 REPORT_FILE = os.path.join("data", "analyst.json")
+# VERDICTELE PER TOKEN, cate unul pe zi UTC (sentiment, pret, R:R): verificate la 7 si 30 de
+# zile pe lumanarile zilnice - asa se vede, masurat, daca pasii 1-4 per token au valoare.
+CALLS_FILE = os.path.join("data", "analyst_calls.json")
 MAX_FETCH = 16         # candidati din afara listei scanate (piata + liderii sectoarelor), cu lumanari zilnice aduse la fiecare scanare
 DAILY_BARS = 300
 
@@ -78,9 +82,13 @@ def update(exchange, alt_state, details, results, zone_stats, daily_cache):
             c = _daily(exchange, base)
             if c:
                 daily[base] = c
-        report = _core.build_report(alt_state, details, daily, zone_stats, time.time())
+        calls = _load(CALLS_FILE, []) or []
+        report = _core.build_report(alt_state, details, daily, zone_stats, time.time(), calls)
         report["error"] = None
         report["fetched_daily"] = fetched
+        btc_px = (report.get("btc") or {}).get("price") or ((alt_state or {}).get("indicators") or {}).get("btc_price")
+        _save(CALLS_FILE, _core.record_calls(calls, time.strftime("%Y-%m-%d", time.gmtime()),
+                                             report.get("tokens"), btc_px))
     except Exception as e:
         prev = _load(REPORT_FILE, {}) or {}
         prev.update(error=f"{type(e).__name__}: {str(e)[:200]}",
@@ -90,7 +98,9 @@ def update(exchange, alt_state, details, results, zone_stats, daily_cache):
         return prev
     _save(REPORT_FILE, report)
     m, st = report["macro"], report["strategy"]
+    sents = [t["strategy"]["sentiment"] for t in (report.get("tokens") or {}).values()]
     print(f"Analist: BTC.D {m['btc_d'].get('status')} | {m['phase'].get('label')} | indice "
           f"{m['alt_index'].get('value')} | sectoare {len(report['sectors']['top'])} | alfa {len(report['alpha'])} "
-          f"| sentiment {st['sentiment']}")
+          f"| sentiment {st['sentiment']} | tokeni {len(sents)} (Bullish {sents.count('Bullish')}, "
+          f"Neutru {sents.count('Neutru')}, Bearish {sents.count('Bearish')})")
     return report

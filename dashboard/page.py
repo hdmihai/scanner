@@ -10,7 +10,8 @@ from dashboard.config import ALTSEASON_FILE, ALTSEASON_HISTORY_FILE, DATA_DIR, T
 from dashboard.components import load_json, render_weight_bars
 from dashboard.sections.agent import render_agent_card, render_learning_curve
 from dashboard.sections.altseason import render_altseason
-from dashboard.sections.analyst import render_analyst
+from dashboard.sections.analyst import render_analyst, render_token_steps
+from dashboard.sections.tokens import token_anchor
 from dashboard.sections.exchanges import page_href, render_exchange_modules, render_nav
 from dashboard.sections.market import render_briefing, render_evidence, render_indicators, render_levels, render_liquidity, render_opportunity_rows
 from dashboard.sections.plan import (elliott_outcome_stats, recent_calibration, render_calibration, render_plan,
@@ -64,7 +65,15 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
     research_html = _safe("render_research", render_research, load_json(os.path.join(DATA_DIR, "research.json"), None))
     altseason_html = _safe("render_altseason", render_altseason, load_json(ALTSEASON_FILE, None),
                                       load_json(ALTSEASON_HISTORY_FILE, []))
-    analyst_html = _safe("render_analyst", render_analyst, load_json(os.path.join(DATA_DIR, "analyst.json"), None))
+    # ANALISTUL: raportul de piata si pasii 1-4 per token, cu legaturi spre cardul fiecarui token
+    # de pe pagina bursei active (unde e detaliul complet si graficul cu invalidarea marcata)
+    _an = load_json(os.path.join(DATA_DIR, "analyst.json"), None)
+    _primary = (exchange_scans or {}).get("primary") or (exchanges_store or {}).get("used")
+    _links = ({str(sym).split("/")[0].upper(): f"{page_href(_primary)}#{token_anchor(sym)}"
+               for sym in ((details or {}).get("symbols") or {})} if _primary else {})
+    analyst_html = _safe("render_analyst", render_analyst, _an, _links)
+    _best_tok = ((_an or {}).get("tokens") or {}).get(str((best or {}).get("symbol") or "").split("/")[0].upper())
+    main_steps_html = _safe("render_token_steps", render_token_steps, _best_tok)
     similar_html = _safe("render_similar_projects", render_similar_projects, 
         token_meta, narrative, symbol=(best or {}).get("symbol"),
         updated=(TOKEN_META_UPDATED or {}).get("when"))
@@ -92,6 +101,10 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
                         load_json(os.path.join(DATA_DIR, "self_check.json"), None),
                         load_json(ALTSEASON_FILE, None),
                         load_json(os.path.join(DATA_DIR, "runs.json"), None))
+    _inv = ((_best_tok or {}).get("strategy") or {}).get("inv_price")
+    if chart and _inv and chart.get("symbol") == (best or {}).get("symbol"):
+        # invalidarea analistului (pasul 4) pe graficul principal: doar daca incape, nu intinde axa
+        chart = dict(chart, marks=[{"price": _inv, "label": "INVALIDARE ANALIST", "kind": "invsoft"}])
     chart_svg = chart_render.render_components(chart, "main")
     weight_bars = _safe("render_weight_bars", render_weight_bars, weights)
     long_rows = _safe("render_opportunity_rows", render_opportunity_rows, scan.get("top_long", []))
@@ -156,7 +169,10 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
           <span><i class="dot" style="background:#089981"></i>TP</span>
           <span><i class="dot" style="background:#F23645"></i>SL / E INV</span>
           <span><i class="dot" style="background:#0288D1"></i>entry</span>
+          <span><i class="dot" style="background:#C62828"></i>invalidare analist</span>
         </div>
+        <details class="cc an-main"><summary><span class="cc-title">Analist &middot; pașii 1–4 &middot; {(best or {}).get("symbol", "-")}</span></summary>
+          <div class="cc-body">{main_steps_html}</div></details>
       </div>
 
       <div class="card">

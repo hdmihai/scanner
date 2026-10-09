@@ -53,8 +53,9 @@ def _proposal_rows(props, trained):
 
 
 def build_exchange_page(card, cards, scan, details, proposals_store, plans_store, altseason_html,
-                        css, primary, primary_label, scan_time):
-    """HTML-ul complet al paginii unei burse."""
+                        css, primary, primary_label, scan_time, analyst_tokens=None):
+    """HTML-ul complet al paginii unei burse. `analyst_tokens`: pasii 1-4 ai analistului pe fiecare
+    token (aceiasi pe toate bursele - tokenul e acelasi, pretul practic acelasi)."""
     eid = card.get("id")
     label = _html.escape(card.get("label", eid))
     trained = eid == primary
@@ -105,7 +106,8 @@ def build_exchange_page(card, cards, scan, details, proposals_store, plans_store
     tokens_card = ""
     if card.get("connected"):
         tok_html = render_token_details(details, plans_store, watchlist, props, trained, primary_label,
-                                        proposals_ready=bool((proposals_store or {}).get("scan_time")))
+                                        proposals_ready=bool((proposals_store or {}).get("scan_time")),
+                                        analyst_tokens=analyst_tokens)
         tokens_card = f'''<div class="card">
     <h2>Token-uri &middot; {label}</h2>
     <details class="tok-list">

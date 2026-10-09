@@ -45,7 +45,10 @@ ALL_LAYERS = {"ema", "plan", "locked", "ew_primary", "ew_all", "ew_levels",
 # fiecarui token: dreptunghiuri de la formarea zonei pana in prezent, cu marginile ca linii
 # orizontale pe toata latimea - cea mai apropiata zona de fiecare parte incadreaza pretul.
 MAIN_LAYERS = {"ema", "plan", "ew_primary", "ew_inv_primary", "projection",
-               "price_axis", "zones"}
+               "price_axis", "zones", "marks"}
+# marcaje care nu intind axa (ex. invalidarea analistului pe graficul unui token): se deseneaza
+# doar daca pretul lor intra in intervalul dat de lumanari, niveluri si zone
+SOFT_KINDS = {"invsoft"}
 ZONE_KEEP_PCT = 8.0   # a doua zona de pe o parte intinde axa doar daca e la cel mult 8% de pret
 
 
@@ -232,7 +235,8 @@ def render_chart(chart, layers=None, height=300, fullscreen_id=None, show_head=T
     # intervalul de pret: lumanari + niveluri + proiectie. Nivelurile foarte
     # departate (peste 60% de pret) nu intind axa - le-ar turti lumanarile.
     px = chart.get("price") or candles[-1][4]
-    near = [l[0] for l in levels if abs(l[0] - px) / px < 0.6 and not str(l[2]).startswith("z")]
+    near = [l[0] for l in levels if abs(l[0] - px) / px < 0.6 and not str(l[2]).startswith("z")
+            and l[2] not in SOFT_KINDS]
     # ZONELE: cea mai apropiata de fiecare parte intra intreaga in axa (incadreaza pretul); din
     # urmatoarele intra doar marginea dinspre pret, si doar daca e aproape - zona apare ca banda
     # care continua dincolo de marginea graficului, fara sa turteasca lumanarile
@@ -709,6 +713,7 @@ CSS = """
 .zl.zsc{stroke-dasharray:5 3;stroke-width:.9;}
 .pill-zsup{fill:#089981;} .pill-zres{fill:#E67E22;} .pill-zsup2{fill:#6CB8AA;} .pill-zres2{fill:#EFA868;}
 .pill-now{fill:#2962FF;} .lvl-now{stroke:#2962FF;stroke-dasharray:2 2;opacity:.9;}
+.pill-invsoft{fill:#C62828;} .lvl-invsoft{stroke:#C62828;stroke-dasharray:6 3;opacity:.85;}
 .zrow{font-size:12px;padding:5px 8px;border-left:3px solid;margin:4px 0;border-radius:4px;background:#F8FAFC;}
 .zrow-s{border-left-color:#089981;} .zrow-r{border-left-color:#E67E22;}
 .zstat{font-size:11px;margin:6px 0 0;}

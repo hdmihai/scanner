@@ -478,6 +478,7 @@ def check_core_is_pure():
     2. Nucleul importa DOAR din nucleu, din porturi si din biblioteca standard -
        niciodata un adaptor sau un modul vechi din radacina (plan_tracker, ...).
     3. PORTURILE (ports/) nu depind de nimic din proiect.
+    4. PREZENTAREA (dashboard/) nu face retea si nu importa adaptoare de date.
 
     DE CE: o dependenta ascunsa (un open() uitat intr-o functie de calcul, un
     import de ccxt "doar pentru un apel") rupe separarea in tacere - codul merge,
@@ -527,6 +528,33 @@ def check_core_is_pure():
                     if (owner, fn.attr) in file_calls:
                         problems.append(f"{rel}:{n.lineno} apeleaza {owner}.{fn.attr} - I/O pe disc in nucleu; "
                                         f"foloseste portul de stocare.")
+    # 4. PREZENTAREA (dashboard/) doar citeste starea salvata si deseneaza: fara retea si fara
+    #    adaptoarele care aduc date (altseason, istoricul pe 10 ani, CoinGecko, burse) - numele
+    #    si regulile domeniului le ia din nucleu. Altfel generarea paginii ar putea face cereri
+    #    sau ar depinde de un adaptor care se schimba.
+    pres_allowed = {"dashboard", "core", "ports", "chart_render", "exchanges"}
+    for dirpath, _dirs, files in os.walk(os.path.join(ROOT, "dashboard")):
+        for f in sorted(files):
+            if not f.endswith(".py"):
+                continue
+            rel = os.path.relpath(os.path.join(dirpath, f), ROOT)
+            try:
+                tree = _ast.parse(read(rel) or "")
+            except SyntaxError:
+                continue
+            for n in _ast.walk(tree):
+                mods = []
+                if isinstance(n, _ast.Import):
+                    mods = [a.name for a in n.names]
+                elif isinstance(n, _ast.ImportFrom) and n.module and not n.level:
+                    mods = [n.module]
+                for m in mods:
+                    top = m.split(".")[0]
+                    if top in net:
+                        problems.append(f"{rel}:{n.lineno} importa {m} - prezentarea (dashboard/) nu face retea.")
+                    elif top in root_mods and top not in pres_allowed:
+                        problems.append(f"{rel}:{n.lineno} importa {m} - prezentarea (dashboard/) poate importa doar "
+                                        f"{sorted(pres_allowed)} (regula dependentelor); domeniul vine din nucleu.")
 
 
 def check_package_identity():
