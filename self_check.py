@@ -255,9 +255,33 @@ def check_freshness(details):
         out.append(_chk("fresh_scan", "WARN", "Scanare veche",
                         f"ultima scanare e de acum {(time.time() - ts) / 3600:.1f} ore"))
     alt = _load("altseason.json", None)
-    if alt is None or alt.get("stale") or time.time() - (alt or {}).get("ts", 0) > 6 * 3600:
-        out.append(_chk("fresh_altseason", "WARN", "Faza altcoin season neactualizata",
-                        "datele CoinGecko lipsesc sau sunt mai vechi de 6 ore"))
+    # ALTSEASON LA FIECARE SCANARE, raportat la istoricul pe 10 ani: evaluarea trebuie sa fie a
+    # scanarii curente (nu doar "mai noua de 6 ore"), contextul pe 10 ani sa ajunga pana ieri,
+    # iar raportul analistului (care le foloseste) sa fie generat acum. Comparatia e intr-un
+    # singur sens - "mai vechi decat scanarea": evaluarea se face in timpul scanarii, deci nu
+    # poate fi mai veche decat ea decat daca n-a rulat (o stare mai NOUA decat scanarea apare
+    # doar in poarta de echivalenta, unde altseason-ul e starea salvata, iar ceasul e inghetat).
+    ref = ts if ts is not None else time.time()
+    if alt is None or alt.get("stale") or ref - (alt or {}).get("ts", 0) > 2 * 3600:
+        out.append(_chk("fresh_altseason", "WARN", "Faza altcoin season neactualizata la aceasta scanare",
+                        "altseason.json lipseste, e marcat vechi (CoinGecko indisponibil) sau nu e de la "
+                        "scanarea curenta"))
+    hday = ((alt or {}).get("history") or {}).get("last_day")
+    if alt is not None:
+        lag = None
+        try:
+            lag = (ref - time.mktime(time.strptime(hday, "%Y-%m-%d")) + time.timezone) / 86400 if hday else None
+        except (TypeError, ValueError):
+            lag = None
+        if lag is None or lag > 3:
+            out.append(_chk("fresh_altseason_10y", "WARN", "Contextul altseason pe 10 ani neactualizat",
+                            f"ultima zi din istoricul pe 10 ani: {hday or 'lipsa'} - comparatia cu ultimii "
+                            "10 ani nu include zilele recente"))
+    an = _load("analyst.json", None)
+    if an is not None and (an.get("error") or ref - (an.get("ts") or 0) > 2 * 3600):
+        out.append(_chk("fresh_analyst", "WARN", "Raportul analistului neactualizat",
+                        (f"ultima actualizare a esuat: {an.get('error')}" if an.get("error")
+                         else "raportul nu e de la scanarea curenta")))
     meta = (_load("token_metadata.json", {}) or {}).get("tokens") or {}
     scans = _load("exchange_scans.json", {}) or {}
     uni = set()
