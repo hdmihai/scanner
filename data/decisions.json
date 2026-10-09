@@ -1,39 +1,30 @@
 {
-  "scan_time": "2026-10-09 07:03 UTC",
+  "scan_time": "2026-10-09 08:03 UTC",
   "decisions": {
-    "ATOM/USDT": {
-      "action": "ISSUE",
-      "mode": "EXPLORARE_FILTRU",
-      "reason": "semnal din treimea de jos (0.126 < 0.210), emis pentru explorare (15% din cele filtrate) - pastreaza evaluarea agentului nedeformata",
-      "calibrated_prob": 29.8,
-      "agent_prob": 0.1263,
-      "elliott_bias": null,
-      "next_entry": null
-    },
     "FIL/USDT": {
       "action": "SKIP",
       "mode": "FILTRU_AGENT",
-      "reason": "agentul pune semnalul in treimea de jos (0.203 < 0.210); masurat in afara esantionului, acea treime pierde in medie",
+      "reason": "agentul pune semnalul in treimea de jos (0.201 < 0.210); masurat in afara esantionului, acea treime pierde in medie",
       "calibrated_prob": 27.5,
-      "agent_prob": 0.2025,
+      "agent_prob": 0.2013,
       "elliott_bias": null,
       "next_entry": null
     },
-    "ETH/USDT": {
+    "NEAR/USDT": {
       "action": "ISSUE",
-      "mode": "EXPLORARE_FILTRU",
-      "reason": "semnal din treimea de jos (0.104 < 0.210), emis pentru explorare (15% din cele filtrate) - pastreaza evaluarea agentului nedeformata",
-      "calibrated_prob": 42.5,
-      "agent_prob": 0.104,
-      "elliott_bias": -0.0577,
-      "next_entry": 2633.4293399999997
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta dezactivata: pe walk-forward a inrautatit rezultatul in 2 din 3 rulari",
+      "calibrated_prob": 27.5,
+      "agent_prob": 0.2402,
+      "elliott_bias": null,
+      "next_entry": null
     },
     "GRAM/USDT": {
       "action": "SKIP",
       "mode": "FILTRU_AGENT",
-      "reason": "agentul pune semnalul in treimea de jos (0.085 < 0.210); masurat in afara esantionului, acea treime pierde in medie",
+      "reason": "agentul pune semnalul in treimea de jos (0.121 < 0.210); masurat in afara esantionului, acea treime pierde in medie",
       "calibrated_prob": 29.8,
-      "agent_prob": 0.0851,
+      "agent_prob": 0.1213,
       "elliott_bias": 0.2,
       "next_entry": null
     }

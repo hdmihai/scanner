@@ -60,6 +60,15 @@
 .proj-t{font:700 8.5px var(--font-mono);fill:#7E57C2;}
 .proj-tag{font:600 8px var(--font-mono);fill:#7E57C2;}
 .rsi{stroke:#7E57C2;stroke-width:1.2;}
+.zone.zs{fill:#089981;opacity:.08;} .zone.zr{fill:#F57C00;opacity:.10;}
+.zone.zs.z1d{opacity:.15;} .zone.zr.z1d{opacity:.17;}
+.zl{stroke-width:1;} .zl.zs{stroke:#089981;opacity:.8;} .zl.zr{stroke:#E67E22;opacity:.85;}
+.zl.zsc{stroke-dasharray:5 3;stroke-width:.9;}
+.pill-zsup{fill:#089981;} .pill-zres{fill:#E67E22;} .pill-zsup2{fill:#6CB8AA;} .pill-zres2{fill:#EFA868;}
+.pill-now{fill:#2962FF;} .lvl-now{stroke:#2962FF;stroke-dasharray:2 2;opacity:.9;}
+.zrow{font-size:12px;padding:5px 8px;border-left:3px solid;margin:4px 0;border-radius:4px;background:#F8FAFC;}
+.zrow-s{border-left-color:#089981;} .zrow-r{border-left-color:#E67E22;}
+.zstat{font-size:11px;margin:6px 0 0;}
 .sub-t{font:600 8px var(--font-mono);fill:#64748B;}
 
 :root{
@@ -562,19 +571,35 @@ footer{margin-top:26px;color:var(--text-dim);font-size:11px;line-height:1.6;}
 .res-head{font-size:13px;margin:0 0 6px;line-height:1.5;}
 .res-note{text-transform:none;letter-spacing:0;font-size:12px;margin:4px 0 8px;line-height:1.5;}
 .res-rule{background:var(--panel-2);border-radius:7px;padding:8px 10px;margin-bottom:6px;font-size:13px;}
+/* Analistul de rotatie a capitalului (dashboard/sections/analyst.py) */
+.an-head{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;margin-bottom:10px;}
+.an-head .dim{text-transform:none;letter-spacing:0;font-size:11px;}
+.an-h{font-size:12.5px;font-weight:700;letter-spacing:.04em;margin:14px 0 6px;color:var(--text);}
+.an-ul{margin:4px 0 6px 18px;padding:0;font-size:13px;line-height:1.5;}
+.an-ul>li{margin:4px 0;}
+.an-sub{margin:2px 0 2px 16px;padding:0;font-size:12.5px;}
+.an-why{color:var(--text-dim);font-size:11.5px;}
+.an-rr{font-family:var(--font-mono);font-size:11.5px;color:var(--text-dim);margin:2px 0 6px;}
+.an-asym{color:var(--bull);font-weight:600;}
+.an-10y{background:var(--panel-2);border-radius:8px;padding:8px 10px;margin:8px 0;}
+.an-note{font-size:11px;color:var(--text-dim);margin:4px 0 8px;line-height:1.45;}
+.an-spark{display:block;width:240px;max-width:100%;height:46px;margin:4px 0;}
+.an-sp75{stroke:#CBD5E1;stroke-dasharray:3 3;} .an-spl{stroke:#7E57C2;stroke-width:1.6;}
+.an-spd{fill:#7E57C2;} .an-spt{font:8px var(--font-mono);fill:#94A3B8;}
+.an-legend{flex-wrap:wrap;gap:6px 14px;}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
     <div class="brand">SCANLINE<small>Modulul bursei Bybit</small></div>
-    <div class="meta">2026-10-09 07:03 UTC<br>4h</div>
+    <div class="meta">2026-10-09 08:03 UTC<br>4h</div>
   </header>
   <nav class="nav"><a class="nav-i" href="../index.html">Principal</a><a class="nav-i" href="okx.html">OKX</a><a class="nav-i" href="kucoin.html">KuCoin</a><a class="nav-i" href="gate.html">Gate.io</a><a class="nav-i" href="mexc.html">MEXC</a><a class="nav-i" href="kraken.html">Kraken</a><a class="nav-i nav-on nav-off" href="bybit.html">Bybit</a></nav>
 
   <div class="card">
     <h2>Altcoin season &middot; modul separat, acelasi pe toate bursele</h2>
-    <div class="as-strip"><div class="as-phase">FAZA 1</div><div class="as-strip-t"><strong>Acumulare / recuperare BTC</strong> &middot; incredere 83%<div class="as-strip-m">regim ciclu BTC: acumulare / recuperare &middot; indice altseason 53/100 &middot; dominanta BTC 59.08% &middot; BTC $82,479 &middot; evaluat 2026-10-09 07:03 UTC</div></div><a class="exm-link" href="../index.html#altseason">Analiza completa</a></div>
+    <div class="as-strip"><div class="as-phase">FAZA 1</div><div class="as-strip-t"><strong>Acumulare / recuperare BTC</strong> &middot; incredere 83%<div class="as-strip-m">regim ciclu BTC: acumulare / recuperare &middot; indice altseason 53/100 &middot; dominanta BTC 59.07% &middot; BTC $82,557 &middot; evaluat 2026-10-09 08:03 UTC</div></div><a class="exm-link" href="../index.html#altseason">Analiza completa</a></div>
   </div>
 
   <div class="card">
