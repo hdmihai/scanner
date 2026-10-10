@@ -402,3 +402,21 @@ def ex_tokens(watchlist, symbols, analyst_tokens):
 
 def altseason_strip(state):
     return altseason(state)[:2]
+
+
+def memory(st):
+    if not st:
+        return ["Depozitul de memorie nu a rulat încă (Actions → Memorie agent)"]
+    ds = st.get("datasets") or {}
+    tot_rows = sum((v or {}).get("rows", 0) for v in ds.values())
+    tot_b = sum((v or {}).get("bytes", 0) for v in ds.values())
+    l1 = (f"{tot_rows:,} rânduri · {tot_b / 1e6:.1f} MB Parquet · "
+          + ("release-uri GitHub" if st.get("store") == "github-releases" else str(st.get("store"))))
+    c = (ds.get("candles") or {}).get("coverage") or {}
+    l2 = ("Lumânări: " + ", ".join(f"{k} {v.get('with_data', 0)} simboluri" for k, v in sorted(c.items()))) if c else None
+    pr = st.get("probe") or {}
+    errs = ((st.get("last_run") or {}).get("errors") or [])
+    l3 = (f"⚠ {len(errs)} erori la ultima rulare" if errs else
+          f"Arhiva Binance: {'accesibilă' if (pr.get('binance_vision') or {}).get('ok') else 'inaccesibilă din runner'}"
+          f" · ultima rulare {(st.get('last_run') or {}).get('finished', '-')}")
+    return _lines(l1, l2, l3)
