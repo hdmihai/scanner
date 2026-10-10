@@ -97,8 +97,31 @@ STATE_SOURCE = current_source()
 BASE_FEATURES = ["trend", "momentum", "volatility", "volume", "persistence_n"]
 FEATURES = BASE_FEATURES + ev_mod.FEATURE_KEYS
 
-LEARNING_RATE = 0.05
+LEARNING_RATE = 0.05            # doar valoarea initiala a obiectului; antrenarea foloseste learning_rate(n)
 L2 = 1e-4
+
+# RITMUL DE INVATARE, legat de cat a memorat agentul: pasi mari cat are putine exemple, mai mici
+# pe masura ce memoria creste - lr(n) = max(LR_MIN, LR0 / sqrt(1 + n / LR_HALF)). Era fix 0.05:
+# cu 16.000 de exemple, fiecare plan nou muta greutatile la fel de mult ca primul, deci modelul
+# "tinea minte" practic doar ultimele cateva sute de planuri.
+# Masurat CAUZAL (predictie la crearea planului, invatare la inchiderea lui) pe 16.480 de planuri:
+# AUC 0.604 cu 0.05 fix, 0.631 cu acest program - cel mai bun dintre cele testate (fix 0.001-0.2,
+# descrescatoare cu alti parametri, Adagrad).
+LR0 = 0.02
+LR_HALF = 1000
+LR_MIN = 0.001
+
+# EVALUAREA CAUZALA. Inainte, planurile se invatau in ordinea INCHIDERII, iar predictia "in afara
+# esantionului" pentru un plan se facea dupa ce modelul invatase din planurile inchise CAT TIMP el
+# era deschis - rezultate pe care la decizie nu le avea. Pe 16.480 de planuri asta umfla AUC-ul de
+# la ~0.60 la ~0.70 si "treimea de sus" de la -0.06R la +0.37R/plan, adica exact cifrele care
+# activau filtrul agentului. Acum predictia se face la CREAREA planului (sau e cea inregistrata la
+# decizie, pentru planurile live), iar invatarea la inchiderea lui.
+EVAL_VERSION = "causal-v1"
+
+
+def learning_rate(n):
+    return max(LR_MIN, LR0 / math.sqrt(1.0 + max(0, n) / LR_HALF))
 MIN_SAMPLES_TO_ACTIVATE = 300   # sub atat, agentul ramane in mod shadow
 MIN_DAYS_TO_ACTIVATE = 21       # ...si trebuie sa acopere si destul timp calendaristic
 MIN_AUC = 0.55                  # sub atat, modelul nu ordoneaza mai bine decat hazardul
@@ -590,13 +613,25 @@ def train_from_plans(plans, model, state):
               and p.get("state") != plan_tracker.STATE_NO_ENTRY]
     closed.sort(key=lambda p: p.get("closed_ts") or 0)
 
+    # EVENIMENTE IN TIMP (vezi EVAL_VERSION): crearea fiecarui plan = predictia, inchiderea = invatarea.
+    # La aceeasi secunda, crearea vine inaintea inchiderii (0 < 1).
+    events = sorted([(p.get("created_ts") or 0, 0, k) for k, p in enumerate(closed)]
+                    + [(p.get("closed_ts") or 0, 1, k) for k, p in enumerate(closed)])
+    at_creation = {}
     new_samples = 0
-    for p in closed:
+    for _t, kind, k in events:
+        p = closed[k]
+        if kind == 0:
+            at_creation[k] = model.predict_proba(extract_features(p))
+            continue
         y = 1.0 if p["realized_r"] > 0 else 0.0
         x = extract_features(p)
 
-        # 1) INTAI prezic (pe date nevazute) - acuratete onesta
-        p_agent = model.predict_proba(x)
+        # 1) PREDICTIA DE LA DECIZIE: cea inregistrata pe planul live (exact ce a vazut decizia), altfel
+        #    a modelului de la crearea planului - niciodata cea de dupa rezultatele de care nu stia
+        rec = (p.get("decision") or {}).get("agent_prob")
+        p_agent = (float(rec) if p.get("source") != "backtest" and isinstance(rec, (int, float))
+                   else at_creation.get(k, model.predict_proba(x)))
         # baseline: formula pe care o afisa sistemul inainte de calibrare
         score = p.get("score_at_entry") or 0
         p_base = min(50 + score * 0.35, 88) / 100.0
@@ -628,7 +663,8 @@ def train_from_plans(plans, model, state):
         state["recent"] = (state.get("recent", []) + [agent_ok])[-RECENT_WINDOW:]
         state["recent_baseline"] = (state.get("recent_baseline", []) + [base_ok])[-RECENT_WINDOW:]
 
-        # 2) ABIA APOI invat din el
+        # 2) ABIA APOI invat din el, cu pasul dat de cat a memorat deja
+        model.lr = learning_rate(state["agent"]["total"])
         model.learn_one(x, y)
         p["agent_trained"] = True
         new_samples += 1
@@ -650,6 +686,8 @@ def train_from_plans(plans, model, state):
         state["last_event_ts"] = last
 
     state["samples_trained"] = state.get("samples_trained", 0) + new_samples
+    state["learning_rate"] = round(learning_rate(state["agent"]["total"]), 5)
+    state["eval_version"] = EVAL_VERSION
     return new_samples
 
 

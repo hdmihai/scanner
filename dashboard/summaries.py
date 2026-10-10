@@ -110,6 +110,18 @@ def exchanges(store, scans_store):
 
 
 def briefing(brief):
+    f = (brief or {}).get("facts") or {}
+    real, sim = (f.get("real") or {}).get("all"), (f.get("simulated") or {}).get("all")
+    if real is not None or sim is not None:
+        lv, al = f.get("live") or {}, (f.get("real") or {}).get("agent_live") or {}
+        l1 = (f"Real: {real['n']} închise · {real['win_rate']}% câștig · {real['avg_r']:+.3f}R/plan"
+              + (f" (din {lv['since']})" if lv.get("since") else "")) if real else "Real: niciun plan live închis încă"
+        l2 = (f"Simulat: {sim['n']} închise · {sim['win_rate']}% · {sim['avg_r']:+.3f}R/plan"
+              + (f" (backtest din {(f.get('simulated') or {}).get('since')})" if (f.get('simulated') or {}).get('since') else "")
+              ) if sim else "Simulat: niciun backtest integrat"
+        l3 = (f"Agent {f.get('agent_status') or '?'}"
+              + (f" · confirmare live {al['n']}/100" if al.get("n") is not None and f.get("agent_status") != "ACTIVE" else ""))
+        return _lines(l1, l2, l3)
     t = plain((brief or {}).get("text"))
     if not t:
         return []

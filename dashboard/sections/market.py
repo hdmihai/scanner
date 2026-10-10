@@ -10,7 +10,19 @@ def render_briefing(brief):
     if not brief or not brief.get("text"):
         return ""
     # doar continutul: cardul (pliat, cu titlul si sursa) il construieste dashboard.page
-    return f'<p class="briefing-text">{brief["text"]}</p>'
+    sec = brief.get("sections")
+    if not sec:
+        return f'<p class="briefing-text">{brief["text"]}</p>'
+    import html as _h
+    def li(items):
+        return "".join("<li>" + _h.escape(str(it)) + "</li>" for it in items or [])
+    return ('<div class="brief-cols">'
+            '<div class="brief-col brief-sim"><h3>Simulated history <span class="dim">backtest</span></h3>'
+            f'<ul>{li(sec.get("simulated"))}</ul></div>'
+            '<div class="brief-col brief-real"><h3>Real data statistics <span class="dim">piata reala - pe ele '
+            'se confirma agentul</span></h3>'
+            f'<ul>{li(sec.get("real"))}</ul></div></div>'
+            f'<p class="brief-agent">{_h.escape(str(sec.get("agent") or ""))}</p>')
 
 
 def render_opportunity_rows(rows):

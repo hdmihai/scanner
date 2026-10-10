@@ -168,6 +168,14 @@ def main():
         print(f"[i] In asteptarea backtest-ului (excluse, fara reantrenare): {', '.join(_pending)}")
 
     state = load_json(MODEL_FILE, None)
+    if state is not None and state.get("eval_version") != _core.EVAL_VERSION and state.get("agent", {}).get("total"):
+        # o singura data: evaluarea salvata era facuta in ordinea inchiderii (cu rezultate pe care
+        # decizia nu le avea) - reantrenez cauzal, cu ritmul de invatare legat de memorie
+        print(f"[i] Evaluare {state.get('eval_version') or 'in ordinea inchiderii'} -> {_core.EVAL_VERSION}: "
+              "reantrenez de la zero, cauzal.")
+        state = None
+        for p in plans:
+            p.pop("agent_trained", None)
     if state is not None and _audit_retrain:
         print("[i] Agentul invatase din planuri scoase de audit - reantrenez de la zero pe memoria curata.")
         state = None
