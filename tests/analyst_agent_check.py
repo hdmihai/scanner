@@ -132,6 +132,12 @@ def check_agent():
     ok(CA.backtest_pending([{"source": "backtest", "components": {k: 0.0 for k in CA.ev_mod.FEATURE_KEYS}}]) == [],
        "backtest re-rulat (cu cheia) -> nimic in asteptare")
     ok(CA.backtest_pending([{"source": "live", "components": {}}]) == [], "fara backtest -> nimic de comparat")
+    if has_bt and bt_has:
+        # dupa reconstructia memoriei backtest-ul contine ev_analyst: caracteristica e ACTIVA
+        _, st = AG.load_agent()
+        ok("ev_analyst" not in (st.get("pending_features") or []) and not pend,
+           "backtest-ul regenerat contine ev_analyst -> caracteristica activa, invatata pe tot istoricul")
+        return
     ok("ev_analyst" in AG.excluded_features(), "excluderea activa inca de la prima scanare (PENDING_DEFAULT)")
     model, state = AG.load_agent()
     skew = CA.feature_skew(plans)

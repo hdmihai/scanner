@@ -153,8 +153,7 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
              _sum("altseason", SUM.altseason, _alt), anchor="altseason"),
         fold('Burse &middot; <span class="dim">cate un modul per bursa</span>', exchanges_html,
              _sum("exchanges", SUM.exchanges, exchanges_store, exchange_scans), anchor="burse"),
-    ] + ([fold('Briefing &middot; <span class="dim">' + ("Gemini" if (briefing or {}).get("source") == "gemini"
-                                                          else "generat din statistici") + '</span>',
+    ] + ([fold('Briefing &middot; <span class="dim">real data vs simulated history</span>',
                briefing_html, _sum("briefing", SUM.briefing, briefing), anchor="briefing", cls="briefing-card")]
          if briefing_html else []))
     left_cards = "\n\n      ".join([

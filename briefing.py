@@ -100,6 +100,41 @@ def gather_facts():
 
     last_scan = history[-1] if history else {}
 
+    # DATE REALE vs ISTORIC SIMULAT, separat: doar planurile live confirma sau infirma agentul pe
+    # piata reala; backtest-ul il pre-antreneaza. In acelasi paragraf, cifrele backtest-ului
+    # (16.000+ planuri) acopereau complet rezultatul live.
+    def _stats(ps):
+        rs = [p["realized_r"] for p in ps]
+        if not rs:
+            return None
+        wins = [r for r in rs if r > 0]
+        loss = [-r for r in rs if r <= 0]
+        return {"n": len(rs), "win_rate": round(100 * len(wins) / len(rs), 1),
+                "avg_r": round(sum(rs) / len(rs), 3), "total_r": round(sum(rs), 2),
+                "profit_factor": round(sum(wins) / sum(loss), 2) if loss and sum(loss) > 0 else None}
+    live_closed = [p for p in closed if p.get("source") != "backtest"]
+    bt_closed = [p for p in closed if p.get("source") == "backtest"]
+    live_open = [p for p in open_plans if p.get("source") != "backtest"]
+    live_recent = sorted(live_closed, key=lambda p: p.get("closed_ts") or 0, reverse=True)[:3]
+    real = {
+        "all": _stats(live_closed),
+        "by_direction": {d: _stats([p for p in live_closed if p.get("direction") == d]) for d in ("LONG", "SHORT")},
+        "no_entry": sum(1 for p in plans if p.get("source") != "backtest" and p.get("state") == "NO_ENTRY"
+                        and same(p.get("geometry", "v1"))),
+        "open": len(live_open),
+        "recent": [{"id": p["id"], "symbol": p["symbol"], "direction": p["direction"], "r": p["realized_r"]}
+                   for p in live_recent],
+        "divergence": summary.get("divergence"),
+        "agent_live": agent.get("live"),
+    }
+    simulated = {
+        "all": _stats(bt_closed),
+        "since": (summary.get("backtest") or {}).get("since"),
+        "edge_recent": (summary.get("edge") or {}).get("recent"),
+        "edge_status": (summary.get("edge") or {}).get("status"),
+        "rebuilt": plans_store.get("rebuilt"),
+    }
+
     return {
         "scan_time": last_scan.get("scan_time"),
         "universe_size": last_scan.get("universe_size"),
@@ -134,6 +169,8 @@ def gather_facts():
         "agent_balanced": agent.get("balanced_agent"),
         "baseline_balanced": agent.get("balanced_baseline"),
         "agent_weights": (agent.get("model") or {}).get("weights"),
+        "real": real,
+        "simulated": simulated,
     }
 
 
@@ -216,6 +253,81 @@ def deterministic_briefing(f):
     return " ".join(parts)
 
 
+def _r(v, nd=3):
+    return "n/d" if v is None else f"{v:+.{nd}f}R"
+
+
+def sections(f):
+    """Briefing-ul in doua sectiuni: DATE REALE (piata reala - pe ele se confirma agentul) si
+    ISTORIC SIMULAT (backtest - pre-antrenare, calibrare, cercetare). Fiecare e o lista de
+    propozitii construite doar din cifre masurate."""
+    real, sim = f.get("real") or {}, f.get("simulated") or {}
+    lv, lsum = real.get("all"), f.get("live") or {}
+    r = []
+    if lv:
+        ci = (f" (IC95 {lsum['avg_r_ci_low']:+.3f}..{lsum['avg_r_ci_high']:+.3f}R)"
+              if lsum.get("avg_r_ci_low") is not None else "")
+        r.append(f"Pe piata reala{(' din ' + lsum['since']) if lsum.get('since') else ''}: {lv['n']} planuri "
+                 f"inchise, castig {lv['win_rate']}%, R mediu {_r(lv['avg_r'])}{ci}, total {lv['total_r']:+.2f}R"
+                 + (f", profit factor {lv['profit_factor']}" if lv.get("profit_factor") is not None else "") + ".")
+        dirs = [f"{d} {s_['n']} planuri {_r(s_['avg_r'])}" for d, s_ in (real.get("by_direction") or {}).items() if s_]
+        if dirs:
+            r.append("Pe directii: " + "; ".join(dirs) + ".")
+        dv = real.get("divergence") or {}
+        vs = dv.get("vs_all") or {}
+        verd = {"sub_backtest": "SEMNIFICATIV sub simulare", "in_marja": "in marja statistica",
+                "peste_backtest": "peste simulare"}
+        parts = []
+        if dv.get("basis") == "aceeasi_perioada" and dv.get("diff") is not None:
+            w = dv.get("window") or ["?", "?"]
+            parts.append(f"pe aceeasi perioada ({w[0]} - {w[1]}, {dv.get('n_bt_window')} planuri simulate) "
+                         f"{dv['diff']:+.3f}R/plan (IC95 {dv['ci_low']:+.3f}..{dv['ci_high']:+.3f}), "
+                         + verd.get(dv.get("status"), dv.get("status") or ""))
+        if vs.get("diff") is not None:
+            parts.append(f"fata de tot istoricul simulat {vs['diff']:+.3f}R/plan (IC95 {vs['ci_low']:+.3f}.."
+                         f"{vs['ci_high']:+.3f}), " + verd.get(vs.get("status"), vs.get("status") or ""))
+        if parts:
+            r.append("Real vs simulat: " + "; ".join(parts) + ".")
+    else:
+        r.append("Niciun plan live inchis inca - nu exista inca nicio masuratoare pe piata reala.")
+    al = real.get("agent_live") or {}
+    if al.get("n") is not None:
+        r.append(f"Agentul pe date reale: " + (f"AUC {al['auc']:.3f} (IC {al.get('ci_low')}-{al.get('ci_high')}) "
+                                               if al.get("auc") is not None else "")
+                 + f"pe {al['n']}/100 planuri necesare confirmarii.")
+    if real.get("recent"):
+        r.append("Ultimele inchise live: " + ", ".join(f"#{p['id']} {p['symbol']} {p['r']:+.2f}R"
+                                                       for p in real["recent"]) + ".")
+    r.append(f"Deschise acum: {real.get('open', 0)}; anulate fara intrare (pretul nu a revenit): "
+             f"{real.get('no_entry', 0)}.")
+
+    s_ = []
+    bt = sim.get("all")
+    if bt:
+        rb = sim.get("rebuilt") or {}
+        s_.append(f"Backtest {sim.get('since') or ''}-azi" + (f" (regenerat {rb['when']})" if rb.get("when") else "")
+                  + f": {bt['n']} planuri inchise, castig {bt['win_rate']}%, R mediu {_r(bt['avg_r'])}, "
+                  f"total {bt['total_r']:+.2f}R" + (f", profit factor {bt['profit_factor']}" if bt.get("profit_factor") else "") + ".")
+        er = sim.get("edge_recent") or {}
+        if er.get("r") is not None:
+            s_.append(f"Ultimele 12 luni simulate: {er['r']:+.3f}R/plan (IC95 {er['ci_low']:+.3f}..{er['ci_high']:+.3f}) pe "
+                      f"{er['n']} planuri - " + {"pozitiv": "distinct pozitiv", "neconcludent": "nu e distinct de zero",
+                                                 "negativ": "negativ"}.get(sim.get("edge_status"), "") + ".")
+        b, w = f.get("best_bucket"), f.get("worst_bucket")
+        if b and w and b["range"] != w["range"]:
+            s_.append(f"Calibrare (dominata de backtest): cel mai bun interval de scor {b['range']} ({b['win_rate']}%, "
+                      f"{b['avg_r']:+.2f}R), cel mai slab {w['range']} ({w['win_rate']}%, {w['avg_r']:+.2f}R).")
+        s_.append("Rol: pre-antrenarea agentului, calibrarea si cercetarea regulilor - nu e rezultat pe piata reala.")
+    else:
+        s_.append("Niciun backtest integrat - agentul invata doar din planurile live.")
+
+    if f.get("agent_status") == "ACTIVE":
+        ag = f"Agentul e ACTIV ({f.get('agent_reason')})."
+    else:
+        ag = f"Agentul e in SHADOW: invata, dar nu filtreaza ({f.get('agent_reason')})."
+    return {"real": r, "simulated": s_, "agent": ag}
+
+
 # ========================= VARIANTA CU GEMINI ==============================
 
 LLM_ERROR = None      # cauza ultimului esec Gemini, raportata de diagnostic
@@ -269,7 +381,7 @@ def main():
         source = "gemini" if text else "determinist"
         if not text:
             text = deterministic_briefing(facts)
-        out = {"text": text, "source": source, "facts": facts}
+        out = {"text": text, "source": source, "facts": facts, "sections": sections(facts)}
         if source == "determinist":
             out["llm_error"] = LLM_ERROR if GEMINI_API_KEY else "GEMINI_API_KEY lipseste"
         save_json(BRIEFING_FILE, out)

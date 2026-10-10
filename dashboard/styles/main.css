@@ -564,3 +564,12 @@ details.fold,details.fold>summary{min-width:0;max-width:100%;}
    altseason nu se mai latesc dupa tabele (tabelele isi pastreaza derularea proprie) */
 .legend{flex-wrap:wrap;row-gap:4px;}
 .as-cols>*{min-width:0;}
+/* briefing in doua sectiuni: istoric simulat si date reale (cele reale evidentiate) */
+.brief-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.brief-col{border:1px solid var(--border);border-radius:8px;padding:10px 12px;min-width:0;}
+.brief-col h3{margin:0 0 6px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;}
+.brief-col ul{margin:0;padding-left:18px;font-size:13px;line-height:1.5;}
+.brief-col li+li{margin-top:4px;}
+.brief-real{border-color:var(--amber);background:rgba(180,83,9,.04);}
+.brief-agent{margin:10px 0 0;font-size:12.5px;color:var(--text-dim);}
+@media(max-width:700px){.brief-cols{grid-template-columns:1fr;}}

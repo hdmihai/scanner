@@ -71,6 +71,11 @@ def render_agent_card(agent_state, audit=None):
                      'backtest-ul re-rulat le contine; apoi agentul se reantreneaza pe tot istoricul): '
                      + ", ".join(names.get(k, k) for k in pend) + '</span>')
 
+    if agent_state.get("learning_rate") is not None:
+        bal_line += (f'<br><span class="dim">ritm de invatare {agent_state["learning_rate"]} dupa {a["total"]} exemple '
+                     '(scade cu memoria: 0.02/sqrt(1+n/1000), minim 0.001) &middot; evaluare '
+                     + ("cauzala: predictia de la crearea planului" if agent_state.get("eval_version") else
+                        "in ordinea inchiderii (umflata)") + '</span>')
     au = audit or {}
     if au.get("when"):
         rb = au.get("rebuild") or {}
