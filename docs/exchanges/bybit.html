@@ -607,34 +607,52 @@ footer{margin-top:26px;color:var(--text-dim);font-size:11px;line-height:1.6;}
 .an-tn{font-family:var(--font-mono);font-size:11.5px;white-space:nowrap;}
 .tok-an{font-size:10px;}
 @media (max-width:560px){.an-trow{grid-template-columns:54px 70px 1fr;}.an-trow .an-tn:last-child{grid-column:3;}}
+
+/* SECTIUNI PLIATE: fiecare card e un <details> inchis implicit; raman titlul si cel mult 3
+   randuri de rezumat (dashboard/summaries.py); un rand prea lung pentru coloana (telefon,
+   coloana ingusta) se rupe pe cel mult doua linii, ca cifrele sa nu se piarda. */
+details.fold>summary{list-style:none;cursor:pointer;display:block;}
+details.fold>summary::-webkit-details-marker{display:none;}
+details.fold>summary h2{margin:0;display:flex;align-items:center;gap:8px;}
+details.fold>summary h2::before{content:"▸";color:var(--amber);font-size:12px;flex:none;}
+details.fold[open]>summary h2::before{content:"▾";}
+details.fold[open]>summary h2{margin-bottom:12px;}
+details.fold>summary:hover h2{color:var(--text);}
+.fold-sum{display:flex;flex-direction:column;gap:3px;margin:9px 0 0 20px;font-size:12.5px;line-height:1.45;
+  color:var(--text);min-width:0;}
+.fold-line{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  overflow-wrap:anywhere;}
+.fold-line:first-child{font-weight:600;}
+details.fold[open]>summary .fold-sum{display:none;}
+/* fara min-width:0, latimea minima a continutului ar latii coloana grilei peste ecranul telefonului */
+.grid>*{min-width:0;}
+details.fold,details.fold>summary{min-width:0;max-width:100%;}
+.fold-tools{display:flex;gap:8px;justify-content:flex-end;margin:-6px 0 12px;}
+.fold-tools button{font:inherit;font-size:12px;padding:5px 11px;border:1px solid var(--border);border-radius:6px;
+  background:var(--panel);color:var(--text-dim);cursor:pointer;}
+.fold-tools button:hover{color:var(--text);border-color:var(--text-dim);}
+@media(max-width:600px){.fold-sum{margin-left:0;font-size:12px;gap:4px;}}
+/* pe telefon, cu sectiunile deschise: legenda graficului se rupe pe randuri, iar coloanele
+   altseason nu se mai latesc dupa tabele (tabelele isi pastreaza derularea proprie) */
+.legend{flex-wrap:wrap;row-gap:4px;}
+.as-cols>*{min-width:0;}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
     <div class="brand">SCANLINE<small>Modulul bursei Bybit</small></div>
-    <div class="meta">2026-10-10 09:44 UTC<br>4h</div>
+    <div class="meta">2026-10-10 11:04 UTC<br>4h</div>
   </header>
   <nav class="nav"><a class="nav-i" href="../index.html">Principal</a><a class="nav-i" href="okx.html">OKX</a><a class="nav-i" href="kucoin.html">KuCoin</a><a class="nav-i" href="gate.html">Gate.io</a><a class="nav-i" href="mexc.html">MEXC</a><a class="nav-i" href="kraken.html">Kraken</a><a class="nav-i nav-on nav-off" href="bybit.html">Bybit</a></nav>
+  <div class="fold-tools"><button type="button" data-fold="open">Deschide tot</button><button type="button" data-fold="close">Închide tot</button></div>
 
-  <div class="card">
-    <h2>Altcoin season &middot; modul separat, acelasi pe toate bursele</h2>
-    <div class="as-strip"><div class="as-phase">FAZA 1</div><div class="as-strip-t"><strong>Acumulare / recuperare BTC</strong> &middot; incredere 83%<div class="as-strip-m">regim ciclu BTC: acumulare / recuperare &middot; indice altseason 64/100 &middot; dominanta BTC 59.61% &middot; BTC $82,826 &middot; evaluat 2026-10-10 09:44 UTC</div></div><a class="exm-link" href="../index.html#altseason">Analiza completa</a></div>
-  </div>
+  <details class="card fold" id="altseason"><summary class="fold-head"><h2>Altcoin season &middot; modul separat, acelasi pe toate bursele</h2><span class="fold-sum"><span class="fold-line" title="Regim ACUMULARE / RECUPERARE · faza 1 Acumulare / recuperare BTC (83%)">Regim ACUMULARE / RECUPERARE · faza 1 Acumulare / recuperare BTC (83%)</span><span class="fold-line" title="indice alts 64/100 · BTC.D 59.62% · ETH/BTC -4.8%/30z">indice alts 64/100 · BTC.D 59.62% · ETH/BTC -4.8%/30z</span></span></summary><div class="fold-body"><div class="as-strip"><div class="as-phase">FAZA 1</div><div class="as-strip-t"><strong>Acumulare / recuperare BTC</strong> &middot; incredere 83%<div class="as-strip-m">regim ciclu BTC: acumulare / recuperare &middot; indice altseason 64/100 &middot; dominanta BTC 59.62% &middot; BTC $82,787 &middot; evaluat 2026-10-10 11:04 UTC</div></div><a class="exm-link" href="../index.html#altseason">Analiza completa</a></div></div></details>
 
-  <div class="card">
-    <h2>Bybit &middot; starea bursei</h2>
-    <div class="ex-role ex-role-off"><strong>Indisponibila.</strong> bybit GET https://api.bybit.com/v5/market/instruments-info?category=spot 403 Forbidden {
-    error:The Amazon CloudFront distribution is configured to block access from your countr<br><span class="dim">Blocata geografic pentru runner-ele GitHub (raspunde 403); ramane afisata ca indisponibila, cu motivul exact.</span></div>
-    
-    
-    <div class="cap-chips"><span class="cap-chip cap-no">Lumanari istorice</span><span class="cap-chip cap-no">Adancime live</span><span class="cap-chip cap-no">Flux de tranzactii live</span><span class="cap-chip cap-no">Order book istoric</span><span class="cap-chip cap-no">Open interest</span></div>
-  </div>
+  <details class="card fold" id="stare"><summary class="fold-head"><h2>Bybit &middot; starea bursei</h2><span class="fold-sum"><span class="fold-line" title="Indisponibilă: bybit GET https://api.bybit.com/v5/market/instruments-info?category=spot 403 Forbidden { error:The Amazon CloudFront distribution is configured to blo">Indisponibilă: bybit GET https://api.bybit.com/v5/market/instruments-info?category=spot 403 Forbidden { error:The Amazon CloudFront distribution is configured to blo</span></span></summary><div class="fold-body"><div class="ex-role ex-role-off"><strong>Indisponibila.</strong> bybit GET https://api.bybit.com/v5/market/instruments-info?category=spot 403 Forbidden {
+    error:The Amazon CloudFront distribution is configured to block access from your countr<br><span class="dim">Blocata geografic pentru runner-ele GitHub (raspunde 403); ramane afisata ca indisponibila, cu motivul exact.</span></div><div class="cap-chips"><span class="cap-chip cap-no">Lumanari istorice</span><span class="cap-chip cap-no">Adancime live</span><span class="cap-chip cap-no">Flux de tranzactii live</span><span class="cap-chip cap-no">Order book istoric</span><span class="cap-chip cap-no">Open interest</span></div></div></details>
 
-  <div class="card">
-    <h2>Propunerile agentului &middot; Bybit <span class="dim">(simulate, neantrenat)</span></h2>
-    <div class="prop-list"><a class="prop-row" href="#tok-ADA-USDT"><span class="prop-sym">ADA/USDT</span><span class="badge badge-long">LONG</span><span class="prop-score">70</span><span class="tag tag-ok">ar emite</span><span class="prop-num">42.6% masurat</span><span class="prop-num dim">intrare 0.274854</span></a><a class="prop-row" href="#tok-FIL-USDT"><span class="prop-sym">FIL/USDT</span><span class="badge badge-long">LONG</span><span class="prop-score">70</span><span class="tag tag-ok">ar emite</span><span class="prop-num">42.6% masurat</span><span class="prop-num dim">intrare 1.1527</span></a><a class="prop-row" href="#tok-THETA-USDT"><span class="prop-sym">THETA/USDT</span><span class="badge badge-long">LONG</span><span class="prop-score">69</span><span class="tag tag-ok">ar emite</span><span class="prop-num">42.6% masurat</span><span class="prop-num dim">intrare 0.240754</span></a><a class="prop-row" href="#tok-AVAX-USDT"><span class="prop-sym">AVAX/USDT</span><span class="badge badge-long">LONG</span><span class="prop-score">66</span><span class="tag tag-ok">ar emite</span><span class="prop-num">42.6% masurat</span><span class="prop-num dim">intrare 11.3465</span></a><a class="prop-row" href="#tok-GRAM-USDT"><span class="prop-sym">GRAM/USDT</span><span class="badge badge-long">LONG</span><span class="prop-score">58</span><span class="tag tag-ok">ar emite</span><span class="prop-num">29.8% masurat</span><span class="prop-num dim">intrare 1.5461</span></a><a class="prop-row" href="#tok-EGLD-USDT"><span class="prop-sym">EGLD/USDT</span><span class="badge badge-long">LONG</span><span class="prop-score">54</span><span class="tag tag-ok">ar emite</span><span class="prop-num">29.8% masurat</span><span class="prop-num dim">intrare 4.4827</span></a><a class="prop-row" href="#tok-BTC-USDT"><span class="prop-sym">BTC/USDT</span><span class="badge badge-long">LONG</span><span class="prop-score">53</span><span class="tag tag-ok">ar emite</span><span class="prop-num">29.8% masurat</span><span class="prop-num dim">intrare 85,850.52</span></a><a class="prop-row" href="#tok-MANA-USDT"><span class="prop-sym">MANA/USDT</span><span class="badge badge-long">LONG</span><span class="prop-score">53</span><span class="tag tag-ok">ar emite</span><span class="prop-num">29.8% masurat</span><span class="prop-num dim">intrare 0.101790</span></a><a class="prop-row" href="#tok-ZEN-USDT"><span class="prop-sym">ZEN/USDT</span><span class="badge badge-short">SHORT</span><span class="prop-score">53</span><span class="tag tag-ok">ar emite</span><span class="prop-num">29.8% masurat</span><span class="prop-num dim">intrare 7.2439</span></a><a class="prop-row" href="#tok-POL-USDT"><span class="prop-sym">POL/USDT</span><span class="badge badge-short">SHORT</span><span class="prop-score">51</span><span class="tag tag-ok">ar emite</span><span class="prop-num">29.8% masurat</span><span class="prop-num dim">intrare 0.112005</span></a><a class="prop-row" href="#tok-TRX-USDT"><span class="prop-sym">TRX/USDT</span><span class="badge badge-short">SHORT</span><span class="prop-score">31</span><span class="tag tag-ok">ar emite</span><span class="prop-num">26.4% masurat</span><span class="prop-num dim">intrare 0.336082</span></a></div>
-  </div>
+  <details class="card fold" id="propuneri"><summary class="fold-head"><h2>Propunerile agentului &middot; Bybit <span class="dim">(simulate, neantrenat)</span></h2><span class="fold-sum"><span class="fold-line" title="11 propuneri (simulate): 11 emise">11 propuneri (simulate): 11 emise</span><span class="fold-line" title="Scor maxim: ADA LONG 70, FIL LONG 70, THETA LONG 69">Scor maxim: ADA LONG 70, FIL LONG 70, THETA LONG 69</span></span></summary><div class="fold-body"><div class="prop-list"><a class="prop-row" href="#tok-ADA-USDT"><span class="prop-sym">ADA/USDT</span><span class="badge badge-long">LONG</span><span class="prop-score">70</span><span class="tag tag-ok">ar emite</span><span class="prop-num">42.6% masurat</span><span class="prop-num dim">intrare 0.274854</span></a><a class="prop-row" href="#tok-FIL-USDT"><span class="prop-sym">FIL/USDT</span><span class="badge badge-long">LONG</span><span class="prop-score">70</span><span class="tag tag-ok">ar emite</span><span class="prop-num">42.6% masurat</span><span class="prop-num dim">intrare 1.1527</span></a><a class="prop-row" href="#tok-THETA-USDT"><span class="prop-sym">THETA/USDT</span><span class="badge badge-long">LONG</span><span class="prop-score">69</span><span class="tag tag-ok">ar emite</span><span class="prop-num">42.6% masurat</span><span class="prop-num dim">intrare 0.240754</span></a><a class="prop-row" href="#tok-AVAX-USDT"><span class="prop-sym">AVAX/USDT</span><span class="badge badge-long">LONG</span><span class="prop-score">66</span><span class="tag tag-ok">ar emite</span><span class="prop-num">42.6% masurat</span><span class="prop-num dim">intrare 11.3465</span></a><a class="prop-row" href="#tok-GRAM-USDT"><span class="prop-sym">GRAM/USDT</span><span class="badge badge-long">LONG</span><span class="prop-score">58</span><span class="tag tag-ok">ar emite</span><span class="prop-num">29.8% masurat</span><span class="prop-num dim">intrare 1.5461</span></a><a class="prop-row" href="#tok-EGLD-USDT"><span class="prop-sym">EGLD/USDT</span><span class="badge badge-long">LONG</span><span class="prop-score">54</span><span class="tag tag-ok">ar emite</span><span class="prop-num">29.8% masurat</span><span class="prop-num dim">intrare 4.4827</span></a><a class="prop-row" href="#tok-BTC-USDT"><span class="prop-sym">BTC/USDT</span><span class="badge badge-long">LONG</span><span class="prop-score">53</span><span class="tag tag-ok">ar emite</span><span class="prop-num">29.8% masurat</span><span class="prop-num dim">intrare 85,850.52</span></a><a class="prop-row" href="#tok-MANA-USDT"><span class="prop-sym">MANA/USDT</span><span class="badge badge-long">LONG</span><span class="prop-score">53</span><span class="tag tag-ok">ar emite</span><span class="prop-num">29.8% masurat</span><span class="prop-num dim">intrare 0.101790</span></a><a class="prop-row" href="#tok-ZEN-USDT"><span class="prop-sym">ZEN/USDT</span><span class="badge badge-short">SHORT</span><span class="prop-score">53</span><span class="tag tag-ok">ar emite</span><span class="prop-num">29.8% masurat</span><span class="prop-num dim">intrare 7.2439</span></a><a class="prop-row" href="#tok-POL-USDT"><span class="prop-sym">POL/USDT</span><span class="badge badge-short">SHORT</span><span class="prop-score">51</span><span class="tag tag-ok">ar emite</span><span class="prop-num">29.8% masurat</span><span class="prop-num dim">intrare 0.112005</span></a><a class="prop-row" href="#tok-TRX-USDT"><span class="prop-sym">TRX/USDT</span><span class="badge badge-short">SHORT</span><span class="prop-score">31</span><span class="tag tag-ok">ar emite</span><span class="prop-num">26.4% masurat</span><span class="prop-num dim">intrare 0.336082</span></a></div></div></details>
   
 
   <footer>
@@ -643,5 +661,26 @@ footer{margin-top:26px;color:var(--text-dim);font-size:11px;line-height:1.6;}
     verifica intotdeauna pe cont propriu inainte de orice decizie de trading.
   </footer>
 </div>
+<script>
+(function(){
+  function openTo(id){
+    var el=document.getElementById(id); if(!el) return;
+    for(var p=el;p;p=p.parentElement){ if(p.tagName==='DETAILS') p.open=true; }
+    el.scrollIntoView();
+  }
+  function fromHash(){ if(location.hash.length>1){ try{ openTo(decodeURIComponent(location.hash.slice(1))); }catch(e){} } }
+  window.addEventListener('hashchange',fromHash);
+  if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded',fromHash); } else { fromHash(); }
+  document.addEventListener('click',function(e){
+    var b=e.target.closest && e.target.closest('[data-fold]');
+    if(b){ var o=b.getAttribute('data-fold')==='open';
+      document.querySelectorAll('details.fold').forEach(function(d){ d.open=o; }); return; }
+    var a=e.target.closest && e.target.closest('a[href*="#"]');
+    if(a){ var u=new URL(a.getAttribute('href'),location.href);
+      if(u.pathname===location.pathname && u.hash.length>1){
+        setTimeout(function(){ try{ openTo(decodeURIComponent(u.hash.slice(1))); }catch(err){} },0); } }
+  });
+})();
+</script>
 </body>
 </html>
