@@ -18,6 +18,7 @@ from dashboard.sections.market import render_briefing, render_evidence, render_i
 from dashboard.sections.plan import (elliott_outcome_stats, recent_calibration, render_calibration, render_plan,
                                      render_plan_memory, tracked_plan)
 from dashboard.sections.health import health_items, render_health
+from dashboard.sections.memory import render_memory
 from dashboard.sections.research import render_research
 from dashboard.sections.status import render_self_check, render_similar_projects
 
@@ -89,6 +90,8 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
         updated=(TOKEN_META_UPDATED or {}).get("when"))
     learning_curve_html = _safe("render_learning_curve", render_learning_curve, history, weights_history, health, agent_state)
     _audit = load_json(os.path.join(DATA_DIR, "plan_audit.json"), None)
+    _mem = load_json(os.path.join(DATA_DIR, "memory_status.json"), None)
+    _memory_html = _safe("render_memory", render_memory, _mem, (_mem or {}).get("where"))
     _policy = load_json(os.path.join(DATA_DIR, "scoring_policy.json"), None)
     agent_html = _safe("render_agent_card", render_agent_card, agent_state, _audit)
     plans_html = _safe("render_plan_memory", render_plan_memory, plans_store)
@@ -199,6 +202,8 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
         fold("Agent AI &middot; invatare online", agent_html, _sum("agent", SUM.agent, agent_state, _audit), anchor="agent"),
         fold("Learning curve &middot; progresul agentului", learning_curve_html,
              _sum("learning", SUM.learning, agent_state, health)),
+        fold("Depozit de memorie &middot; istoricul complet al agentului", _memory_html,
+             _sum("memory", SUM.memory, _mem), anchor="memorie"),
         fold("Sessions", sessions_body, _sum("sessions", SUM.sessions, session)),
     ])
 

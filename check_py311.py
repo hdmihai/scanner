@@ -59,6 +59,12 @@ def check_source(path):
             list(tokenize.generate_tokens(io.StringIO(src).readline))
         except (tokenize.TokenError, SyntaxError) as exc:
             problems.append((getattr(exc, "lineno", 0), f"tokenizare esuata: {exc}"))
+        # Tokenizatorul de 3.11 nu respinge un sir neterminat (il emite ca ERRORTOKEN): un f-string
+        # rupt pe doua randuri a trecut de garda si a picat abia la import. Compilarea il prinde.
+        try:
+            compile(src, str(path), "exec")
+        except SyntaxError as exc:
+            problems.append((exc.lineno or 0, f"eroare de sintaxa pe {sys.version_info[0]}.{sys.version_info[1]}: {exc.msg}"))
         return problems
 
     fstring_stack = []   # caracterele de ghilimea ale f-string-urilor deschise
