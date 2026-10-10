@@ -62,7 +62,9 @@ import liquidation as liq_mod
 import market_structure as struct_mod
 import elliott as ew_mod
 import liquidity_structure as ls_mod
+import data_reset
 import plan_tracker
+from core import relative as rel_mod
 
 DATA_DIR = "data"
 BACKTEST_FILE = os.path.join(DATA_DIR, "backtest_plans.json")
@@ -330,6 +332,41 @@ def alt_for_bar(open_ms, bar_ms):
             "alt_bias": round(_A.ALT_BIAS[ph] * conf, 3), "btc_bias": round(_A.BTC_BIAS[ph] * conf, 3)}
 
 
+_BTC_DAYS = None
+
+
+def btc_closes_until(day, n=201):
+    """Inchiderile zilnice BTC (istoricul pe 10 ani, altseason_cycles.json) ale ultimelor `n`
+    zile pana la `day` inclusiv - referinta fortei relative din evidenta `analyst`."""
+    global _BTC_DAYS
+    if _BTC_DAYS is None:
+        _BTC_DAYS = ([], {})
+        st = load_json(os.path.join(DATA_DIR, "altseason_cycles.json"), {}) or {}
+        keys = st.get("timeline_keys") or []
+        if "day" in keys and "btc" in keys:
+            di, bi = keys.index("day"), keys.index("btc")
+            for r in st.get("timeline") or []:
+                if r[bi]:
+                    _BTC_DAYS[1][r[di]] = len(_BTC_DAYS[0])
+                    _BTC_DAYS[0].append(r[bi])
+    k = _BTC_DAYS[1].get(day)
+    return None if k is None else _BTC_DAYS[0][max(0, k - n + 1):k + 1]
+
+
+def rel_for_bar(symbol, htf, i, open_ms, bar_ms, price):
+    """Verdictul analistului pe token la bara i (core/relative.verdict, aceeasi functie ca live):
+    inchiderile zilnice ale tokenului, agregate din lumanarile de baza (doar zile inchise), si
+    ale BTC pentru ACEEASI ultima zi. None pentru BTC sau fara date suficiente."""
+    if symbol.upper().startswith("BTC/"):
+        return None
+    closes, counts = htf["1d"]
+    tok = closes[max(0, counts[i] - 201):counts[i]]
+    btc = btc_closes_until(time.strftime("%Y-%m-%d", time.gmtime((open_ms + bar_ms) / 1000.0 - 86400)), len(tok))
+    if not tok or not btc or len(btc) != len(tok):
+        return None
+    return rel_mod.verdict(tok, btc, price)
+
+
 def replay_symbol(symbol, candles, weights, start_id):
     """Parcurge istoricul bara cu bara. La fiecare bara vede STRICT trecutul."""
     plans = []
@@ -399,7 +436,8 @@ def replay_symbol(symbol, candles, weights, start_id):
                                       ew=bt_ew, ew_bias=bt_ew_bias,
                                       liqs=bt_liqs, liqs_bias=bt_liqs_bias,
                                       alt=alt_for_bar(bar[0], bar_ms), symbol=symbol,
-                                      direction=scored["direction"])
+                                      direction=scored["direction"],
+                                      rel=rel_for_bar(symbol, htf, i, bar[0], bar_ms, scored["price"]))
         levels = scanner.compute_trade_plan(
             scored["direction"], scored["price"], scored["atr"], structure, fib)
         if not levels:
@@ -438,6 +476,7 @@ def replay_symbol(symbol, candles, weights, start_id):
             "decision": {"action": "ISSUE", "mode": "BACKTEST",
                          "reason": "replay istoric, fara poarta de decizie"},
             "geometry": plan_tracker.GEOMETRY_VERSION,
+            "fv": plan_tracker.FEATURE_VERSION,
             "bar_seconds": scanner.timeframe_seconds(),
             "source": "backtest",
         }
@@ -664,6 +703,17 @@ def main():
     if "--windows" in sys.argv:
         n_windows = int(sys.argv[sys.argv.index("--windows") + 1])
 
+    live_store = load_json(PLANS_FILE, {"next_id": 1, "plans": []}) if merge else None
+    if merge:
+        # GARDA DE FAMILIE, inainte de orice descarcare: un backtest pe alt timeframe decat
+        # scanarea live ar arhiva planurile live la integrare (vezi data_reset.check_family).
+        err = data_reset.check_family(live_store, plan_tracker.GEOMETRY_FAMILY)
+        if err:
+            raise SystemExit("[EROARE] " + err)
+        if data_reset.needs_rebuild(live_store):
+            print("[i] Integrarea acestui backtest RECONSTRUIESTE memoria agentului de la zero "
+                  "(epoca de date noua) - vezi data_reset.py.")
+
     exchange, markets, tickers, _, exchange_id = scanner.connect_exchange(scope=None)
     symbols = resolve_symbols(exchange, markets, tickers)
     if not symbols:
@@ -680,8 +730,10 @@ def main():
     for base, sym in symbols.items():
         print(f"  {base:6s} -> {sym}")
 
-    weights = load_json(os.path.join(DATA_DIR, "weights.json"),
-                        dict(scanner.DEFAULT_WEIGHTS))
+    # Ponderile de scor: inghetate (politica scrisa la reconstructie), neutre la o reconstructie
+    # de la zero, altfel weights.json - aceleasi pe care le va folosi scanarea live dupa integrare.
+    weights, w_src = data_reset.scoring_weights(live_store if merge else load_json(PLANS_FILE, {}))
+    print(f"Ponderi de scor: {weights} ({w_src})")
 
     histories = {}
     all_plans = []
@@ -733,7 +785,12 @@ def main():
         print("\nNiciun plan inchis - verifica datele sau parametrii.")
         return
 
-    store = {"next_id": next_id, "plans": all_plans}
+    store = {"next_id": next_id, "plans": all_plans,
+             # cine a generat backtest-ul: merge_backtest.py integreaza la o reconstructie doar un
+             # backtest generat de codul curent (data_reset.backtest_is_current)
+             "meta": {"fv": plan_tracker.FEATURE_VERSION, "data_epoch": data_reset.audit_core.DATA_EPOCH,
+                      "geometry": plan_tracker.GEOMETRY_VERSION, "weights": weights,
+                      "generated": time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime())}}
     store["calibration"] = plan_tracker.build_calibration(store)
     store["summary"] = plan_tracker.summarize(store)
     save_json(BACKTEST_FILE, store, compact=True)
@@ -755,7 +812,23 @@ def main():
     print(f"Salvat in {BACKTEST_FILE}")
 
     if merge:
-        live = load_json(PLANS_FILE, {"next_id": 1, "plans": []})
+        live = live_store
+        if data_reset.needs_rebuild(live):
+            # RECONSTRUCTIE: o singura data pe epoca de date. Planurile de backtest noi se
+            # numeroteaza dupa cele existente; tot restul (ce se scoate, ce se sterge, ponderile
+            # inghetate) e in data_reset.rebuild.
+            offset = live.get("next_id", 1)
+            for i, p in enumerate(all_plans):
+                p["id"] = offset + i
+            live["next_id"] = offset + len(all_plans)
+            data_reset.rebuild(live, all_plans, weights, plan_tracker.same_family,
+                               plan_tracker.GEOMETRY_FAMILY, plan_tracker.FEATURE_VERSION)
+            live["calibration"] = plan_tracker.build_calibration(live)
+            live["summary"] = plan_tracker.summarize(live)
+            plan_tracker.save_plans(live)
+            print(f"\nMemoria reconstruita: {len(live['plans'])} planuri in {PLANS_FILE}. "
+                  "Pasul urmator al workflow-ului antreneaza agentul de la zero.")
+            return
 
         # DEDUPLICARE, dupa identitatea stabila a planului.
         # merge_backtest.py avea aceasta verificare; backtest.py --merge NU o

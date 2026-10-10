@@ -10,9 +10,18 @@ agentul deschide planuri si invata; pe celelalte decizia e simulata.
 
 import html as _html
 
-from dashboard.components import fmt_price
+from dashboard import summaries as SUM
+from dashboard.components import FOLD_JS, FOLD_TOOLS, fmt_price, fold
 from dashboard.sections.exchanges import proposal_counts, render_caps, render_nav
 from dashboard.sections.tokens import decision_label, render_token_details, token_anchor
+
+
+def _sum(fn, *a):
+    try:
+        return fn(*a) or []
+    except Exception as e:
+        print(f"[!] rezumat {getattr(fn, '__name__', fn)}: {e}")
+        return []
 
 
 def _role(card, trained, learn_label):
@@ -53,9 +62,10 @@ def _proposal_rows(props, trained):
 
 
 def build_exchange_page(card, cards, scan, details, proposals_store, plans_store, altseason_html,
-                        css, primary, primary_label, scan_time, analyst_tokens=None):
+                        css, primary, primary_label, scan_time, analyst_tokens=None, alt_summary=None):
     """HTML-ul complet al paginii unei burse. `analyst_tokens`: pasii 1-4 ai analistului pe fiecare
-    token (aceiasi pe toate bursele - tokenul e acelasi, pretul practic acelasi)."""
+    token (aceiasi pe toate bursele - tokenul e acelasi, pretul practic acelasi); `alt_summary`:
+    rezumatul sectiunii altseason. Toate sectiunile sunt pliate, cu rezumatul lor vizibil."""
     eid = card.get("id")
     label = _html.escape(card.get("label", eid))
     trained = eid == primary
@@ -98,23 +108,17 @@ def build_exchange_page(card, cards, scan, details, proposals_store, plans_store
         # sufixul se calculeaza separat: ghilimele simple in expresia unui f-string cu
         # ghilimele simple sunt valide doar din Python 3.12 (workflow-ul ruleaza 3.11)
         simulated = "" if trained else ' <span class="dim">(simulate, neantrenat)</span>'
-        prop_card = f'''<div class="card">
-    <h2>Propunerile agentului &middot; {label}{simulated}</h2>
-    <div class="prop-list">{_proposal_rows(props, trained)}</div>
-  </div>'''
+        prop_card = fold(f"Propunerile agentului &middot; {label}{simulated}",
+                         f'<div class="prop-list">{_proposal_rows(props, trained)}</div>',
+                         _sum(SUM.ex_proposals, props, trained), anchor="propuneri")
 
     tokens_card = ""
     if card.get("connected"):
         tok_html = render_token_details(details, plans_store, watchlist, props, trained, primary_label,
                                         proposals_ready=bool((proposals_store or {}).get("scan_time")),
                                         analyst_tokens=analyst_tokens)
-        tokens_card = f'''<div class="card">
-    <h2>Token-uri &middot; {label}</h2>
-    <details class="tok-list">
-      <summary>Lista celor {len(watchlist)} token-uri &middot; {len(symbols)} cu analiza completa</summary>
-      <div class="tok-list-body">{tok_html}</div>
-    </details>
-  </div>'''
+        tokens_card = fold(f"Token-uri &middot; {label}", f'<div class="tok-list-body">{tok_html}</div>',
+                           _sum(SUM.ex_tokens, watchlist, symbols, analyst_tokens), anchor="tokeni")
 
     return f'''<!doctype html>
 <html lang="ro">
@@ -134,19 +138,13 @@ def build_exchange_page(card, cards, scan, details, proposals_store, plans_store
     <div class="meta">{scan_time}<br>{(details or {}).get("timeframe") or ""}</div>
   </header>
   {render_nav(cards, eid, True)}
+  {FOLD_TOOLS}
 
-  <div class="card">
-    <h2>Altcoin season &middot; modul separat, acelasi pe toate bursele</h2>
-    {altseason_html}
-  </div>
+  {fold("Altcoin season &middot; modul separat, acelasi pe toate bursele", altseason_html, alt_summary or [],
+        anchor="altseason")}
 
-  <div class="card">
-    <h2>{label} &middot; starea bursei</h2>
-    {_role(card, trained, primary_label)}
-    {banner}
-    {stats}
-    {render_caps(card)}
-  </div>
+  {fold(f"{label} &middot; starea bursei", _role(card, trained, primary_label) + banner + stats + render_caps(card),
+        _sum(SUM.ex_state, card, scan, details, trained), anchor="stare")}
 
   {prop_card}
   {tokens_card}
@@ -157,5 +155,6 @@ def build_exchange_page(card, cards, scan, details, proposals_store, plans_store
     verifica intotdeauna pe cont propriu inainte de orice decizie de trading.
   </footer>
 </div>
+{FOLD_JS}
 </body>
 </html>'''

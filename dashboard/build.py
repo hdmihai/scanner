@@ -9,6 +9,7 @@ from dashboard.config import AGENT_MODEL_FILE, BRIEFING_FILE, CHART_FILE, DETAIL
 from dashboard.page import _safe, build_html, css
 from dashboard.exchange_page import build_exchange_page
 from dashboard.sections.altseason import render_altseason_strip
+from dashboard import summaries as SUM
 from dashboard.components import compute_model_health, get_session_info, load_json
 
 
@@ -76,7 +77,13 @@ def write_exchange_pages(cards, primary, exchange_scans, primary_details, ex_pro
     import exchanges as ex_mod                      # notele adaptoarelor (ex. de ce lipseste Bybit)
     scans = (exchange_scans or {}).get("scans") or {}
     page_css = css()
-    alt_html = _safe("render_altseason_strip", render_altseason_strip, load_json(ALTSEASON_FILE, None))
+    _alt = load_json(ALTSEASON_FILE, None)
+    alt_html = _safe("render_altseason_strip", render_altseason_strip, _alt)
+    try:
+        alt_summary = SUM.altseason_strip(_alt)
+    except Exception as e:
+        print(f"[!] rezumat altseason: {e}")
+        alt_summary = []
     primary_label = next((c.get("label") for c in cards if c.get("id") == primary), primary or "bursa activa")
     # pasii 1-4 ai analistului per token (data/analyst.json), pe cardul fiecarui token
     analyst_tokens = (load_json(os.path.join(DATA_DIR, "analyst.json"), {}) or {}).get("tokens")
@@ -89,7 +96,7 @@ def write_exchange_pages(cards, primary, exchange_scans, primary_details, ex_pro
             details = load_json(os.path.join(EXCHANGES_DATA_DIR, eid, "details.json"), {})
         html = _safe(f"pagina {eid}", build_exchange_page, card, cards, scans.get(eid), details,
                      ex_proposals.get(eid), plans_store, alt_html, page_css, primary, primary_label,
-                     scan_time, analyst_tokens)
+                     scan_time, analyst_tokens, alt_summary)
         if not html.lstrip().startswith("<!doctype"):
             # pagina a esuat: o pagina minimala cu eroarea, nu una lipsa
             html = (f'<!doctype html><html lang="ro"><head><meta charset="utf-8"><title>{eid}</title>'

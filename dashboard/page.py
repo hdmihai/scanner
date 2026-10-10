@@ -7,7 +7,8 @@ import chart_render
 import html as _html
 
 from dashboard.config import ALTSEASON_FILE, ALTSEASON_HISTORY_FILE, DATA_DIR, TOKEN_META_UPDATED
-from dashboard.components import load_json, render_weight_bars
+from dashboard import summaries as SUM
+from dashboard.components import FOLD_JS, FOLD_TOOLS, fold, load_json, render_weight_bars
 from dashboard.sections.agent import render_agent_card, render_learning_curve
 from dashboard.sections.altseason import render_altseason
 from dashboard.sections.analyst import render_analyst, render_token_steps
@@ -16,7 +17,7 @@ from dashboard.sections.exchanges import page_href, render_exchange_modules, ren
 from dashboard.sections.market import render_briefing, render_evidence, render_indicators, render_levels, render_liquidity, render_opportunity_rows
 from dashboard.sections.plan import (elliott_outcome_stats, recent_calibration, render_calibration, render_plan,
                                      render_plan_memory, tracked_plan)
-from dashboard.sections.health import render_health
+from dashboard.sections.health import health_items, render_health
 from dashboard.sections.research import render_research
 from dashboard.sections.status import render_self_check, render_similar_projects
 
@@ -45,6 +46,15 @@ def _safe(name, fn, *a, **k):
         print(f"[!] sectiunea {name} a esuat: {e}")
         return (f'<p class="dim">Sectiunea nu s-a putut genera ({name}: '
                 f'{_html.escape(str(e))[:160]}). Restul dashboard-ului e actualizat.</p>')
+
+
+def _sum(name, fn, *a, **k):
+    """Rezumatul unei sectiuni pliate; un rezumat care esueaza dispare, sectiunea ramane."""
+    try:
+        return fn(*a, **k) or []
+    except Exception as e:
+        print(f"[!] rezumatul {name} a esuat: {e}")
+        return []
 
 
 def build_html(scan, best, deep, chart, health, weights, session, token_meta, narrative, history, weights_history, agent_state, plans_store, briefing, details, exchanges_store,
@@ -78,7 +88,9 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
         token_meta, narrative, symbol=(best or {}).get("symbol"),
         updated=(TOKEN_META_UPDATED or {}).get("when"))
     learning_curve_html = _safe("render_learning_curve", render_learning_curve, history, weights_history, health, agent_state)
-    agent_html = _safe("render_agent_card", render_agent_card, agent_state)
+    _audit = load_json(os.path.join(DATA_DIR, "plan_audit.json"), None)
+    _policy = load_json(os.path.join(DATA_DIR, "scoring_policy.json"), None)
+    agent_html = _safe("render_agent_card", render_agent_card, agent_state, _audit)
     plans_html = _safe("render_plan_memory", render_plan_memory, plans_store)
     _all = (plans_store or {}).get("plans") or []
     _latest = max(_all, key=lambda p: p.get("id", 0)) if _all else None
@@ -100,7 +112,7 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
     health_html = _safe("render_health", render_health, history, agent_state, plans_store,
                         load_json(os.path.join(DATA_DIR, "self_check.json"), None),
                         load_json(ALTSEASON_FILE, None),
-                        load_json(os.path.join(DATA_DIR, "runs.json"), None))
+                        load_json(os.path.join(DATA_DIR, "runs.json"), None), _audit)
     _inv = ((_best_tok or {}).get("strategy") or {}).get("inv_price")
     if chart and _inv and chart.get("symbol") == (best or {}).get("symbol"):
         # invalidarea analistului (pasul 4) pe graficul principal: doar daca incape, nu intinde axa
@@ -112,6 +124,84 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
     scan_time = scan.get("scan_time", "-")
     universe = scan.get("universe_size", 0)
     sessions_txt = ", ".join(session["active"])
+
+    _runs = load_json(os.path.join(DATA_DIR, "runs.json"), None)
+    _sc = load_json(os.path.join(DATA_DIR, "self_check.json"), None)
+    _alt = load_json(ALTSEASON_FILE, None)
+    _hw = _sum("health", lambda: SUM.health(*health_items(history, agent_state, plans_store, _sc, _alt, _runs,
+                                                           _audit)))
+    _open_best = tracked_plan(plans_store, (best or {}).get("symbol"), (best or {}).get("direction"))
+    _sym = (best or {}).get("symbol", "-")
+    legend = """<div class="legend">
+          <span><i class="dot" style="background:#26A69A"></i>EMA 9</span>
+          <span><i class="dot" style="background:#F57C00"></i>EMA 20</span>
+          <span><i class="dot" style="background:#E53935"></i>EMA 50</span>
+          <span><i class="dot" style="background:#1565C0"></i>EMA 200</span>
+          <span><i class="dot" style="background:#7E57C2"></i>Elliott</span>
+          <span><i class="dot" style="background:#089981"></i>TP</span>
+          <span><i class="dot" style="background:#F23645"></i>SL / E INV</span>
+          <span><i class="dot" style="background:#0288D1"></i>entry</span>
+          <span><i class="dot" style="background:#C62828"></i>invalidare analist</span>
+        </div>"""
+    table_head = ('<table><tr><th>Symbol</th><th>Score</th><th title="formula, nu masuratoare">Prob*</th>'
+                  '<th>Pers</th></tr>')
+    top_cards = "\n\n  ".join([
+        fold("Starea sistemului", health_html, _hw, anchor="stare"),
+        fold("Analist Web3 &middot; rotatia capitalului si risc (la fiecare scanare)", analyst_html,
+             _sum("analyst", SUM.analyst, _an), anchor="analist"),
+        fold("Altcoin season &middot; faza ciclului (date reale de piata)", altseason_html,
+             _sum("altseason", SUM.altseason, _alt), anchor="altseason"),
+        fold('Burse &middot; <span class="dim">cate un modul per bursa</span>', exchanges_html,
+             _sum("exchanges", SUM.exchanges, exchanges_store, exchange_scans), anchor="burse"),
+    ] + ([fold('Briefing &middot; <span class="dim">' + ("Gemini" if (briefing or {}).get("source") == "gemini"
+                                                          else "generat din statistici") + '</span>',
+               briefing_html, _sum("briefing", SUM.briefing, briefing), anchor="briefing", cls="briefing-card")]
+         if briefing_html else []))
+    left_cards = "\n\n      ".join([
+        fold(f"Grafic &middot; {_sym}", f"""{chart_svg}
+        {legend}
+        <details class="cc an-main"><summary><span class="cc-title">Analist &middot; pașii 1–4 &middot; {_sym}</span></summary>
+          <div class="cc-body">{main_steps_html}</div></details>""",
+             _sum("chart", SUM.chart, best, deep, _best_tok), anchor="grafic"),
+        fold("Indicatori &middot; VWAP, Volume Profile, SuperTrend, MACD", indicators_html,
+             _sum("indicators", SUM.indicators, deep)),
+        fold("Market structure &middot; Fibonacci", levels_html, _sum("structure", SUM.structure, deep)),
+        fold("Liquidity levels &middot; order book", liquidity_html, _sum("liquidity", SUM.liquidity, deep)),
+        fold("Detalii per token", tokens_html, _sum("tokens", SUM.tokens_moved, _cards)),
+        fold('Top long <span class="dim">* Prob = formula din scor, nu masuratoare - vezi cardul de calibrare</span>',
+             f"{table_head}{long_rows}</table>", _sum("top_long", SUM.top, scan.get("top_long"), "long")),
+        fold('Top short <span class="dim">* idem</span>', f"{table_head}{short_rows}</table>",
+             _sum("top_short", SUM.top, scan.get("top_short"), "short")),
+    ])
+    _frozen = ('<p class="dim" style="margin:0 0 8px;">Ponderi inghetate din ' + str((_policy or {}).get("since"))
+               + ' - aceleasi pentru backtest si live; ajustarea euristica de mai jos e doar diagnostic.</p>'
+               if (_policy or {}).get("frozen") else "")
+    weights_body = f"""{_frozen}{weight_bars}
+        <div class="health-row">
+          <span class="dim">{health["evaluated"]}/{health["min_samples"]} evaluated &middot; hit-rate {health["hit_rate"] if health["hit_rate"] is not None else "-"}%</span>
+          <span class="health-status">{health["status"]}</span>
+        </div>"""
+    sessions_body = f"""<div class="sessions">
+          <div><span class="dim">UTC now</span>{session["utc_time"]}</div>
+          <div><span class="dim">Active</span>{sessions_txt}</div>
+        </div>"""
+    right_cards = "\n\n      ".join([
+        fold("AI plan &middot; best candidate", plan_html,
+             _sum("plan", SUM.plan, best, _dec.get((best or {}).get("symbol")), _open_best), anchor="plan"),
+        fold("Auto-diagnostic &middot; auto-reparare agent", selfcheck_html, _sum("self_check", SUM.self_check, _sc)),
+        fold("Cercetare autonoma &middot; reguli testate pe date nevazute", research_html,
+             _sum("research", SUM.research, load_json(os.path.join(DATA_DIR, "research.json"), None))),
+        fold("Similar projects", similar_html, _sum("similar", SUM.similar, token_meta, narrative, (best or {}).get("symbol"))),
+        fold("Adaptive weights &middot; model health", weights_body, _sum("weights", SUM.weights, weights, health, _policy)),
+        fold(f'Evidente &middot; <span class="dim">{evidence_symbol}, din memoria agentului</span>', evidence_html,
+             _sum("evidence", SUM.evidence, _latest)),
+        fold("Autonomous plan memory", plans_html, _sum("plan_memory", SUM.plan_memory, plans_store)),
+        fold("Calibrare &middot; probabilitate masurata", calibration_html, _sum("calibration", SUM.calibration, plans_store)),
+        fold("Agent AI &middot; invatare online", agent_html, _sum("agent", SUM.agent, agent_state, _audit), anchor="agent"),
+        fold("Learning curve &middot; progresul agentului", learning_curve_html,
+             _sum("learning", SUM.learning, agent_state, health)),
+        fold("Sessions", sessions_body, _sum("sessions", SUM.sessions, session)),
+    ])
 
     return f'''<!doctype html>
 <html lang="ro">
@@ -132,141 +222,17 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
     <div class="meta">{scan_time}<br>universe {universe}</div>
   </header>
   {nav_html}
+  {FOLD_TOOLS}
 
-  <div class="card">
-    <h2>Starea sistemului</h2>
-    {health_html}
-  </div>
-
-  <div class="card" id="analist">
-    <h2>Analist Web3 &middot; rotatia capitalului si risc (la fiecare scanare)</h2>
-    {analyst_html}
-  </div>
-
-  <div class="card" id="altseason">
-    <h2>Altcoin season &middot; faza ciclului (date reale de piata)</h2>
-    {altseason_html}
-  </div>
-
-  <div class="card">
-    <h2>Burse &middot; <span class="dim">cate un modul per bursa</span></h2>
-    {exchanges_html}
-  </div>
-
-  {briefing_html}
+  {top_cards}
 
   <div class="grid">
     <div>
-      <div class="card">
-        <h2>Grafic &middot; {(best or {}).get("symbol", "-")}</h2>
-        {chart_svg}
-        <div class="legend">
-          <span><i class="dot" style="background:#26A69A"></i>EMA 9</span>
-          <span><i class="dot" style="background:#F57C00"></i>EMA 20</span>
-          <span><i class="dot" style="background:#E53935"></i>EMA 50</span>
-          <span><i class="dot" style="background:#1565C0"></i>EMA 200</span>
-          <span><i class="dot" style="background:#7E57C2"></i>Elliott</span>
-          <span><i class="dot" style="background:#089981"></i>TP</span>
-          <span><i class="dot" style="background:#F23645"></i>SL / E INV</span>
-          <span><i class="dot" style="background:#0288D1"></i>entry</span>
-          <span><i class="dot" style="background:#C62828"></i>invalidare analist</span>
-        </div>
-        <details class="cc an-main"><summary><span class="cc-title">Analist &middot; pașii 1–4 &middot; {(best or {}).get("symbol", "-")}</span></summary>
-          <div class="cc-body">{main_steps_html}</div></details>
-      </div>
-
-      <div class="card">
-        <h2>Indicatori &middot; VWAP, Volume Profile, SuperTrend, MACD</h2>
-        {indicators_html}
-      </div>
-
-      <div class="card">
-        <h2>Market structure &middot; Fibonacci</h2>
-        {levels_html}
-      </div>
-
-      <div class="card">
-        <h2>Liquidity levels &middot; order book</h2>
-        {liquidity_html}
-      </div>
-
-      <div class="card">
-        <h2>Detalii per token</h2>
-        {tokens_html}
-      </div>
-
-      <div class="card">
-        <h2>Top long <span class="dim">* Prob = formula din scor, nu masuratoare - vezi cardul de calibrare</span></h2>
-        <table><tr><th>Symbol</th><th>Score</th><th title="formula, nu masuratoare">Prob*</th><th>Pers</th></tr>{long_rows}</table>
-      </div>
-      <div class="card">
-        <h2>Top short <span class="dim">* idem</span></h2>
-        <table><tr><th>Symbol</th><th>Score</th><th title="formula, nu masuratoare">Prob*</th><th>Pers</th></tr>{short_rows}</table>
-      </div>
+      {left_cards}
     </div>
 
     <div>
-      <div class="card">
-        <h2>AI plan &middot; best candidate</h2>
-        {plan_html}
-      </div>
-
-      <div class="card">
-        <h2>Auto-diagnostic &middot; auto-reparare agent</h2>
-        {selfcheck_html}
-      </div>
-
-      <div class="card">
-        <h2>Cercetare autonoma &middot; reguli testate pe date nevazute</h2>
-        {research_html}
-      </div>
-
-      <div class="card">
-        <h2>Similar projects</h2>
-        {similar_html}
-      </div>
-
-      <div class="card">
-        <h2>Adaptive weights &middot; model health</h2>
-        {weight_bars}
-        <div class="health-row">
-          <span class="dim">{health["evaluated"]}/{health["min_samples"]} evaluated &middot; hit-rate {health["hit_rate"] if health["hit_rate"] is not None else "-"}%</span>
-          <span class="health-status">{health["status"]}</span>
-        </div>
-      </div>
-
-      <div class="card">
-        <h2>Evidente &middot; <span class="dim">{evidence_symbol}, din memoria agentului</span></h2>
-        {evidence_html}
-      </div>
-
-      <div class="card">
-        <h2>Autonomous plan memory</h2>
-        {plans_html}
-      </div>
-
-      <div class="card">
-        <h2>Calibrare &middot; probabilitate masurata</h2>
-        {calibration_html}
-      </div>
-
-      <div class="card">
-        <h2>Agent AI &middot; invatare online</h2>
-        {agent_html}
-      </div>
-
-      <div class="card">
-        <h2>Learning curve &middot; progresul agentului</h2>
-        {learning_curve_html}
-      </div>
-
-      <div class="card">
-        <h2>Sessions</h2>
-        <div class="sessions">
-          <div><span class="dim">UTC now</span>{session["utc_time"]}</div>
-          <div><span class="dim">Active</span>{sessions_txt}</div>
-        </div>
-      </div>
+      {right_cards}
     </div>
   </div>
 
@@ -276,5 +242,6 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
     verifica intotdeauna pe cont propriu inainte de orice decizie de trading.
   </footer>
 </div>
+{FOLD_JS}
 </body>
 </html>'''

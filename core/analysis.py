@@ -187,13 +187,14 @@ def build_symbol_details(r, candles, hist_tab, daily=None, htf=None):
     }
 
 
-def build_signal_context(sig, candles, exchange, caps, book_levels, alt_state):
+def build_signal_context(sig, candles, exchange, caps, book_levels, alt_state, rel=None):
     """Evidentele complete ale unui semnal - aceleasi pe orice bursa - si nivelurile
     planului. Intoarce (niveluri, semnal imbogatit).
 
     `exchange` e conexiunea bursei semnalului (order flow, open interest, timeframe-
     urile de confirmare), `caps` capabilitatile ei, `book_levels` order book-ul
-    ACESTUI simbol (fetch_liquidity_levels) sau None.
+    ACESTUI simbol (fetch_liquidity_levels) sau None, `rel` verdictul analistului pe token
+    (core/relative.verdict, din inchiderile zilnice ale tokenului si ale BTC) sau None.
     REGULA (garda: check_integrity): totul se calculeaza DOAR din seria proprie -
     highs_s / lows_s / closes_s - niciodata din seria altui token."""
     highs_s = [c[2] for c in candles]
@@ -264,7 +265,7 @@ def build_signal_context(sig, candles, exchange, caps, book_levels, alt_state):
                                          ew=sig_ew, ew_bias=sig_ew_bias,
                                          liqs=sig_liqs, liqs_bias=sig_liqs_bias,
                                          alt=alt_state, symbol=sig["symbol"],
-                                         direction=sig["direction"])
+                                         direction=sig["direction"], rel=rel)
     # CONFLICT PLAN - ELLIOTT. `sig_ew_bias` e exact caracteristica ev_elliott
     # a agentului (directia asteptata a structurii, fata de directia planului).
     # Masurat pe 16.318 planuri reale: cu ev_elliott <= -0.1 (Elliott

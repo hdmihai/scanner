@@ -104,6 +104,11 @@ def compute_trade_plan(direction, price, atr_val, structure, fib):
         tp2_candidates = [c for c in (ext_1618, price - risk * 4) if c <= tp2_ceiling]
         tp2 = max(tp2_candidates) if tp2_candidates else tp2_ceiling
 
+    # NIVELURI IMPOSIBILE: la o volatilitate extrema (ATR cat jumatate din pret - ex. DOGE in
+    # ianuarie 2021) SL-ul unui LONG sau tinta unui SHORT ies sub zero. Un asemenea plan nu se
+    # poate tranzactiona, iar in memorie ar fi un rezultat fals (gasit de core/plan_audit).
+    if min(entry, sl, tp1, tp2) <= 0:
+        return None
     expected_r = round(abs(tp2 - entry) / risk, 2)
     return {
         "entry": round_price(entry), "sl": round_price(sl),

@@ -30,6 +30,58 @@ PLANS_FILE = os.path.join(DATA_DIR, "plans.json")
 MODEL_FILE = os.path.join(DATA_DIR, "agent_model.json")
 
 
+AUDIT_FILE = os.path.join(DATA_DIR, "plan_audit.json")
+DETAILS_FILE = os.path.join(DATA_DIR, "latest_details.json")
+
+
+def audit_memory(plans_store, pending):
+    """AUDITUL MEMORIEI, inainte de fiecare antrenare (core/plan_audit): planurile LIVE cu date
+    false (niveluri imposibile, R care nu decurge din stare, rezultat contrazis de lumanarile
+    reale, dubluri, caracteristici rupte) se scot din plans.json, cu motivul in
+    data/plan_audit.json. Planurile de backtest gresite doar se raporteaza: sunt reproductibile,
+    deci se corecteaza la sursa si se regenereaza (Backtest cu merge), nu se sterg una cate una.
+    Intoarce True daca agentul invatase din vreun plan scos (=> reantrenare de la zero)."""
+    import time as _t
+    from core import plan_audit as A
+    now = _t.time()
+    plans = plans_store.get("plans") or []
+    det = (load_json(DETAILS_FILE, {}) or {}).get("symbols") or {}
+    rep = A.audit(plans, now, {s: d.get("candles") for s, d in det.items()}, ev_mod.FEATURE_KEYS,
+                  _core.BASE_FEATURES, pending, plan_tracker.evaluate_plan, plan_tracker.cost_in_r,
+                  plan_tracker._r_at, plan_tracker.TP1_FRACTION)
+    live_f = [f for f in rep["flagged"] if f["source"] != "backtest"]
+    bt_f = [f for f in rep["flagged"] if f["source"] == "backtest"]
+    n_live = sum(1 for p in plans if p.get("source") != "backtest")
+    ok, why = A.removal_allowed({"flagged": live_f, "checked": n_live})
+    when = _t.strftime("%Y-%m-%d %H:%M UTC", _t.gmtime(now))
+    retrain, removed = False, []
+    if live_f and ok:
+        ids = {f["id"] for f in live_f}
+        reason = {f["id"]: f["reason"] for f in live_f}
+        gone = [p for p in plans if p.get("id") in ids]
+        retrain = any(p.get("agent_trained") and p.get("state") != plan_tracker.STATE_NO_ENTRY for p in gone)
+        plans_store["plans"] = [p for p in plans if p.get("id") not in ids]
+        plans_store["calibration"] = plan_tracker.build_calibration(plans_store)
+        plans_store["summary"] = plan_tracker.summarize(plans_store)
+        removed = [A.compact_record(p, reason[p["id"]], when) for p in gone]
+        for r in removed:
+            print(f"[audit] scos planul #{r['id']} {r['symbol']} {r['direction']}: {r['reason']}")
+    elif live_f:
+        print(f"[audit] {why}")
+    if bt_f:
+        print(f"[audit] {len(bt_f)} planuri de backtest cu date gresite - se corecteaza la regenerarea "
+              f"backtest-ului: " + "; ".join(f"#{f['id']} {f['reason']}" for f in bt_f[:3]))
+    log = load_json(AUDIT_FILE, {}) or {}
+    log.update({"when": when, "ts": now, "checked": rep["checked"], "reevaluated": rep["reevaluated"],
+                "live_flagged": len(live_f), "removed_now": len(removed), "blocked": None if ok else why,
+                "backtest_flagged": len(bt_f), "backtest_examples": bt_f[:5], "by_reason": rep["by_reason"],
+                "pending_live": live_f[:20] if not ok else [], "retrained": retrain,
+                "epoch": plans_store.get("data_epoch")})
+    log["removed"] = ((log.get("removed") or []) + removed)[-500:]
+    save_json(AUDIT_FILE, log)
+    return retrain
+
+
 _Q_CACHE = {"ts": 0, "set": set()}
 
 
@@ -53,14 +105,17 @@ _X_CACHE = {"ts": 0, "set": set(_core.LIVE_ONLY_FEATURES)}
 
 def excluded_features():
     """Caracteristicile excluse din model: mereu cele doar-live, plus cele cu decalaj
-    de prezenta masurat (salvate in starea agentului, reincarcate o data pe minut)."""
+    de prezenta masurat si cele in asteptarea backtest-ului (salvate in starea agentului,
+    reincarcate o data pe minut)."""
     import time as _t
     if _t.time() - _X_CACHE["ts"] > 60:
         try:
             with open(MODEL_FILE) as f:
-                _X_CACHE["set"] = set(json.load(f).get("skew_excluded") or []) | _core.LIVE_ONLY_FEATURES
+                st = json.load(f)
+            _X_CACHE["set"] = (set(st.get("skew_excluded") or []) | _core.LIVE_ONLY_FEATURES
+                               | set(st.get("pending_features", _core.PENDING_DEFAULT) or []))
         except Exception:
-            _X_CACHE["set"] = set(_core.LIVE_ONLY_FEATURES)
+            _X_CACHE["set"] = set(_core.LIVE_ONLY_FEATURES) | set(_core.PENDING_DEFAULT)
         _X_CACHE["ts"] = _t.time()
     return _X_CACHE["set"]
 
@@ -95,15 +150,37 @@ def load_agent():
 
 def main():
     plans_store = load_json(PLANS_FILE, {"plans": []})
-    plans = plans_store.get("plans", [])
     import time as _t
+    _pending = _core.backtest_pending(plans_store.get("plans", []))
+    # auditul memoriei: planurile cu date false ies din plans.json INAINTE de invatare
+    try:
+        _audit_retrain = audit_memory(plans_store, _pending)
+    except Exception as _e:                      # auditul nu are voie sa opreasca antrenarea
+        print(f"[!] auditul memoriei a esuat: {_e}")
+        _audit_retrain = False
+    plans = plans_store.get("plans", [])
     _skew = _core.feature_skew(plans)
     _excl = _core.skew_excluded(_skew)
-    _X_CACHE.update(ts=_t.time() + 10 ** 9, set=set(_excl))     # fix pentru aceasta rulare
+    _X_CACHE.update(ts=_t.time() + 10 ** 9, set=set(_excl) | set(_pending))     # fix pentru aceasta rulare
     if _excl:
         print(f"[i] Excluse din model (decalaj live-backtest): {', '.join(_excl)}")
+    if _pending:
+        print(f"[i] In asteptarea backtest-ului (excluse, fara reantrenare): {', '.join(_pending)}")
 
     state = load_json(MODEL_FILE, None)
+    if state is not None and _audit_retrain:
+        print("[i] Agentul invatase din planuri scoase de audit - reantrenez de la zero pe memoria curata.")
+        state = None
+        for p in plans:
+            p.pop("agent_trained", None)
+    # O caracteristica IESITA din asteptare (backtest-ul re-rulat o contine acum): reantrenare
+    # completa, ca greutatea ei sa se invete pe tot istoricul, nu doar pe planurile urmatoare.
+    _released = sorted(set((state or {}).get("pending_features") or []) - set(_pending))
+    if state is not None and _released:
+        print(f"[i] Backtest-ul contine acum {', '.join(_released)} - reantrenez de la zero pe toate planurile.")
+        state = None
+        for p in plans:
+            p.pop("agent_trained", None)
     # MASCA DE CARACTERISTICI (excluse + carantina). Cand se schimba, reantrenez de la
     # zero: o caracteristica zerorizata cat timp modelul s-a antrenat ramane cu greutatea
     # 0 si dupa ridicarea carantinei (ev_elliott: 0.0 dupa o carantina falsa de 2 zile).
@@ -185,7 +262,10 @@ def main():
         print("Niciun plan inca - agentul invata din planuri inchise. "
               "Ruleaza intai crypto_ai_scanner.py.")
         state["skew"], state["skew_excluded"], state["feature_mask"] = _skew, _excl, _mask
+        state["pending_features"] = _pending
         save_json(MODEL_FILE, state)
+        if plans_store.get("plans") is not None and os.path.exists(PLANS_FILE):
+            plan_tracker.save_plans(plans_store)     # auditul poate fi golit memoria
         return
 
     new_samples = _core.train_from_plans(plans, model, state)
@@ -213,6 +293,7 @@ def main():
     state["majority_baseline"] = _core.majority_class_accuracy(pairs)
     state["predicted_positive_rate"] = _core.predicted_positive_rate(pairs)
     state["skew"], state["skew_excluded"], state["feature_mask"] = _skew, _excl, _mask
+    state["pending_features"] = _pending
     save_json(MODEL_FILE, state)
 
     acc_agent, acc_base, acc_recent = _core.summarize(state)

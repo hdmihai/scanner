@@ -59,6 +59,11 @@ def main():
     tmp = tempfile.mkdtemp()
     for f in NEED:
         shutil.copy(os.path.join("data", f), os.path.join(tmp, f))
+    # rotatia sectoarelor se verifica de la zero: cu sectoarele din productie proaspete (fetch-uite
+    # in ultimele 3 ore), mai putine ar fi scadente si numaratoarea ar depinde de ora rularii
+    _st = json.load(open(os.path.join(tmp, "altseason.json")))
+    _st["sectors"] = {"items": {}, "total": 0}
+    json.dump(_st, open(os.path.join(tmp, "altseason.json"), "w"))
     A.STATE_FILE, A.HISTORY_FILE = os.path.join(tmp, "altseason.json"), os.path.join(tmp, "altseason_history.json")
     AH.STATE_FILE = os.path.join(tmp, "altseason_cycles.json")
     AH.daily_update = lambda st, ex: False      # fara retea: istoricul pe 10 ani ramane cel copiat

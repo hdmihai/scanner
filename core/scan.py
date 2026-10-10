@@ -49,6 +49,7 @@ from core import liquidity_structure as ls_mod
 from core import market as mkt
 from core import market_structure as struct_mod
 from core import plans as plan_tracker
+from core import relative as rel_mod
 from core import zones as zones_mod
 from ports.market_data import CAP_OHLCV, CAP_ORDERBOOK_LIVE
 from core.analysis import (_open_plan_for_base, build_signal_context, build_symbol_details,
@@ -56,7 +57,7 @@ from core.analysis import (_open_plan_for_base, build_signal_context, build_symb
 from core.config import (CHART_FILE, CONFIG, DEFAULT_WEIGHTS, DETAILS_FILE, EXCHANGES_DIR,
                          EXCHANGES_FILE, EXCHANGE_HISTORY_KEEP, EXCHANGE_SCANS_FILE,
                          EXCHANGE_TIME_BUDGET, HISTORY_FILE, PER_SIGNAL_ORDER_BOOK,
-                         SECONDARY_SCAN_LIMIT, WEIGHTS_FILE, WEIGHTS_HISTORY_FILE,
+                         SCORING_POLICY_FILE, SECONDARY_SCAN_LIMIT, WEIGHTS_FILE, WEIGHTS_HISTORY_FILE,
                          timeframe_seconds)
 from core.geometry import compute_fibonacci, compute_structure_levels, compute_trade_plan
 from core.learning import compute_persistence_and_age, evaluate_and_learn
@@ -101,6 +102,19 @@ def _canon_base(symbol):
         if base in CONFIG.get("aliases", {}).get(b, [b]):
             return b
     return base
+
+
+def relative_for(daily_by_base, symbol, price):
+    """Verdictul analistului pe token (core/relative) pentru evidenta `analyst` a semnalului:
+    din inchiderile zilnice ale tokenului si ale BTC, aceleasi zile inchise. None pentru BTC
+    sau cand lipsesc datele - evidenta lipseste atunci, nu primeste o valoare inventata."""
+    base = _canon_base(symbol)
+    if base == "BTC":
+        return None
+    try:
+        return rel_mod.from_candles((daily_by_base or {}).get(base), (daily_by_base or {}).get("BTC"), price)
+    except Exception:
+        return None
 
 
 def load_json(path, default):
@@ -255,7 +269,9 @@ def analyze_exchange(adapter, handle, card, ctx):
         book = (fetch_liquidity_levels(handle, sig["symbol"], attempts=adapter.book_limits)
                 if CAP_ORDERBOOK_LIVE in caps else None)
         levels, sig_e = build_signal_context(sig, cache[sig["symbol"]], handle, caps, book,
-                                             ctx["alt_state"])
+                                             ctx["alt_state"],
+                                             rel=relative_for(ctx.get("daily_by_base"), sig["symbol"],
+                                                              sig.get("price")))
         if not levels:
             continue
         sig_e["neighbors"] = ai_agent.comparable_entries(ai_agent.extract_features(sig_e), ctx["closed"])
@@ -464,12 +480,23 @@ def main():
 
     weights = load_json(WEIGHTS_FILE, dict(DEFAULT_WEIGHTS))
     history = load_json(HISTORY_FILE, [])
+    # PONDERI INGHETATE dupa reconstructia memoriei: scorul planurilor live se calculeaza cu
+    # aceleasi ponderi ca backtest-ul pe care invata agentul. Altfel ajustarea euristica de mai
+    # jos muta scorurile ora de ora, iar calibrarea si cercetarea (masurate pe intervale de scor
+    # din backtest) ar compara scoruri pe scari diferite.
+    policy = load_json(SCORING_POLICY_FILE, None) or {}
+    frozen = bool(policy.get("frozen") and isinstance(policy.get("weights"), dict))
+    if frozen:
+        weights = {k: float(v) for k, v in policy["weights"].items()}
 
-    # 1) evalueaza semnalele vechi si "invata" din ele
-    weights = evaluate_and_learn(
-        history, weights, all_tickers,
+    # 1) evalueaza semnalele vechi si "invata" din ele (cu ponderile inghetate: doar diagnostic -
+    #    rezultatele hit/miss se inregistreaza, ponderile raman cele ale backtest-ului)
+    learned = evaluate_and_learn(
+        history, dict(weights), all_tickers,
         CONFIG["lookahead_hours"], CONFIG["hit_threshold_atr"],
     )
+    if not frozen:
+        weights = learned
 
     # 2) scaneaza piata curenta
     now_ts = time.time()
@@ -533,8 +560,9 @@ def main():
 
     # LUMANARI ZILNICE (1D) pentru zonele de suport/rezistenta pe timeframe mare: cu doar
     # 260 de bare de 4h (~43 de zile), un pret aflat la minimul seriei nu are niciun suport
-    # dedesubt - cele 1D (~10 luni) il incadreaza. Un apel per simbol; doar afisare si
-    # analiza, deciziile de plan nu le citesc.
+    # dedesubt - cele 1D (~10 luni) il incadreaza. Un apel per simbol. Zonele sunt doar afisare
+    # si analiza; din aceleasi zile se calculeaza verdictul analistului pe token (evidenta
+    # `analyst`), care intra in modelul agentului abia cand exista si in backtest.
     daily_cache = {}
     for r in results:
         try:
@@ -544,6 +572,17 @@ def main():
             continue
         if o and len(o) > 1:
             daily_cache[r["symbol"]] = o[:-1]          # fara ziua curenta, neinchisa
+
+    # BTC e referinta fortei relative (evidenta `analyst`): o singura cerere in plus doar daca
+    # BTC nu e printre simbolurile scanate.
+    daily_by_base = {_canon_base(s): o for s, o in daily_cache.items()}
+    if "BTC" not in daily_by_base:
+        try:
+            o = exchange.fetch_ohlcv("BTC/USDT", timeframe="1d", limit=DAILY_ZONE_BARS)
+            if o and len(o) > 1:
+                daily_by_base["BTC"] = o[:-1]
+        except Exception as e:
+            print(f"[!] zile BTC pentru forta relativa: {str(e)[:120]}")
 
     for r in results:
         candles = ohlcv_cache.get(r["symbol"])
@@ -778,7 +817,8 @@ def main():
         book_levels = liquidity
         if PER_SIGNAL_ORDER_BOOK and sig["symbol"] != best["symbol"]:
             book_levels = fetch_liquidity_levels(exchange, sig["symbol"])
-        levels, sig = build_signal_context(sig, candles, exchange, active_caps, book_levels, alt_state)
+        levels, sig = build_signal_context(sig, candles, exchange, active_caps, book_levels, alt_state,
+                                           rel=relative_for(daily_by_base, sig["symbol"], sig.get("price")))
         if not levels:
             # geometrie degenerata (ex. ATR efectiv zero) - sar peste simbol,
             # nu opresc scanarea din cauza unuia singur
@@ -864,6 +904,7 @@ def main():
             "alt_state": alt_state, "calibration": calibration, "agent_model": agent_model,
             "agent_state": agent_state, "closed": closed_for_neighbors, "plan_store": plan_store,
             "htf_zones": {_canon_base(s): (d.get("zones") or {}).get("d1") for s, d in details.items()},
+            "daily_by_base": daily_by_base,
             "now_ts": now_ts, "budget": EXCHANGE_TIME_BUDGET,
             "limit": max(SECONDARY_SCAN_LIMIT, len(CONFIG.get("watchlist") or []))})
     except Exception as _e:
