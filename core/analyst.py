@@ -20,6 +20,7 @@ import math
 from datetime import datetime, timedelta, timezone
 
 from core.analysis import daily_zones
+from core import relative as _relative
 
 WORDS = 10                  # limita textelor scurte din format
 BTCD_MOVE_PP = 0.5          # directia dominantei: cel putin 0.5 pp pe 30 de zile
@@ -631,7 +632,14 @@ def token_report(base, d, m, ind, sec_rows, members, candles, btc_candles, macro
     price = (d or {}).get("price") or m.get("price") or (candles[-1][4] if candles else None)
     rs7, rs30, rs200 = _rel(m.get("r7"), g("btc_r7")), _rel(m.get("r30"), g("btc_r30")), _rel(m.get("r200"), g("btc_r200"))
     src = "CoinGecko"
-    if rs30 is None and candles:
+    # Pe lumanarile zilnice ale bursei, cand exista: aceeasi functie (core/relative) din care
+    # agentul primeste evidenta `analyst` - verdictul afisat e exact cel pe care invata agentul.
+    rv = _relative.from_candles(candles, btc_candles, price)
+    if rv:
+        rs7, rs30 = rv["rs7"], rv["rs30"]
+        rs200 = _rs_candles(candles, btc_candles, 200) if len(candles) > 200 else rs200
+        src = "bursă, închideri zilnice"
+    elif rs30 is None and candles:
         rs7, rs30, rs200 = (_rs_candles(candles, btc_candles, 7), _rs_candles(candles, btc_candles, 30),
                             _rs_candles(candles, btc_candles, 200))
         src = "lumânări zilnice"

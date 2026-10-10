@@ -31,6 +31,7 @@ import json
 import os
 import sys
 
+import data_reset
 import plan_tracker
 
 DATA_DIR = "data"
@@ -76,6 +77,36 @@ def main():
         return 1
 
     live = load_json(PLANS_FILE, {"next_id": 1, "plans": []})
+    err = data_reset.check_family(live, plan_tracker.GEOMETRY_FAMILY)
+    if err:
+        print("[EROARE] " + err)
+        return 1
+    if data_reset.needs_rebuild(live):
+        # RECONSTRUCTIA memoriei cere un backtest generat de codul CURENT: unul vechi ar reintroduce
+        # exact datele pe care reconstructia trebuie sa le inlocuiasca.
+        if not data_reset.backtest_is_current(bt, plan_tracker.FEATURE_VERSION):
+            print("[EROARE] data/backtest_plans.json a fost generat de o versiune anterioara a agentului "
+                  f"(meta: {bt.get('meta')}). Ruleaza Backtest cu mode single/walk_forward si merge true.")
+            return 1
+        if dry:
+            print("Ar reconstrui memoria (epoca noua). Nimic nu a fost scris.")
+            return 0
+        offset = live.get("next_id", 1)
+        fresh = [p for p in bt["plans"] if plan_tracker.same_family(p.get("geometry"))]
+        for i, p in enumerate(fresh):
+            p["id"] = offset + i
+        live["next_id"] = offset + len(fresh)
+        data_reset.rebuild(live, fresh, (bt.get("meta") or {}).get("weights") or data_reset.DEFAULT_WEIGHTS,
+                           plan_tracker.same_family, plan_tracker.GEOMETRY_FAMILY, plan_tracker.FEATURE_VERSION)
+        live["calibration"] = plan_tracker.build_calibration(live)
+        live["summary"] = plan_tracker.summarize(live)
+        plan_tracker.save_plans(live)
+        try:
+            os.remove(BACKTEST_FILE)
+        except OSError:
+            pass
+        print(f"Memoria reconstruita: {len(live['plans'])} planuri. Ruleaza ai_agent.py (pasul urmator).")
+        return 0
     # REGENERARE, identic cu backtest.py --merge: planurile de backtest ale
     # familiei curente se INLOCUIESC cu cele din backtest_plans.json. Doar cu
     # deduplicare, modul merge_only pastra caracteristicile calculate cu logica

@@ -305,7 +305,9 @@ def check_tokens(fails):
     alt = _alt_fixture()
     t0 = 1_766_000_000_000
     btc_px = [60000 + 60 * i for i in range(260)]
-    up = [1.0 + 0.004 * i for i in range(230)] + [1.92 - 0.004 * i for i in range(20)] + [1.84 + 0.01 * i for i in range(10)]
+    # lumanarile zilnice sunt acum sursa fortei relative (aceeasi functie ca evidenta agentului),
+    # deci seria bate BTC si pe ele, nu doar in datele CoinGecko: +5% pe 30 de zile, +7% pe 7 zile
+    up = [1.0 + 0.004 * i for i in range(230)] + [1.92 - 0.004 * i for i in range(20)] + [1.84 + 0.02 * i for i in range(10)]
     down = [3.0 - 0.006 * i for i in range(260)]
     daily = {"BTC": _series(btc_px, t0), "UPC": _series(up, t0), "DNC": _series(down, t0)}
     ind = alt["indicators"]

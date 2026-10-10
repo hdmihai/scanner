@@ -235,3 +235,47 @@ def render_rich_chart(chart, fullscreen_id=None):
     existente (graficele per token)."""
     return chart_render.render_chart(chart, chart_render.MAIN_LAYERS, 300,
                                      fullscreen_id=fullscreen_id)
+
+
+# ------------------------------------------------------------------ sectiuni pliate
+
+def fold(title, body, summary=(), anchor=None, cls=""):
+    """O sectiune a dashboard-ului, PLIATA implicit: titlul si cel mult 3 randuri de rezumat
+    (dashboard.summaries) raman vizibile; continutul complet se deschide la atingere. Rezumatul
+    e text simplu, escapat aici; titlul e HTML (poate contine &middot; si <span class="dim">)."""
+    import html as _h
+    lines = "".join(f'<span class="fold-line" title="{_h.escape(str(x), quote=True)}">{_h.escape(str(x))}</span>'
+                    for x in list(summary or [])[:3] if x)
+    ida = f' id="{anchor}"' if anchor else ""
+    sum_html = f'<span class="fold-sum">{lines}</span>' if lines else ""
+    return (f'<details class="card fold{(" " + cls) if cls else ""}"{ida}>'
+            f'<summary class="fold-head"><h2>{title}</h2>{sum_html}</summary>'
+            f'<div class="fold-body">{body}</div></details>')
+
+
+# Bara "deschide / inchide tot" si scriptul care deschide sectiunile pliate cand o legatura
+# duce in interiorul lor (ex. #analist, cardul unui token de pe pagina bursei).
+FOLD_TOOLS = ('<div class="fold-tools"><button type="button" data-fold="open">Deschide tot</button>'
+              '<button type="button" data-fold="close">Închide tot</button></div>')
+
+FOLD_JS = """<script>
+(function(){
+  function openTo(id){
+    var el=document.getElementById(id); if(!el) return;
+    for(var p=el;p;p=p.parentElement){ if(p.tagName==='DETAILS') p.open=true; }
+    el.scrollIntoView();
+  }
+  function fromHash(){ if(location.hash.length>1){ try{ openTo(decodeURIComponent(location.hash.slice(1))); }catch(e){} } }
+  window.addEventListener('hashchange',fromHash);
+  if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded',fromHash); } else { fromHash(); }
+  document.addEventListener('click',function(e){
+    var b=e.target.closest && e.target.closest('[data-fold]');
+    if(b){ var o=b.getAttribute('data-fold')==='open';
+      document.querySelectorAll('details.fold').forEach(function(d){ d.open=o; }); return; }
+    var a=e.target.closest && e.target.closest('a[href*="#"]');
+    if(a){ var u=new URL(a.getAttribute('href'),location.href);
+      if(u.pathname===location.pathname && u.hash.length>1){
+        setTimeout(function(){ try{ openTo(decodeURIComponent(u.hash.slice(1))); }catch(err){} },0); } }
+  });
+})();
+</script>"""

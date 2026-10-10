@@ -195,7 +195,7 @@ ELLIOTT_CONFLICT_MAX = -0.1
 # 72.837 de planuri aruncate la resetari, din care ~40.000 pentru schimbari de
 # tip "am adaugat un indicator". Agentul repornea de la zero exact cand se
 # apropia de pragul de activare. De asta nu-l trecea niciodata.
-FEATURE_VERSION = "f7"      # f5 = + Elliott cu numaratori concurente
+FEATURE_VERSION = "f8"      # f5 = + Elliott cu numaratori concurente; f8 = + ev_analyst (verdictul analistului)
 
 
 def _build_geometry(caps_sig=None):
@@ -440,6 +440,10 @@ def create_plan(store, signal, plan_levels, decision):
         "fusion": signal.get("fusion"),
         "neighbors": signal.get("neighbors"),
         "geometry": GEOMETRY_VERSION,
+        # versiunea setului de caracteristici cu care s-a creat planul - auditul memoriei
+        # (core/plan_audit) si reconstructia unei epoci de date recunosc dupa ea planurile
+        # create de versiuni anterioare ale agentului
+        "fv": FEATURE_VERSION,
         "bar_seconds": signal.get("bar_seconds", DEFAULT_BAR_SECONDS),
     }
     store["plans"].append(plan)

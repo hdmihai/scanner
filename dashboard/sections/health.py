@@ -23,7 +23,14 @@ def _tile(level, title, value, detail):
             f'<span class="hl-d">{detail}</span></div>')
 
 
-def render_health(history, agent_state, plans_store, self_check, altseason, runs=None):
+def render_health(history, agent_state, plans_store, self_check, altseason, runs=None, audit=None):
+    worst, items = health_items(history, agent_state, plans_store, self_check, altseason, runs, audit)
+    head = {"OK": "TOTUL FUNCTIONEAZA", "WARN": "ATENTIE", "ERROR": "PROBLEMA"}[worst]
+    return (f'<div class="hl-head hl-{worst.lower()}">{head}</div>'
+            f'<div class="hl-grid">{"".join(_tile(*t) for t in items)}</div>')
+
+
+def health_items(history, agent_state, plans_store, self_check, altseason, runs=None, audit=None):
     """STAREA SISTEMULUI. Problemele gasite pana acum doar prin verificari manuale
     - scanari care rulau la 4-7 ore in loc de orar, auto-diagnosticul dezactivat
     fara nicio eroare vizibila, agentul neconfirmat live - apar aici primele."""
@@ -33,7 +40,7 @@ def render_health(history, agent_state, plans_store, self_check, altseason, runs
 
     def add(level, *a):
         nonlocal worst
-        tiles.append(_tile(level, *a))
+        tiles.append((level,) + a)
         worst = level if rank[level] > rank[worst] else worst
 
     ts = _scan_times(history)
@@ -119,11 +126,26 @@ def render_health(history, agent_state, plans_store, self_check, altseason, runs
             ("toate verificarile OK" if not bad else f"{len(bad)} informare: " + bad[0]["title"])))
     else:
         add("WARN", "Auto-diagnostic", "lipsa", "data/self_check.json nu exista - pasul de diagnostic nu ruleaza")
+    au = audit or {}
+    if au.get("when"):
+        # AUDITUL MEMORIEI (core/plan_audit, la fiecare antrenare): plafon depasit = problema (auditul
+        # nu a sters nimic, decide omul); planuri de backtest gresite = de regenerat
+        rb = au.get("rebuild") or {}
+        lvl = "ERROR" if au.get("blocked") else ("WARN" if au.get("backtest_flagged") else "OK")
+        val = ("blocat" if au.get("blocked") else
+               (f"{au.get('removed_now')} scoase acum" if au.get("removed_now") else "memorie curata"))
+        det = (f"{au.get('checked', 0)} planuri verificate, {au.get('reevaluated', 0)} reevaluate pe lumanari reale"
+               f" &middot; {len(au.get('removed') or [])} scoase in total")
+        if au.get("blocked"):
+            det += f" &middot; {au['blocked']}"
+        if au.get("backtest_flagged"):
+            det += f" &middot; {au['backtest_flagged']} planuri de backtest gresite: ruleaza Backtest (merge true)"
+        if rb:
+            det += f" &middot; reconstruita {rb.get('when')} (epoca {rb.get('epoch')})"
+        add(lvl, "Audit memorie planuri", val, det)
     al = altseason or {}
     if al:
         stale = al.get("stale") or now - (al.get("ts") or 0) > 6 * 3600
         add("WARN" if stale else "OK", "Date altseason", "vechi" if stale else "la zi",
             f"{al.get('when')}" + (f" &middot; {al.get('last_error')}" if stale and al.get("last_error") else ""))
-    head = {"OK": "TOTUL FUNCTIONEAZA", "WARN": "ATENTIE", "ERROR": "PROBLEMA"}[worst]
-    return (f'<div class="hl-head hl-{worst.lower()}">{head}</div>'
-            f'<div class="hl-grid">{"".join(tiles)}</div>')
+    return worst, tiles

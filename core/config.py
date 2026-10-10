@@ -97,6 +97,12 @@ WEIGHTS_FILE = os.path.join(CONFIG["data_dir"], "weights.json")
 WEIGHTS_HISTORY_FILE = os.path.join(CONFIG["data_dir"], "weights_history.json")
 
 
+# POLITICA PONDERILOR DE SCOR, scrisa la reconstructia memoriei (data_reset.py): cu "frozen",
+# scanarea foloseste exact ponderile cu care s-a generat backtest-ul, iar ajustarea euristica
+# (core/learning.evaluate_and_learn) ramane doar diagnostic. Fara fisier: comportamentul vechi.
+SCORING_POLICY_FILE = os.path.join(CONFIG["data_dir"], "scoring_policy.json")
+
+
 CHART_FILE = os.path.join(CONFIG["data_dir"], "latest_chart.json")
 
 

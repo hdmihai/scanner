@@ -9,12 +9,8 @@ from dashboard.components import fmt_price
 def render_briefing(brief):
     if not brief or not brief.get("text"):
         return ""
-    src = brief.get("source", "determinist")
-    tag = "Gemini" if src == "gemini" else "generat din statistici"
-    return f'''<div class="card briefing-card">
-    <h2>Briefing &middot; <span class="dim">{tag}</span></h2>
-    <p class="briefing-text">{brief["text"]}</p>
-  </div>'''
+    # doar continutul: cardul (pliat, cu titlul si sursa) il construieste dashboard.page
+    return f'<p class="briefing-text">{brief["text"]}</p>'
 
 
 def render_opportunity_rows(rows):

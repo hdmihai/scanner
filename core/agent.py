@@ -244,6 +244,27 @@ def feature_skew(plans):
     return out
 
 
+# CARACTERISTICI IN ASTEPTAREA BACKTEST-ULUI. O evidenta noua (ex. ev_analyst, verdictul
+# Analistului Web3) apare intai doar pe planurile live; planurile de backtest existente nu o
+# poarta deloc. feature_skew nu o poate masura (nu are cu ce compara), deci ar intra in model cu
+# valori live si 0 in cele ~16.000 de planuri de backtest - exact decalajul de mai sus. Ramane
+# exclusa (0 la antrenare si la predictie) pana cand backtest-ul re-rulat o contine; atunci
+# agentul se reantreneaza o data pe toate planurile, ca greutatea ei sa fie invatata pe tot
+# istoricul (ai_agent.main). Nu face parte din `feature_mask`: intrarea in asteptare nu cere
+# reantrenare - caracteristica nu a avut niciodata alta greutate decat 0.
+# PENDING_DEFAULT acopera prima scanare dupa introducere, inainte ca agentul sa fi calculat lista.
+PENDING_DEFAULT = ("ev_analyst",)
+
+
+def backtest_pending(plans):
+    """Caracteristicile pe care NICIUN plan de backtest nu le poarta (lista sortata). Fara planuri
+    de backtest, lista e goala: nu exista decalaj de masurat."""
+    bt = [p.get("components") or {} for p in plans if p.get("source") == "backtest"]
+    if not bt:
+        return []
+    return sorted(k for k in ev_mod.FEATURE_KEYS if not any(k in c for c in bt))
+
+
 def skew_excluded(skew):
     return sorted(LIVE_ONLY_FEATURES | {k for k, (pl, pb) in skew.items() if abs(pl - pb) >= SKEW_PP})
 

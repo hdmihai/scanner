@@ -62,7 +62,7 @@ def _item(key, label, direction, strength, value=None):
 def build_evidence(ind, price, atr, rsi=None, components=None,
                    flow=None, book=None, caps=None, liq=None, liq_bias=None,
                    struct=None, ew=None, ew_bias=None,
-                   liqs=None, liqs_bias=None, alt=None, symbol=None, direction=None):
+                   liqs=None, liqs_bias=None, alt=None, symbol=None, direction=None, rel=None):
     """Construieste lista de evidente dintr-un set de indicatori.
 
     `ind` e iesirea lui indicators.compute_all(). Orice lipseste se sare -
@@ -282,6 +282,26 @@ def build_evidence(ind, price, atr, rsi=None, components=None,
                             direction if favors else ("SHORT" if direction == "LONG" else "LONG"),
                             _clip(abs(b), 0, 1), cls["phase"]))
 
+    # VERDICTUL ANALISTULUI WEB3 PE TOKEN (core/relative.verdict): forta relativa fata de BTC
+    # pe 7/30 de zile si pozitia fata de MA200 1D, din inchideri zilnice - acelasi calcul ca pe
+    # cardul analistului si in backtest. Bullish sustine LONG, Bearish sustine SHORT, Neutru nu
+    # sustine nimic. Pentru BTC nu exista (forta relativa a BTC fata de el insusi e zero).
+    # NU intra in `fusion` (EXCLUDED_FROM_FUSION): scorul de fuziune e o caracteristica a
+    # agentului, invatata pe planuri fara aceasta evidenta - adaugata acolo, ar muta ev_fusion
+    # live fara ca modelul sa fi vazut vreodata asa ceva. Agentul ii invata greutatea separat,
+    # ca ev_analyst, abia cand backtest-ul o contine (core/agent.backtest_pending).
+    if rel and rel.get("sentiment") and direction and not (symbol or "").upper().startswith("BTC/"):
+        sent = rel["sentiment"]
+        r7 = rel.get("rs7")
+        txt = (f"Analist: {sent} - {'peste' if rel.get('above_ma200') else 'sub'} MA200 1D, "
+               f"{rel['rs30']:+.1f}% vs BTC/30z" + ("" if r7 is None else f", {r7:+.1f}%/7z"))
+        if sent == "Bullish":
+            ev.append(_item("analyst", txt, DIR_LONG, 1.0, round(rel["rs30"], 2)))
+        elif sent == "Bearish":
+            ev.append(_item("analyst", txt, DIR_SHORT, 1.0, round(rel["rs30"], 2)))
+        else:
+            ev.append(_item("analyst", txt, DIR_NEUTRAL, 0.0, round(rel["rs30"], 2)))
+
     comp = components or {}
     if comp.get("volume") is not None:
         v = comp["volume"]
@@ -294,10 +314,16 @@ def build_evidence(ind, price, atr, rsi=None, components=None,
     return ev
 
 
+# Evidente afisate si invatate separat de agent, dar care nu intra in scorul de fuziune
+# (vezi nota de la evidenta `analyst` din build_evidence).
+EXCLUDED_FROM_FUSION = {"analyst"}
+
+
 def fusion(evidence, direction):
     """Numara evidentele care sustin si care contrazic directia planului.
     Echivalentul panoului 'EVIDENCE FUSION' din sistemul de referinta, dar cu
     numere care chiar provin din ce s-a calculat."""
+    evidence = [e for e in evidence if e.get("key") not in EXCLUDED_FROM_FUSION]
     support = [e for e in evidence if e["direction"] == direction]
     oppose = [e for e in evidence if e["direction"] not in (direction, DIR_NEUTRAL)]
     neutral = [e for e in evidence if e["direction"] == DIR_NEUTRAL]
@@ -317,7 +343,7 @@ EVIDENCE_KEYS = ["ema_fast", "ema_stack", "supertrend", "macd", "vwap",
                  "poc", "value_area", "rsi", "volume", "volatility",
                  "order_flow", "book_imbalance", "liq_magnet",
                  "ichimoku", "ma_cross", "regime", "mtf_align", "elliott",
-                 "liq_struct", "liq_sweep", "altseason"]
+                 "liq_struct", "liq_sweep", "altseason", "analyst"]
 
 
 def evidence_features(evidence, direction):

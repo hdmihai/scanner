@@ -86,6 +86,17 @@ def archive_stale_plans(store):
     family = "-".join(parts[:2]) + "-" if len(parts) >= 2 else _core.GEOMETRY_VERSION
 
     plans = store.get("plans") or []
+    # GARDA: un proces pornit pe ALT timeframe decat scanarea live (ex. backtest lasat pe 1h,
+    # un script rulat fara SCAN_TIMEFRAME) ar vedea planurile live ca "geometrie veche" si le-ar
+    # muta in arhiva. Masurat: 26.175 de planuri v6-4h ajunsesera asa in arhiva. Familia live e
+    # cea a celui mai nou plan live; daca difera de a procesului, nu arhivez nimic.
+    live = [p for p in plans if p.get("source") != "backtest" and p.get("geometry")]
+    if live:
+        newest = max(live, key=lambda p: (p.get("created_ts") or 0, p.get("id") or 0))["geometry"]
+        if not newest.startswith(family):
+            print(f"[!] Arhivare oprita: procesul ruleaza pe familia {family[:-1]}, planurile live pe "
+                  f"{newest} - ar fi arhivat date active.")
+            return 0
     keep, by_geo = [], {}
     for p in plans:
         geo = p.get("geometry", "v1")

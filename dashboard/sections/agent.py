@@ -6,7 +6,7 @@
 from dashboard.components import compute_hit_rate_curve, render_line_chart_svg
 
 
-def render_agent_card(agent_state):
+def render_agent_card(agent_state, audit=None):
     if not agent_state or not agent_state.get("agent", {}).get("total"):
         return ('<p class="dim">Agentul nu s-a antrenat inca &mdash; ruleaza ai_agent.py '
                 'dupa prima scanare cu rezultate evaluate.</p>')
@@ -62,6 +62,24 @@ def render_agent_card(agent_state):
         bal_line += ('<br><span class="dim">excluse din model (nu exista la fel in backtest): '
                      + ", ".join(f'{k}{" (" + str(sk[k][0]) + "% live / " + str(sk[k][1]) + "% backtest)" if k in sk else ""}'
                                  for k in ex) + '</span>')
+    pend = agent_state.get("pending_features")
+    if pend is None:
+        pend = ["ev_analyst"] if "ev_analyst" in ((agent_state.get("model") or {}).get("weights") or {}) else []
+    if pend:
+        names = {"ev_analyst": "ev_analyst (verdictul Analistului Web3)"}
+        bal_line += ('<br><span class="dim">in asteptarea backtest-ului (afisate pe planuri, greutate 0 pana cand '
+                     'backtest-ul re-rulat le contine; apoi agentul se reantreneaza pe tot istoricul): '
+                     + ", ".join(names.get(k, k) for k in pend) + '</span>')
+
+    au = audit or {}
+    if au.get("when"):
+        rb = au.get("rebuild") or {}
+        bal_line += ('<br><span class="dim">audit memorie: ' + f'{au.get("checked", 0)} planuri verificate, '
+                     f'{len(au.get("removed") or [])} scoase pentru date false'
+                     + (f' &middot; BLOCAT: {au["blocked"]}' if au.get("blocked") else "")
+                     + (f' &middot; memorie reconstruita {rb.get("when")}: {rb.get("removed_total")} planuri vechi '
+                        f'scoase, {rb.get("backtest_new")} de backtest regenerate' if rb else "")
+                     + '</span>')
 
     return f'''
     <div class="agent-status agent-{status_cls}">
