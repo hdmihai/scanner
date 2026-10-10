@@ -1,0 +1,72 @@
+name: Memorie agent
+
+# DEPOZITUL DE MEMORIE AL AGENTULUI (memory_sync.py): istoricul complet in fisiere Parquet, in
+# release-urile acestui repo (gratuit, fara cheie noua - GITHUB_TOKEN; fisiere sub 2 GiB, cel mult
+# 1000 pe release, fara limita de marime totala). Git-ul pastreaza doar rezumatul
+# (data/memory_status.json), afisat pe dashboard in cardul "Depozit de memorie".
+#
+# Ruleaza la 6 ore: completarea initiala a istoricului (tot universul bursei, de la listare; arhiva
+# Binance, luna cu luna) se face in mai multe rulari, fiecare continuand de unde a ramas; dupa aceea,
+# o rulare doar adauga barele noi. De pe telefon: Actions -> Memorie agent -> Run workflow.
+on:
+  schedule:
+    - cron: "41 */6 * * *"
+  workflow_dispatch:
+    inputs:
+      budget:
+        description: "Buget de timp, minute (job-ul se opreste curat si continua la rularea urmatoare)"
+        required: true
+        default: "45"
+      datasets:
+        description: "Seturile de date: plans, candles, binance (separate prin virgula)"
+        required: true
+        default: "plans,candles,binance"
+
+permissions:
+  contents: write
+
+# Grup SEPARAT de scanare: depozitul nu scrie in plans.json si nici in starea agentului, deci nu are
+# de ce sa intarzie scanarea orara. Commit-ul lui atinge un singur fisier (data/memory_status.json).
+concurrency:
+  group: agent-memory
+  cancel-in-progress: false
+
+jobs:
+  memory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Descarca repo-ul
+        uses: actions/checkout@v4
+
+      - name: Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Instaleaza dependinte
+        run: pip install ccxt requests duckdb==1.2.2
+
+      - name: Sincronizeaza depozitul de memorie
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MEMORY_BUDGET_MIN: ${{ inputs.budget || '45' }}
+          MEMORY_DATASETS: ${{ inputs.datasets || 'plans,candles,binance' }}
+          MEMORY_CACHE_DIR: ${{ runner.temp }}/memory-cache
+        run: python memory_sync.py
+
+      - name: Salveaza rezumatul
+        if: always()
+        run: |
+          git config user.name "crypto-ai-scanner-bot"
+          git config user.email "actions@users.noreply.github.com"
+          python3 -c "import json; json.load(open('data/memory_status.json'))" || exit 0
+          git add data/memory_status.json
+          git diff --staged --quiet && exit 0
+          git commit -m "memorie agent $(date -u +'%Y-%m-%d %H:%M UTC')"
+          for i in 1 2 3 4 5; do
+            git pull --rebase -q origin "${GITHUB_REF_NAME}" && git push -q && exit 0
+            sleep $((i * 10))
+          done
+          echo "[!] push esuat dupa 5 incercari"; exit 1
