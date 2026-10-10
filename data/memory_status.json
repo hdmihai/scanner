@@ -1,0 +1,106 @@
+{
+ "datasets": {
+  "binance": {
+   "bytes": 0,
+   "coverage": {},
+   "max_ts": null,
+   "min_ts": null,
+   "partitions": 0,
+   "rows": 0
+  },
+  "candles": {
+   "bytes": 29769141,
+   "coverage": {
+    "okx:1d": {
+     "symbols": 407,
+     "with_data": 407
+    },
+    "okx:4h": {
+     "symbols": 126,
+     "with_data": 126
+    }
+   },
+   "max_ts": 1791648000000,
+   "min_ts": 1515628800000,
+   "partitions": 18,
+   "rows": 1386456
+  },
+  "plans": {
+   "bytes": 2493918,
+   "coverage": {},
+   "max_ts": 1791665536.0111794,
+   "min_ts": 1518537600.0,
+   "partitions": 10,
+   "rows": 21755
+  }
+ },
+ "history": [
+  {
+   "errors": 0,
+   "rows": {
+    "binance": 0,
+    "candles": 1386456,
+    "plans": 21755
+   },
+   "s": 2716.8,
+   "when": "2026-10-10 21:48 UTC"
+  }
+ ],
+ "last_run": {
+  "budget_min": 45.0,
+  "done": {
+   "binance": {
+    "skipped": "buget de timp epuizat"
+   },
+   "candles": {
+    "1d": {
+     "complete": 407,
+     "covered": 407,
+     "no_data": 0,
+     "rows_added": 378186,
+     "symbols_updated": 407,
+     "universe": 407
+    },
+    "4h": {
+     "complete": 125,
+     "covered": 126,
+     "no_data": 0,
+     "rows_added": 1008270,
+     "symbols_updated": 126,
+     "universe": 407
+    }
+   },
+   "plans": {
+    "partitions_written": 10,
+    "plans": 21755
+   }
+  },
+  "duration_s": 2716.8,
+  "errors": [],
+  "finished": "2026-10-10 21:48 UTC",
+  "started": "2026-10-10 21:03 UTC"
+ },
+ "probe": {
+  "binance_vision": {
+   "detail": "31 lumanari BTCUSDT 1d ianuarie 2024",
+   "ok": true,
+   "s": 0.7
+  },
+  "cpu": 4,
+  "disk_free_gb": 92.0,
+  "exchange": {
+   "id": "okx",
+   "ok": true,
+   "s": 2.5
+  },
+  "ram_gb": 16.4
+ },
+ "releases": {
+  "binance": "memory-binance",
+  "candles": "memory-candles",
+  "plans": "memory-plans"
+ },
+ "schema": 1,
+ "store": "github-releases",
+ "where": "hdmihai/scanner"
+}
