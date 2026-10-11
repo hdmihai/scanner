@@ -59,6 +59,19 @@ def save_json(path, data):
 
 # ========================= FAPTELE (doar numere reale) ======================
 
+def _universe_facts():
+    try:
+        with open(os.path.join("data", "memory_status.json")) as f:
+            u = (json.load(f) or {}).get("universe_backtest") or {}
+    except (OSError, ValueError):
+        return None
+    if (u.get("liquid") or {}).get("r") is None:
+        return None
+    e = u.get("edge") or {}
+    return {"symbols": u.get("symbols_liquid"), "liquid": u.get("liquid"), "rest": u.get("rest"),
+            "recent": e.get("recent"), "status": e.get("status"), "when": u.get("when"), "rules": u.get("rules")}
+
+
 def gather_facts():
     plans_store = load_json(PLANS_FILE, {})
     agent = load_json(AGENT_FILE, {})
@@ -127,12 +140,25 @@ def gather_facts():
         "divergence": summary.get("divergence"),
         "agent_live": agent.get("live"),
     }
+    # regulile de evaluare (core/plans.EVAL_RULES): un backtest evaluat cu reguli vechi nu e
+    # comparabil cu live-ul pana la regenerare - se spune explicit, langa cifre
+    try:
+        import plan_tracker as _pt
+        _rules = _pt.EVAL_RULES
+    except Exception:
+        _rules = None
+    _bt_old = [p for p in bt_closed if _rules is not None and p.get("er") != _rules]
     simulated = {
         "all": _stats(bt_closed),
         "since": (summary.get("backtest") or {}).get("since"),
         "edge_recent": (summary.get("edge") or {}).get("recent"),
         "edge_status": (summary.get("edge") or {}).get("status"),
         "rebuilt": plans_store.get("rebuilt"),
+        "rules": _rules,
+        "stale_rules": ({"n": len(_bt_old), "of": len(bt_closed), "old": _bt_old[0].get("er") or 1}
+                        if _bt_old else None),
+        # strategia pe tot universul bursei (depozitul de memorie, memory_sync.universe_backtest)
+        "universe": _universe_facts(),
     }
 
     return {
@@ -303,6 +329,12 @@ def sections(f):
 
     s_ = []
     bt = sim.get("all")
+    stale = sim.get("stale_rules") or {}
+    if bt and stale.get("n"):
+        s_.append(f"ATENTIE: {stale['n']} din {stale['of']} planuri simulate sunt evaluate cu regulile vechi "
+                  f"(v{stale['old']}), live-ul cu regulile curente (v{sim.get('rules')}) - cifrele simulate de mai "
+                  "jos sunt supraestimate si nu se compara cu live-ul pana la regenerarea backtest-ului "
+                  "(Actions -> Backtest, 4h, merge).")
     if bt:
         rb = sim.get("rebuilt") or {}
         s_.append(f"Backtest {sim.get('since') or ''}-azi" + (f" (regenerat {rb['when']})" if rb.get("when") else "")
@@ -317,6 +349,13 @@ def sections(f):
         if b and w and b["range"] != w["range"]:
             s_.append(f"Calibrare (dominata de backtest): cel mai bun interval de scor {b['range']} ({b['win_rate']}%, "
                       f"{b['avg_r']:+.2f}R), cel mai slab {w['range']} ({w['win_rate']}%, {w['avg_r']:+.2f}R).")
+        uv = sim.get("universe") or {}
+        if uv.get("liquid"):
+            lq, rc = uv["liquid"], uv.get("recent") or {}
+            s_.append(f"Pe tot universul bursei ({uv.get('symbols')} simboluri lichide, aceeasi strategie): "
+                      f"{lq['r']:+.3f}R/plan (IC95 {lq.get('ci_low', 0):+.3f}..{lq.get('ci_high', 0):+.3f}, n={lq['n']})"
+                      + (f"; ultimele 12 luni {rc['r']:+.3f}R/plan (IC95 {rc['ci_low']:+.3f}..{rc['ci_high']:+.3f})"
+                         if rc.get("r") is not None else "") + ".")
         s_.append("Rol: pre-antrenarea agentului, calibrarea si cercetarea regulilor - nu e rezultat pe piata reala.")
     else:
         s_.append("Niciun backtest integrat - agentul invata doar din planurile live.")

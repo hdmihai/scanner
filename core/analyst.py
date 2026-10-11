@@ -394,16 +394,10 @@ def _risk(m, beta, corr):
 
 
 def alpha_symbols(alt, details, sectors_top):
-    """Tickerele candidate, in ordinea prioritatii: tokenii scanati care bat BTC, candidatii de
-    crestere din piata, liderii sectoarelor cu momentum. Adaptorul aduce lumanarile zilnice."""
-    out = []
-    markets = (alt or {}).get("markets") or {}
-    ind = (alt or {}).get("indicators") or {}
-    for sym in details or {}:
-        base = sym.split("/")[0].upper()
-        m = markets.get(base) or {}
-        if (_rel(m.get("r30"), ind.get("btc_r30")) or -1) > 0 and (_rel(m.get("r7"), ind.get("btc_r7")) or -1) > 0:
-            out.append(base)
+    """Tickerele candidate, in ordinea prioritatii: tokenii scanati (au deja lumanari zilnice de pe
+    bursa - filtrul "bate BTC" se aplica in `alpha`, pe aceleasi cifre ca fisa tokenului), candidatii
+    de crestere din piata, liderii sectoarelor cu momentum. Adaptorul aduce lumanarile zilnice."""
+    out = [sym.split("/")[0].upper() for sym in details or {}]
     out += [c["symbol"].upper() for c in (alt or {}).get("candidates") or []]
     for s in sectors_top or []:
         out += [x["symbol"].upper() for x in s.get("leaders", [])[:2]]
@@ -437,8 +431,6 @@ def alpha(alt, details, daily, sectors_top, btc_daily):
             # candidatii de crestere au deja forta relativa fata de BTC (altseason.growth_candidates)
             rs7, rs30 = cand[base].get("rs7"), cand[base].get("rs30")
             m = {"name": cand[base].get("name"), "rank": cand[base].get("rank"), **m}
-        if rs7 is None or rs30 is None or rs7 <= 0 or rs30 <= 0:
-            continue
         sym, d = det_by_base.get(base, (None, None))
         candles = (daily or {}).get(base)
         other = False
@@ -447,6 +439,17 @@ def alpha(alt, details, daily, sectors_top, btc_daily):
             # R:R si beta ar fi calculate pe alta moneda, deci nu se folosesc
             candles, other = None, True
         price = (d or {}).get("price") or m.get("price") or (candles[-1][4] if candles else None)
+        # ACEEASI SURSA CA FISA TOKENULUI: cu lumanari zilnice de pe bursa, forta relativa se
+        # calculeaza din inchiderile zilnice (core/relative - aceeasi functie din care invata
+        # agentul). Inainte, filtrul si cifrele de aici veneau din CoinGecko (ferestre glisante pana
+        # acum), iar fisa aceluiasi token arata alte cifre (GRT: 7z +0.3% aici, -2.4% pe fisa).
+        src = "CoinGecko" if rs7 is not None else None
+        rv = _relative.from_candles(candles, btc_daily, price) if candles else None
+        if rv:
+            rs7, rs30, src = rv["rs7"], rv["rs30"], "bursă, închideri zilnice"
+            rs200 = _rs_candles(candles, btc_daily, 200) if len(candles) > 200 else rs200
+        if rs7 is None or rs30 is None or rs7 <= 0 or rs30 <= 0:
+            continue
         if d:
             z = ((d.get("zones") or {}).get("d1")) or {}
         else:
@@ -474,6 +477,7 @@ def alpha(alt, details, daily, sectors_top, btc_daily):
                      "has_daily": bool(candles) or bool(d),
                      "source": "listă scanată" if d else src_of.get(base, "piață"),
                      "rs7": round(rs7, 1), "rs30": round(rs30, 1), "rs200": round(rs200, 1) if rs200 is not None else None,
+                     "rs_source": src,
                      "price": price, "support": sup, "resistance": res, "atr_d": atr, "stop": stop, "target": target,
                      "rr": rr, "asymmetric": bool(rr is not None and rr >= ASYM_RR), "near_support": near,
                      "beta": beta, "corr": corr, "risk_info": rinfo, "signal": sig,

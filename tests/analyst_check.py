@@ -380,10 +380,56 @@ def check_tokens(fails):
         fails.append("tokeni: lista tokenilor sau legatura spre card lipseste din raport")
     cands = {"symbols": {"UPC/USDT": dict(det["UPC/USDT"], candles=daily["UPC"][-80:], score=70)}}
     page = render_token_details(cands, {}, None, {}, True, "OKX", analyst_tokens=toks)
-    if "Analist &middot; pașii 1–4" not in page or "analist Bullish" not in page:
+    if "Web3 Researcher &middot; pașii 1–4" not in page or "Web3 Researcher Bullish" not in page:
         fails.append("tokeni: pasii 1-4 lipsesc de pe cardul tokenului din pagina bursei")
     print(f"  5. tokeni: {len(toks)} rapoarte (UPC {up_t['strategy']['sentiment']}, DNC {dn_t['strategy']['sentiment']}, "
           f"BTC referinta), invalidare la baza suportului, verdicte verificate la 30 de zile, afisare pe card")
+
+
+def check_track(fails):
+    """Cat valoreaza verdictul (core/relative.track_record): pe tokeni cu MOMENTUM real (trendul de 30 de
+    zile continua) verdictul Bullish bate Bearish semnificativ; pe mers aleator diferenta nu e
+    semnificativa; tokenii nelichizi si cei exclusi nu intra; afisarea spune verdictul masurat."""
+    from core import relative as REL
+    from dashboard.sections.analyst import track_text
+    rnd = random.Random(11)
+    n = 700
+    btc, p = [], 30000.0
+    for i in range(n):
+        p *= math.exp(rnd.gauss(0.0003, 0.03))
+        btc.append(p)
+
+    def token(mom, vol=5e5):
+        px, out, drift = 10.0, [], 0.0
+        for i in range(n):
+            drift = 0.985 * drift + rnd.gauss(0, 0.0025) if mom else 0.0
+            px *= math.exp(drift + rnd.gauss(0, 0.04)) * (btc[i] / btc[i - 1] if i else 1.0)
+            out.append(px)
+        s = _series(out)
+        for c in s:
+            c[5] = vol
+        return s
+    b = _series(btc)
+    mom = {f"M{i}/USDT": token(True) for i in range(40)}
+    rw = {f"R{i}/USDT": token(False) for i in range(40)}
+    t_m = REL.track_record(mom, b, boot=400)
+    t_r = REL.track_record(rw, b, boot=400)
+    sm, sr = t_m["horizons"]["7"]["spread"], t_r["horizons"]["7"]["spread"]
+    if not sm["ci_low"] > 0:
+        fails.append(f"istoricul verdictului: pe tokeni cu momentum real diferenta Bullish-Bearish nu e pozitiva ({sm})")
+    if not (sr["ci_low"] <= 0 <= sr["ci_high"]):
+        fails.append(f"istoricul verdictului: pe mers aleator diferenta iese semnificativa ({sr}) - masurarea e partinitoare")
+    thin = {"T/USDT": token(True, vol=10.0)}
+    if REL.track_record(thin, b) is not None:
+        fails.append("istoricul verdictului: un token nelichid a intrat in masurare")
+    if REL.track_record(mom, b, exclude=set(mom)) is not None:
+        fails.append("istoricul verdictului: tokenii exclusi au intrat in masurare")
+    txt, txt_r = track_text(t_m), track_text(t_r)
+    if "semnificativ" not in txt or "fără diferență măsurabilă" not in txt_r or track_text(None):
+        fails.append(f"istoricul verdictului: textul nu urmeaza masurarea ({txt[:80]} / {txt_r[:80]})")
+    print(f"  6. istoricul verdictului: momentum real {sm['mean']:+.2f} pp (IC {sm['ci_low']:+.2f}..{sm['ci_high']:+.2f}), "
+          f"mers aleator {sr['mean']:+.2f} pp (IC {sr['ci_low']:+.2f}..{sr['ci_high']:+.2f}), filtre de lichiditate si "
+          "excludere OK")
 
 
 def main():
@@ -393,6 +439,7 @@ def main():
     rep = check_report(fails)
     check_render(fails, rep)
     check_tokens(fails)
+    check_track(fails)
     print("\nANALIST: " + ("RESPINS - " + "; ".join(fails) if fails else "TRECUT"))
     return 1 if fails else 0
 

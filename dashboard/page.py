@@ -82,7 +82,9 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
     _primary = (exchange_scans or {}).get("primary") or (exchanges_store or {}).get("used")
     _links = ({str(sym).split("/")[0].upper(): f"{page_href(_primary)}#{token_anchor(sym)}"
                for sym in ((details or {}).get("symbols") or {})} if _primary else {})
-    analyst_html = _safe("render_analyst", render_analyst, _an, _links)
+    # cat valoreaza verdictul pe token, masurat pe tot istoricul zilnic din depozitul de memorie
+    _track = (load_json(os.path.join(DATA_DIR, "memory_status.json"), None) or {}).get("verdict_track")
+    analyst_html = _safe("render_analyst", render_analyst, _an, _links, _track)
     _best_tok = ((_an or {}).get("tokens") or {}).get(str((best or {}).get("symbol") or "").split("/")[0].upper())
     main_steps_html = _safe("render_token_steps", render_token_steps, _best_tok)
     similar_html = _safe("render_similar_projects", render_similar_projects, 
@@ -118,8 +120,8 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
                         load_json(os.path.join(DATA_DIR, "runs.json"), None), _audit)
     _inv = ((_best_tok or {}).get("strategy") or {}).get("inv_price")
     if chart and _inv and chart.get("symbol") == (best or {}).get("symbol"):
-        # invalidarea analistului (pasul 4) pe graficul principal: doar daca incape, nu intinde axa
-        chart = dict(chart, marks=[{"price": _inv, "label": "INVALIDARE ANALIST", "kind": "invsoft"}])
+        # invalidarea Web3 Researcher (pasul 4) pe graficul principal: doar daca incape, nu intinde axa
+        chart = dict(chart, marks=[{"price": _inv, "label": "INVALIDARE WEB3 RESEARCHER", "kind": "invsoft"}])
     chart_svg = chart_render.render_components(chart, "main")
     weight_bars = _safe("render_weight_bars", render_weight_bars, weights)
     long_rows = _safe("render_opportunity_rows", render_opportunity_rows, scan.get("top_long", []))
@@ -144,14 +146,16 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
           <span><i class="dot" style="background:#089981"></i>TP</span>
           <span><i class="dot" style="background:#F23645"></i>SL / E INV</span>
           <span><i class="dot" style="background:#0288D1"></i>entry</span>
-          <span><i class="dot" style="background:#C62828"></i>invalidare analist</span>
+          <span><i class="dot" style="background:#C62828"></i>invalidare Web3 Researcher</span>
         </div>"""
     table_head = ('<table><tr><th>Symbol</th><th>Score</th><th title="formula, nu masuratoare">Prob*</th>'
                   '<th>Pers</th></tr>')
     top_cards = "\n\n  ".join([
         fold("Starea sistemului", health_html, _hw, anchor="stare"),
-        fold("Analist Web3 &middot; rotatia capitalului si risc (la fiecare scanare)", analyst_html,
-             _sum("analyst", SUM.analyst, _an), anchor="analist"),
+        # "#analist" (numele vechi al sectiunii) ramane valid: legaturile salvate deschid aceeasi sectiune
+        fold("Web3 Researcher &middot; rotatia capitalului si risc (la fiecare scanare)",
+             '<span id="analist"></span>' + analyst_html,
+             _sum("analyst", SUM.analyst, _an), anchor="web3-researcher"),
         fold("Altcoin season &middot; faza ciclului (date reale de piata)", altseason_html,
              _sum("altseason", SUM.altseason, _alt), anchor="altseason"),
         fold('Burse &middot; <span class="dim">cate un modul per bursa</span>', exchanges_html,
@@ -162,7 +166,7 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
     left_cards = "\n\n      ".join([
         fold(f"Grafic &middot; {_sym}", f"""{chart_svg}
         {legend}
-        <details class="cc an-main"><summary><span class="cc-title">Analist &middot; pașii 1–4 &middot; {_sym}</span></summary>
+        <details class="cc an-main"><summary><span class="cc-title">Web3 Researcher &middot; pașii 1–4 &middot; {_sym}</span></summary>
           <div class="cc-body">{main_steps_html}</div></details>""",
              _sum("chart", SUM.chart, best, deep, _best_tok), anchor="grafic"),
         fold("Indicatori &middot; VWAP, Volume Profile, SuperTrend, MACD", indicators_html,

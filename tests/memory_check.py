@@ -11,7 +11,9 @@ Uz (din radacina repo-ului): python -m tests.memory_check      (cere `duckdb`)
      multe rulari cu buget mic (fiecare continua de unde a ramas);
   4. BINANCE (arhiva simulata): luni noi adaugate, timpii in microsecunde normalizati, checksum gresit respins;
   5. RELEASE-URI GITHUB (server API simulat local): partitiile si indexul se urca, se inlocuiesc fara
-     fereastra de pierdere (nume temporar + redenumire), a doua rulare nu urca nimic.
+     fereastra de pierdere (nume temporar + redenumire), a doua rulare nu urca nimic;
+  6. MASURARILE DIN DEPOZIT: verdictul Web3 Researcher pe istoric; replay-ul rapid al strategiei da
+     exact planurile backtest-ului complet; strategia pe tot universul, o data pe zi.
 Nu scrie nimic in repo (data/memory_status.json se redirectioneaza intr-un dosar temporar).
 """
 
@@ -144,6 +146,34 @@ def check_candles(tmp):
     have = PQ.query(f"SELECT count(*) n FROM {{src}} WHERE symbol = '{sym}/USDT' AND ts % {ms} = 0",
                     [f for f in files if "__4h__" in f])[0]["n"]
     ok(have == want, f"{sym} 4h: {have} lumanari inchise in memorie, {want} pe bursa")
+    check_measures(store, sym)
+
+
+def check_measures(store, sym):
+    """Masurarile din depozit: verdictul Web3 Researcher pe istoric si strategia pe tot universul -
+    replay-ul rapid da EXACT planurile replay-ului complet al backtest-ului."""
+    import backtest as BT
+    tr = MS.verdict_track(store, "okx")
+    ok(isinstance(tr, dict) and (tr.get("horizons") or tr.get("skipped")),
+       "verdictul pe istoric: " + (f"{tr.get('tokens')} tokeni, {tr.get('obs')} zile-token" if tr.get("horizons")
+                                   else f"sarit ({tr.get('skipped')})"))
+    files = [store.local_path("candles", n) for n in store.names("candles") if "__4h__" in n]
+    rows = PQ.query(f"SELECT ts, open, high, low, close, volume FROM {{src}} WHERE symbol = '{sym}/USDT' ORDER BY ts", files)
+    c = [[r["ts"], r["open"], r["high"], r["low"], r["close"], r["volume"]] for r in rows]
+    w = {"trend": 1.0, "momentum": 1.0, "volatility": 1.0, "volume": 1.0}
+    full, _ = BT.replay_symbol(f"{sym}/USDT", c, w, 1)
+    fast = BT.replay_plans(f"{sym}/USDT", c, w)
+    key = lambda p: (p["direction"], round(p["created_ts"], 3), p["entry"], p["sl"], p["tp1"], p["tp2"],
+                     p["state"], p.get("realized_r"), p.get("closed_ts"))
+    ok(full and sorted(map(key, full)) == sorted(map(key, fast)),
+       f"replay rapid = replay complet pe {sym}: {len(fast)} din {len(full)} planuri identice")
+    status = {}
+    res = MS.universe_backtest(store, "okx", time.monotonic() + 3600, status)
+    u = status.get("universe_backtest") or {}
+    ok(res.get("symbols", 0) > 0 and u.get("plans", 0) > 0 and u.get("edge") is not None and u.get("rules") == BT.plan_tracker.EVAL_RULES,
+       f"strategia pe tot universul: {res}")
+    again = MS.universe_backtest(store, "okx", time.monotonic() + 3600, status)
+    ok(again.get("skipped") and "o data pe zi" in again["skipped"], "a doua rulare in aceeasi zi: sarita")
 
 
 def check_binance(tmp):

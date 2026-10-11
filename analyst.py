@@ -75,8 +75,11 @@ def update(exchange, alt_state, details, results, zone_stats, daily_cache):
         top = _core.sector_momentum((alt_state or {}).get("sectors"),
                                     (alt_state or {}).get("indicators")).get("top")
         fetched = 0
+        # tokenii scanati au lumanarile zilnice din scanare; cererile in plus (cel mult MAX_FETCH) sunt
+        # doar pentru candidatii din afara listei
+        scanned = {s.split("/")[0].upper() for s in (details or {})}
         for base in _core.alpha_symbols(alt_state, details, top):
-            if base in daily or exchange is None or fetched >= MAX_FETCH:
+            if base in daily or base in scanned or exchange is None or fetched >= MAX_FETCH:
                 continue
             fetched += 1
             c = _daily(exchange, base)

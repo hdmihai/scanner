@@ -254,7 +254,7 @@ def fold(title, body, summary=(), anchor=None, cls=""):
 
 
 # Bara "deschide / inchide tot" si scriptul care deschide sectiunile pliate cand o legatura
-# duce in interiorul lor (ex. #analist, cardul unui token de pe pagina bursei).
+# duce in interiorul lor (ex. #web3-researcher, cardul unui token de pe pagina bursei).
 FOLD_TOOLS = ('<div class="fold-tools"><button type="button" data-fold="open">Deschide tot</button>'
               '<button type="button" data-fold="close">Închide tot</button></div>')
 

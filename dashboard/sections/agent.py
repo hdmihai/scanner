@@ -66,7 +66,7 @@ def render_agent_card(agent_state, audit=None):
     if pend is None:
         pend = ["ev_analyst"] if "ev_analyst" in ((agent_state.get("model") or {}).get("weights") or {}) else []
     if pend:
-        names = {"ev_analyst": "ev_analyst (verdictul Analistului Web3)"}
+        names = {"ev_analyst": "ev_analyst (verdictul Web3 Researcher)"}
         bal_line += ('<br><span class="dim">in asteptarea backtest-ului (afisate pe planuri, greutate 0 pana cand '
                      'backtest-ul re-rulat le contine; apoi agentul se reantreneaza pe tot istoricul): '
                      + ", ".join(names.get(k, k) for k in pend) + '</span>')

@@ -296,6 +296,103 @@ def _analyze_safe(adapter, handle, card, ctx):
                 "truncated": False, "history_entry": None, "log": [], "duration_s": 0.0}
 
 
+def _closed_only(candles, bar_seconds, now):
+    """Doar barele INCHISE (deschidere + durata <= acum): o bara in formare are inchiderea si
+    extremele inca nefinale."""
+    return [c for c in candles or [] if c[0] / 1000.0 + bar_seconds <= now + 1]
+
+
+def _first_bar(p, closed, exchange, now):
+    """Stabileste bara partiala de creare a planului live (core/plans, regula F). True = planul se
+    poate evalua acum; False = lumanarile de 5 minute lipsesc deocamdata (se reincearca la
+    scanarea urmatoare, ca rezultatul sa nu depinda de o cerere esuata)."""
+    if not plan_tracker.first_bar_due(p, closed):
+        return True
+    try:
+        sub = exchange.fetch_ohlcv(p["symbol"], timeframe=plan_tracker.FIRST_BAR_TF,
+                                   since=int(p["created_ts"] * 1000), limit=60)
+        p["first_bar"] = plan_tracker.partial_first_bar(p, sub)
+        return True
+    except Exception as e:
+        _a, end = plan_tracker.creation_bar(p)
+        p["first_bar_tries"] = int(p.get("first_bar_tries") or 0) + 1
+        # renunt doar dupa mai multe scanari esuate SI dupa o zi: o cerere picata o data (limita de
+        # cereri, o problema de retea) nu are voie sa schimbe felul in care e evaluat planul
+        if (p["first_bar_tries"] < plan_tracker.FIRST_BAR_MAX_TRIES
+                or now - end < plan_tracker.FIRST_BAR_GIVE_UP_HOURS * 3600):
+            print(f"  [!] plan #{p['id']} {p['symbol']}: bara partiala de creare indisponibila ({str(e)[:80]}) - "
+                  f"reincerc la scanarea urmatoare (incercarea {p['first_bar_tries']})")
+            return False
+        p["first_bar"] = None
+        p["first_bar_note"] = (f"lumanarile de 5 minute indisponibile dupa {p['first_bar_tries']} incercari - "
+                               "evaluat fara restul barei de creare")
+        return True
+
+
+def evaluate_live_plans(plan_store, exchange, ohlcv_cache, now):
+    """Evalueaza planurile live deschise pe barele inchise. Un plan evaluat cu alte reguli decat
+    cele curente (core/plans.EVAL_RULES) - deschis sau inchis - se reevalueaza o data de la creare,
+    cu aceleasi reguli ca backtest-ul; rezultatul vechi ramane pe plan (`er_prev`), iar agentul se
+    reantreneaza daca invatase din el. Intoarce planurile inchise ACUM (nu si cele reevaluate care
+    erau deja inchise)."""
+    closed_now, changed_learned, migrated = [], [], []
+    bar_s = timeframe_seconds()
+    for p in plan_store["plans"]:
+        if p.get("source") == "backtest":
+            continue
+        stale = plan_tracker.needs_reevaluation(p)
+        was_closed = p["state"] in plan_tracker.CLOSED_STATES
+        if was_closed and not stale:
+            continue
+        candles = ohlcv_cache.get(p["symbol"])
+        if not candles:
+            # Planul e "orfan": simbolul a iesit din top-200 sau din universul
+            # scanat. Fara asta ar ramane OPEN la nesfarsit si nu s-ar invata
+            # niciodata din el. Descarc explicit - sunt putine cazuri.
+            try:
+                candles = exchange.fetch_ohlcv(p["symbol"], timeframe=CONFIG["timeframe"],
+                                               limit=CONFIG["candles"])
+                # aceeasi regula ca la scanare: fara bara in formare
+                candles = _closed_only(candles, p.get("bar_seconds") or bar_s, now)
+                ohlcv_cache[p["symbol"]] = candles
+                print(f"  (plan #{p['id']} {p['symbol']}: lumanari descarcate separat)")
+            except Exception as e:
+                print(f"  [!] plan #{p['id']} {p['symbol']}: {e}")
+                continue
+        if stale and was_closed and candles and candles[0][0] / 1000.0 > p["created_ts"]:
+            # lumanarile nu mai acopera crearea planului: nu se poate reevalua corect - ramane cu
+            # rezultatul masurat atunci, marcat ca atare (auditul nu il reevalueaza)
+            p["er_note"] = "prea vechi pentru reevaluare: lumanarile nu mai acopera crearea"
+            continue
+        if not _first_bar(p, candles, exchange, now):
+            continue
+        old = plan_tracker.reset_outcome(p) if stale else None
+        if plan_tracker.evaluate_plan(p, plan_tracker.with_first_bar(p, candles)) or stale:
+            if p["state"] in plan_tracker.CLOSED_STATES and not was_closed:
+                closed_now.append(p)
+        if stale:
+            p["er"] = plan_tracker.EVAL_RULES
+            same = (old["state"] == p["state"] and (old.get("realized_r") is None) == (p.get("realized_r") is None)
+                    and abs((old.get("realized_r") or 0) - (p.get("realized_r") or 0)) < 0.002)
+            if not same:
+                p["er_prev"] = old
+                migrated.append(p)
+                if p.get("agent_trained"):
+                    changed_learned.append(p)
+    if migrated:
+        print(f"  Reevaluate cu regulile de evaluare v{plan_tracker.EVAL_RULES}: {len(migrated)} planuri live "
+              "si-au schimbat rezultatul:")
+        for p in migrated[:20]:
+            o = p["er_prev"]
+            print(f"    #{p['id']} {p['symbol']} {p['direction']}: {o['state']} {o.get('realized_r')}R -> "
+                  f"{p['state']} {p.get('realized_r')}R")
+    if changed_learned:
+        # agentul invatase rezultatul vechi: se reantreneaza de la zero (ai_agent.main)
+        plan_store["retrain_reason"] = (f"{len(changed_learned)} planuri live reevaluate cu regulile "
+                                        f"v{plan_tracker.EVAL_RULES} si-au schimbat rezultatul")
+    return closed_now
+
+
 def run_exchange_modules(exchange_cards, exchange_handles, primary_id, ctx):
     """Analiza completa pe fiecare bursa secundara conectata, IN PARALEL (fiecare cu
     bugetul ei, pe conexiunea deja deschisa la sondare), apoi datele fiecarui modul
@@ -608,7 +705,7 @@ def main():
     try:
         ANALYST(exchange, alt_state, details, results, zone_stats, daily_cache)
     except Exception as _e:
-        print(f"[!] analist: {_e}")
+        print(f"[!] Web3 Researcher: {_e}")
 
     # SCANARE PER BURSA, doar pentru afisare. Bursa activa refoloseste datele
     # deja descarcate, deci nu costa nimic in plus; celelalte se scaneaza in
@@ -770,26 +867,9 @@ def main():
             "zone_stats": zone_stats,
         })
 
-    # 1) evaluez planurile deschise pe lumanarile proaspete
-    closed_now = []
-    for p in plan_store["plans"]:
-        if p["state"] in plan_tracker.CLOSED_STATES:
-            continue
-        candles = ohlcv_cache.get(p["symbol"])
-        if not candles:
-            # Planul e "orfan": simbolul a iesit din top-200 sau din universul
-            # scanat. Fara asta ar ramane OPEN la nesfarsit si nu s-ar invata
-            # niciodata din el. Descarc explicit - sunt putine cazuri.
-            try:
-                candles = exchange.fetch_ohlcv(
-                    p["symbol"], timeframe=CONFIG["timeframe"], limit=CONFIG["candles"])
-                ohlcv_cache[p["symbol"]] = candles
-                print(f"  (plan orfan #{p['id']} {p['symbol']}: descarcat separat)")
-            except Exception as e:
-                print(f"  [!] plan orfan #{p['id']} {p['symbol']}: {e}")
-                continue
-        if plan_tracker.evaluate_plan(p, candles) and p["state"] in plan_tracker.CLOSED_STATES:
-            closed_now.append(p)
+    # 1) evaluez planurile deschise pe lumanarile proaspete (si reevaluez o data planurile live
+    # evaluate cu reguli vechi - core/plans.EVAL_RULES)
+    closed_now = evaluate_live_plans(plan_store, exchange, ohlcv_cache, time.time())
 
     # 2) recalibrez ACUM, dupa evaluare - deciziile de mai jos trebuie sa
     # foloseasca si rezultatele inchise chiar in aceasta rulare, nu date vechi

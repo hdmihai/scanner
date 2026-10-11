@@ -18,12 +18,30 @@ def find_swing_points(highs, lows, lookback=5):
     return swing_highs, swing_lows
 
 
-def compute_structure_levels(highs, lows, n_levels=3):
-    """Niveluri simple de suport/rezistenta, din cele mai recente puncte de swing (echivalentul S1-S3 / R1-R3 din poza ta)."""
-    swing_highs, swing_lows = find_swing_points(highs, lows)
+def swing_indices(highs, lows, lookback=5):
+    """Indicii punctelor de swing pe toata seria - aceeasi definitie ca find_swing_points. Un swing la
+    indicele j e confirmat abia la bara j + lookback (are nevoie de barele de dupa el): la bara i
+    conteaza doar cei cu j <= i - lookback, exact ce vede find_swing_points pe barele 0..i."""
+    sh, sl = [], []
+    for i in range(lookback, len(highs) - lookback):
+        if highs[i] == max(highs[i - lookback:i + lookback + 1]):
+            sh.append(i)
+        if lows[i] == min(lows[i - lookback:i + lookback + 1]):
+            sl.append(i)
+    return sh, sl
+
+
+def levels_from_swings(swing_highs, swing_lows, n_levels=3):
+    """S1-S3 / R1-R3 din valorile celor mai recente puncte de swing (ultimele 12)."""
     resistance = sorted(set(round_price(h) for h in swing_highs[-12:]), reverse=True)[:n_levels]
     support = sorted(set(round_price(l) for l in swing_lows[-12:]), reverse=True)[-n_levels:]
     return {"resistance": resistance, "support": support}
+
+
+def compute_structure_levels(highs, lows, n_levels=3):
+    """Niveluri simple de suport/rezistenta, din cele mai recente puncte de swing (echivalentul S1-S3 / R1-R3 din poza ta)."""
+    swing_highs, swing_lows = find_swing_points(highs, lows)
+    return levels_from_swings(swing_highs, swing_lows, n_levels)
 
 
 def compute_fibonacci(highs, lows, lookback=100):

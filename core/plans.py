@@ -29,13 +29,16 @@ REGULI EXPLICITE (ca sa nu-mi umflu rezultatele)
 1. AMBIGUITATE IN ACEEASI BARA: daca o bara atinge si SL si TP, presupun ca
    SL a venit primul. Fara date de tick nu pot sti ordinea, deci aleg mereu
    varianta defavorabila mie. Altfel as raporta rezultate mai bune decat
-   realitatea.
+   realitatea. Regula se aplica la fel oricarei ambiguitati (tinta pe bara
+   intrarii, TP1 si intoarcerea la intrare in aceeasi bara) - vezi regulile
+   de evaluare (EVAL_RULES) de la `evaluate_plan`.
 2. MODEL DE POZITIE: 50% din pozitie se inchide la TP1, restul merge la TP2,
    iar SL-ul se muta la breakeven dupa TP1. E o regula standard, si e
    declarata explicit ca sa fie reproductibila.
 3. EXPIRARE: dupa MAX_BARS fara sa atinga nimic, planul se inchide la pretul
    curent (mark-to-market), nu se sterge. Un plan care nu a mers nicaieri e
-   tot un rezultat din care se invata.
+   tot un rezultat din care se invata. Barele se numara pe grila timpului,
+   identic in live si in backtest.
 
 CE FACE IN PLUS FATA DE POZE
 ----------------------------
@@ -74,7 +77,7 @@ def auto_mitigations():
         return {}
 
 
-MAX_BARS = 48          # cate lumanari las un plan deschis (48 = 2 zile pe 1h)
+MAX_BARS = 48          # cate bare las un plan deschis de la intrare (48 = 8 zile pe 4h, 2 zile pe 1h)
 MIN_BUCKET_SAMPLES = 20  # sub atat, nu pronunt o probabilitate calibrata
 
 
@@ -444,6 +447,9 @@ def create_plan(store, signal, plan_levels, decision):
         # (core/plan_audit) si reconstructia unei epoci de date recunosc dupa ea planurile
         # create de versiuni anterioare ale agentului
         "fv": FEATURE_VERSION,
+        # versiunea regulilor de evaluare (EVAL_RULES) - un plan evaluat cu reguli vechi se
+        # reevalueaza de la creare (scanarea), nu se amesteca in statistici cu cele noi
+        "er": EVAL_RULES,
         "bar_seconds": signal.get("bar_seconds", DEFAULT_BAR_SECONDS),
     }
     store["plans"].append(plan)
@@ -452,6 +458,40 @@ def create_plan(store, signal, plan_levels, decision):
 
 
 # ======================= EVALUARE BARA CU BARA ==============================
+#
+# REGULILE DE EVALUARE - versiunea EVAL_RULES, salvata pe fiecare plan ("er"). Aceleasi pentru
+# live si backtest. O bara arata doar deschiderea, maximul, minimul si inchiderea, nu si ORDINEA
+# in care s-au atins; orice ambiguitate se rezolva IMPOTRIVA planului (regula 1 din antet,
+# extinsa consecvent), ca rezultatul sa fie o margine de jos, nu o promisiune:
+#   A. SL si o tinta in aceeasi bara -> SL.
+#   B. Bara intrarii: o tinta atinsa in aceeasi bara cu umplerea NU se numara - maximul (minimul
+#      la SHORT) putea veni INAINTE de umplere. Exceptie: bara care deschide deja dincolo de
+#      intrare (umplere la deschidere, deci tot ce urmeaza in bara e dupa ea).
+#   C. Prima bara cu TP1 care atinge si intrarea -> a doua jumatate iese la breakeven in aceeasi
+#      bara (intoarcerea la intrare putea veni DUPA TP1).
+#   D. TP2 fara TP1 inregistrat: TP1 e intre intrare si TP2, deci s-a atins in aceeasi bara -
+#      jumatate la TP1, jumatate la TP2. Inainte se platea toata pozitia la TP2.
+#   E. Timpul se masoara pe GRILA barelor, nu numarand lumanarile primite intr-un apel:
+#      asteptarea intrarii (MAX_WAIT_BARS) incepe cu bara in care s-a creat planul, durata maxima
+#      (MAX_BARS) cu bara intrarii. Rezultatul e identic cand backtest-ul trimite cate o bara si
+#      cand scanarea trimite toate barele. Inainte, backtest-ul nu expira niciodata un plan
+#      (masurat: 1.013 planuri tinute peste 48 de bare, unul 3.452), iar live-ul le expira.
+#   F. Planul live se creeaza in mijlocul barei (scanarea ruleaza la ~40 de minute dupa inchiderea
+#      ei, cu planul calculat pe barele inchise). Restul barei de creare se evalueaza dintr-o bara
+#      PARTIALA, construita din lumanarile de 5 minute de dupa creare (plan["first_bar"], pusa de
+#      scanare cand bara s-a inchis). Inainte se sarea toata bara: live-ul masura alta strategie
+#      decat backtest-ul (masurat pe 16.406 planuri: -0.047R/plan cu prima bara sarita, fata de
+#      +0.059R cu ea).
+# Backtest-ul creeaza planul la INCHIDEREA barei de semnal (inainte: la deschiderea ei, cu 4 ore
+# prea devreme), deci bara lui de creare e chiar prima bara evaluata, intreaga.
+EVAL_RULES = 2
+FIRST_BAR_TF = "5m"            # lumanarile din care se construieste bara partiala de creare (live)
+FIRST_BAR_SECONDS = 300
+FIRST_BAR_GIVE_UP_HOURS = 24   # dupa atat timp fara lumanari de 5 minute ...
+FIRST_BAR_MAX_TRIES = 6        # ... si dupa atatea scanari esuate: evaluare fara bara partiala
+OUTCOME_FIELDS = ("state", "state_detail", "realized_r", "gross_r", "closed_ts", "entered_ts",
+                  "tp1_hit_ts", "bars_checked")
+
 
 def cost_in_r(entry, sl):
     """Costul tranzactiei exprimat in R. Zero daca nu s-a intrat in piata."""
@@ -470,9 +510,84 @@ def _r_at(price, entry, sl, direction):
     return move / risk
 
 
+def _grid(ts, bar_seconds):
+    """Deschiderea barei (pe grila timeframe-ului, UTC) care contine momentul `ts`."""
+    return math.floor(ts / bar_seconds + 1e-9) * bar_seconds
+
+
+def creation_bar(plan):
+    """(deschidere, inchidere) ale barei in care s-a creat planul."""
+    bar_s = plan.get("bar_seconds") or DEFAULT_BAR_SECONDS
+    a = _grid(plan["created_ts"], bar_s)
+    return a, a + bar_s
+
+
+def first_bar_due(plan, closed_candles):
+    """True cand planul live are nevoie acum de bara partiala de creare: creat in mijlocul barei,
+    bara s-a inchis (`closed_candles` = doar bare inchise) si bara partiala nu e inca stabilita."""
+    if plan.get("source") == "backtest" or "first_bar" in plan:
+        return False
+    a, _b = creation_bar(plan)
+    if plan["created_ts"] <= a + 1e-6:
+        return False
+    return bool(closed_candles) and closed_candles[-1][0] / 1000.0 >= a
+
+
+def partial_first_bar(plan, sub_candles, sub_seconds=FIRST_BAR_SECONDS):
+    """Bara partiala [creare, inchiderea barei de creare), din lumanarile mai mici incepute dupa
+    creare si incheiate in bara. [] = niciuna in interval (creat in ultimele minute ale barei)."""
+    a, b = creation_bar(plan)
+    lo_ms, hi_ms = plan["created_ts"] * 1000.0, b * 1000.0
+    rows = []
+    for c in sub_candles or []:
+        try:
+            ts, o, h, l, cl = float(c[0]), float(c[1]), float(c[2]), float(c[3]), float(c[4])
+        except (TypeError, ValueError, IndexError):
+            continue
+        if ts >= lo_ms and ts + sub_seconds * 1000 <= hi_ms and min(o, h, l, cl) > 0 and h >= l:
+            rows.append((ts, o, h, l, cl, float(c[5] or 0) if len(c) > 5 else 0.0))
+    if not rows:
+        return []
+    rows.sort()
+    return [int(math.ceil(plan["created_ts"] * 1000)), rows[0][1], max(r[2] for r in rows),
+            min(r[3] for r in rows), rows[-1][4], round(sum(r[5] for r in rows), 8)]
+
+
+def with_first_bar(plan, candles):
+    """Lumanarile pe care se evalueaza planul: bara partiala de creare (daca exista) + barele."""
+    fb = plan.get("first_bar")
+    return ([fb] if fb else []) + list(candles or [])
+
+
+def needs_reevaluation(plan):
+    """Plan live evaluat cu alte reguli decat cele curente (inclusiv cele dinaintea versionarii)."""
+    return plan.get("source") != "backtest" and plan.get("er") != EVAL_RULES
+
+
+def reset_outcome(plan):
+    """Sterge rezultatul evaluarii (planul redevine PENDING, ca la creare) si intoarce rezultatul
+    vechi, pentru jurnal. Nivelurile, decizia si caracteristicile raman neatinse."""
+    old = {k: plan.get(k) for k in ("state", "realized_r", "closed_ts", "entered_ts", "tp1_hit_ts")}
+    old["er"] = plan.get("er", 1)
+    for k in OUTCOME_FIELDS:
+        plan.pop(k, None)
+    plan.update({"state": STATE_PENDING, "state_detail": "ASTEAPTA PULLBACK la zona de intrare",
+                 "realized_r": None, "closed_ts": None, "bars_checked": 0})
+    return old
+
+
+def _close(plan, state, detail, r, bar_ts, entry, sl):
+    plan["state"] = state
+    plan["state_detail"] = detail
+    plan["gross_r"] = round(r, 3)
+    plan["realized_r"] = round(r - cost_in_r(entry, sl), 3)
+    plan["closed_ts"] = bar_ts
+
+
 def evaluate_plan(plan, candles):
-    """Parcurge lumanarile de dupa crearea planului si determina ce s-a atins
-    PRIMUL. `candles` = [[ts, open, high, low, close, volume], ...].
+    """Parcurge lumanarile de dupa crearea planului si determina ce s-a atins PRIMUL, dupa regulile
+    de mai sus. `candles` = [[ts, open, high, low, close, volume], ...] (pentru live: cu bara
+    partiala de creare in fata, vezi `with_first_bar`).
 
     Returneaza True daca starea planului s-a schimbat."""
     if plan["state"] in CLOSED_STATES:
@@ -484,70 +599,59 @@ def evaluate_plan(plan, candles):
     risk = abs(entry - sl)
     if risk <= 0:
         return False
+    bar_s = plan.get("bar_seconds") or DEFAULT_BAR_SECONDS
+    created = plan["created_ts"]
 
-    relevant = [c for c in candles if c[0] / 1000.0 >= plan["created_ts"]]
+    relevant = [c for c in candles if c[0] / 1000.0 >= created]
     if not relevant:
         return False
 
-    # FAZA 1: planul asteapta ca pretul sa revina la zona de intrare
+    # FAZA 1: planul asteapta ca pretul sa revina la zona de intrare. Asteptarea se masoara pe
+    # grila barelor (regula E), deci e aceeasi in backtest (o bara pe apel) si live (toate barele).
     if plan["state"] == STATE_PENDING:
-        # BUG FIX: asteptarea se masoara in TIMP, nu numarand barele primite in
-        # apelul curent. Scanarea live trimite toate lumanarile de la creare, deci
-        # numaratoarea iesea corecta; backtest-ul trimite cate UNA, deci contorul
-        # ramanea mereu 1 si NO_ENTRY nu se declansa niciodata - backtest-ul nu
-        # modela deloc expirarea pullback-ului. Criteriul de timp e identic in
-        # ambele moduri si e si idempotent la reevaluari suprapuse.
-        bar_seconds = plan.get("bar_seconds") or DEFAULT_BAR_SECONDS
-        deadline = plan["created_ts"] + MAX_WAIT_BARS * bar_seconds
+        start = _grid(created, bar_s)
+        deadline = start + MAX_WAIT_BARS * bar_s
         waited = 0
         for c in relevant:
-            waited += 1
             bar_ts, high, low = c[0] / 1000.0, c[2], c[3]
+            waited = int(round((_grid(bar_ts, bar_s) - start) / bar_s)) + 1
             touched = (low <= entry) if is_long else (high >= entry)
             if touched:
                 plan["state"] = STATE_OPEN
                 plan["state_detail"] = "INTRARE ATINSA - pozitie activa"
                 plan["entered_ts"] = bar_ts
                 break
-            if bar_ts >= deadline:
+            if _grid(bar_ts, bar_s) + bar_s >= deadline:
                 plan["state"] = STATE_NO_ENTRY
                 plan["state_detail"] = f"PRETUL NU A REVENIT in {MAX_WAIT_BARS} bare - anulat"
                 plan["realized_r"] = 0.0   # niciun trade: nicio pierdere si niciun cost
                 plan["gross_r"] = 0.0
                 plan["closed_ts"] = bar_ts
+                plan["bars_checked"] = waited
                 return True
         if plan["state"] == STATE_PENDING:
             plan["bars_checked"] = waited
             return False
 
-    # BUG FIX (idempotenta, gasit la testul de 2000 de variante):
-    # faza de tranzactie incepe de la INTRARE, nu de la creare. Filtrul asta
-    # trebuie sa se aplice SI cand planul e deja OPEN dintr-o evaluare
-    # anterioara - atunci blocul PENDING de mai sus e sarit complet. Fara el,
-    # reevaluarea verifica SL si TP pe barele de DINAINTE de intrare: la un
-    # LONG care mai intai a urcat la TP1 si abia apoi a coborat la zona de
-    # intrare, a doua trecere inregistra fals TP1, apoi iesirea la breakeven.
+    # Faza de tranzactie incepe de la INTRARE, nu de la creare - si cand planul e deja OPEN dintr-o
+    # evaluare anterioara (reevaluarea nu are voie sa verifice SL/TP pe barele de dinainte).
     if plan.get("entered_ts"):
         relevant = [c for c in relevant if c[0] / 1000.0 >= plan["entered_ts"]]
     if not relevant:
         return plan["state"] != STATE_PENDING
 
-    # BUG FIX (idempotenta): retin MOMENTUL cand s-a atins TP1, nu doar un
-    # boolean. Fara asta, la reevaluarea planului - se intampla la FIECARE
-    # scanare, pe aceleasi lumanari - SL-ul mutat la breakeven se aplica
-    # RETROACTIV si barelor de dinainte de TP1. Cum entry-ul e langa pretul
-    # curent, aproape orice plan coboara sub entry la un moment dat inainte de
-    # TP1, deci toti castigatorii s-ar fi inchis fals la +0.5R in loc sa ruleze
-    # spre TP2 - si toate datele de invatare ar fi fost falsificate in jos.
+    entered = plan["entered_ts"]
+    entry_bar = _grid(entered, bar_s)
+    # Momentul atingerii TP1 se retine (nu doar un boolean): breakeven-ul se aplica doar barelor de
+    # DUPA el, si la reevaluare (fiecare scanare), nu retroactiv.
     tp1_ts = plan.get("tp1_hit_ts")
     changed = False
     bars = 0
 
     for c in relevant:
-        bars += 1
-        bar_ts, high, low, close = c[0] / 1000.0, c[2], c[3], c[4]
+        bar_ts, opn, high, low, close = c[0] / 1000.0, c[1], c[2], c[3], c[4]
+        bars = int(round((_grid(bar_ts, bar_s) - entry_bar) / bar_s)) + 1
 
-        # breakeven-ul se aplica DOAR barelor de dupa cea in care s-a atins TP1
         after_tp1 = tp1_ts is not None and bar_ts > tp1_ts
         active_sl = entry if after_tp1 else sl
 
@@ -555,37 +659,45 @@ def evaluate_plan(plan, candles):
             sl_touched = low <= active_sl
             tp1_touched = high >= tp1
             tp2_touched = high >= tp2
+            at_entry = low <= entry
         else:
             sl_touched = high >= active_sl
             tp1_touched = low <= tp1
             tp2_touched = low <= tp2
+            at_entry = high >= entry
 
-        # REGULA 1: ambiguitate in aceeasi bara -> presupun SL primul
+        # REGULA B: pe bara intrarii, tintele nu se numara (decat la umplerea la deschidere)
+        if abs(bar_ts - entered) < 1e-6 and not ((opn <= entry) if is_long else (opn >= entry)):
+            tp1_touched = tp2_touched = False
+
+        # REGULA A: SL si tinta in aceeasi bara -> SL primul
         if sl_touched:
             if after_tp1:
                 # jumatate luata la TP1, restul iesit la breakeven
-                r = TP1_FRACTION * _r_at(tp1, entry, sl, direction)
-                plan["state_detail"] = "TP1 HIT - SL LA BREAKEVEN"
+                _close(plan, STATE_SL, "TP1 HIT - SL LA BREAKEVEN",
+                       TP1_FRACTION * _r_at(tp1, entry, sl, direction), bar_ts, entry, sl)
             else:
-                r = -1.0
-                plan["state_detail"] = "SL HIT - INVALIDATED"
-            plan["state"] = STATE_SL
-            plan["gross_r"] = round(r, 3)
-            plan["realized_r"] = round(r - cost_in_r(entry, sl), 3)
-            plan["closed_ts"] = bar_ts
+                _close(plan, STATE_SL, "SL HIT - INVALIDATED", -1.0, bar_ts, entry, sl)
+            changed = True
+            break
+
+        r_tp1 = _r_at(tp1, entry, sl, direction)
+        # REGULA C: prima bara cu TP1 care atinge si intrarea -> breakeven in aceeasi bara
+        if tp1_touched and tp1_ts is None and at_entry:
+            tp1_ts = bar_ts
+            plan["tp1_hit_ts"] = bar_ts
+            _close(plan, STATE_SL, "TP1 HIT - SL LA BREAKEVEN (aceeasi bara)",
+                   TP1_FRACTION * r_tp1, bar_ts, entry, sl)
             changed = True
             break
 
         if tp2_touched:
-            r_tp1 = _r_at(tp1, entry, sl, direction)
-            r_tp2 = _r_at(tp2, entry, sl, direction)
-            r = (TP1_FRACTION * r_tp1 + (1 - TP1_FRACTION) * r_tp2
-                 if tp1_ts is not None else r_tp2)
-            plan["state"] = STATE_TP2
-            plan["state_detail"] = "TP2 HIT - CLOSED"
-            plan["gross_r"] = round(r, 3)
-            plan["realized_r"] = round(r - cost_in_r(entry, sl), 3)
-            plan["closed_ts"] = bar_ts
+            # REGULA D: TP2 trece prin TP1 - jumatate la TP1, jumatate la TP2
+            if tp1_ts is None:
+                tp1_ts = bar_ts
+                plan["tp1_hit_ts"] = bar_ts
+            r = TP1_FRACTION * r_tp1 + (1 - TP1_FRACTION) * _r_at(tp2, entry, sl, direction)
+            _close(plan, STATE_TP2, "TP2 HIT - CLOSED", r, bar_ts, entry, sl)
             changed = True
             break
 
@@ -596,15 +708,12 @@ def evaluate_plan(plan, candles):
             plan["state_detail"] = "TP1 HIT - RULEAZA SPRE TP2"
             changed = True
 
+        # REGULA E: durata maxima pe grila, de la bara intrarii
         if bars >= MAX_BARS:
             r = _r_at(close, entry, sl, direction)
             if tp1_ts is not None:
-                r = TP1_FRACTION * _r_at(tp1, entry, sl, direction) + (1 - TP1_FRACTION) * r
-            plan["state"] = STATE_EXPIRED
-            plan["state_detail"] = f"EXPIRAT dupa {bars} bare"
-            plan["gross_r"] = round(r, 3)
-            plan["realized_r"] = round(r - cost_in_r(entry, sl), 3)
-            plan["closed_ts"] = bar_ts
+                r = TP1_FRACTION * r_tp1 + (1 - TP1_FRACTION) * r
+            _close(plan, STATE_EXPIRED, f"EXPIRAT dupa {bars} bare", r, bar_ts, entry, sl)
             changed = True
             break
 
@@ -872,11 +981,54 @@ def decide(calibration, signal, agent_pred=None, bucket_size=20):
 
 # ============================== RAPORTARE ===================================
 
+DAY_S = 86400
+WEEK_S = 7 * DAY_S
+
+
+def block_size(ts_list):
+    """Blocul de timp pentru bootstrap: saptamana cand datele acopera cel putin o jumatate de an
+    (destule blocuri), altfel ziua (live-ul are doar cateva saptamani)."""
+    if not ts_list:
+        return DAY_S
+    return WEEK_S if (max(ts_list) - min(ts_list)) >= 26 * WEEK_S else DAY_S
+
+
+def block_mean_ci(rows, block_s=None, n_boot=600, seed=13):
+    """IC95 al mediei prin bootstrap pe BLOCURI de timp. `rows` = [(ts, valoare)].
+    Planurile din aceeasi zi sau saptamana sunt corelate - aceeasi miscare a pietei le loveste pe
+    toate -, deci tratate ca independente dau un interval prea ingust (masurat pe backtest-ul pe 30
+    de simboluri: de aproximativ 2 ori mai ingust decat pe blocuri saptamanale). (None, None) cu
+    mai putin de 2 blocuri."""
+    import random as _r
+    if block_s is None:
+        block_s = block_size([t for t, _ in rows])
+    by = {}
+    for t, v in rows:
+        b = by.setdefault(int(t // block_s), [0.0, 0])
+        b[0] += v
+        b[1] += 1
+    blocks = list(by.values())
+    k = len(blocks)
+    if k < 2:
+        return None, None
+    rnd = _r.Random(seed)
+    means = []
+    for _ in range(n_boot):
+        tot = cnt = 0
+        for _i in range(k):
+            b = blocks[rnd.randrange(k)]
+            tot += b[0]
+            cnt += b[1]
+        means.append(tot / cnt)
+    means.sort()
+    return means[int(0.025 * n_boot)], means[int(0.975 * n_boot) - 1]
+
+
 def _split_stats(closed):
     """Statistici pentru un subset de planuri inchise, cu incertitudinea lor:
-    rata de castig cu interval Wilson, R mediu cu IC95 normal (eroare standard).
-    Planurile din aceeasi zi sunt corelate (aceeasi miscare de piata), deci
-    intervalele sunt mai degraba prea INGUSTE decat prea largi."""
+    rata de castig cu interval Wilson, R mediu cu IC95 prin bootstrap pe blocuri de timp
+    (block_mean_ci): planurile din aceeasi zi sunt corelate (aceeasi miscare de piata), iar
+    eroarea standard obisnuita dadea intervale prea INGUSTE."""
     n = len(closed)
     if not n:
         return {"closed": 0}
@@ -884,15 +1036,15 @@ def _split_stats(closed):
     wins = sum(1 for r in rs if r > 0)
     lo, hi = wilson_interval(wins, n)
     m = sum(rs) / n
-    se = math.sqrt(sum((r - m) ** 2 for r in rs) / (n - 1) / n) if n > 1 else None
+    c_lo, c_hi = block_mean_ci([(_ts(p), p["realized_r"]) for p in closed]) if n > 1 else (None, None)
     first = min((p.get("created_ts") or 0 for p in closed), default=0)
     return {
         "closed": n,
         "win_rate": round(100 * wins / n, 1),
         "wr_ci_low": round(100 * lo, 1), "wr_ci_high": round(100 * hi, 1),
         "avg_r": round(m, 3),
-        "avg_r_ci_low": round(m - 1.96 * se, 3) if se is not None else None,
-        "avg_r_ci_high": round(m + 1.96 * se, 3) if se is not None else None,
+        "avg_r_ci_low": round(c_lo, 3) if c_lo is not None else None,
+        "avg_r_ci_high": round(c_hi, 3) if c_hi is not None else None,
         "total_r": round(sum(rs), 2),
         "since": time.strftime("%Y-%m-%d", time.gmtime(first)) if first else None,
     }
@@ -907,11 +1059,30 @@ def _ts(p):
 
 
 def _boot_diff(lr, br, n_boot, seed=11):
+    """Diferenta R mediu live - backtest cu IC95 bootstrap pe ZILE (fiecare parte resamplata pe
+    blocuri de cate o zi: planurile aceleiasi zile sunt corelate). `lr`, `br` = [(ts, R)]."""
     import random as _r
     rnd = _r.Random(seed)
-    m = lambda v: sum(v) / len(v)
-    br_s = br[-5000:]
-    diffs = sorted(m([rnd.choice(lr) for _ in lr]) - m([rnd.choice(br_s) for _ in br_s]) for _ in range(n_boot))
+
+    def blocks(rows):
+        by = {}
+        for t, v in rows:
+            b = by.setdefault(int(t // DAY_S), [0.0, 0])
+            b[0] += v
+            b[1] += 1
+        return list(by.values())
+
+    def draw(bl):
+        tot = cnt = 0
+        for _i in range(len(bl)):
+            b = bl[rnd.randrange(len(bl))]
+            tot += b[0]
+            cnt += b[1]
+        return tot / cnt
+    def m(rows):
+        return sum(r for _t, r in rows) / len(rows)
+    lb, bb = blocks(lr), blocks(br[-5000:])
+    diffs = sorted(draw(lb) - draw(bb) for _ in range(n_boot))
     lo, hi = diffs[int(0.025 * n_boot)], diffs[int(0.975 * n_boot) - 1]
     status = "sub_backtest" if hi < 0 else ("peste_backtest" if lo > 0 else "in_marja")
     return {"diff": round(m(lr) - m(br), 3), "ci_low": round(lo, 3), "ci_high": round(hi, 3), "status": status,
@@ -937,15 +1108,15 @@ def divergence(live, bt, n_boot=2000):
     si backtest, fata de planurile de backtest din aceleasi zile. Comparatia cu tot
     istoricul ramane informativa (vs_all). Daca fereastra comuna e prea mica,
     comparatia cade pe tot istoricul, marcata ca atare (basis)."""
-    lr = [p["realized_r"] for p in live]
-    br = [p["realized_r"] for p in bt]
+    lr = [(_ts(p), p["realized_r"]) for p in sorted(live, key=_ts)]
+    br = [(_ts(p), p["realized_r"]) for p in sorted(bt, key=_ts)]
     if len(lr) < DIVERGENCE_MIN_LIVE or len(br) < 300:
         return {"n_live": len(lr), "status": "date_insuficiente"}
     vs_all = _boot_diff(lr, br, n_boot)
     lo_t = min(_ts(p) for p in live)
     hi_t = min(max(_ts(p) for p in live), max(_ts(p) for p in bt))
-    lw = [p["realized_r"] for p in live if _ts(p) <= hi_t]
-    bw = [p["realized_r"] for p in bt if lo_t <= _ts(p) <= hi_t]
+    lw = [(t, r) for t, r in lr if t <= hi_t]
+    bw = [(t, r) for t, r in br if lo_t <= t <= hi_t]
     out = {"n_live": len(lr), "vs_all": vs_all, "n_live_window": len(lw), "n_bt_window": len(bw),
            "window": [time.strftime("%Y-%m-%d", time.gmtime(lo_t)), time.strftime("%Y-%m-%d", time.gmtime(hi_t))]}
     if len(lw) >= DIVERGENCE_MIN_LIVE and len(bw) >= DIVERGENCE_MIN_WINDOW_BT:
@@ -962,7 +1133,7 @@ EDGE_RECENT_DAYS = 365
 
 def edge_by_period(bt):
     """EDGE-UL IN TIMP, masurat pe backtest: R mediu pe plan pe fiecare an si pe
-    ultimele 365 de zile, cu interval de incredere 95%.
+    ultimele 365 de zile, cu interval de incredere 95% pe blocuri saptamanale.
 
     Raspunde la intrebarea pe care media pe tot istoricul o ascunde: strategia mai
     castiga ACUM? Masurat la introducere (6 oct 2026): 2018-2024 intre +0.09 si
@@ -973,24 +1144,58 @@ def edge_by_period(bt):
         return {"status": "date_insuficiente"}
 
     def stat(vals):
+        # IC95 pe blocuri saptamanale (planurile aceleiasi saptamani sunt corelate); cu sub 2 saptamani,
+        # pe zile
         n = len(vals)
-        mean = sum(vals) / n
-        var = sum((v - mean) ** 2 for v in vals) / (n - 1) if n > 1 else 0.0
-        se = (var / n) ** 0.5
-        return {"n": n, "r": round(mean, 3), "ci_low": round(mean - 1.96 * se, 3),
-                "ci_high": round(mean + 1.96 * se, 3)}
+        mean = sum(v for _, v in vals) / n
+        lo, hi = block_mean_ci(vals, WEEK_S)
+        if lo is None:
+            lo, hi = block_mean_ci(vals, DAY_S)
+        return {"n": n, "r": round(mean, 3), "ci_low": round(lo if lo is not None else mean, 3),
+                "ci_high": round(hi if hi is not None else mean, 3)}
 
     years = {}
     for t, r in rows:
-        years.setdefault(time.strftime("%Y", time.gmtime(t)), []).append(r)
+        years.setdefault(time.strftime("%Y", time.gmtime(t)), []).append((t, r))
     last = max(t for t, _ in rows)
-    recent = [r for t, r in rows if t >= last - EDGE_RECENT_DAYS * 86400]
+    recent = [(t, r) for t, r in rows if t >= last - EDGE_RECENT_DAYS * 86400]
     rec = stat(recent) if len(recent) >= 30 else None
     status = ("date_insuficiente" if rec is None else "pozitiv" if rec["ci_low"] > 0
               else "negativ" if rec["ci_high"] < 0 else "neconcludent")
     return {"by_year": {y: stat(v) for y, v in sorted(years.items()) if len(v) >= 30},
             "recent": rec, "recent_days": EDGE_RECENT_DAYS,
             "until": time.strftime("%Y-%m-%d", time.gmtime(last)), "status": status}
+
+
+UNIVERSE_MIN_QV = 200000.0     # lichiditate minima la creare: mediana volumului pe bara, USDT (30 de bare)
+
+
+def universe_summary(plans, watch=(), min_qv=UNIVERSE_MIN_QV):
+    """Strategia curenta pe TOT universul bursei (replay-ul rapid din backtest.replay_plans, pe
+    lumanarile din depozitul de memorie): R mediu pe plan cu IC95 pe blocuri saptamanale, pe
+    simbolurile lichide (fara bare goale la creare), separat lista urmarita si restul, pe directii si
+    pe ani. Raspunde la intrebarea pe care 30 de simboluri nu o pot transa: are strategia un
+    avantaj in piata, nu doar pe lista din care invata agentul?"""
+    entered = [p for p in plans if isinstance(p.get("realized_r"), (int, float)) and p.get("state") != STATE_NO_ENTRY]
+    liq = [p for p in entered if (p.get("qv30") or 0) >= min_qv and not p.get("zero20")]
+
+    def st(ps):
+        if len(ps) < 30:
+            return {"n": len(ps)}
+        lo, hi = block_mean_ci([(_ts(p), p["realized_r"]) for p in ps], WEEK_S)
+        m = sum(p["realized_r"] for p in ps) / len(ps)
+        return {"n": len(ps), "r": round(m, 4), "ci_low": round(lo, 4) if lo is not None else None,
+                "ci_high": round(hi, 4) if hi is not None else None,
+                "win": round(100.0 * sum(1 for p in ps if p["realized_r"] > 0) / len(ps), 1)}
+    watch = set(watch or ())
+    return {"symbols": len({p.get("symbol") for p in plans}), "symbols_liquid": len({p.get("symbol") for p in liq}),
+            "plans": len(plans), "entered": len(entered), "min_qv": min_qv,
+            "all": st(entered), "liquid": st(liq),
+            "watchlist": st([p for p in liq if p.get("symbol") in watch]),
+            "rest": st([p for p in liq if p.get("symbol") not in watch]),
+            "long": st([p for p in liq if p.get("direction") == "LONG"]),
+            "short": st([p for p in liq if p.get("direction") == "SHORT"]),
+            "edge": edge_by_period(liq)}
 
 
 def _cal_slim(e):

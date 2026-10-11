@@ -138,7 +138,7 @@ def chart(best, deep, analyst_tok):
     l2 = (f"Plan: intrare {fmt_price(pl['entry'])} · SL {fmt_price(pl['sl'])} · TP1 {fmt_price(pl['tp1'])} · "
           f"TP2 {fmt_price(pl['tp2'])}") if pl.get("entry") is not None else None
     st = (analyst_tok or {}).get("strategy") or {}
-    l3 = (f"Analist: {st['sentiment']}" + (f" · invalidare {fmt_price(st['inv_price'])}" if st.get("inv_price") else "")
+    l3 = (f"Web3 Researcher: {st['sentiment']}" + (f" · invalidare {fmt_price(st['inv_price'])}" if st.get("inv_price") else "")
           ) if st.get("sentiment") else None
     return _lines(l1, l2, l3)
 
@@ -396,7 +396,7 @@ def ex_tokens(watchlist, symbols, analyst_tokens):
         k = ((t or {}).get("strategy") or {}).get("sentiment")
         if k:
             cnt[k] = cnt.get(k, 0) + 1
-    l2 = ("Analist: " + " · ".join(f"{cnt[k]} {k}" for k in ("Bullish", "Neutru", "Bearish") if cnt.get(k))) if cnt else None
+    l2 = ("Web3 Researcher: " + " · ".join(f"{cnt[k]} {k}" for k in ("Bullish", "Neutru", "Bearish") if cnt.get(k))) if cnt else None
     return _lines(l1, l2)
 
 
@@ -414,6 +414,11 @@ def memory(st):
           + ("release-uri GitHub" if st.get("store") == "github-releases" else str(st.get("store"))))
     c = (ds.get("candles") or {}).get("coverage") or {}
     l2 = ("Lumânări: " + ", ".join(f"{k} {v.get('with_data', 0)} simboluri" for k, v in sorted(c.items()))) if c else None
+    u = (st.get("universe_backtest") or {}).get("liquid") or {}
+    if u.get("r") is not None:
+        # strategia pe tot universul lichid e informatia de decizie din depozit: inlocuieste randul despre lumanari
+        l2 = (f"Strategia pe {st['universe_backtest'].get('symbols_liquid', 0)} simboluri lichide: {u['r']:+.3f}R/plan"
+              + (f" (IC95 {u['ci_low']:+.3f}..{u['ci_high']:+.3f})" if u.get("ci_low") is not None else ""))
     pr = st.get("probe") or {}
     errs = ((st.get("last_run") or {}).get("errors") or [])
     l3 = (f"⚠ {len(errs)} erori la ultima rulare" if errs else
