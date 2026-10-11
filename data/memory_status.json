@@ -1,37 +1,42 @@
 {
  "datasets": {
   "binance": {
-   "bytes": 0,
-   "coverage": {},
-   "max_ts": null,
-   "min_ts": null,
-   "partitions": 0,
-   "rows": 0
+   "bytes": 853770,
+   "coverage": {
+    "binance:1d": {
+     "symbols": 35,
+     "with_data": 35
+    }
+   },
+   "max_ts": 1790726400000,
+   "min_ts": 1523923200000,
+   "partitions": 9,
+   "rows": 34626
   },
   "candles": {
-   "bytes": 29769141,
+   "bytes": 58212485,
    "coverage": {
     "okx:1d": {
      "symbols": 407,
      "with_data": 407
     },
     "okx:4h": {
-     "symbols": 126,
-     "with_data": 126
+     "symbols": 407,
+     "with_data": 407
     }
    },
-   "max_ts": 1791648000000,
+   "max_ts": 1791676800000,
    "min_ts": 1515628800000,
    "partitions": 18,
-   "rows": 1386456
+   "rows": 2766648
   },
   "plans": {
-   "bytes": 2493918,
+   "bytes": 2494470,
    "coverage": {},
-   "max_ts": 1791665536.0111794,
+   "max_ts": 1791694735.1379023,
    "min_ts": 1518537600.0,
    "partitions": 10,
-   "rows": 21755
+   "rows": 21757
   }
  },
  "history": [
@@ -44,41 +49,62 @@
    },
    "s": 2716.8,
    "when": "2026-10-10 21:48 UTC"
+  },
+  {
+   "errors": 0,
+   "rows": {
+    "binance": 34626,
+    "candles": 2766648,
+    "plans": 21757
+   },
+   "s": 2718.0,
+   "when": "2026-10-11 07:12 UTC"
   }
  ],
  "last_run": {
   "budget_min": 45.0,
   "done": {
    "binance": {
-    "skipped": "buget de timp epuizat"
+    "1d": {
+     "covered": 35,
+     "months_added": 1159,
+     "rows_added": 34626,
+     "universe": 705
+    },
+    "4h": {
+     "covered": 0,
+     "months_added": 0,
+     "rows_added": 0,
+     "universe": 705
+    }
    },
    "candles": {
     "1d": {
      "complete": 407,
      "covered": 407,
      "no_data": 0,
-     "rows_added": 378186,
+     "rows_added": 407,
      "symbols_updated": 407,
      "universe": 407
     },
     "4h": {
-     "complete": 125,
-     "covered": 126,
+     "complete": 407,
+     "covered": 407,
      "no_data": 0,
-     "rows_added": 1008270,
-     "symbols_updated": 126,
+     "rows_added": 1379785,
+     "symbols_updated": 407,
      "universe": 407
     }
    },
    "plans": {
-    "partitions_written": 10,
-    "plans": 21755
+    "partitions_written": 1,
+    "plans": 21757
    }
   },
-  "duration_s": 2716.8,
+  "duration_s": 2718.0,
   "errors": [],
-  "finished": "2026-10-10 21:48 UTC",
-  "started": "2026-10-10 21:03 UTC"
+  "finished": "2026-10-11 07:12 UTC",
+  "started": "2026-10-11 06:26 UTC"
  },
  "probe": {
   "binance_vision": {
@@ -91,7 +117,7 @@
   "exchange": {
    "id": "okx",
    "ok": true,
-   "s": 2.5
+   "s": 2.4
   },
   "ram_gb": 16.4
  },
