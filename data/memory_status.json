@@ -1,20 +1,20 @@
 {
  "datasets": {
   "binance": {
-   "bytes": 853770,
+   "bytes": 4080347,
    "coverage": {
     "binance:1d": {
-     "symbols": 35,
-     "with_data": 35
+     "symbols": 180,
+     "with_data": 180
     }
    },
    "max_ts": 1790726400000,
-   "min_ts": 1523923200000,
-   "partitions": 9,
-   "rows": 34626
+   "min_ts": 1502928000000,
+   "partitions": 10,
+   "rows": 202251
   },
   "candles": {
-   "bytes": 58212485,
+   "bytes": 58226388,
    "coverage": {
     "okx:1d": {
      "symbols": 407,
@@ -25,18 +25,18 @@
      "with_data": 407
     }
    },
-   "max_ts": 1791676800000,
+   "max_ts": 1791705600000,
    "min_ts": 1515628800000,
    "partitions": 18,
-   "rows": 2766648
+   "rows": 2767462
   },
   "plans": {
-   "bytes": 2494470,
+   "bytes": 2495450,
    "coverage": {},
-   "max_ts": 1791694735.1379023,
+   "max_ts": 1791720326.828884,
    "min_ts": 1518537600.0,
    "partitions": 10,
-   "rows": 21757
+   "rows": 21761
   }
  },
  "history": [
@@ -59,6 +59,16 @@
    },
    "s": 2718.0,
    "when": "2026-10-11 07:12 UTC"
+  },
+  {
+   "errors": 0,
+   "rows": {
+    "binance": 202251,
+    "candles": 2767462,
+    "plans": 21761
+   },
+   "s": 2719.8,
+   "when": "2026-10-11 14:16 UTC"
   }
  ],
  "last_run": {
@@ -66,9 +76,9 @@
   "done": {
    "binance": {
     "1d": {
-     "covered": 35,
-     "months_added": 1159,
-     "rows_added": 34626,
+     "covered": 180,
+     "months_added": 5596,
+     "rows_added": 167626,
      "universe": 705
     },
     "4h": {
@@ -83,41 +93,41 @@
      "complete": 407,
      "covered": 407,
      "no_data": 0,
-     "rows_added": 407,
-     "symbols_updated": 407,
+     "rows_added": 0,
+     "symbols_updated": 0,
      "universe": 407
     },
     "4h": {
      "complete": 407,
      "covered": 407,
      "no_data": 0,
-     "rows_added": 1379785,
+     "rows_added": 814,
      "symbols_updated": 407,
      "universe": 407
     }
    },
    "plans": {
     "partitions_written": 1,
-    "plans": 21757
+    "plans": 21761
    }
   },
-  "duration_s": 2718.0,
+  "duration_s": 2719.8,
   "errors": [],
-  "finished": "2026-10-11 07:12 UTC",
-  "started": "2026-10-11 06:26 UTC"
+  "finished": "2026-10-11 14:16 UTC",
+  "started": "2026-10-11 13:31 UTC"
  },
  "probe": {
   "binance_vision": {
    "detail": "31 lumanari BTCUSDT 1d ianuarie 2024",
    "ok": true,
-   "s": 0.7
+   "s": 1.4
   },
   "cpu": 4,
   "disk_free_gb": 92.0,
   "exchange": {
    "id": "okx",
    "ok": true,
-   "s": 2.4
+   "s": 2.3
   },
   "ram_gb": 16.4
  },
