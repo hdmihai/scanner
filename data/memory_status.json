@@ -1,20 +1,20 @@
 {
  "datasets": {
   "binance": {
-   "bytes": 4080347,
+   "bytes": 6596112,
    "coverage": {
     "binance:1d": {
-     "symbols": 180,
-     "with_data": 180
+     "symbols": 284,
+     "with_data": 284
     }
    },
    "max_ts": 1790726400000,
    "min_ts": 1502928000000,
    "partitions": 10,
-   "rows": 202251
+   "rows": 331501
   },
   "candles": {
-   "bytes": 58226388,
+   "bytes": 58243037,
    "coverage": {
     "okx:1d": {
      "symbols": 407,
@@ -25,18 +25,18 @@
      "with_data": 407
     }
    },
-   "max_ts": 1791705600000,
+   "max_ts": 1791734400000,
    "min_ts": 1515628800000,
    "partitions": 18,
-   "rows": 2767462
+   "rows": 2768276
   },
   "plans": {
-   "bytes": 2495450,
+   "bytes": 2988806,
    "coverage": {},
-   "max_ts": 1791720326.828884,
-   "min_ts": 1518537600.0,
+   "max_ts": 1791748359.7100308,
+   "min_ts": 1518552000.0,
    "partitions": 10,
-   "rows": 21761
+   "rows": 27868
   }
  },
  "history": [
@@ -69,6 +69,16 @@
    },
    "s": 2719.8,
    "when": "2026-10-11 14:16 UTC"
+  },
+  {
+   "errors": 0,
+   "rows": {
+    "binance": 331501,
+    "candles": 2768276,
+    "plans": 27868
+   },
+   "s": 2714.3,
+   "when": "2026-10-11 23:13 UTC"
   }
  ],
  "last_run": {
@@ -76,9 +86,9 @@
   "done": {
    "binance": {
     "1d": {
-     "covered": 180,
-     "months_added": 5596,
-     "rows_added": 167626,
+     "covered": 284,
+     "months_added": 4314,
+     "rows_added": 129250,
      "universe": 705
     },
     "4h": {
@@ -107,27 +117,38 @@
     }
    },
    "plans": {
-    "partitions_written": 1,
-    "plans": 21761
+    "partitions_written": 10,
+    "plans": 27868
+   },
+   "universe": {
+    "liquid": 279,
+    "plans": 177862,
+    "symbols": 378
+   },
+   "verdict": {
+    "from": "2018-06-10",
+    "obs": 157686,
+    "to": "2026-10-03",
+    "tokens": 230
    }
   },
-  "duration_s": 2719.8,
+  "duration_s": 2714.3,
   "errors": [],
-  "finished": "2026-10-11 14:16 UTC",
-  "started": "2026-10-11 13:31 UTC"
+  "finished": "2026-10-11 23:13 UTC",
+  "started": "2026-10-11 22:28 UTC"
  },
  "probe": {
   "binance_vision": {
    "detail": "31 lumanari BTCUSDT 1d ianuarie 2024",
    "ok": true,
-   "s": 1.4
+   "s": 0.7
   },
   "cpu": 4,
   "disk_free_gb": 92.0,
   "exchange": {
    "id": "okx",
    "ok": true,
-   "s": 2.3
+   "s": 2.6
   },
   "ram_gb": 16.4
  },
@@ -136,7 +157,209 @@
   "candles": "memory-candles",
   "plans": "memory-plans"
  },
- "schema": 1,
+ "schema": 2,
  "store": "github-releases",
+ "universe_backtest": {
+  "all": {
+   "ci_high": 0.0161,
+   "ci_low": -0.0805,
+   "n": 136146,
+   "r": -0.0329,
+   "win": 31.9
+  },
+  "edge": {
+   "by_year": {
+    "2018": {
+     "ci_high": 0.384,
+     "ci_low": 0.003,
+     "n": 845,
+     "r": 0.179
+    },
+    "2019": {
+     "ci_high": 0.32,
+     "ci_low": -0.042,
+     "n": 1089,
+     "r": 0.121
+    },
+    "2020": {
+     "ci_high": 0.114,
+     "ci_low": -0.126,
+     "n": 3694,
+     "r": -0.012
+    },
+    "2021": {
+     "ci_high": 0.145,
+     "ci_low": -0.054,
+     "n": 8867,
+     "r": 0.044
+    },
+    "2022": {
+     "ci_high": 0.21,
+     "ci_low": -0.063,
+     "n": 8325,
+     "r": 0.074
+    },
+    "2023": {
+     "ci_high": 0.129,
+     "ci_low": -0.127,
+     "n": 6941,
+     "r": -0.019
+    },
+    "2024": {
+     "ci_high": 0.143,
+     "ci_low": -0.097,
+     "n": 12267,
+     "r": 0.023
+    },
+    "2025": {
+     "ci_high": 0.025,
+     "ci_low": -0.173,
+     "n": 11461,
+     "r": -0.075
+    },
+    "2026": {
+     "ci_high": 0.045,
+     "ci_low": -0.206,
+     "n": 5239,
+     "r": -0.088
+    }
+   },
+   "recent": {
+    "ci_high": 0.062,
+    "ci_low": -0.194,
+    "n": 7299,
+    "r": -0.076
+   },
+   "recent_days": 365,
+   "status": "neconcludent",
+   "until": "2026-10-11"
+  },
+  "entered": 136146,
+  "exchange": "okx",
+  "liquid": {
+   "ci_high": 0.05,
+   "ci_low": -0.0462,
+   "n": 58728,
+   "r": 0.0012,
+   "win": 32.8
+  },
+  "long": {
+   "ci_high": 0.0568,
+   "ci_low": -0.1027,
+   "n": 29622,
+   "r": -0.0227,
+   "win": 32.4
+  },
+  "min_qv": 200000.0,
+  "plans": 177862,
+  "rest": {
+   "ci_high": 0.0483,
+   "ci_low": -0.0511,
+   "n": 46493,
+   "r": -0.0004,
+   "win": 32.8
+  },
+  "rules": 2,
+  "short": {
+   "ci_high": 0.1107,
+   "ci_low": -0.0549,
+   "n": 29106,
+   "r": 0.0255,
+   "win": 33.1
+  },
+  "symbols": 378,
+  "symbols_liquid": 279,
+  "tf": "4h",
+  "ts": 1791757880.8179343,
+  "watchlist": {
+   "ci_high": 0.0721,
+   "ci_low": -0.0453,
+   "n": 12235,
+   "r": 0.0073,
+   "win": 32.6
+  },
+  "when": "2026-10-11 22:31 UTC"
+ },
+ "verdict_track": {
+  "exchange": "okx",
+  "from": "2018-06-10",
+  "horizons": {
+   "30": {
+    "Bearish": {
+     "beat": 35.2,
+     "mean": -2.03,
+     "median": -5.95,
+     "n": 69282
+    },
+    "Bullish": {
+     "beat": 33.5,
+     "mean": -1.29,
+     "median": -10.08,
+     "n": 20804
+    },
+    "Neutru": {
+     "beat": 31.0,
+     "mean": -3.02,
+     "median": -8.83,
+     "n": 66130
+    },
+    "by_year": {
+     "2020": 7.36,
+     "2021": 1.32,
+     "2022": -4.04,
+     "2023": 1.91,
+     "2024": -0.53,
+     "2025": -1.47,
+     "2026": -1.42
+    },
+    "spread": {
+     "ci_high": 2.17,
+     "ci_low": -2.27,
+     "days": 1333,
+     "mean": 0.05
+    }
+   },
+   "7": {
+    "Bearish": {
+     "beat": 40.3,
+     "mean": -0.73,
+     "median": -1.76,
+     "n": 69506
+    },
+    "Bullish": {
+     "beat": 39.9,
+     "mean": 0.87,
+     "median": -3.05,
+     "n": 21425
+    },
+    "Neutru": {
+     "beat": 38.5,
+     "mean": -0.66,
+     "median": -2.38,
+     "n": 66755
+    },
+    "by_year": {
+     "2020": 5.55,
+     "2021": -1.41,
+     "2022": 0.91,
+     "2023": 0.02,
+     "2024": 1.82,
+     "2025": 1.23,
+     "2026": 0.39
+    },
+    "spread": {
+     "ci_high": 1.78,
+     "ci_low": 0.15,
+     "days": 1356,
+     "mean": 0.95
+    }
+   }
+  },
+  "min_qv": 1000000.0,
+  "obs": 157686,
+  "to": "2026-10-03",
+  "tokens": 230,
+  "when": "2026-10-11 22:30 UTC"
+ },
  "where": "hdmihai/scanner"
 }
