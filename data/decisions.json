@@ -1,23 +1,41 @@
 {
-  "scan_time": "2026-10-11 07:05 UTC",
+  "scan_time": "2026-10-11 08:04 UTC",
   "decisions": {
+    "FLOW/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta dezactivata: pe walk-forward a inrautatit rezultatul in 2 din 3 rulari",
+      "calibrated_prob": 29.7,
+      "agent_prob": 0.3448,
+      "elliott_bias": 0.2,
+      "next_entry": null
+    },
     "ATOM/USDT": {
       "action": "SKIP",
       "mode": "ASTEAPTA_CORECTIA",
       "reason": "Elliott contrazice planul LONG (Primary Developing Harmonic D FORMING BULLISH 38%: D inca nu a ajuns in zona PRZ). Istoric: planurile contra Elliott n-au avut avantaj (+0.04R/plan, fata de +0.11R fara conflict). Nivel urmarit pentru intrare: ~1.846.",
       "calibrated_prob": 26.4,
-      "agent_prob": 0.3918,
+      "agent_prob": 0.4,
       "elliott_bias": -0.4,
       "next_entry": 1.846
     },
-    "ICP/USDT": {
-      "action": "SKIP",
-      "mode": "ASTEAPTA_CORECTIA",
-      "reason": "Elliott contrazice planul SHORT (Primary Motive W5 BEARISH 65%: impulsul pare complet - W5 a atins 2.948, iar pretul a retras 78% din ea; urmeaza corectia A-B-C). Istoric: planurile contra Elliott n-au avut avantaj (+0.04R/plan, fata de +0.11R fara conflict). Nivel urmarit pentru intrare: ~3.24871.",
-      "calibrated_prob": 42.5,
-      "agent_prob": 0.102,
-      "elliott_bias": -0.2603,
-      "next_entry": 3.248705974
+    "POL/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta dezactivata: pe walk-forward a inrautatit rezultatul in 2 din 3 rulari",
+      "calibrated_prob": 29.7,
+      "agent_prob": 0.2208,
+      "elliott_bias": 0.4417,
+      "next_entry": null
+    },
+    "MANA/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta dezactivata: pe walk-forward a inrautatit rezultatul in 2 din 3 rulari",
+      "calibrated_prob": 29.7,
+      "agent_prob": 0.1139,
+      "elliott_bias": null,
+      "next_entry": null
     }
   }
 }
