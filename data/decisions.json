@@ -1,14 +1,32 @@
 {
-  "scan_time": "2026-10-11 15:01 UTC",
+  "scan_time": "2026-10-11 16:01 UTC",
   "decisions": {
     "ATOM/USDT": {
       "action": "SKIP",
       "mode": "ASTEAPTA_CORECTIA",
-      "reason": "Elliott contrazice planul LONG (Primary Developing Motive W3 FORMING BEARISH 55%: unda 3 in formare - faza cea mai puternica a trendului). Istoric: planurile contra Elliott n-au avut avantaj (+0.04R/plan, fata de +0.11R fara conflict). Nivel urmarit pentru intrare: ~1.62791.",
+      "reason": "Elliott contrazice planul LONG (Primary Developing Harmonic D FORMING BULLISH 31%: D inca nu a ajuns in zona PRZ). Istoric: planurile contra Elliott n-au avut avantaj (+0.04R/plan, fata de +0.11R fara conflict). Nivel urmarit pentru intrare: ~1.846.",
+      "calibrated_prob": 42.5,
+      "agent_prob": 0.3745,
+      "elliott_bias": -0.4,
+      "next_entry": 1.846
+    },
+    "THETA/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta dezactivata: pe walk-forward a inrautatit rezultatul in 2 din 3 rulari",
       "calibrated_prob": 26.4,
-      "agent_prob": 0.4016,
-      "elliott_bias": -0.769,
-      "next_entry": 1.62791184
+      "agent_prob": 0.3571,
+      "elliott_bias": null,
+      "next_entry": null
+    },
+    "TRX/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta dezactivata: pe walk-forward a inrautatit rezultatul in 2 din 3 rulari",
+      "calibrated_prob": 29.7,
+      "agent_prob": 0.3258,
+      "elliott_bias": 0.6307,
+      "next_entry": null
     }
   }
 }
