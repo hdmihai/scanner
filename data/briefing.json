@@ -2,7 +2,7 @@
   "text": "Din 21129 planuri inchise, rata de succes e 32.6%, cu -18.81R cumulat (-0.001R in medie pe plan) si profit factor 1.0. 17 planuri sunt inca deschise. Atentie: 21050 dintre ele sunt din backtest. LIVE, din 2026-09-28: 79 planuri inchise, castig 25.3% (IC 17.0-35.9%), R mediu -0.283R (IC95 -0.670..+0.052R), total -22.37R. Ultimele inchise: #314986 ZEN/USDT -1.05R, #314989 POL/USDT -1.05R, #320576 DASH/USDT -1.04R. Pe intervalele de scor cu destule date, cel mai bine merge 0-19 (28.5%, +0.13R mediu, n=200), iar cel mai slab 40-59 (29.7%, -0.04R, n=10341). Deciziile de a deschide sau refuza planuri se bazeaza pe aceste cifre masurate, nu pe scorul brut. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (ordonarea pe planurile LIVE nu e inca confirmata: 79/100 planuri live evaluate (AUC live 0.659 pana acum) - agentul invata, dar nu filtreaza).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-10-11 22:50 UTC",
+    "scan_time": "2026-10-11 23:53 UTC",
     "universe_size": 30,
     "plans_total": 27868,
     "plans_open": 17,
@@ -264,7 +264,32 @@
       },
       "rules": 2,
       "stale_rules": null,
-      "universe": null
+      "universe": {
+        "symbols": 279,
+        "liquid": {
+          "ci_high": 0.05,
+          "ci_low": -0.0462,
+          "n": 58728,
+          "r": 0.0012,
+          "win": 32.8
+        },
+        "rest": {
+          "ci_high": 0.0483,
+          "ci_low": -0.0511,
+          "n": 46493,
+          "r": -0.0004,
+          "win": 32.8
+        },
+        "recent": {
+          "ci_high": 0.062,
+          "ci_low": -0.194,
+          "n": 7299,
+          "r": -0.076
+        },
+        "status": "neconcludent",
+        "when": "2026-10-11 22:31 UTC",
+        "rules": 2
+      }
     }
   },
   "sections": {
@@ -280,6 +305,7 @@
       "Backtest 2018-02-13-azi (regenerat 2026-10-11 20:52 UTC): 21050 planuri inchise, castig 32.6%, R mediu +0.000R, total +3.56R, profit factor 1.0.",
       "Ultimele 12 luni simulate: -0.058R/plan (IC95 -0.161..+0.054) pe 3717 planuri - nu e distinct de zero.",
       "Calibrare (dominata de backtest): cel mai bun interval de scor 0-19 (28.5%, +0.13R), cel mai slab 40-59 (29.7%, -0.04R).",
+      "Pe tot universul bursei (279 simboluri lichide, aceeasi strategie): +0.001R/plan (IC95 -0.046..+0.050, n=58728); ultimele 12 luni -0.076R/plan (IC95 -0.194..+0.062).",
       "Rol: pre-antrenarea agentului, calibrarea si cercetarea regulilor - nu e rezultat pe piata reala."
     ],
     "agent": "Agentul e in SHADOW: invata, dar nu filtreaza (ordonarea pe planurile LIVE nu e inca confirmata: 79/100 planuri live evaluate (AUC live 0.659 pana acum) - agentul invata, dar nu filtreaza)."
