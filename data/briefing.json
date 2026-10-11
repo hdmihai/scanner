@@ -1,11 +1,11 @@
 {
-  "text": "Din 16481 planuri inchise, rata de succes e 33.3%, cu +1356.23R cumulat (+0.082R in medie pe plan) si profit factor 1.12. 19 planuri sunt inca deschise. Atentie: 16406 dintre ele sunt din backtest. LIVE, din 2026-09-28: 75 planuri inchise, castig 25.3% (IC 16.9-36.2%), R mediu -0.318R (IC95 -0.656..+0.019R), total -23.87R. Ultimele inchise: #207105 TRX/USDT +2.63R, #207110 POL/USDT +3.83R, #313526 FLOW/USDT -1.02R. Pe intervalele de scor cu destule date, cel mai bine merge 0-19 (27.3%, +0.34R mediu, n=161), iar cel mai slab 40-59 (29.7%, +0.05R, n=7877). Deciziile de a deschide sau refuza planuri se bazeaza pe aceste cifre masurate, nu pe scorul brut. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (ordonarea pe planurile LIVE nu e inca confirmata: 75/100 planuri live evaluate (AUC live 0.689 pana acum) - agentul invata, dar nu filtreaza).",
+  "text": "Din 16481 planuri inchise, rata de succes e 33.3%, cu +1356.23R cumulat (+0.082R in medie pe plan) si profit factor 1.12. 20 planuri sunt inca deschise. Atentie: 16406 dintre ele sunt din backtest. LIVE, din 2026-09-28: 75 planuri inchise, castig 25.3% (IC 16.9-36.2%), R mediu -0.318R (IC95 -0.656..+0.019R), total -23.87R. Ultimele inchise: #207105 TRX/USDT +2.63R, #207110 POL/USDT +3.83R, #313526 FLOW/USDT -1.02R. Pe intervalele de scor cu destule date, cel mai bine merge 0-19 (27.3%, +0.34R mediu, n=161), iar cel mai slab 40-59 (29.7%, +0.05R, n=7877). Deciziile de a deschide sau refuza planuri se bazeaza pe aceste cifre masurate, nu pe scorul brut. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (ordonarea pe planurile LIVE nu e inca confirmata: 75/100 planuri live evaluate (AUC live 0.689 pana acum) - agentul invata, dar nu filtreaza).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-10-11 11:05 UTC",
+    "scan_time": "2026-10-11 12:05 UTC",
     "universe_size": 30,
-    "plans_total": 21760,
-    "plans_open": 19,
+    "plans_total": 21761,
+    "plans_open": 20,
     "plans_closed": 16481,
     "legacy_closed": 0,
     "legacy_total_r": null,
@@ -74,6 +74,12 @@
     ],
     "open_now": [
       {
+        "id": 314991,
+        "symbol": "ICP/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
         "id": 314990,
         "symbol": "MANA/USDT",
         "direction": "SHORT",
@@ -95,13 +101,7 @@
         "id": 314987,
         "symbol": "AVAX/USDT",
         "direction": "SHORT",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 314986,
-        "symbol": "ZEN/USDT",
-        "direction": "SHORT",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
+        "state": "INTRARE ATINSA - pozitie activa"
       }
     ],
     "best_bucket": {
@@ -186,7 +186,7 @@
         }
       },
       "no_entry": 23,
-      "open": 19,
+      "open": 20,
       "recent": [
         {
           "id": 207105,
@@ -271,7 +271,7 @@
       "Real vs simulat: pe aceeasi perioada (2026-09-28 - 2026-10-09, 82 planuri simulate) +0.261R/plan (IC95 -0.128..+0.704), in marja statistica; fata de tot istoricul simulat -0.402R/plan (IC95 -0.751..-0.069), SEMNIFICATIV sub simulare.",
       "Agentul pe date reale: AUC 0.689 (IC 0.518-0.834) pe 75/100 planuri necesare confirmarii.",
       "Ultimele inchise live: #207105 TRX/USDT +2.63R, #207110 POL/USDT +3.83R, #293331 SEI/USDT -1.04R.",
-      "Deschise acum: 19; anulate fara intrare (pretul nu a revenit): 23."
+      "Deschise acum: 20; anulate fara intrare (pretul nu a revenit): 23."
     ],
     "simulated": [
       "Backtest 2018-02-13-azi (regenerat 2026-10-10 10:57 UTC): 16406 planuri inchise, castig 33.3%, R mediu +0.084R, total +1380.10R, profit factor 1.12.",
