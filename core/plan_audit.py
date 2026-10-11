@@ -24,8 +24,8 @@ REGULI (fiecare verificabila, nicio euristica de "pare ciudat"):
                 cu R, NO_ENTRY cu R nenul, pozitie inchisa fara moment de intrare (live);
   R           - R net != R brut - cost; SL fara -1R (sau fara TP1 atins inainte); TP2 cu alt R
                 decat cel dat de niveluri;
-  rezultat    - reevaluat pe lumanarile reale (aceeasi functie, core/plans.evaluate_plan),
-                planul inchis ajunge la alta stare sau alt R;
+  rezultat    - reevaluat pe lumanarile reale (aceeasi functie, core/plans.evaluate_plan, cu
+                aceleasi reguli de evaluare ca planul), planul inchis ajunge la alta stare sau alt R;
   timp        - creat sau inchis in viitor;
   caracteristici - valori ne-numerice sau in afara intervalului; un plan live caruia ii lipseste
                 o caracteristica pe care planurile live o aveau deja la crearea lui (calcul rupt);
@@ -39,14 +39,16 @@ agentul reantrenat - se face o singura data pe epoca, la integrarea backtest-ulu
 
 import math
 
-DATA_EPOCH = 1                # 1 = 2026-10: prima memorie curata (backtest regenerat cu ev_analyst)
+DATA_EPOCH = 2                # 1 = 2026-10-10: prima memorie curata (backtest regenerat cu ev_analyst)
+#                               2 = 2026-10-11: regulile de evaluare v2 (core/plans.EVAL_RULES) - backtest-ul
+#                                   regenerat cu ele; planurile live se reevalueaza in scanare
 MAX_REMOVE_FRAC = 0.02        # peste 2% din planuri intr-o rulare: auditul se opreste si raporteaza
 MAX_REMOVE_N = 300
 TOL_R = 0.002                 # rotunjirea la 3 zecimale din core/plans
 CLOSED = ("TP2_HIT", "SL_HIT", "EXPIRED", "NO_ENTRY")
 POSITION_CLOSED = ("TP2_HIT", "SL_HIT", "EXPIRED")
 REEVAL_FIELDS = ("state", "state_detail", "realized_r", "gross_r", "closed_ts", "entered_ts",
-                 "tp1_hit_ts", "bars_checked")
+                 "tp1_hit_ts", "bars_checked", "er_prev")
 
 
 def _num(v):
@@ -147,10 +149,17 @@ def missing_at_creation(plans, feature_keys, pending=()):
 
 def reevaluate(p, candles, evaluate_fn):
     """Starea si R-ul pe care le-ar avea planul reevaluat de la zero pe `candles`, sau None daca
-    lumanarile nu acopera planul de la creare pana la inchidere."""
+    lumanarile nu acopera planul de la creare pana la inchidere. Bara partiala de creare a unui
+    plan live (`first_bar`, din lumanarile de 5 minute) e pastrata pe plan si intra in fata, exact
+    ca la evaluarea din scanare."""
     if not candles or p.get("state") not in POSITION_CLOSED + ("NO_ENTRY",):
         return None
-    if candles[0][0] / 1000.0 > p["created_ts"] or candles[-1][0] / 1000.0 < (p.get("closed_ts") or 0):
+    fb = p.get("first_bar")
+    if fb:
+        candles = [fb] + [c for c in candles if c[0] > fb[0]]
+    elif candles[0][0] / 1000.0 > p["created_ts"]:
+        return None
+    if candles[-1][0] / 1000.0 < (p.get("closed_ts") or 0):
         return None
     q = {k: v for k, v in p.items() if k not in REEVAL_FIELDS}
     q["state"] = "PENDING"
@@ -159,9 +168,13 @@ def reevaluate(p, candles, evaluate_fn):
 
 
 def audit(plans, now, candles_by_symbol, feature_keys, base_features, pending, evaluate_fn, cost_fn, r_at,
-          tp1_fraction):
+          tp1_fraction, eval_rules=None):
     """{"checked", "flagged": [{"id", "symbol", "direction", "source", "state", "realized_r",
-    "created_ts", "reason"}], "by_reason": {motiv: n}, "reevaluated": n}."""
+    "created_ts", "reason"}], "by_reason": {motiv: n}, "reevaluated": n}.
+
+    `eval_rules` = versiunea curenta a regulilor de evaluare: un plan evaluat cu alte reguli nu se
+    reevalueaza aici (diferenta ar fi a regulilor, nu o data falsa) - scanarea il reevalueaza o
+    data, de la creare, cu regulile curente."""
     flagged, seen, reev = [], {}, 0
     miss = missing_at_creation(plans, feature_keys, pending)
     for p in sorted(plans, key=lambda x: x.get("id") or 0):
@@ -176,7 +189,7 @@ def audit(plans, now, candles_by_symbol, feature_keys, base_features, pending, e
                 reason = f"dublura a planului #{seen[key]}"
             else:
                 seen[key] = p.get("id")
-        if not reason and p.get("source") != "backtest":
+        if not reason and p.get("source") != "backtest" and (eval_rules is None or p.get("er") == eval_rules):
             q = reevaluate(p, candles_by_symbol.get(p.get("symbol")), evaluate_fn)
             if q is not None:
                 reev += 1

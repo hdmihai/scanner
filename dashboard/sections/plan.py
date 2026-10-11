@@ -299,11 +299,19 @@ def render_plan_memory(store):
             cls = "tp2" if r > 0 else "sl"
         r_txt = f'<span class="plan-r r-{"pos" if r and r > 0 else "neg"}">{r:+.2f}R</span>' if r is not None else ""
         mode = (p.get("decision") or {}).get("mode", "")
+        # planul reevaluat cu regulile de evaluare curente (core/plans.EVAL_RULES): rezultatul vechi
+        # ramane vizibil, ca schimbarea sa fie verificabila
+        prev = p.get("er_prev") or {}
+        prev_txt = ""
+        if prev:
+            pr = prev.get("realized_r")
+            prev_txt = (f'<div class="dim">reevaluat cu regulile v{p.get("er")}: înainte {prev.get("state")}'
+                        + (f' {pr:+.2f}R' if isinstance(pr, (int, float)) else "") + '</div>')
         cards.append(f'''<div class="plan-card plan-{cls}">
       <div class="plan-head-row"><strong>PLAN #{p["id"]} &middot; {p["symbol"]}</strong>{r_txt}</div>
       <div class="plan-state">{p["direction"]} &middot; {label}</div>
       <div class="plan-lv">entry {fmt_price(p["entry"])} &middot; SL {fmt_price(p["sl"])} &middot; TP1 {fmt_price(p["tp1"])}</div>
-      <div class="dim" style="margin-top:4px;">{p["created_time"]} &middot; {mode}</div>
+      <div class="dim" style="margin-top:4px;">{p["created_time"]} &middot; {mode}</div>{prev_txt}
     </div>''')
     return head + '<div class="plan-grid-cards">' + "".join(cards) + "</div>"
 

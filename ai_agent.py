@@ -48,7 +48,7 @@ def audit_memory(plans_store, pending):
     det = (load_json(DETAILS_FILE, {}) or {}).get("symbols") or {}
     rep = A.audit(plans, now, {s: d.get("candles") for s, d in det.items()}, ev_mod.FEATURE_KEYS,
                   _core.BASE_FEATURES, pending, plan_tracker.evaluate_plan, plan_tracker.cost_in_r,
-                  plan_tracker._r_at, plan_tracker.TP1_FRACTION)
+                  plan_tracker._r_at, plan_tracker.TP1_FRACTION, eval_rules=plan_tracker.EVAL_RULES)
     live_f = [f for f in rep["flagged"] if f["source"] != "backtest"]
     bt_f = [f for f in rep["flagged"] if f["source"] == "backtest"]
     n_live = sum(1 for p in plans if p.get("source") != "backtest")
@@ -178,6 +178,14 @@ def main():
             p.pop("agent_trained", None)
     if state is not None and _audit_retrain:
         print("[i] Agentul invatase din planuri scoase de audit - reantrenez de la zero pe memoria curata.")
+        state = None
+        for p in plans:
+            p.pop("agent_trained", None)
+    # Scanarea a reevaluat planuri live cu regulile de evaluare curente (core/plans.EVAL_RULES), iar
+    # agentul invatase rezultatul vechi al unora: reantrenare de la zero pe rezultatele corecte.
+    _why = plans_store.pop("retrain_reason", None)
+    if state is not None and _why:
+        print(f"[i] {_why} - reantrenez de la zero.")
         state = None
         for p in plans:
             p.pop("agent_trained", None)

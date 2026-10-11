@@ -48,7 +48,24 @@ def ok(cond, label):
 
 def _audit(plans, candles):
     return A.audit(plans, time.time(), candles, EV.FEATURE_KEYS, CA.BASE_FEATURES, CA.PENDING_DEFAULT,
-                   PT.evaluate_plan, PT.cost_in_r, PT._r_at, PT.TP1_FRACTION)
+                   PT.evaluate_plan, PT.cost_in_r, PT._r_at, PT.TP1_FRACTION, eval_rules=PT.EVAL_RULES)
+
+
+def _migrated(plans, candles):
+    """Copia memoriei cu planurile live reevaluate cu regulile curente, ca in scanare
+    (core/scan.evaluate_live_plans) - fara lumanarile de 5 minute (offline), deci fara bara partiala
+    de creare. Planurile pe care lumanarile nu le acopera raman cu regulile vechi."""
+    out = []
+    for p in plans:
+        q = copy.deepcopy(p)
+        cs = candles.get(q.get("symbol")) or []
+        if PT.needs_reevaluation(q) and cs and cs[0][0] / 1000.0 <= q["created_ts"]:
+            PT.reset_outcome(q)
+            q["first_bar"] = None
+            PT.evaluate_plan(q, cs)
+            q["er"] = PT.EVAL_RULES
+        out.append(q)
+    return out
 
 
 def main():
@@ -61,11 +78,17 @@ def main():
     rep = _audit(plans, candles)
     live_f = [f for f in rep["flagged"] if f["source"] != "backtest"]
     ok(not live_f, f"niciun plan live marcat din {sum(1 for p in plans if p.get('source') != 'backtest')} "
-                   f"({rep['reevaluated']} reevaluate pe lumanarile reale)")
+                   f"({rep['reevaluated']} reevaluate pe lumanarile reale; cele cu reguli vechi nu se reevalueaza)")
     print(f"     backtest marcat: {[(f['id'], f['reason']) for f in rep['flagged'] if f['source'] == 'backtest'][:3]}")
+    plans = _migrated(plans, candles)
+    rep = _audit(plans, candles)
+    live_f = [f for f in rep["flagged"] if f["source"] != "backtest"]
+    ok(not live_f and rep["reevaluated"] > 0,
+       f"dupa reevaluarea cu regulile v{PT.EVAL_RULES}: niciun plan live marcat ({rep['reevaluated']} reevaluate)")
 
     print("2. putere: date false injectate")
-    live = [p for p in plans if p.get("source") != "backtest" and p.get("state") in ("SL_HIT", "TP2_HIT")]
+    live = [p for p in plans if p.get("source") != "backtest" and p.get("state") in ("SL_HIT", "TP2_HIT")
+            and p.get("er") == PT.EVAL_RULES]
     reev = [p for p in live if A.reevaluate(p, candles.get(p["symbol"]), PT.evaluate_plan)]
     base = reev[0] if reev else live[0]
     tp2 = next((p for p in live if p["state"] == "TP2_HIT"), base)

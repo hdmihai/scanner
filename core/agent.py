@@ -268,7 +268,7 @@ def feature_skew(plans):
 
 
 # CARACTERISTICI IN ASTEPTAREA BACKTEST-ULUI. O evidenta noua (ex. ev_analyst, verdictul
-# Analistului Web3) apare intai doar pe planurile live; planurile de backtest existente nu o
+# Web3 Researcher) apare intai doar pe planurile live; planurile de backtest existente nu o
 # poarta deloc. feature_skew nu o poate masura (nu are cu ce compara), deci ar intra in model cu
 # valori live si 0 in cele ~16.000 de planuri de backtest - exact decalajul de mai sus. Ramane
 # exclusa (0 la antrenare si la predictie) pana cand backtest-ul re-rulat o contine; atunci

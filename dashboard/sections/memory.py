@@ -22,6 +22,32 @@ def _mb(b):
     return f"{b / 1e9:.2f} GB" if b >= 1e9 else f"{b / 1e6:.1f} MB"
 
 
+def _ci(x):
+    if not x or x.get("r") is None:
+        return "n/d"
+    ci = (f" (IC95 {x['ci_low']:+.3f}..{x['ci_high']:+.3f})" if x.get("ci_low") is not None else "")
+    return f"{x['r']:+.3f}R/plan{ci}, n={x.get('n', 0):,}"
+
+
+def universe_text(u):
+    """Strategia curenta pe tot universul bursei (memory_sync.universe_backtest), in cateva randuri."""
+    if not u or (u.get("liquid") or {}).get("r") is None:
+        return ""
+    e = u.get("edge") or {}
+    rec = e.get("recent") or {}
+    yrs = " &middot; ".join(f"{y} {v['r']:+.3f}" for y, v in list((e.get("by_year") or {}).items())[-4:])
+    verdict = {"pozitiv": "distinct pozitiv", "negativ": "NEGATIV", "neconcludent": "nu e distinct de zero"}.get(
+        e.get("status"), "")
+    return (f'<p class="mem-note"><strong>Strategia curenta pe tot universul bursei</strong> '
+            f'({u.get("symbols_liquid", 0)} simboluri lichide din {u.get("symbols", 0)}, regulile de evaluare '
+            f'v{u.get("rules", "?")}, masurat {_html.escape(str(u.get("when", "-")))}): {_ci(u.get("liquid"))}. '
+            f'Lista urmarita: {_ci(u.get("watchlist"))}; restul: {_ci(u.get("rest"))}. '
+            f'LONG {_ci(u.get("long"))}; SHORT {_ci(u.get("short"))}. '
+            + (f'Ultimele 12 luni: {rec["r"]:+.3f}R/plan (IC95 {rec["ci_low"]:+.3f}..{rec["ci_high"]:+.3f}) - {verdict}. '
+               if rec.get("r") is not None else "")
+            + (f'Pe ani: {yrs}.' if yrs else "") + '</p>')
+
+
 def render_memory(st, repo=None):
     if not st:
         return ('<p class="mem-note">Depozitul nu a rulat inca. Actions &rarr; <strong>Memorie agent</strong> &rarr; '
@@ -56,6 +82,7 @@ def render_memory(st, repo=None):
             '<div class="as-table-wrap"><table class="mem-table"><tr><th>Set de date</th><th>Randuri</th><th>Marime</th>'
             '<th>Partitii</th><th>Perioada</th><th>Acoperire</th></tr>' + "".join(rows) + '</table></div>'
             f'<p class="mem-note">{probe}</p>'
+            + universe_text(st.get("universe_backtest"))
             + (f'<p class="mem-note">Ultima rulare: {done}</p>' if done else "")
             + (f'<p class="plan-conflict" style="margin-top:8px;">Erori: {_html.escape("; ".join(errs))[:400]}</p>' if errs else ""))
 
@@ -66,6 +93,12 @@ def _done(name, v):
         return f"{_html.escape(name)}: sarit ({_html.escape(str(v['skipped']))})"
     if name == "plans":
         return f"planuri: {v.get('plans', 0):,} oglindite, {v.get('partitions_written', 0)} partitii rescrise"
+    if name == "universe":
+        return (f"strategia pe tot universul: {v.get('symbols', 0)} simboluri ({v.get('liquid', 0)} lichide), "
+                f"{v.get('plans', 0):,} planuri")
+    if name == "verdict":
+        return (f"verdictul Web3 Researcher masurat pe {v.get('tokens', 0)} tokeni, {v.get('obs', 0):,} zile-token "
+                f"({_html.escape(str(v.get('from') or '?'))} - {_html.escape(str(v.get('to') or '?'))})")
     parts = []
     for tf, d in sorted(v.items()):
         if not isinstance(d, dict):

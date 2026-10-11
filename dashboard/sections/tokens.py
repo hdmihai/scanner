@@ -385,7 +385,7 @@ def render_token_details(details, plans_store, watchlist=None, proposals=None,
         prop_tag = f'<span class="tag tag-{pcls} tok-dec">{ptxt}</span>' if ptxt else ""
         an_tok = analyst_tokens.get(sym.split("/")[0].upper())
         an_sent = ((an_tok or {}).get("strategy") or {}).get("sentiment")
-        an_tag = (f'<span class="tag {SENT_CLS.get(an_sent, "tag-info")} tok-an">analist {an_sent}</span>'
+        an_tag = (f'<span class="tag {SENT_CLS.get(an_sent, "tag-info")} tok-an">Web3 Researcher {an_sent}</span>'
                   if an_sent else "")
         an_inv = ((an_tok or {}).get("strategy") or {}).get("inv_price")
         # Grafic BOGAT pentru fiecare token cu semnal, nu doar pentru cel mai
@@ -410,8 +410,8 @@ def render_token_details(details, plans_store, watchlist=None, proposals=None,
                    "liq_structure": d.get("liq_structure"),
                    # zonele de suport/rezistenta (timeframe-ul scanarii + 1D) - desenate pe grafic
                    "zones": d.get("zones"),
-                   # invalidarea analistului (pasul 4): marcata doar daca incape in grafic, nu intinde axa
-                   "marks": ([{"price": an_inv, "label": "INVALIDARE ANALIST", "kind": "invsoft"}]
+                   # invalidarea Web3 Researcher (pasul 4): marcata doar daca incape in grafic, nu intinde axa
+                   "marks": ([{"price": an_inv, "label": "INVALIDARE WEB3 RESEARCHER", "kind": "invsoft"}]
                              if an_inv else [])}
             # FARA maximizare pe graficele per token: suprapunerea duplica
             # intregul SVG, iar la 30 de tokenuri asta inseamna ~2.4 MB de
@@ -510,7 +510,7 @@ def render_token_details(details, plans_store, watchlist=None, proposals=None,
           <div><span class="dim">PROBABILITATE</span><br>{prob_txt}<br><span class="dim" style="font-size:10px;">{prob_note}</span></div>
         </div>
         <h4>Grafic</h4>{chart_html}
-        <h4>Analist &middot; pașii 1–4</h4>{render_token_steps(an_tok)}
+        <h4>Web3 Researcher &middot; pașii 1–4</h4>{render_token_steps(an_tok)}
         <h4>Elliott Wave</h4>{ew_html}
         <h4>Structura de piata</h4>{struct_html}
         <h4>Zone de lichidare</h4>{liq_html}

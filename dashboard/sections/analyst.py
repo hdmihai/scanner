@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""dashboard.sections.analyst - Raportul analistului de rotatie a capitalului, in cele patru sectiuni:
+"""dashboard.sections.analyst - Raportul Web3 Researcher (rotatia capitalului), in cele patru sectiuni:
 diagnostic macro (alt season check), sectoare momentum, filtrare alfa, strategie executiva - plus
 graficul BTC 1D cu zonele de suport/rezistenta si nivelul de invalidare."""
 
@@ -134,6 +134,32 @@ def _calls_text(c):
             + "; primele verificări la 7 zile, apoi la 30 de zile - până atunci nu au o rată măsurată.")
 
 
+def track_text(tr):
+    """Cat valoreaza verdictul pe token pe tot istoricul zilnic al bursei (core/relative.track_record,
+    calculat de jobul depozitului de memorie): cat de des a batut BTC fiecare verdict si diferenta
+    Bullish - Bearish, cu IC95 pe blocuri de zile. Fara masurare: nimic (nu se afirma o valoare)."""
+    hz = (tr or {}).get("horizons") or {}
+    parts = []
+    for h in ("7", "30"):
+        r = hz.get(h) or {}
+        b, n, sp = r.get("Bullish"), r.get("Bearish"), r.get("spread")
+        if not (b and n and sp):
+            continue
+        if sp["ci_low"] > 0:
+            v = "Bullish bate Bearish, semnificativ"
+        elif sp["ci_high"] < 0:
+            v = "invers: Bearish bate Bullish, semnificativ"
+        else:
+            v = "fără diferență măsurabilă"
+        parts.append(f"la {h} zile — Bullish a bătut BTC în {b['beat']:.0f}% din cazuri (mediana {b['median']:+.1f}%), "
+                     f"Bearish în {n['beat']:.0f}%; diferența medie Bullish − Bearish {sp['mean']:+.2f} pp "
+                     f"(IC95 {sp['ci_low']:+.2f}..{sp['ci_high']:+.2f}): {v}")
+    if not parts:
+        return ""
+    return (f"Pe istoricul zilnic al bursei ({tr.get('from')} – {tr.get('to')}, {tr.get('tokens')} tokeni lichizi, "
+            f"{tr.get('obs'):,} zile-token): " + "; ".join(parts) + ".")
+
+
 def render_token_list(tokens, links=None):
     """Toti tokenii scanati intr-o lista compacta: sentimentul, sectorul, R:R si invalidarea -
     cu legatura spre cardul tokenului (pasii 1-4 complet)."""
@@ -155,12 +181,13 @@ def render_token_list(tokens, links=None):
     return "".join(rows)
 
 
-def render_analyst(rep, links=None):
+def render_analyst(rep, links=None, track=None):
     """Raportul complet. Fiecare rand vine dintr-o cifra masurata la aceasta scanare (vezi
     core/analyst.py); cand o sursa lipseste, randul spune ce lipseste, nu inventeaza.
-    `links`: {ticker: legatura spre cardul tokenului de pe pagina bursei active}."""
+    `links`: {ticker: legatura spre cardul tokenului de pe pagina bursei active};
+    `track`: valoarea verdictului pe token pe tot istoricul (data/memory_status.json)."""
     if not rep or not rep.get("macro"):
-        return ('<p class="dim">Raportul analistului apare după prima scanare cu versiunea nouă '
+        return ('<p class="dim">Raportul Web3 Researcher apare după prima scanare cu versiunea nouă '
                 '(altseason, zone 1D, sectoare).</p>')
     fr, m = rep.get("fresh") or {}, rep["macro"]
     bd, ph, ai, ty = m.get("btc_d") or {}, m.get("phase") or {}, m.get("alt_index") or {}, m.get("ten_year") or {}
@@ -231,7 +258,8 @@ def render_analyst(rep, links=None):
         elif p.get("rr") is None:
             geo.append("R:R indisponibil: lipsește suportul 1D sub preț sau ținta deasupra")
         rows.append(f'<li><strong>{_e(p["ticker"])}:</strong> <span class="an-why">{_e(p.get("name") or "")}'
-                    + (f' · #{p["rank"]}' if p.get("rank") else "") + f' · {_e(p.get("source"))}</span>'
+                    + (f' · #{p["rank"]}' if p.get("rank") else "") + f' · {_e(p.get("source"))}'
+                    + (f' · forța relativă: {_e(p["rs_source"])}' if p.get("rs_source") else "") + '</span>'
                     f'<ul class="an-sub"><li><em>Argument:</em> {_e(p["argument"])}</li>'
                     f'<li><em>Risc Critic:</em> {_e(p["risk"])}</li></ul>'
                     f'<div class="an-rr{" an-asym" if p.get("asymmetric") else ""}">{_e(" · ".join(geo))}</div></li>')
@@ -239,7 +267,8 @@ def render_analyst(rep, links=None):
         rows.append('<li>Niciun proiect nu bate BTC simultan pe 7 și pe 30 de zile în datele acestei scanări.</li>')
     zs = chart_render.zone_stats_text(rep.get("zone_stats"))
     s3 = ('<h3 class="an-h">3. FILTRARE ALFA (PROIECTE SPECIFICE)</h3><ul class="an-ul">' + "".join(rows) + "</ul>"
-          + '<p class="an-note">Selecție: bat BTC pe 7 ȘI pe 30 de zile. R:R e geometrie din zonele 1D (stop sub baza '
+          + '<p class="an-note">Selecție: bat BTC pe 7 ȘI pe 30 de zile - din închiderile zilnice de pe bursă, aceleași '
+            'cifre ca pe fișa tokenului (CoinGecko doar pentru monedele fără lumânări pe bursă). R:R e geometrie din zonele 1D (stop sub baza '
             'suportului, țintă la prima rezistență), nu probabilitate; asimetric = R:R ≥ 3. Riscul critic e măsurat: '
             'oferta în circulație și FDV (deblocări), volumul (lichiditate), β și corelația cu BTC.'
           + (" " + _e(" ".join(zs)) if zs else "") + "</p>")
@@ -260,5 +289,7 @@ def render_analyst(rep, links=None):
               f'<p class="an-note">Aceleași reguli ca pentru piață, aplicate fiecărui token din lista din care învață '
               f'agentul: forța față de BTC și faza rotației, sectorul și momentum-ul lui, R:R din zonele 1D și riscul '
               f'măsurat, apoi sentimentul (în interiorul sentimentului pieței), intrarea și invalidarea. Detaliul complet '
-              f'e pe cardul fiecărui token. {_e(_calls_text(rep.get("calls")))}</p></details>')
+              f'e pe cardul fiecărui token. {_e(_calls_text(rep.get("calls")))}</p>'
+              + (f'<p class="an-note an-track"><strong>Cât valorează verdictul:</strong> {_e(track_text(track))}</p>'
+                 if track_text(track) else "") + '</details>')
     return f'{head}<div class="an-body">{s1}{s2}{s3}{s4}{s5}</div>{_btc_chart(rep)}'

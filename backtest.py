@@ -447,12 +447,16 @@ def replay_symbol(symbol, candles, weights, start_id):
         if risk <= 0:
             continue
 
+        # Planul exista de la INCHIDEREA barei de semnal (semnalul foloseste inchiderea ei), nu de la
+        # deschiderea ei: cu deschiderea, crearea era datata cu o bara prea devreme. Prima bara
+        # evaluata e urmatoarea, intreaga (core/plans, regula E - aceeasi grila ca live-ul).
+        made_ts = bar_ts + bar_ms / 1000.0
         open_plan = {
             "id": next_id,
             "symbol": symbol,
             "direction": scored["direction"],
-            "created_ts": bar_ts,
-            "created_time": time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime(bar_ts)),
+            "created_ts": made_ts,
+            "created_time": time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime(made_ts)),
             "entry": levels["entry"], "sl": levels["sl"],
             "tp1": levels["tp1"], "tp2": levels["tp2"],
             "risk": risk,
@@ -477,12 +481,71 @@ def replay_symbol(symbol, candles, weights, start_id):
                          "reason": "replay istoric, fara poarta de decizie"},
             "geometry": plan_tracker.GEOMETRY_VERSION,
             "fv": plan_tracker.FEATURE_VERSION,
+            "er": plan_tracker.EVAL_RULES,
             "bar_seconds": scanner.timeframe_seconds(),
             "source": "backtest",
         }
         next_id += 1
 
     return plans, next_id
+
+
+REPLAY_WINDOW = 600     # barele trimise scorului si structurii in replay-ul rapid
+
+
+def replay_plans(symbol, candles, weights, window=REPLAY_WINDOW):
+    """Replay-ul RAPID al strategiei: ACELEASI planuri ca replay_symbol, fara evidentele agentului.
+    In backtest crearea planului nu depinde de evidente (sunt doar caracteristicile din care invata
+    agentul), deci rezultatele strategiei se pot masura fara ele, de ~60 de ori mai repede - pe tot
+    universul bursei din depozitul de memorie. Scorul primeste ultimele `window` bare (EMA-urile folosesc
+    oricum ultimele 100/150, iar RSI-ul Wilder converge); punctele de swing se calculeaza o data pe
+    toata seria, deci structura e exact cea din replay_symbol (verificat: planuri identice, si pe
+    seriile in care swing-urile recente sunt rare). Fiecare plan poarta lichiditatea de la
+    creare (`qv30`: mediana volumului in USDT pe 30 de bare) si barele fara tranzactii din ultimele 20
+    (`zero20`) - universul se filtreaza dupa ele."""
+    import bisect
+    from core import geometry as geo_mod
+    plans, open_plan = [], None
+    _d = [b[0] - a[0] for a, b in zip(candles[:80], candles[1:81]) if b[0] > a[0]]
+    bar_ms = max(set(_d), key=_d.count) if _d else 4 * 3600000
+    # punctele de swing pe toata seria, o singura data: la bara i, cele confirmate pana atunci
+    # (j <= i - 5) - aceleasi niveluri ca compute_structure_levels pe barele 0..i, fara fereastra
+    all_h, all_l = [c[2] for c in candles], [c[3] for c in candles]
+    sh_idx, sl_idx = geo_mod.swing_indices(all_h, all_l)
+    for i in range(WARMUP_BARS, len(candles)):
+        bar = candles[i]
+        if open_plan is not None:
+            plan_tracker.evaluate_plan(open_plan, [bar])
+            if open_plan["state"] in plan_tracker.CLOSED_STATES:
+                plans.append(open_plan)
+                open_plan = None
+        if open_plan is not None:
+            continue
+        w = candles[max(0, i - window + 1):i + 1]
+        scored = scanner.score_symbol(w, weights)
+        if not scored:
+            continue
+        highs, lows = [c[2] for c in w], [c[3] for c in w]
+        kh, kl = bisect.bisect_right(sh_idx, i - 5), bisect.bisect_right(sl_idx, i - 5)
+        structure = geo_mod.levels_from_swings([all_h[j] for j in sh_idx[max(0, kh - 12):kh]],
+                                               [all_l[j] for j in sl_idx[max(0, kl - 12):kl]])
+        levels = scanner.compute_trade_plan(scored["direction"], scored["price"], scored["atr"],
+                                            structure, scanner.compute_fibonacci(highs, lows))
+        if not levels:
+            continue
+        risk = abs(levels["entry"] - levels["sl"])
+        if risk <= 0:
+            continue
+        last = sorted((c[5] or 0) * c[4] for c in w[-30:])
+        open_plan = {
+            "symbol": symbol, "direction": scored["direction"], "created_ts": bar[0] / 1000.0 + bar_ms / 1000.0,
+            "entry": levels["entry"], "sl": levels["sl"], "tp1": levels["tp1"], "tp2": levels["tp2"],
+            "risk": risk, "state": plan_tracker.STATE_PENDING, "realized_r": None, "closed_ts": None,
+            "bars_checked": 0, "score_at_entry": scored["risk_adjusted"], "bar_seconds": bar_ms / 1000.0,
+            "source": "backtest", "er": plan_tracker.EVAL_RULES,
+            "qv30": last[len(last) // 2], "zero20": sum(1 for c in w[-20:] if not c[5] or c[2] == c[3]),
+        }
+    return plans
 
 
 # ============================ VARIANTE DE INTRARE ===========================

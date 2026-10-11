@@ -233,6 +233,32 @@ def check_plan_geometry(store):
     return _chk("plan_geometry", "OK", "Geometria planurilor", "toate planurile deschise sunt coerente")
 
 
+def check_eval_rules(store):
+    """Toate planurile trebuie evaluate cu ACELEASI reguli (core/plans.EVAL_RULES): un backtest
+    generat cu reguli vechi nu e comparabil cu live-ul (care se reevalueaza singur in scanare) si
+    invata agentul alte rezultate decat cele pe care le masoara live."""
+    import plan_tracker
+    cur = plan_tracker.EVAL_RULES
+    bt = [p for p in store.get("plans") or [] if p.get("source") == "backtest"]
+    bt_old = [p for p in bt if p.get("er") != cur]
+    live_old = [p for p in store.get("plans") or [] if plan_tracker.needs_reevaluation(p)]
+    if bt_old:
+        return _chk("eval_rules", "WARN", "Backtest evaluat cu reguli vechi",
+                    f"{len(bt_old)} din {len(bt)} planuri de backtest sunt evaluate cu regulile "
+                    f"v{bt_old[0].get('er') or 1}, iar regulile curente sunt v{cur} (ambiguitatile din "
+                    "bara rezolvate impotriva planului, expirare si in backtest, TP2 prin TP1, prima bara "
+                    "live). Statisticile simulate si agentul folosesc inca rezultatele vechi - ruleaza "
+                    "Actions -> Backtest (timeframe 4h, merge true): reconstructia se face o singura data.")
+    if live_old:
+        return _chk("eval_rules", "WARN", "Planuri live in curs de reevaluare",
+                    f"{len(live_old)} planuri live inca evaluate cu reguli vechi - se reevalueaza la "
+                    "urmatoarea scanare (asteapta lumanarile de 5 minute ale barei de creare).",
+                    [f"#{p.get('id')} {p.get('symbol')} {p.get('direction')}: {p.get('er_note') or 'in asteptare'}"
+                     for p in live_old[:5]])
+    return _chk("eval_rules", "OK", "Reguli de evaluare",
+                f"toate planurile evaluate cu regulile v{cur} (live si backtest)")
+
+
 def check_calibration_coverage(store):
     plans = store.get("plans") or []
     live = [p for p in plans if p.get("source") != "backtest"]
@@ -279,7 +305,7 @@ def check_freshness(details):
                             "10 ani nu include zilele recente"))
     an = _load("analyst.json", None)
     if an is not None and (an.get("error") or ref - (an.get("ts") or 0) > 2 * 3600):
-        out.append(_chk("fresh_analyst", "WARN", "Raportul analistului neactualizat",
+        out.append(_chk("fresh_analyst", "WARN", "Raportul Web3 Researcher neactualizat",
                         (f"ultima actualizare a esuat: {an.get('error')}" if an.get("error")
                          else "raportul nu e de la scanarea curenta")))
     meta = (_load("token_metadata.json", {}) or {}).get("tokens") or {}
@@ -522,7 +548,7 @@ def run():
 
     checks = [check_targets_vs_extreme(details), check_plan_vs_forecast(details, store),
               check_evidence_vs_panel(details, store), check_plan_geometry(store),
-              check_calibration_coverage(store)] + check_freshness(details)
+              check_calibration_coverage(store), check_eval_rules(store)] + check_freshness(details)
     fh_checks, fh_table = feature_health(store)
     checks += fh_checks + [live_vs_backtest(store), backtest_edge(store)]
 

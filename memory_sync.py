@@ -8,7 +8,11 @@ La fiecare rulare, cu buget de timp (MEMORY_BUDGET_MIN, implicit 45 de minute):
   1. PLANURI: oglinda memoriei de planuri (data/plans.json) in Parquet - doar partitiile schimbate;
   2. LUMANARI: istoricul complet 1d si 4h pentru TOT universul USDT spot al bursei principale, de la
      listare, incremental (simbolurile ramase in urma intai; rularea urmatoare continua);
-  3. BINANCE: arhiva publica data.binance.vision (1d, 4h), luna cu luna, verificata cu checksum - doar
+  3. VERDICT: cat valoreaza verdictul Web3 Researcher pe token, masurat pe tot istoricul zilnic al
+     bursei (randamentul urmator fata de BTC la 7 si 30 de zile) - in data/memory_status.json;
+  4. UNIVERS: strategia curenta pe tot universul bursei (replay rapid pe lumanarile de 4h din depozit),
+     o data pe zi - R mediu pe plan cu IC95, lista urmarita fata de rest, pe ani;
+  5. BINANCE: arhiva publica data.binance.vision (1d, 4h), luna cu luna, verificata cu checksum - doar
      daca sonda o gaseste accesibila din runner.
 Depozitul: release-urile GitHub ale repo-ului (GITHUB_TOKEN + GITHUB_REPOSITORY, setate de workflow),
 altfel un dosar local (MEMORY_LOCAL_DIR, implicit memory_local/ - pentru teste). Nimic din acest job
@@ -226,6 +230,90 @@ def sync_binance(store, deadline):
     return done
 
 
+# --------------------------------------------------------------------- 4. verdictul Web3 Researcher
+
+def verdict_track(store, exchange_id):
+    """Cat valoreaza verdictul Web3 Researcher pe token (core/relative.track_record), pe tot istoricul
+    zilnic al bursei din depozit: verdictul din inchiderile pana in ziua respectiva si randamentul
+    urmator fata de BTC la 7 si 30 de zile. Rezultatul intra in data/memory_status.json (afisat langa
+    jurnalul live de verdicte)."""
+    from core import altseason as ALT
+    from core import relative as REL
+    names = sorted(n for n in store.names("candles") if n.startswith(f"candles__{exchange_id}__1d__"))
+    files = [p for p in (store.local_path("candles", n) for n in names) if p]
+    if not files:
+        return {"skipped": "fara lumanari zilnice in depozit"}
+    rows = PQ.query("SELECT symbol, ts, open, high, low, close, volume FROM {src} ORDER BY symbol, ts", files)
+    ser = {}
+    for r in rows:
+        ser.setdefault(r["symbol"], []).append([r["ts"], r["open"], r["high"], r["low"], r["close"], r["volume"]])
+    btc = ser.pop("BTC/USDT", None)
+    skip = {s for s in ser if s.split("/")[0].lower() in (ALT.STABLE | ALT.WRAPPED)}
+    tr = REL.track_record(ser, btc, exclude=skip)
+    if not tr:
+        return {"skipped": "istoric insuficient"}
+    tr["when"] = time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime())
+    tr["exchange"] = exchange_id
+    return tr
+
+
+# --------------------------------------------------------------------- 5. strategia pe tot universul
+
+UNIVERSE_EVERY_H = 20          # o masurare pe zi (lumanarile de 4h ale unei zile schimba putin rezultatul)
+UNIVERSE_MIN_BUDGET_S = 15 * 60
+
+
+def _universe_one(args):
+    """Proces separat: lumanarile unui simbol din depozit si replay-ul rapid al strategiei."""
+    files, symbol, weights, tf = args
+    os.environ.setdefault("SCAN_TIMEFRAME", tf)
+    import backtest as BT
+    rows = PQ.query("SELECT ts, open, high, low, close, volume FROM {src} WHERE symbol = '"
+                    + symbol.replace("'", "''") + "' ORDER BY ts", files)
+    candles = [[r["ts"], r["open"], r["high"], r["low"], r["close"], r["volume"]] for r in rows]
+    if len(candles) < BT.WARMUP_BARS + 50:
+        return symbol, []
+    return symbol, BT.replay_plans(symbol, candles, weights)
+
+
+def universe_backtest(store, exchange_id, deadline, status):
+    """Strategia curenta (scor, geometrie, regulile de evaluare) pe TOT universul bursei din depozit,
+    cu replay-ul rapid (backtest.replay_plans), o data pe zi; rezumatul (core/plans.universe_summary)
+    intra in data/memory_status.json. Masoara daca strategia are un avantaj in piata, nu doar pe cele
+    ~30 de simboluri din care invata agentul."""
+    from core import altseason as ALT
+    from core import plans as PC
+    prev = status.get("universe_backtest") or {}
+    if time.time() - (prev.get("ts") or 0) < UNIVERSE_EVERY_H * 3600:
+        return {"skipped": f"masurat acum {(time.time() - prev['ts']) / 3600:.0f} ore (o data pe zi)"}
+    if deadline - time.monotonic() < UNIVERSE_MIN_BUDGET_S:
+        return {"skipped": "buget de timp insuficient la aceasta rulare"}
+    tf = ((_load(os.path.join("data", "latest_details.json"), {}) or {}).get("timeframe") or "4h")
+    names = sorted(n for n in store.names("candles") if n.startswith(f"candles__{exchange_id}__{tf}__"))
+    files = [p for p in (store.local_path("candles", n) for n in names) if p]
+    if not files:
+        return {"skipped": f"fara lumanari {tf} in depozit"}
+    syms = sorted(r["symbol"] for r in PQ.query("SELECT DISTINCT symbol FROM {src}", files))
+    syms = [x for x in syms if x.split("/")[0].lower() not in (ALT.STABLE | ALT.WRAPPED)]
+    weights = (_load(os.path.join("data", "scoring_policy.json"), {}) or {}).get("weights") or \
+        {"trend": 1.0, "momentum": 1.0, "volatility": 1.0, "volume": 1.0}
+    watch = set(((_load(os.path.join("data", "latest_details.json"), {}) or {}).get("symbols") or {}))
+    import multiprocessing as mp
+    plans, done = [], 0
+    with mp.Pool(max(1, os.cpu_count() or 1)) as pool:
+        for _sym, ps in pool.imap_unordered(_universe_one, [(files, x, weights, tf) for x in syms]):
+            plans += ps
+            done += 1
+            if time.monotonic() > deadline:
+                pool.terminate()
+                return {"skipped": f"buget depasit dupa {done} din {len(syms)} simboluri"}
+    summ = PC.universe_summary(plans, watch)
+    summ.update(ts=time.time(), when=time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime()), exchange=exchange_id,
+                tf=tf, rules=PC.EVAL_RULES)
+    status["universe_backtest"] = summ
+    return {"symbols": summ["symbols"], "liquid": summ["symbols_liquid"], "plans": summ["plans"]}
+
+
 # --------------------------------------------------------------------- statusul
 
 def dataset_status(store, ds):
@@ -242,6 +330,10 @@ def main():
     budget = float(os.environ.get("MEMORY_BUDGET_MIN", "45")) * 60
     deadline = t0 + budget
     wanted = [d.strip() for d in os.environ.get("MEMORY_DATASETS", "plans,candles,binance").split(",") if d.strip()]
+    if "candles" in wanted:
+        # masurarile din depozit urmeaza lumanarile proaspete: verdictul Web3 Researcher si strategia
+        # pe tot universul (o data pe zi)
+        wanted += [x for x in ("verdict", "universe") if x not in wanted]
     store, kind, where = make_store()
     exchange_id = (_load(EXCHANGES_FILE, {}) or {}).get("used") or "okx"
 
@@ -264,8 +356,16 @@ def main():
         run["errors"].append(f"sonda: {e}")
     print("SONDA:", json.dumps(status.get("probe"), ensure_ascii=False))
 
+    def _verdict():
+        tr = verdict_track(store, exchange_id)
+        if tr.get("horizons"):
+            status["verdict_track"] = tr
+        return {k: tr.get(k) for k in ("tokens", "obs", "from", "to", "skipped") if tr.get(k) is not None}
+
     steps = [("plans", lambda: sync_plans(store)),
              ("candles", lambda: sync_exchange_candles(store, exchange_id, open_exchange, deadline)),
+             ("verdict", _verdict),
+             ("universe", lambda: universe_backtest(store, exchange_id, deadline, status)),
              ("binance", lambda: (sync_binance(store, deadline)
                                   if (status.get("probe") or {}).get("binance_vision", {}).get("ok")
                                   else {"skipped": "arhiva Binance inaccesibila din runner"}))]

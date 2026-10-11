@@ -29,7 +29,7 @@ import hashlib
 import json
 import time
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2            # 2 = + `er` (versiunea regulilor de evaluare a planului, core/plans.EVAL_RULES)
 
 # tag-ul release-ului pentru fiecare set de date
 DATASETS = {
@@ -41,7 +41,7 @@ DATASETS = {
 # campurile scalare ale unui plan pastrate in memorie (restul - evidente text, vecini - sunt afisare)
 PLAN_FIELDS = (
     ("id", "BIGINT"), ("symbol", "VARCHAR"), ("direction", "VARCHAR"), ("source", "VARCHAR"),
-    ("geometry", "VARCHAR"), ("fv", "VARCHAR"), ("created_ts", "DOUBLE"), ("entered_ts", "DOUBLE"),
+    ("geometry", "VARCHAR"), ("fv", "VARCHAR"), ("er", "BIGINT"), ("created_ts", "DOUBLE"), ("entered_ts", "DOUBLE"),
     ("closed_ts", "DOUBLE"), ("state", "VARCHAR"), ("entry", "DOUBLE"), ("sl", "DOUBLE"), ("tp1", "DOUBLE"),
     ("tp2", "DOUBLE"), ("risk", "DOUBLE"), ("planned_r_tp2", "DOUBLE"), ("gross_r", "DOUBLE"),
     ("realized_r", "DOUBLE"), ("score_at_entry", "DOUBLE"), ("persistence_at_entry", "DOUBLE"),
@@ -78,6 +78,7 @@ def plan_row(p, feature_keys):
     row = {
         "id": p.get("id"), "symbol": p.get("symbol"), "direction": p.get("direction"),
         "source": p.get("source") or "live", "geometry": p.get("geometry"), "fv": p.get("fv"),
+        "er": p.get("er") if isinstance(p.get("er"), int) and not isinstance(p.get("er"), bool) else None,
         "created_ts": _num(p.get("created_ts")), "entered_ts": _num(p.get("entered_ts")),
         "closed_ts": _num(p.get("closed_ts")), "state": p.get("state"),
         "entry": _num(p.get("entry")), "sl": _num(p.get("sl")), "tp1": _num(p.get("tp1")),

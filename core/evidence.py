@@ -293,7 +293,7 @@ def build_evidence(ind, price, atr, rsi=None, components=None,
     if rel and rel.get("sentiment") and direction and not (symbol or "").upper().startswith("BTC/"):
         sent = rel["sentiment"]
         r7 = rel.get("rs7")
-        txt = (f"Analist: {sent} - {'peste' if rel.get('above_ma200') else 'sub'} MA200 1D, "
+        txt = (f"Web3 Researcher: {sent} - {'peste' if rel.get('above_ma200') else 'sub'} MA200 1D, "
                f"{rel['rs30']:+.1f}% vs BTC/30z" + ("" if r7 is None else f", {r7:+.1f}%/7z"))
         if sent == "Bullish":
             ev.append(_item("analyst", txt, DIR_LONG, 1.0, round(rel["rs30"], 2)))
