@@ -289,7 +289,7 @@ def check_render(fails, rep):
         fails.append("afisare: pretul curent lipseste de pe graficul BTC 1D")
     import re
     import chart_render
-    vals = re.findall(rf'<text class="pill-t" x="{chart_render.W - chart_render.PAD_R + 6}" y="[\d.-]+">([^<]+)</text>',
+    vals = re.findall(rf'<text class="pill-t pill-pxt" x="{chart_render.W - chart_render.PAD_R + 7}" y="[\d.-]+">([^<]+)</text>',
                       html)
     if len(vals) != len(set(vals)):
         fails.append(f"afisare: pastile de pret dublate pe graficul BTC 1D ({sorted(vals)})")

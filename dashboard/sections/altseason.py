@@ -20,7 +20,7 @@ def render_altseason_history(h):
     tl = h.get("timeline_tail") or []
     svg = ""
     if len(tl) > 20:
-        W, H, L, T, B = 760, 170, 34, 10, 22
+        W, H, L, T, B = 760, 210, 40, 12, 28
         pw, ph = W - L - 10, H - T - B
         days = [r[0] for r in tl]
         xi = lambda i: L + pw * i / (len(tl) - 1)
@@ -34,39 +34,43 @@ def render_altseason_history(h):
         parts = [f'<svg viewBox="0 0 {W} {H}" class="ah-svg" role="img" aria-label="Indice altseason istoric si BTC">']
         for w in h.get("windows") or []:
             x0, x1 = xd(w["start"]), xd(w["end"])
-            parts.append(f'<rect x="{x0:.1f}" y="{T}" width="{max(2, x1 - x0):.1f}" height="{ph}" fill="#089981" opacity="0.18"/>')
+            parts.append(f'<rect x="{x0:.1f}" y="{T}" width="{max(2, x1 - x0):.1f}" height="{ph}" fill="#2E8B6A" opacity="0.14"/>')
         for lvl in (25, 75):
             parts.append(f'<line x1="{L}" x2="{L + pw}" y1="{yai(lvl):.1f}" y2="{yai(lvl):.1f}" stroke="#CBD5E1" stroke-dasharray="3 3"/>'
                          f'<text x="{L - 4}" y="{yai(lvl) + 3:.1f}" text-anchor="end" class="ah-t">{lvl}</text>')
         pts = " ".join(f"{xi(i):.1f},{yb(r[2]):.1f}" for i, r in enumerate(tl) if r[2])
-        parts.append(f'<polyline points="{pts}" fill="none" stroke="#94A3B8" stroke-width="1.2"/>')
+        parts.append(f'<polyline points="{pts}" fill="none" stroke="#8792A2" stroke-width="1.3"/>')
         pts = " ".join(f"{xi(i):.1f},{yai(r[1]):.1f}" for i, r in enumerate(tl) if r[1] is not None)
-        parts.append(f'<polyline points="{pts}" fill="none" stroke="#7E57C2" stroke-width="1.6"/>')
+        parts.append(f'<polyline points="{pts}" fill="none" stroke="#6B5BA8" stroke-width="1.8"/>')
         # etichetele: varfurile sus, minimele jos; cand doua etichete de acelasi
         # tip sunt prea apropiate, a doua coboara/urca un rand (nu se suprapun)
         last_x = {"V": [], "M": []}
         for c in h.get("cycles") or []:
-            for d, col, lab in ((c.get("top"), "#F23645", "V"), (c.get("low"), "#089981", "M")):
+            for d, col, lab in ((c.get("top"), "#9E3530", "V"), (c.get("low"), "#1F6B50", "M")):
                 if d and d >= days[0]:
                     x = xd(d)
-                    lvl = sum(1 for px_ in last_x[lab] if abs(x - px_) < 62)
+                    lvl = sum(1 for px_ in last_x[lab] if abs(x - px_) < 84)
                     last_x[lab].append(x)
-                    y = (T + 9 + 10 * lvl) if lab == "V" else (T + ph - 4 - 10 * lvl)
-                    anchor = "end" if x > L + pw - 60 else "start"
+                    y = (T + 12 + 14 * lvl) if lab == "V" else (T + ph - 5 - 14 * lvl)
+                    anchor = "end" if x > L + pw - 84 else "start"
                     dx = -2 if anchor == "end" else 2
                     parts.append(f'<line x1="{x:.1f}" x2="{x:.1f}" y1="{T}" y2="{T + ph}" stroke="{col}" stroke-width="0.8" opacity="0.7"/>'
+                                 # contur alb dedesubt: eticheta ramane lizibila peste curbe
+                                 f'<text x="{x + dx:.1f}" y="{y:.1f}" text-anchor="{anchor}" class="ah-t ah-h">{lab} {d[:7]}</text>'
                                  f'<text x="{x + dx:.1f}" y="{y:.1f}" text-anchor="{anchor}" class="ah-t" style="fill:{col}">{lab} {d[:7]}</text>')
         for y in range(int(days[0][:4]) + 1, int(days[-1][:4]) + 1):
             x = xd(f"{y}-01-01")
             parts.append(f'<text x="{x:.1f}" y="{H - 6}" text-anchor="middle" class="ah-t">{y}</text>')
         lx, ly = xi(len(tl) - 1), yai(tl[-1][1] or 0)
-        parts.append(f'<circle cx="{lx:.1f}" cy="{ly:.1f}" r="3" fill="#7E57C2"/>'
+        parts.append(f'<circle cx="{lx:.1f}" cy="{ly:.1f}" r="3.5" fill="#6B5BA8"/>'
+                     f'<text x="{lx - 5:.1f}" y="{max(T + 30, ly - 6):.1f}" text-anchor="end" class="ah-t ah-h" '
+                     f'style="font-weight:700">ACUM {tl[-1][1]:.0f}</text>'
                      f'<text x="{lx - 5:.1f}" y="{max(T + 30, ly - 6):.1f}" text-anchor="end" class="ah-t" '
-                     f'style="fill:#7E57C2;font-weight:700">ACUM {tl[-1][1]:.0f}</text></svg>')
-        svg = ('<div class="ah-legend"><span style="color:#7E57C2">&#9632; indice altseason istoric (0-100)</span> '
-               '<span style="color:#94A3B8">&#9632; BTC (scara log)</span> <span style="color:#089981">&#9632; altseason '
-               '(indice &ge; 75)</span> <span style="color:#F23645">V</span> varf ciclu &middot; <span style="color:#089981">M</span> minim</div>'
-               + "".join(parts))
+                     f'style="fill:#3F3470;font-weight:700">ACUM {tl[-1][1]:.0f}</text></svg>')
+        svg = ('<div class="ah-legend"><span style="color:#6B5BA8">&#9632; indice altseason istoric (0-100)</span> '
+               '<span style="color:#8792A2">&#9632; BTC (scara log)</span> <span style="color:#2E8B6A">&#9632; altseason '
+               '(indice &ge; 75)</span> <span style="color:#9E3530">V</span> varf ciclu &middot; <span style="color:#1F6B50">M</span> minim</div>'
+               + '<div class="rc-scroll">' + "".join(parts) + "</div>")
     # --- pozitia de acum
     pc = "".join(f'<li>dupa minimul din {c["low"][:7]}: in {c["same_point"][:7]} indicele era {c["ai"]:.0f}, faza {c["phase"]} '
                  f'({pn(c["phase"])})' + (f'; primul altseason a venit in {c["first_altseason_after_low"][:7]}'

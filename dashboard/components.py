@@ -233,7 +233,7 @@ def render_rich_chart(chart, fullscreen_id=None):
     """Graficul curat, cu straturile principale. Randarea propriu-zisa e in
     chart_render.py; functia ramane aici pentru compatibilitate cu apelurile
     existente (graficele per token)."""
-    return chart_render.render_chart(chart, chart_render.MAIN_LAYERS, 300,
+    return chart_render.render_chart(chart, chart_render.MAIN_LAYERS, 360,
                                      fullscreen_id=fullscreen_id)
 
 

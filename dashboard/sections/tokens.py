@@ -297,7 +297,7 @@ def render_token_chart(sym, d, plans_by_symbol):
     if len(vals) < 3:
         return '<div class="tk-na">N/A</div>'
 
-    W, H, PAD_R = 420, 110, 96
+    W, H, PAD_R = 420, 150, 150     # etichetele au 13 unitati: ~10 px pe telefon
     plot_w = W - PAD_R
     plan = d.get("plan") or {}
     ind = d.get("indicators") or {}
@@ -332,11 +332,11 @@ def render_token_chart(sym, d, plans_by_symbol):
     last = -99
     for price, lbl, cls in levels:
         ly = y(price)
-        ty = max(ly, last + 10)
+        ty = max(ly, last + 15)
         last = ty
         body.append(f'<line class="{cls}" x1="0" y1="{ly:.1f}" x2="{plot_w:.1f}" '
                     f'y2="{ly:.1f}" stroke-dasharray="3 3"/>')
-        body.append(f'<text class="lv-t {cls}-t" x="{plot_w + 4}" y="{ty + 3:.1f}">'
+        body.append(f'<text class="lv-t {cls}-t" x="{plot_w + 5}" y="{ty + 4:.1f}">'
                     f'{lbl} {fmt_price(price)}</text>')
 
     return (f'<svg viewBox="0 0 {W} {H}" class="tk-chart" '

@@ -25,7 +25,7 @@ def _spark(series):
     pts = [(d, v) for d, v in series or [] if v is not None]
     if len(pts) < 3:
         return ""
-    W, H, P = 240, 46, 3
+    W, H, P = 260, 58, 3
     xs = lambda i: P + (W - 2 * P) * i / (len(pts) - 1)
     ys = lambda v: P + (H - 2 * P) * (1 - v / 100)
     line = " ".join(f"{xs(i):.1f},{ys(v):.1f}" for i, (_d, v) in enumerate(pts))
@@ -52,13 +52,13 @@ def _btc_chart(rep):
              "candles": ch["candles"], "ema50": ch.get("ma50"), "ema200": ch.get("ma200"), "price": px,
              "zones": {"frame": [dict(z, tf="1d") for z in (btc.get("zones") or {}).get("zones") or []]},
              "marks": marks}
-    return (chart_render.render_chart(chart, {"zones", "ema", "marks", "price_axis"}, 300)
-            + '<div class="legend an-legend"><span><i class="dot" style="background:#E53935"></i>MA 50 zile</span>'
-              '<span><i class="dot" style="background:#1565C0"></i>MA 200 zile</span>'
-              '<span><i class="dot" style="background:#089981"></i>suport 1D</span>'
-              '<span><i class="dot" style="background:#E67E22"></i>rezistență 1D</span>'
-              '<span><i class="dot" style="background:#2962FF"></i>preț acum</span>'
-              '<span><i class="dot" style="background:#F23645"></i>invalidare</span></div>')
+    return (chart_render.render_chart(chart, {"zones", "ema", "marks", "price_axis"}, 340)
+            + '<div class="legend an-legend"><span><i class="dot" style="background:#B5625E"></i>MA 50 zile</span>'
+              '<span><i class="dot" style="background:#2F5D9E"></i>MA 200 zile</span>'
+              '<span><i class="dot" style="background:#2E8B6A"></i>suport 1D</span>'
+              '<span><i class="dot" style="background:#C98A3E"></i>rezistență 1D</span>'
+              '<span><i class="dot" style="background:#2B4F8C"></i>preț acum</span>'
+              '<span><i class="dot" style="background:#8E2B2B"></i>invalidare</span></div>')
 
 
 SENT_CLS = {"Bullish": "tag-bull", "Bearish": "tag-bear"}
