@@ -15,73 +15,81 @@
   padding:10px 14px;background:#F8FAFC;border-bottom:1px solid transparent;}
 .cc[open]>summary{border-bottom-color:#E3E8EF;}
 .cc>summary::-webkit-details-marker{display:none;}
-.cc>summary::before{content:"▸";color:#64748B;font-size:11px;transition:transform .15s;}
+.cc>summary::before{content:"▸";color:#475569;font-size:12px;transition:transform .15s;}
 .cc[open]>summary::before{transform:rotate(90deg);}
-.cc-title{font-weight:700;font-size:13px;color:#0F172A;white-space:nowrap;}
-.cc-meta{font-size:11px;color:#64748B;font-family:var(--font-mono);margin-left:auto;
+.cc-title{font-weight:700;font-size:14px;color:#0F172A;white-space:nowrap;}
+.cc-meta{font-size:12px;color:#475569;font-family:var(--font-mono);margin-left:auto;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
 .cc-body{padding:10px 12px 12px;}
-.rc-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;
+.rc-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;
   font-family:var(--font-mono);margin-bottom:6px;color:#0F172A;}
-.rc-dir{padding:1px 7px;border-radius:4px;font-weight:700;font-size:11px;}
-.rc-long{background:#E6F4F1;color:#089981;} .rc-short{background:#FDECEE;color:#F23645;}
-.rc-scroll{overflow-x:auto;display:flex;flex-direction:row-reverse;}
-.rc{display:block;width:100%;min-width:640px;height:auto;background:#FFFFFF;}
-.grid{stroke:#EEF1F5;stroke-width:1;}
-.axis-t{font:8px var(--font-mono);fill:#94A3B8;}
-.cu{stroke:#089981;stroke-width:1;} .cd{stroke:#F23645;stroke-width:1;}
-.cuf{fill:#089981;} .cdf{fill:#F23645;}
-.ema9{stroke:#26A69A;stroke-width:1.2;} .ema20{stroke:#F57C00;stroke-width:1.2;}
-.ema50{stroke:#E53935;stroke-width:1.2;} .ema200{stroke:#1565C0;stroke-width:2.2;}
-.lvl{stroke-width:.9;stroke-dasharray:4 3;opacity:.75;}
-.lvl-tp{stroke:#089981;} .lvl-sl,.lvl-inv,.lvl-sts{stroke:#F23645;}
-.lvl-entry,.lvl-vwap,.lvl-val{stroke:#0288D1;} .lvl-locked{stroke:#455A64;}
-.lvl-ew{stroke:#7E57C2;} .lvl-vah,.lvl-poc,.lvl-liqb,.lvl-liqs{stroke:#E67E22;}
-.lvl-stb{stroke:#089981;}
-.heat-s{fill:#F23645;} .heat-l{fill:#089981;}
-.pill-t{font:600 8.5px var(--font-mono);fill:#FFFFFF;}
-.pill-tp,.pill-stb{fill:#089981;} .pill-sl,.pill-inv,.pill-sts{fill:#F23645;}
-.pill-entry,.pill-vwap,.pill-val{fill:#0288D1;} .pill-locked{fill:#455A64;}
-.pill-ew,.pill-ewh{fill:#7E57C2;} .pill-hit{fill:#94A3B8;} .pill-nextentry{fill:#B7791F;} .lvl-nextentry{stroke:#B7791F;stroke-dasharray:6 3;} .lvl-hit{stroke:#94A3B8;} .pill-ewa{fill:#1E88E5;}
-.pill-vah,.pill-poc,.pill-liqb{fill:#E67E22;} .pill-liqs{fill:#C0651A;}
-.ew0-l{stroke:#7E57C2;stroke-width:2;} .ew0-d{fill:#7E57C2;}
-.halo{fill:#FFFFFF;stroke:#FFFFFF;stroke-width:3px;stroke-linejoin:round;}
-.ew0-t-h,.ew0-t{font:700 8.5px var(--font-mono);} .ew0-t{fill:#5E35B1;}
-.proj-t-h{font:700 8.5px var(--font-mono);} .ewx-t-h{font:600 8px var(--font-mono);}
-.ew1-l{stroke:#1E88E5;stroke-width:1.4;stroke-dasharray:5 3;} .ew1-d{fill:#1E88E5;}
-.ew2-l{stroke:#FB8C00;stroke-width:1.2;stroke-dasharray:2 3;} .ew2-d{fill:#FB8C00;}
-.ewx-l{stroke:#94A3B8;stroke-width:1;stroke-dasharray:1 4;} .ewx-d{fill:#CBD5E1;}
-.ewx-t{font:600 8px var(--font-mono);fill:#94A3B8;}
-.live-l{stroke:#7E57C2;stroke-width:1.8;} .live-d{fill:#7E57C2;stroke:#FFFFFF;stroke-width:1.2;}
-.proj-zone{fill:#7E57C2;opacity:.04;}
-.proj-now{stroke:#94A3B8;stroke-width:1;stroke-dasharray:3 3;}
-.proj-l{stroke:#7E57C2;stroke-width:1.6;stroke-dasharray:6 4;}
-.proj-d{fill:#FFFFFF;stroke:#7E57C2;stroke-width:1.5;}
-.proj-t{font:700 8.5px var(--font-mono);fill:#7E57C2;}
-.proj-tag{font:600 8px var(--font-mono);fill:#7E57C2;}
-.rsi{stroke:#7E57C2;stroke-width:1.2;}
-.zone.zs{fill:#089981;opacity:.08;} .zone.zr{fill:#F57C00;opacity:.10;}
-.zone.zs.z1d{opacity:.15;} .zone.zr.z1d{opacity:.17;}
-.zl{stroke-width:1;} .zl.zs{stroke:#089981;opacity:.8;} .zl.zr{stroke:#E67E22;opacity:.85;}
+.rc-dir{padding:2px 8px;border-radius:4px;font-weight:700;font-size:12px;}
+.rc-long{background:#E7F3EE;color:#1F6B50;} .rc-short{background:#F8E9E8;color:#9E3530;}
+.rc-scroll{overflow-x:auto;display:flex;flex-direction:row-reverse;-webkit-overflow-scrolling:touch;}
+.rc{display:block;width:100%;height:auto;background:#FFFFFF;}
+@media(max-width:760px){.rc{min-width:720px;}}
+.rc text{font-family:var(--font-mono);}
+.rc .grid{stroke:#EDF0F4;stroke-width:1;}
+.rc .axis-t{font-size:12px;fill:#475569;}
+.cu{stroke:#2E8B6A;stroke-width:1;} .cd{stroke:#C8463F;stroke-width:1;}
+.cuf{fill:#2E8B6A;} .cdf{fill:#C8463F;}
+.ema9{stroke:#6FAFA6;stroke-width:1.3;} .ema20{stroke:#D9944A;stroke-width:1.3;}
+.ema50{stroke:#B5625E;stroke-width:1.3;} .ema200{stroke:#2F5D9E;stroke-width:2.2;}
+.lvl{stroke-width:1;stroke-dasharray:5 3;opacity:.85;}
+.lvl-tp,.lvl-stb{stroke:#2E8B6A;} .lvl-sl,.lvl-inv,.lvl-sts{stroke:#C8463F;}
+.lvl-entry,.lvl-vwap,.lvl-val{stroke:#2F6FB0;} .lvl-locked{stroke:#5B6675;}
+.lvl-ew{stroke:#6B5BA8;} .lvl-vah,.lvl-poc,.lvl-liqb,.lvl-liqs{stroke:#C98A3E;}
+.lvl-nextentry{stroke:#A8832E;stroke-dasharray:7 3;} .lvl-hit{stroke:#9AA4B2;}
+.heat-s{fill:#C8463F;} .heat-l{fill:#2E8B6A;}
+/* pastile: fond deschis, contur in culoarea nivelului, text aproape negru */
+.pill{stroke-width:1;}
+.rc .pill-t{font-size:12px;font-weight:600;fill:#111827;}
+.rc .pill-pxt{font-weight:700;}
+.pill-tp,.pill-stb,.pill-zsup{fill:#E7F3EE;stroke:#2E8B6A;}
+.pill-sl,.pill-inv,.pill-sts{fill:#F8E9E8;stroke:#C8463F;}
+.pill-entry,.pill-vwap,.pill-val{fill:#E8EFF8;stroke:#2F6FB0;}
+.pill-locked{fill:#EEF0F3;stroke:#5B6675;}
+.pill-ew,.pill-ewh{fill:#EFEDF7;stroke:#6B5BA8;} .pill-ewa{fill:#E8F0F9;stroke:#3B7DC4;}
+.pill-hit{fill:#F3F4F6;stroke:#9AA4B2;} .pill-nextentry{fill:#F6F0E1;stroke:#A8832E;}
+.pill-vah,.pill-poc,.pill-liqb,.pill-zres{fill:#F8EFE3;stroke:#C98A3E;} .pill-liqs{fill:#F6EBDD;stroke:#A9672A;}
+.pill-zsup2{fill:#F1F8F5;stroke:#8DBFAE;} .pill-zres2{fill:#FBF4EA;stroke:#DDB98A;}
+.pill-now{fill:#E6ECF7;stroke:#2B4F8C;} .lvl-now{stroke:#2B4F8C;stroke-dasharray:2 2;opacity:.9;}
+.pill-invsoft{fill:#F5E6E6;stroke:#8E2B2B;} .lvl-invsoft{stroke:#8E2B2B;stroke-dasharray:6 3;opacity:.85;}
+/* etichete pe grafic: text inchis, contur alb dedesubt */
+.rc .halo{fill:#FFFFFF;stroke:#FFFFFF;stroke-width:4px;stroke-linejoin:round;}
+.ew0-l{stroke:#6B5BA8;stroke-width:2;} .ew0-d{fill:#6B5BA8;}
+.rc .ew0-t-h,.rc .ew0-t,.rc .proj-t-h,.rc .proj-t{font-size:12px;font-weight:700;}
+.rc .ew0-t{fill:#3F3470;} .rc .proj-t{fill:#3F3470;}
+.rc .ewx-t-h,.rc .ewx-t{font-size:12px;font-weight:600;} .rc .ewx-t{fill:#475569;}
+.ew1-l{stroke:#3B7DC4;stroke-width:1.4;stroke-dasharray:5 3;} .ew1-d{fill:#3B7DC4;}
+.ew2-l{stroke:#C98A3E;stroke-width:1.2;stroke-dasharray:2 3;} .ew2-d{fill:#C98A3E;}
+.ewx-l{stroke:#9AA4B2;stroke-width:1;stroke-dasharray:1 4;} .ewx-d{fill:#C4CBD5;}
+.live-l{stroke:#6B5BA8;stroke-width:1.8;} .live-d{fill:#6B5BA8;stroke:#FFFFFF;stroke-width:1.2;}
+.proj-zone{fill:#6B5BA8;opacity:.045;}
+.rc .proj-now{stroke:#8792A2;stroke-width:1;stroke-dasharray:3 3;opacity:1;}
+.proj-l{stroke:#6B5BA8;stroke-width:1.6;stroke-dasharray:6 4;}
+.proj-d{fill:#FFFFFF;stroke:#6B5BA8;stroke-width:1.5;}
+.rc .proj-tag,.rc .proj-tag-h{font-size:12px;font-weight:600;opacity:1;} .rc .proj-tag{fill:#334155;}
+.rsi{stroke:#6B5BA8;stroke-width:1.3;}
+.zone.zs{fill:#2E8B6A;opacity:.07;} .zone.zr{fill:#C98A3E;opacity:.09;}
+.zone.zs.z1d{opacity:.13;} .zone.zr.z1d{opacity:.15;}
+.zl{stroke-width:1;} .zl.zs{stroke:#2E8B6A;opacity:.75;} .zl.zr{stroke:#C98A3E;opacity:.8;}
 .zl.zsc{stroke-dasharray:5 3;stroke-width:.9;}
-.pill-zsup{fill:#089981;} .pill-zres{fill:#E67E22;} .pill-zsup2{fill:#6CB8AA;} .pill-zres2{fill:#EFA868;}
-.pill-now{fill:#2962FF;} .lvl-now{stroke:#2962FF;stroke-dasharray:2 2;opacity:.9;}
-.pill-invsoft{fill:#C62828;} .lvl-invsoft{stroke:#C62828;stroke-dasharray:6 3;opacity:.85;}
-.zrow{font-size:12px;padding:5px 8px;border-left:3px solid;margin:4px 0;border-radius:4px;background:#F8FAFC;}
-.zrow-s{border-left-color:#089981;} .zrow-r{border-left-color:#E67E22;}
-.zstat{font-size:11px;margin:6px 0 0;}
-.sub-t{font:600 8px var(--font-mono);fill:#64748B;}
+.zrow{font-size:13px;padding:6px 9px;border-left:3px solid;margin:4px 0;border-radius:4px;background:#F8FAFC;color:#1F2937;}
+.zrow-s{border-left-color:#2E8B6A;} .zrow-r{border-left-color:#C98A3E;}
+.zstat{font-size:12px;margin:6px 0 0;}
+.rc .sub-t{font-size:12px;font-weight:600;fill:#334155;}
 
 :root{
   /* FUNDAL ALB, ca in capturile de referinta. Culorile de semnal urmeaza
-     conventia TradingView (verde #089981, rosu #F23645), iar tonurile de
+     o paleta sobra, de prezentare (verde #2E8B6A, rosu #C8463F), iar tonurile de
      "amber" sunt inchise, ca textul sa ramana lizibil pe alb. */
   --bg:#F5F7FA; --panel:#FFFFFF; --panel-2:#F1F4F8; --border:#E3E8EF;
   --text:#0F172A; --text-dim:#64748B;
-  --bull:#089981; --bear:#F23645; --amber:#B45309;
-  --ema9:#26A69A; --ema20:#F57C00; --ema50:#E53935; --ema200:#1565C0;
-  --ew0:#7E57C2; --ew1:#1E88E5; --ew2:#FB8C00;
-  --info:#0288D1;
+  --bull:#2E8B6A; --bear:#C8463F; --amber:#9A5B13;
+  --ema9:#6FAFA6; --ema20:#D9944A; --ema50:#B5625E; --ema200:#2F5D9E;
+  --ew0:#6B5BA8; --ew1:#3B7DC4; --ew2:#C98A3E;
+  --info:#2F6FB0;
   --font-sans:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
   --font-mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
 }
@@ -127,9 +135,9 @@ header{display:flex;justify-content:space-between;align-items:baseline;
 .candle-bear{fill:var(--bear);stroke:var(--bear);}
 .ema-20{fill:none;stroke:var(--ema20);stroke-width:1.4;opacity:.9;}
 .ema-50{fill:none;stroke:var(--ema50);stroke-width:1.4;opacity:.9;}
-.legend{display:flex;gap:16px;margin-top:8px;font-size:11px;color:var(--text-dim);}
+.legend{display:flex;gap:16px;margin-top:8px;font-size:12.5px;color:#334155;}
 .legend span{display:inline-flex;align-items:center;gap:5px;}
-.dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;}
 
 .levels-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;
   font-family:var(--font-mono);font-size:13px;margin-bottom:12px;}
@@ -195,6 +203,7 @@ header{display:flex;justify-content:space-between;align-items:baseline;
 .fs-overlay:target{display:flex;position:fixed;inset:0;z-index:99;
   background:var(--bg);flex-direction:column;padding:12px;overflow:auto;}
 .fs-inner{flex:1;display:flex;align-items:center;justify-content:center;}
+.fs-inner{overflow:auto;-webkit-overflow-scrolling:touch;}
 .fs-inner svg{width:100%;height:auto;max-height:92vh;}
 .fs-close{align-self:flex-end;font-size:12px;font-family:var(--font-mono);
   padding:7px 14px;border-radius:6px;background:var(--panel-2);
@@ -225,21 +234,23 @@ header{display:flex;justify-content:space-between;align-items:baseline;
 .sc-head{margin-bottom:8px;font-size:12px;}
 .sc-item{border:1px solid var(--border);border-radius:7px;padding:6px 10px;margin:6px 0;background:var(--panel-2);}
 .sc-item summary{cursor:pointer;font-size:12.5px;} .sc-item p{font-size:12px;margin:6px 0;}
-.sc-error{border-left:3px solid #F23645;} .sc-warn{border-left:3px solid #1E88E5;}
+.sc-error{border-left:3px solid #C8463F;} .sc-warn{border-left:3px solid #3B7DC4;}
 .sc-ok{font-size:11px;} .sc-tl{display:flex;flex-wrap:wrap;gap:2px;}
-.sc-chip{width:9px;height:14px;border-radius:2px;background:#089981;display:inline-block;}
-.sc-chip.sc-warn{background:#1E88E5;} .sc-chip.sc-error{background:#F23645;}
+.sc-chip{width:9px;height:14px;border-radius:2px;background:#2E8B6A;display:inline-block;}
+.sc-chip.sc-warn{background:#3B7DC4;} .sc-chip.sc-error{background:#C8463F;}
 .plan-conflict{margin:8px 0;padding:8px 10px;border-radius:6px;font-size:12px;
-  background:#FFF4E5;border-left:3px solid #E67E22;color:#7C3A00;}
-.plan-conflict.explore{background:#EEF4FF;border-left-color:#1E88E5;color:#0B3B78;}
+  background:#FFF4E5;border-left:3px solid #C98A3E;color:#7C3A00;}
+.plan-conflict.explore{background:#EEF4FF;border-left-color:#3B7DC4;color:#0B3B78;}
 .plan-ok{margin:8px 0;padding:6px 10px;border-radius:6px;font-size:12px;background:#E6F4F1;color:#086B5B;}
 .conf-note{font-size:10.5px;margin-top:2px;}
-.ah-svg{width:100%;height:auto;margin:6px 0 4px;} .ah-t{font:9px var(--font-mono);fill:#64748B;}
-.ah-legend{font-size:10.5px;display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;}
+.ah-svg{display:block;width:100%;height:auto;margin:6px 0 4px;}
+@media(max-width:760px){.ah-svg{min-width:720px;}} .ah-t{font:12px var(--font-mono);fill:#475569;}
+.ah-t.ah-h{fill:#FFFFFF;stroke:#FFFFFF;stroke-width:4px;stroke-linejoin:round;}
+.ah-legend{font-size:12.5px;display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;}
 .as-regime{margin:4px 0 8px;font-size:12px;}
 .as-rtag{font:700 11px var(--font-mono);color:#FFFFFF;background:#0F766E;border-radius:4px;padding:3px 7px;}
 .as-head{display:flex;gap:14px;align-items:center;margin-bottom:8px;}
-.as-phase{font:800 20px var(--font-mono);color:#FFFFFF;background:#7E57C2;border-radius:8px;
+.as-phase{font:800 20px var(--font-mono);color:#FFFFFF;background:#6B5BA8;border-radius:8px;
   padding:10px 12px;white-space:nowrap;}
 .as-name{font-size:16px;} .as-meta{font-size:11px;color:var(--text-dim);margin-top:3px;}
 .as-season{font-size:12px;margin:6px 0 10px;}
@@ -247,11 +258,11 @@ header{display:flex;justify-content:space-between;align-items:baseline;
 @media(max-width:700px){.as-ladder{grid-template-columns:repeat(3,1fr);}}
 .as-step{border:1px solid var(--border);border-radius:6px;padding:5px 6px;background:var(--panel-2);
   display:flex;flex-direction:column;gap:2px;min-width:0;}
-.as-step.cur{border-color:#7E57C2;background:#F3EEFB;} .as-step.nxt{border-style:dashed;border-color:#7E57C2;}
+.as-step.cur{border-color:#6B5BA8;background:#F3EEFB;} .as-step.nxt{border-style:dashed;border-color:#6B5BA8;}
 .as-n{font:700 13px var(--font-mono);} .as-t{font-size:9.5px;line-height:1.2;color:var(--text-dim);}
 .as-step.cur .as-t{color:#5E35B1;font-weight:700;}
 .as-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;}
-.as-bar i{display:block;height:100%;background:#7E57C2;}
+.as-bar i{display:block;height:100%;background:#6B5BA8;}
 .as-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;}
 @media(max-width:700px){.as-grid{grid-template-columns:1fr 1fr;}}
 .as-cell{padding:8px 10px;border-radius:7px;background:var(--panel-2);display:flex;flex-direction:column;gap:2px;}
@@ -266,9 +277,9 @@ header{display:flex;justify-content:space-between;align-items:baseline;
 .as-tl{display:flex;flex-wrap:wrap;gap:3px;margin:4px 0 8px;}
 .as-chip{font:700 10px var(--font-mono);width:18px;height:18px;border-radius:4px;display:inline-flex;
   align-items:center;justify-content:center;color:#FFFFFF;background:#94A3B8;}
-.as-chip.p0,.as-chip.p8{background:#F23645;} .as-chip.p1,.as-chip.p2{background:#F57C00;}
-.as-chip.p3{background:#1E88E5;} .as-chip.p4,.as-chip.p5{background:#089981;}
-.as-chip.p6,.as-chip.p7{background:#7E57C2;}
+.as-chip.p0,.as-chip.p8{background:#C8463F;} .as-chip.p1,.as-chip.p2{background:#B9772E;}
+.as-chip.p3{background:#3B7DC4;} .as-chip.p4,.as-chip.p5{background:#2E8B6A;}
+.as-chip.p6,.as-chip.p7{background:#6B5BA8;}
 .as-note{font-size:10.5px;margin-top:8px;}
 .ew-list{display:flex;flex-direction:column;gap:3px;margin-top:6px;}
 .ew-row{display:grid;grid-template-columns:70px 1fr 54px 40px 92px;gap:6px;
@@ -366,10 +377,10 @@ header{display:flex;justify-content:space-between;align-items:baseline;
 .lv-sl{stroke:var(--bear);stroke-width:1;}
 .lv-entry{stroke:var(--info);stroke-width:1;}
 .lv-vwap,.lv-poc,.lv-va{stroke:var(--amber);stroke-width:.8;opacity:.75;}
-.lv-t{font-family:var(--font-mono);font-size:7.5px;}
-.lv-tp-t{fill:var(--bull);} .lv-sl-t{fill:var(--bear);}
-.lv-entry-t{fill:var(--info);}
-.lv-vwap-t,.lv-poc-t,.lv-va-t{fill:var(--amber);}
+.lv-t{font-family:var(--font-mono);font-size:13px;font-weight:600;fill:#1F2937;}
+.lv-tp-t,.lv-sl-t{fill:#1F2937;}
+.lv-entry-t{fill:#1F2937;}
+.lv-vwap-t,.lv-poc-t,.lv-va-t{fill:#475569;}
 .pnl-t{font-family:var(--font-mono);font-size:8px;fill:var(--text-dim);}
 .rsi-l{stroke:var(--info);stroke-width:1;}
 .gridline{stroke:var(--border);stroke-width:.6;}
@@ -481,10 +492,10 @@ footer{margin-top:26px;color:var(--text-dim);font-size:11px;line-height:1.6;}
 
 /* Starea sistemului (dashboard/sections/health.py) */
 .hl-head{font:700 12px var(--font-mono);display:inline-block;border-radius:4px;padding:3px 8px;color:#FFFFFF;margin-bottom:8px;}
-.hl-head.hl-ok{background:#089981;} .hl-head.hl-warn{background:#E67E22;} .hl-head.hl-error{background:#F23645;}
+.hl-head.hl-ok{background:#2E8B6A;} .hl-head.hl-warn{background:#A86A1F;} .hl-head.hl-error{background:#C8463F;}
 .hl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;}
 .hl-tile{border-radius:7px;padding:8px 10px;background:var(--panel-2);display:flex;flex-direction:column;gap:2px;border-left:3px solid #94A3B8;}
-.hl-tile.hl-ok{border-left-color:#089981;} .hl-tile.hl-warn{border-left-color:#E67E22;} .hl-tile.hl-err{border-left-color:#F23645;}
+.hl-tile.hl-ok{border-left-color:#2E8B6A;} .hl-tile.hl-warn{border-left-color:#C98A3E;} .hl-tile.hl-err{border-left-color:#C8463F;}
 .hl-t{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-dim);}
 .hl-d{font-size:10.5px;color:var(--text-dim);}
 
@@ -550,7 +561,7 @@ footer{margin-top:26px;color:var(--text-dim);font-size:11px;line-height:1.6;}
 .tok-moved a,.exm-foot a{color:var(--info);}
 .prop-head{padding:9px 11px;border-radius:7px;font-size:13px;border-left:3px solid var(--border);background:var(--panel);}
 .prop-ok{border-left-color:var(--bull);}
-.prop-warn{border-left-color:#1E88E5;}
+.prop-warn{border-left-color:#3B7DC4;}
 .prop-bad{border-left-color:var(--bear);}
 .prop-info{border-left-color:var(--text-dim);}
 .prop-head .tag{margin-left:6px;vertical-align:middle;}
@@ -584,9 +595,9 @@ footer{margin-top:26px;color:var(--text-dim);font-size:11px;line-height:1.6;}
 .an-asym{color:var(--bull);font-weight:600;}
 .an-10y{background:var(--panel-2);border-radius:8px;padding:8px 10px;margin:8px 0;}
 .an-note{font-size:11px;color:var(--text-dim);margin:4px 0 8px;line-height:1.45;}
-.an-spark{display:block;width:240px;max-width:100%;height:46px;margin:4px 0;}
-.an-sp75{stroke:#CBD5E1;stroke-dasharray:3 3;} .an-spl{stroke:#7E57C2;stroke-width:1.6;}
-.an-spd{fill:#7E57C2;} .an-spt{font:8px var(--font-mono);fill:#94A3B8;}
+.an-spark{display:block;width:260px;max-width:100%;height:58px;margin:4px 0;}
+.an-sp75{stroke:#CBD5E1;stroke-dasharray:3 3;} .an-spl{stroke:#6B5BA8;stroke-width:1.6;}
+.an-spd{fill:#6B5BA8;} .an-spt{font:11px var(--font-mono);fill:#475569;}
 .an-legend{flex-wrap:wrap;gap:6px 14px;}
 /* Analistul per token: pasii 1-4 pe cardul tokenului si lista din raportul de piata */
 .an-tok{border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin:4px 0 10px;background:var(--panel-2);}
@@ -657,12 +668,12 @@ details.fold,details.fold>summary{min-width:0;max-width:100%;}
 <div class="wrap">
   <header>
     <div class="brand">SCANLINE<small>Modulul bursei Bybit</small></div>
-    <div class="meta">2026-10-12 04:19 UTC<br>4h</div>
+    <div class="meta">2026-10-12 05:25 UTC<br>4h</div>
   </header>
   <nav class="nav"><a class="nav-i" href="../index.html">Principal</a><a class="nav-i" href="okx.html">OKX</a><a class="nav-i" href="kucoin.html">KuCoin</a><a class="nav-i" href="gate.html">Gate.io</a><a class="nav-i" href="mexc.html">MEXC</a><a class="nav-i" href="kraken.html">Kraken</a><a class="nav-i nav-on nav-off" href="bybit.html">Bybit</a></nav>
   <div class="fold-tools"><button type="button" data-fold="open">Deschide tot</button><button type="button" data-fold="close">Închide tot</button></div>
 
-  <details class="card fold" id="altseason"><summary class="fold-head"><h2>Altcoin season &middot; modul separat, acelasi pe toate bursele</h2><span class="fold-sum"><span class="fold-line" title="Regim ACUMULARE / RECUPERARE · faza 1 Acumulare / recuperare BTC (82%)">Regim ACUMULARE / RECUPERARE · faza 1 Acumulare / recuperare BTC (82%)</span><span class="fold-line" title="indice alts 68/100 · BTC.D 59.68% · ETH/BTC -6.4%/30z">indice alts 68/100 · BTC.D 59.68% · ETH/BTC -6.4%/30z</span></span></summary><div class="fold-body"><div class="as-strip"><div class="as-phase">FAZA 1</div><div class="as-strip-t"><strong>Acumulare / recuperare BTC</strong> &middot; incredere 82%<div class="as-strip-m">regim ciclu BTC: acumulare / recuperare &middot; indice altseason 68/100 &middot; dominanta BTC 59.68% &middot; BTC $83,449 &middot; evaluat 2026-10-12 04:19 UTC</div></div><a class="exm-link" href="../index.html#altseason">Analiza completa</a></div></div></details>
+  <details class="card fold" id="altseason"><summary class="fold-head"><h2>Altcoin season &middot; modul separat, acelasi pe toate bursele</h2><span class="fold-sum"><span class="fold-line" title="Regim ACUMULARE / RECUPERARE · faza 1 Acumulare / recuperare BTC (81%)">Regim ACUMULARE / RECUPERARE · faza 1 Acumulare / recuperare BTC (81%)</span><span class="fold-line" title="indice alts 68/100 · BTC.D 59.68% · ETH/BTC -6.2%/30z">indice alts 68/100 · BTC.D 59.68% · ETH/BTC -6.2%/30z</span></span></summary><div class="fold-body"><div class="as-strip"><div class="as-phase">FAZA 1</div><div class="as-strip-t"><strong>Acumulare / recuperare BTC</strong> &middot; incredere 81%<div class="as-strip-m">regim ciclu BTC: acumulare / recuperare &middot; indice altseason 68/100 &middot; dominanta BTC 59.68% &middot; BTC $84,052 &middot; evaluat 2026-10-12 05:25 UTC</div></div><a class="exm-link" href="../index.html#altseason">Analiza completa</a></div></div></details>
 
   <details class="card fold" id="stare"><summary class="fold-head"><h2>Bybit &middot; starea bursei</h2><span class="fold-sum"><span class="fold-line" title="Indisponibilă: bybit GET https://api.bybit.com/v5/market/instruments-info?category=spot 403 Forbidden { error:The Amazon CloudFront distribution is configured to blo">Indisponibilă: bybit GET https://api.bybit.com/v5/market/instruments-info?category=spot 403 Forbidden { error:The Amazon CloudFront distribution is configured to blo</span></span></summary><div class="fold-body"><div class="ex-role ex-role-off"><strong>Indisponibila.</strong> bybit GET https://api.bybit.com/v5/market/instruments-info?category=spot 403 Forbidden {
     error:The Amazon CloudFront distribution is configured to block access from your countr<br><span class="dim">Blocata geografic pentru runner-ele GitHub (raspunde 403); ramane afisata ca indisponibila, cu motivul exact.</span></div><div class="cap-chips"><span class="cap-chip cap-no">Lumanari istorice</span><span class="cap-chip cap-no">Adancime live</span><span class="cap-chip cap-no">Flux de tranzactii live</span><span class="cap-chip cap-no">Order book istoric</span><span class="cap-chip cap-no">Open interest</span></div></div></details>
