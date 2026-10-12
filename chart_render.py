@@ -30,9 +30,15 @@ Zero JavaScript: pliere cu <details>, maximizare cu ancora + :target.
 """
 
 W = 760            # latimea viewBox-ului
-PAD_R = 84         # coloana de preturi din dreapta
-PILL_H = 11        # inaltimea unei pastile de nivel
-CHAR_W = 5.1       # latimea medie a unui caracter monospace la 8.5px
+PAD_R = 98         # coloana de preturi din dreapta
+# LIZIBILITATE PE TELEFON: graficul are cel putin 720 px CSS latime (derulare orizontala pe ecrane
+# mai inguste), deci 1 unitate de viewBox ~ 0.95 px; textul de 12 unitati iese ~11.5 px - marimea
+# minima a etichetelor din graficele de prezentare profesionale. Inainte: 8.5 unitati pe 640 px,
+# adica ~7 px, ilizibil.
+FONT = 12          # textul etichetelor si al pastilelor, in unitati de viewBox
+PILL_H = 18        # inaltimea unei pastile de nivel
+CHAR_W = 7.25      # latimea unui caracter monospace la 12 unitati (0.6 em)
+TEXT_DY = 13       # linia de baza a textului in pastila
 MAX_LABEL = 44     # etichete mai lungi se scurteaza (cea mai lunga eticheta
                    # de lichiditate are 40 de caractere - trebuie sa incapa intreaga)
 
@@ -228,8 +234,8 @@ def render_chart(chart, layers=None, height=300, fullscreen_id=None, show_head=T
     # COLOANA PASTILELOR: latimea celei mai late etichete de nivel. Lumanarile
     # si proiectia se deseneaza doar in stanga ei, deci nicio pastila nu mai
     # poate acoperi pretul sau proiectia.
-    lvl_w = [len(_short(l[1])) * CHAR_W + 8 for l in levels]
-    pillcol = min(max(lvl_w) + 6, 250) if lvl_w else 0
+    lvl_w = [len(_short(l[1])) * CHAR_W + 10 for l in levels]
+    pillcol = min(max(lvl_w) + 6, 330) if lvl_w else 0
     xmax = plot_w - pillcol
 
     # intervalul de pret: lumanari + niveluri + proiectie. Nivelurile foarte
@@ -266,18 +272,37 @@ def render_chart(chart, layers=None, height=300, fullscreen_id=None, show_head=T
     def x(i):
         return (i / max(n - 1 + ext, 1)) * xmax
 
+    # PASTILELE (pozitiile se calculeaza inainte de axa, ca axa sa nu scrie sub ele): scenariul
+    # Elliott + nivelurile, pe axa din dreapta, fara
+    # suprapunere. Se sorteaza dupa pret si se impraștie pe verticala; daca nu
+    # incap toate, raman cele cu prioritate mare.
+    pills = [(lv[0], lv[1], lv[2], lv[3]) for lv in levels if lo <= lv[0] <= hi]
+    max_pills = max(3, int(H / (PILL_H + 2)))
+    if len(pills) > max_pills:
+        pills = sorted(pills, key=lambda p: -p[3])[:max_pills]
+    pills.sort(key=lambda p: -p[0])
+    # POZITIILE: fiecare pastila cat mai aproape de pretul ei, fara suprapuneri si in interiorul
+    # graficului - intai de sus in jos (distanta minima), apoi de jos in sus (marginea de jos).
+    # Intr-o singura trecere, pastilele impinse sub marginea de jos se asezau una peste alta.
+    gap = PILL_H + 2
+    pys = []
+    for price, *_rest in pills:
+        want = y(price) - PILL_H / 2
+        pys.append(max(want, pys[-1] + gap) if pys else max(want, 0.0))
+    for k in range(len(pys) - 1, -1, -1):
+        pys[k] = min(pys[k], pys[k + 1] - gap if k + 1 < len(pys) else H - PILL_H)
     b = []
 
-    # axa de pret: 6 diviziuni rotunde, gri discret
-    pill_ys = [y(l[0]) for l in levels]
+    # axa de pret: 6 diviziuni rotunde, gri discret; o eticheta de axa nu se scrie unde e deja o
+    # pastila de pret (pozitia ei FINALA, dupa impraștiere - nu pretul ei)
     if "price_axis" in layers:
         for k in range(1, 6):
             v = lo + rng * k / 6
             yy = y(v)
-            if any(abs(yy - py) < PILL_H + 2 for py in pill_ys):
+            if any(ty - 4 < yy + 4 and yy - 9 < ty + PILL_H + 4 for ty in pys):
                 continue    # o pastila de pret ocupa deja locul
             b.append(f'<line class="grid" x1="0" y1="{yy:.0f}" x2="{plot_w}" y2="{yy:.0f}"/>')
-            b.append(f'<text class="axis-t" x="{W - 4}" y="{yy + 3:.0f}" '
+            b.append(f'<text class="axis-t" x="{W - 4}" y="{yy + 4:.0f}" '
                      f'text-anchor="end">{fmt(v)}</text>')
 
     # ZONELE: dreptunghi de la lumanarea de formare (sau marginea stanga) pana in prezent, plus
@@ -341,25 +366,25 @@ def render_chart(chart, layers=None, height=300, fullscreen_id=None, show_head=T
     placed = []     # cutiile etichetelor deja puse, pentru anti-suprapunere
     for k, (text, kind) in enumerate(chips):
         cy = 3 + k * (PILL_H + 2)
-        w = len(text) * CHAR_W + 8
+        w = len(text) * CHAR_W + 12
         placed.append((0, cy, w + 4, cy + PILL_H))
         b.append(f'<rect class="pill pill-{kind}" x="3" y="{cy}" width="{w:.0f}" '
-                 f'height="{PILL_H}" rx="2"/>')
-        b.append(f'<text class="pill-t" x="7" y="{cy + 8}">{_esc(text)}</text>')
+                 f'height="{PILL_H}" rx="3"/>')
+        b.append(f'<text class="pill-t" x="8" y="{cy + TEXT_DY}">{_esc(text)}</text>')
 
     def place_label(cx, cy, text, above, cls):
-        w = len(text) * CHAR_W * 0.95
+        w = len(text) * CHAR_W
         # incerc intai partea preferata, apoi cealalta; o eticheta care ar iesi
         # din grafic (sub un minim aflat jos, peste un varf aflat sus) nu se
         # taie - trece de partea opusa. Centrul se tine in interiorul zonei.
         cx = min(max(cx, w / 2 + 2), xmax - w / 2 - 2) if xmax > w + 4 else cx
         tries = [(above, k) for k in range(4)] + [(not above, k) for k in range(4)]
         for side_above, step in tries:
-            dy = -(9 + step * 10) if side_above else (15 + step * 10)
+            dy = -(10 + step * 15) if side_above else (20 + step * 15)
             ty = cy + dy
-            if ty - 8 < chips_h or ty + 2 > H:
+            if ty - 11 < chips_h or ty + 3 > H:
                 continue
-            box = (cx - w / 2, ty - 8, cx + w / 2, ty + 2)
+            box = (cx - w / 2, ty - 11, cx + w / 2, ty + 3)
             if not any(box[0] < p[2] and box[2] > p[0] and box[1] < p[3] and box[3] > p[1]
                        for p in placed):
                 placed.append(box)
@@ -372,6 +397,28 @@ def render_chart(chart, layers=None, height=300, fullscreen_id=None, show_head=T
                 b.append(f'<text class="{cls}" x="{cx:.0f}" y="{ty:.0f}" '
                          f'text-anchor="middle">{_esc(text)}</text>')
                 return
+
+    # ETICHETA PROGNOZEI: doua randuri scurte, aliniate la dreapta zonei de prognoza (nu intra sub
+    # coloana pastilelor), sus, sub scenariile Elliott; locul lor se rezerva INAINTE de etichetele
+    # punctelor, ca acestea sa le ocoleasca. Daca sus nu incap (peste o eticheta de scenariu), jos.
+    tags = []
+    if ppath:
+        hist = fc.get("hist") or {}
+        src = {"elliott": "scenariu Elliott", "plan": "drumul planului",
+               "elliott_conflict": "CONFLICT: corectie Elliott",
+               "plan_split": "drumul planului · Elliott impartit"}.get(fc.get("source"), "scenariu")
+        htxt = (f" · istoric {hist['win_rate']}% din {hist['n']}" if hist.get("n") else "")
+        t2 = (f'{htxt.lstrip(" ·")}{" · " if htxt else ""}structura '
+              f'{(proj.get("confidence") or 0) * 100:.0f}%')
+        lines = [f"PROGNOZA · {src}", t2]
+        tw = max(len(t) for t in lines) * CHAR_W
+        x_r = xmax - 4
+        top = [chips_h + 15, chips_h + 30]
+        clash = any(x_r - tw < p[2] and p[1] < top[1] + 3 and p[3] > top[0] - 11 for p in placed)
+        ys = [H - 21, H - 6] if clash else top
+        for y_, t in zip(ys, lines):
+            tags.append((x_r, y_, t))
+            placed.append((x_r - len(t) * CHAR_W, y_ - 11, x_r, y_ + 3))
 
     def draw_count(count, ci, with_labels):
         pts = [p for p in (count.get("points") or [])
@@ -426,46 +473,22 @@ def render_chart(chart, layers=None, height=300, fullscreen_id=None, show_head=T
             b.append(f'<circle class="proj-d" cx="{cx:.0f}" cy="{cy:.0f}" r="3"/>')
             prev = coords[full.index(p) - 1][1]
             place_label(cx, cy, p["label"], cy <= prev, "proj-t")
-        hist = fc.get("hist") or {}
-        # doua randuri scurte: un singur rand lung iesea din grafic in dreapta
-        src = {"elliott": "scenariu Elliott", "plan": "drumul planului",
-               "elliott_conflict": "CONFLICT: corectie Elliott",
-               "plan_split": "drumul planului · Elliott impartit"}.get(fc.get("source"), "scenariu")
-        htxt = (f" · istoric {hist['win_rate']}% din {hist['n']}" if hist.get("n") else "")
-        b.append(f'<text class="proj-tag" x="{nx + 4:.0f}" y="{H - 16}">PROGNOZA · {src}</text>')
-        b.append(f'<text class="proj-tag" x="{nx + 4:.0f}" y="{H - 5}">{htxt.lstrip(" ·")}'
-                 f'{" · " if htxt else ""}structura '
-                 f'{(proj.get("confidence") or 0) * 100:.0f}%</text>')
+        for x_, y_, txt_ in tags:
+            # contur alb dedesubt: textul ramane lizibil peste lumanari si linii
+            b.append(f'<text class="halo proj-tag-h" x="{x_:.0f}" y="{y_:.0f}" text-anchor="end">{_esc(txt_)}</text>')
+            b.append(f'<text class="proj-tag" x="{x_:.0f}" y="{y_:.0f}" text-anchor="end">{_esc(txt_)}</text>')
 
-    # PASTILELE: scenariul Elliott + nivelurile, pe axa din dreapta, fara
-    # suprapunere. Se sorteaza dupa pret si se impraștie pe verticala; daca nu
-    # incap toate, raman cele cu prioritate mare.
-    pills = [(lv[0], lv[1], lv[2], lv[3]) for lv in levels if lo <= lv[0] <= hi]
-    max_pills = max(3, int(H / (PILL_H + 2)))
-    if len(pills) > max_pills:
-        pills = sorted(pills, key=lambda p: -p[3])[:max_pills]
-    pills.sort(key=lambda p: -p[0])
-    # POZITIILE: fiecare pastila cat mai aproape de pretul ei, fara suprapuneri si in interiorul
-    # graficului - intai de sus in jos (distanta minima), apoi de jos in sus (marginea de jos).
-    # Intr-o singura trecere, pastilele impinse sub marginea de jos se asezau una peste alta.
-    gap = PILL_H + 1.5
-    pys = []
-    for price, *_rest in pills:
-        want = y(price) - PILL_H / 2
-        pys.append(max(want, pys[-1] + gap) if pys else max(want, 0.0))
-    for k in range(len(pys) - 1, -1, -1):
-        pys[k] = min(pys[k], pys[k + 1] - gap if k + 1 < len(pys) else H - PILL_H)
     for (price, label, kind, _p), ty in zip(pills, pys):
         text = label if kind in ("ewh", "ewa") else _short(label)
-        lw = len(text) * CHAR_W + 8
-        lx = plot_w - 2 - lw
+        lw = len(text) * CHAR_W + 10
+        lx = plot_w - 3 - lw
         b.append(f'<rect class="pill pill-{kind}" x="{lx:.0f}" y="{ty:.0f}" '
-                 f'width="{lw:.0f}" height="{PILL_H}" rx="2"/>')
-        b.append(f'<text class="pill-t" x="{lx + 4:.0f}" y="{ty + 8:.0f}">{_esc(text)}</text>')
+                 f'width="{lw:.0f}" height="{PILL_H}" rx="3"/>')
+        b.append(f'<text class="pill-t" x="{lx + 5:.0f}" y="{ty + TEXT_DY:.0f}">{_esc(text)}</text>')
         if kind not in ("ewh", "ewa"):
-            b.append(f'<rect class="pill pill-{kind}" x="{plot_w + 2}" y="{ty:.0f}" '
-                     f'width="{PAD_R - 4}" height="{PILL_H}" rx="2"/>')
-            b.append(f'<text class="pill-t" x="{plot_w + 6}" y="{ty + 8:.0f}">{fmt(price)}</text>')
+            b.append(f'<rect class="pill pill-{kind} pill-px" x="{plot_w + 2}" y="{ty:.0f}" '
+                     f'width="{PAD_R - 4}" height="{PILL_H}" rx="3"/>')
+            b.append(f'<text class="pill-t pill-pxt" x="{plot_w + 7}" y="{ty + TEXT_DY:.0f}">{fmt(price)}</text>')
 
     svg = (f'<svg viewBox="0 0 {W} {H}" class="rc" preserveAspectRatio="xMidYMid meet">'
            f'{"".join(b)}</svg>')
@@ -494,7 +517,7 @@ def render_subpanels(chart, height=150):
         return '<p class="dim">N/A</p>'
     n = len(candles)
     plot_w = W - PAD_R
-    vh, rh, mh, gap = 50, 56, 30, 7
+    vh, rh, mh, gap = 56, 64, 36, 10
 
     def x(i):
         return (i / max(n - 1, 1)) * plot_w
@@ -508,7 +531,7 @@ def render_subpanels(chart, height=150):
                     for i, (c, v) in enumerate(zip(candles, vols)) if (c[4] >= c[1]) == k)
         if d:
             b.append(f'<path class="{cls}" d="{d}" opacity="0.55"/>')
-    b.append(f'<text class="sub-t" x="2" y="9">VOLUM</text>')
+    b.append(f'<text class="sub-t" x="2" y="13">VOLUM</text>')
 
     y0 = vh + gap
     rs = chart.get("rsi") or []
@@ -520,9 +543,9 @@ def render_subpanels(chart, height=150):
                        for i, v in enumerate(rs) if v is not None)
         last = next((v for v in reversed(rs) if v is not None), None)
         b.append(f'<polyline class="rsi" points="{pts}" fill="none"/>')
-        b.append(f'<text class="sub-t" x="2" y="{y0 + 9}">RSI 14 · {last:.1f}</text>')
+        b.append(f'<text class="sub-t" x="2" y="{y0 + 13}">RSI 14 · {last:.1f}</text>')
     else:
-        b.append(f'<text class="sub-t" x="2" y="{y0 + 9}">RSI 14 · N/A</text>')
+        b.append(f'<text class="sub-t" x="2" y="{y0 + 13}">RSI 14 · N/A</text>')
 
     y1 = y0 + rh + gap
     hist = (chart.get("macd") or {}).get("histogram")
@@ -533,7 +556,7 @@ def render_subpanels(chart, height=150):
         b.append(f'<line class="grid" x1="0" y1="{mid:.0f}" x2="{plot_w}" y2="{mid:.0f}"/>')
         b.append(f'<rect class="{cls}" x="{plot_w - 40}" y="{mid - bh if hist > 0 else mid:.0f}" '
                  f'width="34" height="{bh:.0f}"/>')
-        b.append(f'<text class="sub-t" x="2" y="{y1 + 9}">MACD hist {hist:+.6g}</text>')
+        b.append(f'<text class="sub-t" x="2" y="{y1 + 13}">MACD hist {hist:+.6g}</text>')
     H = y1 + mh + 2
     return (f'<div class="rc-scroll"><svg viewBox="0 0 {W} {H:.0f}" class="rc" '
             f'preserveAspectRatio="xMidYMid meet">{"".join(b)}</svg></div>')
@@ -622,28 +645,28 @@ def render_components(chart, uid="main"):
     parts = [
         _component("Grafic principal",
                    pr.get("headline") or "nicio structura Elliott curenta",
-                   render_chart(chart, MAIN_LAYERS, 330, fullscreen_id=f"max-{uid}"),
+                   render_chart(chart, MAIN_LAYERS, 390, fullscreen_id=f"max-{uid}"),
                    open_=True),
         _component("Elliott Wave · toate scenariile",
                    f"{ew.get('alive', 0)} din {ew.get('total', 0)} scenarii valide",
                    render_chart(chart, {"ew_primary", "ew_all", "ew_levels",
-                                        "projection", "price_axis"}, 300, show_head=False),
+                                        "projection", "price_axis"}, 340, show_head=False),
                    open_=True),
         _component("Plan · LOCKED vs CURRENT",
                    f"plan #{lock['id']} blocat" if lock else "doar niveluri CURRENT",
-                   render_chart(chart, {"plan", "locked", "price_axis"}, 260,
+                   render_chart(chart, {"plan", "locked", "price_axis"}, 300,
                                 show_head=False)),
         _component("Lichiditate · heatmap si structura",
                    (f"{len(ls.get('levels') or [])} niveluri structurale"
                     + (" · sweep bilateral" if ls.get("two_sided_sweep") else "")),
-                   render_chart(chart, {"liq_heat", "liq_struct", "price_axis"}, 280,
+                   render_chart(chart, {"liq_heat", "liq_struct", "price_axis"}, 320,
                                 show_head=False)),
         _component("Zone de suport / rezistenta", _zone_meta(chart),
-                   render_chart(chart, {"zones", "price_axis"}, 280, show_head=False)
+                   render_chart(chart, {"zones", "price_axis"}, 320, show_head=False)
                    + render_zone_list(chart)),
         _component("Indicatori · VWAP, Volume Profile, SuperTrend",
                    f"SuperTrend {st.get('direction', 'N/A')}",
-                   render_chart(chart, {"ema", "indicators", "price_axis"}, 280,
+                   render_chart(chart, {"ema", "indicators", "price_axis"}, 320,
                                 show_head=False)),
         _component("Volum · RSI · MACD",
                    f"RSI {rs[-1]:.1f}" if rs else "RSI N/A",
@@ -652,9 +675,11 @@ def render_components(chart, uid="main"):
     return '<div class="cc-stack">' + "".join(parts) + "</div>"
 
 
-# CSS-ul componentelor si al graficelor, pe fundal alb. Culorile urmeaza
-# conventiile din capturile de referinta (TradingView): verde #089981 pentru
-# cresteri, rosu #F23645 pentru scaderi, pastile colorate cu text alb.
+# CSS-ul componentelor si al graficelor, pe fundal alb, dupa conventiile graficelor de prezentare
+# profesionala: paleta sobra (tonuri mai putin saturate), etichete cu text inchis pe fond deschis,
+# culoarea doar ca accent (contur, linie), cifre monospace aliniate, minimum ~11 px pe telefon.
+# Regulile de text sunt calificate cu .rc: altfel reguli mai vechi din main.css (.proj-t de 7.5 px)
+# le suprascriau.
 CSS = """
 .cc-stack{display:flex;flex-direction:column;gap:10px;}
 .cc{border:1px solid #E3E8EF;border-radius:10px;background:#FFFFFF;overflow:hidden;}
@@ -662,60 +687,68 @@ CSS = """
   padding:10px 14px;background:#F8FAFC;border-bottom:1px solid transparent;}
 .cc[open]>summary{border-bottom-color:#E3E8EF;}
 .cc>summary::-webkit-details-marker{display:none;}
-.cc>summary::before{content:"▸";color:#64748B;font-size:11px;transition:transform .15s;}
+.cc>summary::before{content:"▸";color:#475569;font-size:12px;transition:transform .15s;}
 .cc[open]>summary::before{transform:rotate(90deg);}
-.cc-title{font-weight:700;font-size:13px;color:#0F172A;white-space:nowrap;}
-.cc-meta{font-size:11px;color:#64748B;font-family:var(--font-mono);margin-left:auto;
+.cc-title{font-weight:700;font-size:14px;color:#0F172A;white-space:nowrap;}
+.cc-meta{font-size:12px;color:#475569;font-family:var(--font-mono);margin-left:auto;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
 .cc-body{padding:10px 12px 12px;}
-.rc-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;
+.rc-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;
   font-family:var(--font-mono);margin-bottom:6px;color:#0F172A;}
-.rc-dir{padding:1px 7px;border-radius:4px;font-weight:700;font-size:11px;}
-.rc-long{background:#E6F4F1;color:#089981;} .rc-short{background:#FDECEE;color:#F23645;}
-.rc-scroll{overflow-x:auto;display:flex;flex-direction:row-reverse;}
-.rc{display:block;width:100%;min-width:640px;height:auto;background:#FFFFFF;}
-.grid{stroke:#EEF1F5;stroke-width:1;}
-.axis-t{font:8px var(--font-mono);fill:#94A3B8;}
-.cu{stroke:#089981;stroke-width:1;} .cd{stroke:#F23645;stroke-width:1;}
-.cuf{fill:#089981;} .cdf{fill:#F23645;}
-.ema9{stroke:#26A69A;stroke-width:1.2;} .ema20{stroke:#F57C00;stroke-width:1.2;}
-.ema50{stroke:#E53935;stroke-width:1.2;} .ema200{stroke:#1565C0;stroke-width:2.2;}
-.lvl{stroke-width:.9;stroke-dasharray:4 3;opacity:.75;}
-.lvl-tp{stroke:#089981;} .lvl-sl,.lvl-inv,.lvl-sts{stroke:#F23645;}
-.lvl-entry,.lvl-vwap,.lvl-val{stroke:#0288D1;} .lvl-locked{stroke:#455A64;}
-.lvl-ew{stroke:#7E57C2;} .lvl-vah,.lvl-poc,.lvl-liqb,.lvl-liqs{stroke:#E67E22;}
-.lvl-stb{stroke:#089981;}
-.heat-s{fill:#F23645;} .heat-l{fill:#089981;}
-.pill-t{font:600 8.5px var(--font-mono);fill:#FFFFFF;}
-.pill-tp,.pill-stb{fill:#089981;} .pill-sl,.pill-inv,.pill-sts{fill:#F23645;}
-.pill-entry,.pill-vwap,.pill-val{fill:#0288D1;} .pill-locked{fill:#455A64;}
-.pill-ew,.pill-ewh{fill:#7E57C2;} .pill-hit{fill:#94A3B8;} .pill-nextentry{fill:#B7791F;} .lvl-nextentry{stroke:#B7791F;stroke-dasharray:6 3;} .lvl-hit{stroke:#94A3B8;} .pill-ewa{fill:#1E88E5;}
-.pill-vah,.pill-poc,.pill-liqb{fill:#E67E22;} .pill-liqs{fill:#C0651A;}
-.ew0-l{stroke:#7E57C2;stroke-width:2;} .ew0-d{fill:#7E57C2;}
-.halo{fill:#FFFFFF;stroke:#FFFFFF;stroke-width:3px;stroke-linejoin:round;}
-.ew0-t-h,.ew0-t{font:700 8.5px var(--font-mono);} .ew0-t{fill:#5E35B1;}
-.proj-t-h{font:700 8.5px var(--font-mono);} .ewx-t-h{font:600 8px var(--font-mono);}
-.ew1-l{stroke:#1E88E5;stroke-width:1.4;stroke-dasharray:5 3;} .ew1-d{fill:#1E88E5;}
-.ew2-l{stroke:#FB8C00;stroke-width:1.2;stroke-dasharray:2 3;} .ew2-d{fill:#FB8C00;}
-.ewx-l{stroke:#94A3B8;stroke-width:1;stroke-dasharray:1 4;} .ewx-d{fill:#CBD5E1;}
-.ewx-t{font:600 8px var(--font-mono);fill:#94A3B8;}
-.live-l{stroke:#7E57C2;stroke-width:1.8;} .live-d{fill:#7E57C2;stroke:#FFFFFF;stroke-width:1.2;}
-.proj-zone{fill:#7E57C2;opacity:.04;}
-.proj-now{stroke:#94A3B8;stroke-width:1;stroke-dasharray:3 3;}
-.proj-l{stroke:#7E57C2;stroke-width:1.6;stroke-dasharray:6 4;}
-.proj-d{fill:#FFFFFF;stroke:#7E57C2;stroke-width:1.5;}
-.proj-t{font:700 8.5px var(--font-mono);fill:#7E57C2;}
-.proj-tag{font:600 8px var(--font-mono);fill:#7E57C2;}
-.rsi{stroke:#7E57C2;stroke-width:1.2;}
-.zone.zs{fill:#089981;opacity:.08;} .zone.zr{fill:#F57C00;opacity:.10;}
-.zone.zs.z1d{opacity:.15;} .zone.zr.z1d{opacity:.17;}
-.zl{stroke-width:1;} .zl.zs{stroke:#089981;opacity:.8;} .zl.zr{stroke:#E67E22;opacity:.85;}
+.rc-dir{padding:2px 8px;border-radius:4px;font-weight:700;font-size:12px;}
+.rc-long{background:#E7F3EE;color:#1F6B50;} .rc-short{background:#F8E9E8;color:#9E3530;}
+.rc-scroll{overflow-x:auto;display:flex;flex-direction:row-reverse;-webkit-overflow-scrolling:touch;}
+.rc{display:block;width:100%;height:auto;background:#FFFFFF;}
+@media(max-width:760px){.rc{min-width:720px;}}
+.rc text{font-family:var(--font-mono);}
+.rc .grid{stroke:#EDF0F4;stroke-width:1;}
+.rc .axis-t{font-size:12px;fill:#475569;}
+.cu{stroke:#2E8B6A;stroke-width:1;} .cd{stroke:#C8463F;stroke-width:1;}
+.cuf{fill:#2E8B6A;} .cdf{fill:#C8463F;}
+.ema9{stroke:#6FAFA6;stroke-width:1.3;} .ema20{stroke:#D9944A;stroke-width:1.3;}
+.ema50{stroke:#B5625E;stroke-width:1.3;} .ema200{stroke:#2F5D9E;stroke-width:2.2;}
+.lvl{stroke-width:1;stroke-dasharray:5 3;opacity:.85;}
+.lvl-tp,.lvl-stb{stroke:#2E8B6A;} .lvl-sl,.lvl-inv,.lvl-sts{stroke:#C8463F;}
+.lvl-entry,.lvl-vwap,.lvl-val{stroke:#2F6FB0;} .lvl-locked{stroke:#5B6675;}
+.lvl-ew{stroke:#6B5BA8;} .lvl-vah,.lvl-poc,.lvl-liqb,.lvl-liqs{stroke:#C98A3E;}
+.lvl-nextentry{stroke:#A8832E;stroke-dasharray:7 3;} .lvl-hit{stroke:#9AA4B2;}
+.heat-s{fill:#C8463F;} .heat-l{fill:#2E8B6A;}
+/* pastile: fond deschis, contur in culoarea nivelului, text aproape negru */
+.pill{stroke-width:1;}
+.rc .pill-t{font-size:12px;font-weight:600;fill:#111827;}
+.rc .pill-pxt{font-weight:700;}
+.pill-tp,.pill-stb,.pill-zsup{fill:#E7F3EE;stroke:#2E8B6A;}
+.pill-sl,.pill-inv,.pill-sts{fill:#F8E9E8;stroke:#C8463F;}
+.pill-entry,.pill-vwap,.pill-val{fill:#E8EFF8;stroke:#2F6FB0;}
+.pill-locked{fill:#EEF0F3;stroke:#5B6675;}
+.pill-ew,.pill-ewh{fill:#EFEDF7;stroke:#6B5BA8;} .pill-ewa{fill:#E8F0F9;stroke:#3B7DC4;}
+.pill-hit{fill:#F3F4F6;stroke:#9AA4B2;} .pill-nextentry{fill:#F6F0E1;stroke:#A8832E;}
+.pill-vah,.pill-poc,.pill-liqb,.pill-zres{fill:#F8EFE3;stroke:#C98A3E;} .pill-liqs{fill:#F6EBDD;stroke:#A9672A;}
+.pill-zsup2{fill:#F1F8F5;stroke:#8DBFAE;} .pill-zres2{fill:#FBF4EA;stroke:#DDB98A;}
+.pill-now{fill:#E6ECF7;stroke:#2B4F8C;} .lvl-now{stroke:#2B4F8C;stroke-dasharray:2 2;opacity:.9;}
+.pill-invsoft{fill:#F5E6E6;stroke:#8E2B2B;} .lvl-invsoft{stroke:#8E2B2B;stroke-dasharray:6 3;opacity:.85;}
+/* etichete pe grafic: text inchis, contur alb dedesubt */
+.rc .halo{fill:#FFFFFF;stroke:#FFFFFF;stroke-width:4px;stroke-linejoin:round;}
+.ew0-l{stroke:#6B5BA8;stroke-width:2;} .ew0-d{fill:#6B5BA8;}
+.rc .ew0-t-h,.rc .ew0-t,.rc .proj-t-h,.rc .proj-t{font-size:12px;font-weight:700;}
+.rc .ew0-t{fill:#3F3470;} .rc .proj-t{fill:#3F3470;}
+.rc .ewx-t-h,.rc .ewx-t{font-size:12px;font-weight:600;} .rc .ewx-t{fill:#475569;}
+.ew1-l{stroke:#3B7DC4;stroke-width:1.4;stroke-dasharray:5 3;} .ew1-d{fill:#3B7DC4;}
+.ew2-l{stroke:#C98A3E;stroke-width:1.2;stroke-dasharray:2 3;} .ew2-d{fill:#C98A3E;}
+.ewx-l{stroke:#9AA4B2;stroke-width:1;stroke-dasharray:1 4;} .ewx-d{fill:#C4CBD5;}
+.live-l{stroke:#6B5BA8;stroke-width:1.8;} .live-d{fill:#6B5BA8;stroke:#FFFFFF;stroke-width:1.2;}
+.proj-zone{fill:#6B5BA8;opacity:.045;}
+.rc .proj-now{stroke:#8792A2;stroke-width:1;stroke-dasharray:3 3;opacity:1;}
+.proj-l{stroke:#6B5BA8;stroke-width:1.6;stroke-dasharray:6 4;}
+.proj-d{fill:#FFFFFF;stroke:#6B5BA8;stroke-width:1.5;}
+.rc .proj-tag,.rc .proj-tag-h{font-size:12px;font-weight:600;opacity:1;} .rc .proj-tag{fill:#334155;}
+.rsi{stroke:#6B5BA8;stroke-width:1.3;}
+.zone.zs{fill:#2E8B6A;opacity:.07;} .zone.zr{fill:#C98A3E;opacity:.09;}
+.zone.zs.z1d{opacity:.13;} .zone.zr.z1d{opacity:.15;}
+.zl{stroke-width:1;} .zl.zs{stroke:#2E8B6A;opacity:.75;} .zl.zr{stroke:#C98A3E;opacity:.8;}
 .zl.zsc{stroke-dasharray:5 3;stroke-width:.9;}
-.pill-zsup{fill:#089981;} .pill-zres{fill:#E67E22;} .pill-zsup2{fill:#6CB8AA;} .pill-zres2{fill:#EFA868;}
-.pill-now{fill:#2962FF;} .lvl-now{stroke:#2962FF;stroke-dasharray:2 2;opacity:.9;}
-.pill-invsoft{fill:#C62828;} .lvl-invsoft{stroke:#C62828;stroke-dasharray:6 3;opacity:.85;}
-.zrow{font-size:12px;padding:5px 8px;border-left:3px solid;margin:4px 0;border-radius:4px;background:#F8FAFC;}
-.zrow-s{border-left-color:#089981;} .zrow-r{border-left-color:#E67E22;}
-.zstat{font-size:11px;margin:6px 0 0;}
-.sub-t{font:600 8px var(--font-mono);fill:#64748B;}
+.zrow{font-size:13px;padding:6px 9px;border-left:3px solid;margin:4px 0;border-radius:4px;background:#F8FAFC;color:#1F2937;}
+.zrow-s{border-left-color:#2E8B6A;} .zrow-r{border-left-color:#C98A3E;}
+.zstat{font-size:12px;margin:6px 0 0;}
+.rc .sub-t{font-size:12px;font-weight:600;fill:#334155;}
 """

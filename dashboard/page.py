@@ -138,15 +138,15 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
     _open_best = tracked_plan(plans_store, (best or {}).get("symbol"), (best or {}).get("direction"))
     _sym = (best or {}).get("symbol", "-")
     legend = """<div class="legend">
-          <span><i class="dot" style="background:#26A69A"></i>EMA 9</span>
-          <span><i class="dot" style="background:#F57C00"></i>EMA 20</span>
-          <span><i class="dot" style="background:#E53935"></i>EMA 50</span>
-          <span><i class="dot" style="background:#1565C0"></i>EMA 200</span>
-          <span><i class="dot" style="background:#7E57C2"></i>Elliott</span>
-          <span><i class="dot" style="background:#089981"></i>TP</span>
-          <span><i class="dot" style="background:#F23645"></i>SL / E INV</span>
-          <span><i class="dot" style="background:#0288D1"></i>entry</span>
-          <span><i class="dot" style="background:#C62828"></i>invalidare Web3 Researcher</span>
+          <span><i class="dot" style="background:#6FAFA6"></i>EMA 9</span>
+          <span><i class="dot" style="background:#D9944A"></i>EMA 20</span>
+          <span><i class="dot" style="background:#B5625E"></i>EMA 50</span>
+          <span><i class="dot" style="background:#2F5D9E"></i>EMA 200</span>
+          <span><i class="dot" style="background:#6B5BA8"></i>Elliott</span>
+          <span><i class="dot" style="background:#2E8B6A"></i>TP</span>
+          <span><i class="dot" style="background:#C8463F"></i>SL / E INV</span>
+          <span><i class="dot" style="background:#2F6FB0"></i>entry</span>
+          <span><i class="dot" style="background:#8E2B2B"></i>invalidare Web3 Researcher</span>
         </div>"""
     table_head = ('<table><tr><th>Symbol</th><th>Score</th><th title="formula, nu masuratoare">Prob*</th>'
                   '<th>Pers</th></tr>')
@@ -163,12 +163,14 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
     ] + ([fold('Briefing &middot; <span class="dim">real data vs simulated history</span>',
                briefing_html, _sum("briefing", SUM.briefing, briefing), anchor="briefing", cls="briefing-card")]
          if briefing_html else []))
-    left_cards = "\n\n      ".join([
-        fold(f"Grafic &middot; {_sym}", f"""{chart_svg}
+    # GRAFICUL pe toata latimea paginii (nu in coloana stanga, de ~550 px pe desktop): etichetele
+    # graficului raman la marimea lor de citire si pe ecran lat
+    chart_card = fold(f"Grafic &middot; {_sym}", f"""{chart_svg}
         {legend}
         <details class="cc an-main"><summary><span class="cc-title">Web3 Researcher &middot; pașii 1–4 &middot; {_sym}</span></summary>
           <div class="cc-body">{main_steps_html}</div></details>""",
-             _sum("chart", SUM.chart, best, deep, _best_tok), anchor="grafic"),
+                      _sum("chart", SUM.chart, best, deep, _best_tok), anchor="grafic")
+    left_cards = "\n\n      ".join([
         fold("Indicatori &middot; VWAP, Volume Profile, SuperTrend, MACD", indicators_html,
              _sum("indicators", SUM.indicators, deep)),
         fold("Market structure &middot; Fibonacci", levels_html, _sum("structure", SUM.structure, deep)),
@@ -233,6 +235,8 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
   {FOLD_TOOLS}
 
   {top_cards}
+
+  {chart_card}
 
   <div class="grid">
     <div>
