@@ -1,4 +1,32 @@
 {
-  "scan_time": "2026-10-12 19:48 UTC",
-  "decisions": {}
+  "scan_time": "2026-10-12 20:15 UTC",
+  "decisions": {
+    "FLOW/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta dezactivata: pe walk-forward a inrautatit rezultatul in 2 din 3 rulari",
+      "calibrated_prob": 28.9,
+      "agent_prob": 0.4503,
+      "elliott_bias": 0.3513,
+      "next_entry": null
+    },
+    "FIL/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta dezactivata: pe walk-forward a inrautatit rezultatul in 2 din 3 rulari",
+      "calibrated_prob": 28.9,
+      "agent_prob": 0.4225,
+      "elliott_bias": null,
+      "next_entry": null
+    },
+    "ZEC/USDT": {
+      "action": "SKIP",
+      "mode": "ASTEAPTA_CORECTIA",
+      "reason": "Elliott contrazice planul SHORT (Primary Developing Motive W4 FORMING BULLISH 65%: unda 4 corectiva - continuarea (W5) e asteptata dupa ea). Istoric: planurile contra Elliott n-au avut avantaj (+0.04R/plan, fata de +0.11R fara conflict). Nivel urmarit pentru intrare: ~1393.29.",
+      "calibrated_prob": 39.5,
+      "agent_prob": 0.2713,
+      "elliott_bias": -0.4,
+      "next_entry": 1393.2855
+    }
+  }
 }
