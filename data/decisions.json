@@ -1,23 +1,32 @@
 {
-  "scan_time": "2026-10-11 23:53 UTC",
+  "scan_time": "2026-10-12 00:54 UTC",
   "decisions": {
+    "FIL/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta dezactivata: pe walk-forward a inrautatit rezultatul in 2 din 3 rulari",
+      "calibrated_prob": 29.7,
+      "agent_prob": 0.4671,
+      "elliott_bias": 0.715,
+      "next_entry": null
+    },
     "ATOM/USDT": {
       "action": "SKIP",
       "mode": "ASTEAPTA_CORECTIA",
       "reason": "Elliott contrazice planul LONG (Primary Developing Harmonic D FORMING BULLISH 31%: D inca nu a ajuns in zona PRZ). Istoric: planurile contra Elliott n-au avut avantaj (+0.04R/plan, fata de +0.11R fara conflict). Nivel urmarit pentru intrare: ~1.846.",
-      "calibrated_prob": 29.7,
-      "agent_prob": 0.414,
+      "calibrated_prob": 28.9,
+      "agent_prob": 0.3984,
       "elliott_bias": -0.4,
       "next_entry": 1.846
     },
     "ZEN/USDT": {
       "action": "SKIP",
       "mode": "ASTEAPTA_CORECTIA",
-      "reason": "Elliott contrazice planul SHORT (Primary Developing Motive W3 FORMING BULLISH 50%: unda 3 in formare - faza cea mai puternica a trendului). Istoric: planurile contra Elliott n-au avut avantaj (+0.04R/plan, fata de +0.11R fara conflict). Nivel urmarit pentru intrare: ~7.99801.",
+      "reason": "Elliott contrazice planul SHORT (Primary Developing Motive W3 FORMING BULLISH 50%: unda 4 corectiva - continuarea (W5) e asteptata dupa ea). Istoric: planurile contra Elliott n-au avut avantaj (+0.04R/plan, fata de +0.11R fara conflict). Nivel urmarit pentru intrare: ~7.22334.",
       "calibrated_prob": 29.7,
-      "agent_prob": 0.2721,
-      "elliott_bias": -1.0,
-      "next_entry": 7.998010768
+      "agent_prob": 0.2772,
+      "elliott_bias": -0.4,
+      "next_entry": 7.223344
     }
   }
 }
