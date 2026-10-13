@@ -1,11 +1,11 @@
 {
-  "text": "Din 21148 planuri inchise, rata de succes e 32.6%, cu -19.40R cumulat (-0.001R in medie pe plan) si profit factor 1.0. 19 planuri sunt inca deschise. Atentie: 21050 dintre ele sunt din backtest. LIVE, din 2026-09-28: 98 planuri inchise, castig 26.5% (IC 18.8-36.0%), R mediu -0.234R (IC95 -0.542..+0.080R), total -22.96R. Ultimele inchise: #293319 DOGE/USDT +5.21R, #342743 ATOM/USDT -1.03R, #314985 AXS/USDT -1.04R. Pe intervalele de scor cu destule date, cel mai bine merge 0-19 (28.9%, +0.14R mediu, n=201), iar cel mai slab 40-59 (29.7%, -0.04R, n=10350). Deciziile de a deschide sau refuza planuri se bazeaza pe aceste cifre masurate, nu pe scorul brut. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (ordonarea pe planurile LIVE nu e inca confirmata: 98/100 planuri live evaluate (AUC live 0.587 pana acum) - agentul invata, dar nu filtreaza).",
+  "text": "Din 21148 planuri inchise, rata de succes e 32.6%, cu -19.40R cumulat (-0.001R in medie pe plan) si profit factor 1.0. 20 planuri sunt inca deschise. Atentie: 21050 dintre ele sunt din backtest. LIVE, din 2026-09-28: 98 planuri inchise, castig 26.5% (IC 18.8-36.0%), R mediu -0.234R (IC95 -0.542..+0.080R), total -22.96R. Ultimele inchise: #293319 DOGE/USDT +5.21R, #342743 ATOM/USDT -1.03R, #314985 AXS/USDT -1.04R. Pe intervalele de scor cu destule date, cel mai bine merge 0-19 (28.9%, +0.14R mediu, n=201), iar cel mai slab 40-59 (29.7%, -0.04R, n=10350). Deciziile de a deschide sau refuza planuri se bazeaza pe aceste cifre masurate, nu pe scorul brut. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (ordonarea pe planurile LIVE nu e inca confirmata: 98/100 planuri live evaluate (AUC live 0.587 pana acum) - agentul invata, dar nu filtreaza).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-10-13 11:27 UTC",
+    "scan_time": "2026-10-13 12:27 UTC",
     "universe_size": 30,
-    "plans_total": 27889,
-    "plans_open": 19,
+    "plans_total": 27890,
+    "plans_open": 20,
     "plans_closed": 21148,
     "legacy_closed": 0,
     "legacy_total_r": null,
@@ -74,6 +74,12 @@
     ],
     "open_now": [
       {
+        "id": 342763,
+        "symbol": "ETH/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
         "id": 342762,
         "symbol": "GRT/USDT",
         "direction": "SHORT",
@@ -83,25 +89,19 @@
         "id": 342761,
         "symbol": "ATOM/USDT",
         "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
+        "state": "INTRARE ATINSA - pozitie activa"
       },
       {
         "id": 342760,
         "symbol": "DOT/USDT",
         "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
+        "state": "INTRARE ATINSA - pozitie activa"
       },
       {
         "id": 342759,
         "symbol": "DOGE/USDT",
         "direction": "SHORT",
         "state": "INTRARE ATINSA - pozitie activa"
-      },
-      {
-        "id": 342758,
-        "symbol": "ICP/USDT",
-        "direction": "LONG",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
       }
     ],
     "best_bucket": {
@@ -186,7 +186,7 @@
         }
       },
       "no_entry": 25,
-      "open": 19,
+      "open": 20,
       "recent": [
         {
           "id": 293319,
@@ -299,7 +299,7 @@
       "Real vs simulat: pe aceeasi perioada (2026-09-28 - 2026-10-11, 122 planuri simulate) +0.233R/plan (IC95 -0.329..+0.715), in marja statistica; fata de tot istoricul simulat -0.234R/plan (IC95 -0.519..+0.122), in marja statistica.",
       "Agentul pe date reale: AUC 0.587 (IC 0.449-0.722) pe 98/100 planuri necesare confirmarii.",
       "Ultimele inchise live: #293319 DOGE/USDT +5.21R, #342743 ATOM/USDT -1.03R, #314985 AXS/USDT -1.04R.",
-      "Deschise acum: 19; anulate fara intrare (pretul nu a revenit): 25."
+      "Deschise acum: 20; anulate fara intrare (pretul nu a revenit): 25."
     ],
     "simulated": [
       "Backtest 2018-02-13-azi (regenerat 2026-10-11 20:52 UTC): 21050 planuri inchise, castig 32.6%, R mediu +0.000R, total +3.56R, profit factor 1.0.",
