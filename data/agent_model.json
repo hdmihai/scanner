@@ -1,52 +1,52 @@
 {
   "model": {
     "weights": {
-      "trend": -0.019897,
-      "momentum": 0.008118,
-      "volatility": -0.309547,
-      "volume": -0.142438,
+      "trend": -0.020929,
+      "momentum": 0.006142,
+      "volatility": -0.313428,
+      "volume": -0.147346,
       "persistence_n": 0.0,
-      "ev_ema_fast": -0.049848,
-      "ev_ema_stack": 0.285769,
-      "ev_supertrend": -0.022657,
-      "ev_macd": 0.19399,
-      "ev_vwap": 0.18365,
-      "ev_poc": 0.008236,
+      "ev_ema_fast": -0.051614,
+      "ev_ema_stack": 0.279516,
+      "ev_supertrend": -0.025095,
+      "ev_macd": 0.190928,
+      "ev_vwap": 0.182194,
+      "ev_poc": 0.002988,
       "ev_value_area": 0.021326,
-      "ev_rsi": -0.15992,
+      "ev_rsi": -0.161322,
       "ev_volume": 0.0,
       "ev_volatility": 0.0,
       "ev_order_flow": 0.0,
       "ev_book_imbalance": 0.0,
       "ev_liq_magnet": 0.0,
-      "ev_ichimoku": 0.048035,
-      "ev_ma_cross": 0.227423,
-      "ev_regime": 0.239796,
-      "ev_mtf_align": -0.098101,
-      "ev_elliott": 0.047683,
-      "ev_liq_struct": -0.044022,
+      "ev_ichimoku": 0.046226,
+      "ev_ma_cross": 0.221595,
+      "ev_regime": 0.236058,
+      "ev_mtf_align": -0.10227,
+      "ev_elliott": 0.04684,
+      "ev_liq_struct": -0.040714,
       "ev_liq_sweep": -0.015099,
-      "ev_altseason": -0.082009,
-      "ev_analyst": 0.063137,
-      "ev_fusion": 0.028859
+      "ev_altseason": -0.079424,
+      "ev_analyst": 0.060021,
+      "ev_fusion": 0.02495
     },
-    "bias": -1.007893
+    "bias": -1.014146
   },
-  "samples_trained": 21065,
+  "samples_trained": 21069,
   "last_trained_scan_ts": 0.0,
   "agent": {
-    "correct": 13976,
-    "total": 21065
+    "correct": 13980,
+    "total": 21069
   },
   "baseline": {
     "correct": 6868,
-    "total": 21065
+    "total": 21069
   },
   "by_direction": {
     "LONG": {
-      "agent": 6834,
+      "agent": 6838,
       "baseline": 3313,
-      "total": 10230
+      "total": 10234
     },
     "SHORT": {
       "agent": 7142,
@@ -56,26 +56,6 @@
   },
   "first_scan_ts": 1518552000.0,
   "pairs": [
-    [
-      0.29844,
-      0.0,
-      -1.05
-    ],
-    [
-      0.36063,
-      0.0,
-      -1.046
-    ],
-    [
-      0.26946,
-      0.0,
-      -1.092
-    ],
-    [
-      0.55198,
-      1.0,
-      2.735
-    ],
     [
       0.35985,
       0.0,
@@ -15055,13 +15035,29 @@
       0.5035,
       0.0,
       -1.024
+    ],
+    [
+      0.396,
+      0.0,
+      -1.038
+    ],
+    [
+      0.3643,
+      0.0,
+      -1.047
+    ],
+    [
+      0.4123,
+      0.0,
+      -1.033
+    ],
+    [
+      0.3681,
+      0.0,
+      -1.03
     ]
   ],
   "recent": [
-    1,
-    0,
-    0,
-    1,
     0,
     0,
     0,
@@ -15254,16 +15250,16 @@
     1,
     0,
     1,
+    1,
+    1,
+    1,
+    0,
     1,
     1,
     1,
-    0
+    1
   ],
   "recent_baseline": [
-    0,
-    1,
-    1,
-    0,
     1,
     1,
     1,
@@ -15455,6 +15451,10 @@
     1,
     0,
     1,
+    0,
+    0,
+    0,
+    0,
     0,
     0,
     0,
@@ -20519,22 +20519,6 @@
   "source": "plans-v6-4h",
   "feature_version": "f8",
   "score_pairs": [
-    [
-      0.47,
-      0.0
-    ],
-    [
-      0.63,
-      0.0
-    ],
-    [
-      0.29,
-      0.0
-    ],
-    [
-      0.71,
-      1.0
-    ],
     [
       0.58,
       0.0
@@ -32518,31 +32502,47 @@
     [
       0.6,
       0.0
+    ],
+    [
+      0.32,
+      0.0
+    ],
+    [
+      0.66,
+      0.0
+    ],
+    [
+      0.49,
+      0.0
+    ],
+    [
+      0.44,
+      0.0
     ]
   ],
-  "last_event_ts": 1791820800.0,
+  "last_event_ts": 1791835200.0,
   "learning_rate": 0.00426,
   "eval_version": "causal-v1",
   "live": {
-    "n": 92,
-    "auc": 0.62,
-    "ci_low": 0.481,
-    "ci_high": 0.762,
-    "avg_r": -0.25
+    "n": 96,
+    "auc": 0.611,
+    "ci_low": 0.466,
+    "ci_high": 0.754,
+    "avg_r": -0.283
   },
-  "status_reason": "ordonarea pe planurile LIVE nu e inca confirmata: 92/100 planuri live evaluate (AUC live 0.620 pana acum) - agentul invata, dar nu filtreaza",
-  "days_covered": 3162.83,
-  "balanced_agent": 66.35976599133633,
-  "balanced_baseline": 32.59773930561551,
+  "status_reason": "ordonarea pe planurile LIVE nu e inca confirmata: 96/100 planuri live evaluate (AUC live 0.611 pana acum) - agentul invata, dar nu filtreaza",
+  "days_covered": 3163.0,
+  "balanced_agent": 66.36625348028267,
+  "balanced_baseline": 32.59141037426121,
   "balanced_directions": [
     "LONG",
     "SHORT"
   ],
-  "auc": 0.5897637278595013,
-  "auc_score_baseline": 0.5524499837479927,
+  "auc": 0.5888078137500993,
+  "auc_score_baseline": 0.5521155878023905,
   "agent_superior": true,
-  "majority_baseline": 67.76666666666667,
-  "predicted_positive_rate": 5.466666666666667,
+  "majority_baseline": 67.8,
+  "predicted_positive_rate": 5.433333333333334,
   "skew": {
     "ev_ema_fast": [
       100,
@@ -32569,7 +32569,7 @@
       100
     ],
     "ev_value_area": [
-      55,
+      53,
       83
     ],
     "ev_rsi": [
@@ -32613,15 +32613,15 @@
       83
     ],
     "ev_elliott": [
-      57,
+      56,
       76
     ],
     "ev_liq_struct": [
-      100,
+      99,
       92
     ],
     "ev_liq_sweep": [
-      8,
+      7,
       7
     ],
     "ev_altseason": [
