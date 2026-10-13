@@ -1,42 +1,46 @@
 {
  "datasets": {
   "binance": {
-   "bytes": 14520326,
+   "bytes": 18755277,
    "coverage": {
     "binance:1d": {
-     "symbols": 658,
-     "with_data": 658
+     "symbols": 703,
+     "with_data": 703
+    },
+    "binance:4h": {
+     "symbols": 30,
+     "with_data": 30
     }
    },
-   "max_ts": 1790726400000,
+   "max_ts": 1790798400000,
    "min_ts": 1502928000000,
-   "partitions": 10,
-   "rows": 752222
+   "partitions": 19,
+   "rows": 979372
   },
   "candles": {
-   "bytes": 58310609,
+   "bytes": 58333391,
    "coverage": {
     "okx:1d": {
      "symbols": 415,
      "with_data": 413
     },
     "okx:4h": {
-     "symbols": 415,
-     "with_data": 413
+     "symbols": 423,
+     "with_data": 421
     }
    },
-   "max_ts": 1791835200000,
+   "max_ts": 1791878400000,
    "min_ts": 1515628800000,
    "partitions": 18,
-   "rows": 2771969
+   "rows": 2773218
   },
   "plans": {
-   "bytes": 2992159,
+   "bytes": 2993747,
    "coverage": {},
-   "max_ts": 1791850520.7689688,
+   "max_ts": 1791894442.5660138,
    "min_ts": 1518552000.0,
    "partitions": 10,
-   "rows": 27884
+   "rows": 27890
   }
  },
  "history": [
@@ -109,6 +113,16 @@
    },
    "s": 2724.4,
    "when": "2026-10-13 01:43 UTC"
+  },
+  {
+   "errors": 0,
+   "rows": {
+    "binance": 979372,
+    "candles": 2773218,
+    "plans": 27890
+   },
+   "s": 2720.8,
+   "when": "2026-10-13 15:20 UTC"
   }
  ],
  "last_run": {
@@ -116,15 +130,15 @@
   "done": {
    "binance": {
     "1d": {
-     "covered": 658,
-     "months_added": 4050,
-     "rows_added": 121057,
+     "covered": 703,
+     "months_added": 2094,
+     "rows_added": 62942,
      "universe": 705
     },
     "4h": {
-     "covered": 0,
-     "months_added": 0,
-     "rows_added": 0,
+     "covered": 30,
+     "months_added": 918,
+     "rows_added": 164208,
      "universe": 705
     }
    },
@@ -133,27 +147,25 @@
      "complete": 413,
      "covered": 413,
      "no_data": 2,
-     "rows_added": 413,
-     "symbols_updated": 413,
-     "universe": 415
+     "rows_added": 0,
+     "symbols_updated": 0,
+     "universe": 423
     },
     "4h": {
-     "complete": 413,
-     "covered": 413,
+     "complete": 421,
+     "covered": 421,
      "no_data": 2,
-     "rows_added": 826,
-     "symbols_updated": 413,
-     "universe": 415
+     "rows_added": 1249,
+     "symbols_updated": 421,
+     "universe": 423
     }
    },
    "plans": {
     "partitions_written": 1,
-    "plans": 27884
+    "plans": 27890
    },
    "universe": {
-    "liquid": 279,
-    "plans": 178097,
-    "symbols": 378
+    "skipped": "masurat acum 14 ore (o data pe zi)"
    },
    "verdict": {
     "from": "2018-06-10",
@@ -162,10 +174,10 @@
     "tokens": 231
    }
   },
-  "duration_s": 2724.4,
+  "duration_s": 2720.8,
   "errors": [],
-  "finished": "2026-10-13 01:43 UTC",
-  "started": "2026-10-13 00:58 UTC"
+  "finished": "2026-10-13 15:20 UTC",
+  "started": "2026-10-13 14:34 UTC"
  },
  "probe": {
   "binance_vision": {
@@ -178,7 +190,7 @@
   "exchange": {
    "id": "okx",
    "ok": true,
-   "s": 2.2
+   "s": 2.7
   },
   "ram_gb": 16.4
  },
@@ -389,7 +401,7 @@
   "obs": 157829,
   "to": "2026-10-05",
   "tokens": 231,
-  "when": "2026-10-13 01:01 UTC"
+  "when": "2026-10-13 14:37 UTC"
  },
  "where": "hdmihai/scanner"
 }
