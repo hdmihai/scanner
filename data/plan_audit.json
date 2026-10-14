@@ -24,18 +24,33 @@
     }
   },
   "rebuild_removed_live": [],
-  "when": "2026-10-14 03:18 UTC",
-  "ts": 1791947880.2409818,
-  "checked": 27896,
-  "reevaluated": 119,
-  "live_flagged": 0,
-  "removed_now": 0,
+  "when": "2026-10-14 04:18 UTC",
+  "ts": 1791951505.4892473,
+  "checked": 27897,
+  "reevaluated": 122,
+  "live_flagged": 1,
+  "removed_now": 1,
   "blocked": null,
   "backtest_flagged": 0,
   "backtest_examples": [],
-  "by_reason": {},
+  "by_reason": {
+    "rezultat contrazis de lumanarile reale": 1
+  },
   "pending_live": [],
-  "retrained": false,
+  "retrained": true,
   "epoch": 2,
-  "removed": []
+  "removed": [
+    {
+      "id": 164053,
+      "symbol": "MANA/USDT",
+      "direction": "LONG",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "TP2_HIT",
+      "realized_r": 2.771,
+      "created_ts": 1790612823.01531,
+      "reason": "rezultat contrazis de lumanarile reale: TP2_HIT 2.771R in memorie, NO_ENTRY 0.0R la reevaluare",
+      "removed": "2026-10-14 04:18 UTC"
+    }
+  ]
 }
