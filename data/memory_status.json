@@ -1,24 +1,24 @@
 {
  "datasets": {
   "binance": {
-   "bytes": 59410352,
+   "bytes": 74340544,
    "coverage": {
     "binance:1d": {
      "symbols": 703,
      "with_data": 703
     },
     "binance:4h": {
-     "symbols": 365,
-     "with_data": 365
+     "symbols": 504,
+     "with_data": 504
     }
    },
    "max_ts": 1790798400000,
    "min_ts": 1502928000000,
    "partitions": 20,
-   "rows": 3373637
+   "rows": 4271140
   },
   "candles": {
-   "bytes": 58401039,
+   "bytes": 58401252,
    "coverage": {
     "okx:1d": {
      "symbols": 423,
@@ -29,13 +29,13 @@
      "with_data": 429
     }
    },
-   "max_ts": 1791964800000,
+   "max_ts": 1791979200000,
    "min_ts": 1515628800000,
    "partitions": 18,
-   "rows": 2776175
+   "rows": 2776604
   },
   "plans": {
-   "bytes": 2995606,
+   "bytes": 2995602,
    "coverage": {},
    "max_ts": 1791979708.5625517,
    "min_ts": 1518552000.0,
@@ -153,6 +153,16 @@
    },
    "s": 2733.6,
    "when": "2026-10-14 13:08 UTC"
+  },
+  {
+   "errors": 0,
+   "rows": {
+    "binance": 4271140,
+    "candles": 2776604,
+    "plans": 27898
+   },
+   "s": 2732.3,
+   "when": "2026-10-14 18:22 UTC"
   }
  ],
  "last_run": {
@@ -166,9 +176,9 @@
      "universe": 705
     },
     "4h": {
-     "covered": 365,
-     "months_added": 4626,
-     "rows_added": 829810,
+     "covered": 504,
+     "months_added": 5011,
+     "rows_added": 897503,
      "universe": 705
     }
    },
@@ -185,7 +195,7 @@
      "complete": 429,
      "covered": 429,
      "no_data": 2,
-     "rows_added": 852,
+     "rows_added": 429,
      "symbols_updated": 429,
      "universe": 431
     }
@@ -195,7 +205,7 @@
     "plans": 27898
    },
    "universe": {
-    "skipped": "masurat acum 13 ore (o data pe zi)"
+    "skipped": "masurat acum 18 ore (o data pe zi)"
    },
    "verdict": {
     "from": "2018-06-10",
@@ -204,23 +214,23 @@
     "tokens": 231
    }
   },
-  "duration_s": 2733.6,
+  "duration_s": 2732.3,
   "errors": [],
-  "finished": "2026-10-14 13:08 UTC",
-  "started": "2026-10-14 12:22 UTC"
+  "finished": "2026-10-14 18:22 UTC",
+  "started": "2026-10-14 17:36 UTC"
  },
  "probe": {
   "binance_vision": {
    "detail": "31 lumanari BTCUSDT 1d ianuarie 2024",
    "ok": true,
-   "s": 0.8
+   "s": 0.4
   },
   "cpu": 4,
   "disk_free_gb": 91.1,
   "exchange": {
    "id": "okx",
    "ok": true,
-   "s": 2.4
+   "s": 2.5
   },
   "ram_gb": 16.4
  },
@@ -431,7 +441,7 @@
   "obs": 157902,
   "to": "2026-10-06",
   "tokens": 231,
-  "when": "2026-10-14 12:24 UTC"
+  "when": "2026-10-14 17:38 UTC"
  },
  "where": "hdmihai/scanner"
 }
