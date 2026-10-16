@@ -114,8 +114,21 @@ def _dataset(tmp):
 
 
 def check_candles(tmp):
+    """Ceasul bursei simulate e inghetat la momentul scanarii din setul de date (ca in poarta de
+    echivalenta). Cu ceasul real, testul pica oricand datele din data/latest_details.json erau mai
+    vechi de doua bare de 4h fata de ora rularii (14.10.2026: 0/38 "la zi" pe 4h, si pe codul vechi)."""
     print("3. lumanari (bursa simulata)")
     ds = _dataset(tmp)
+    from tests import dataset as _ds
+    frozen, real_time = _ds.frozen_time(ds), time.time
+    time.time = lambda: frozen
+    try:
+        return _check_candles(tmp, ds)
+    finally:
+        time.time = real_time
+
+
+def _check_candles(tmp, ds):
     sys.path.insert(0, os.path.join(ROOT, "tests", "fakes"))
     import ccxt  # noqa: F401  (cel simulat)
     from adapters.exchanges.venues import CcxtVenues

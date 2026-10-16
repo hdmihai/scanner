@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """dashboard.sections.status - Auto-diagnosticul si proiectele similare."""
 
+import html as _html
 import os
 
 
@@ -12,6 +13,50 @@ def _self_repair_installed():
     promitea patch-uri automate si dupa ce self_repair.py fusese sters (semnalat de
     monitorul zilnic) - acum spune ce se intampla efectiv."""
     return os.path.exists("self_repair.py") or os.path.isdir("selfrepair")
+
+
+VERDICT_TAG = {"dovedit": "tag-bull", "daunator": "tag-bear"}
+SEV_CLS = {"mare": "sc-error", "medie": "sc-warn", "mica": "sc-mica"}
+
+
+def render_audit(audit):
+    """AUTO-AUDITUL (core/self_audit.py): parghiile de decizie cu dovada lor masurata acum si
+    registrul de imbunatatiri pe care agentul le-a gasit singur - deschise, apoi rezolvate."""
+    if not audit:
+        return ""
+    e_ = lambda v: _html.escape(str(v if v is not None else ""))
+    lev = "".join(
+        f'<li><strong>{e_(r.get("name"))}</strong> &middot; {e_(r.get("state"))} &middot; '
+        f'<span class="tag {VERDICT_TAG.get(r.get("verdict"), "tag-info")}">{e_(r.get("verdict"))}</span>'
+        f'<br><span class="au-ev">{e_(r.get("evidence"))}</span></li>' for r in audit.get("levers") or [])
+    from core.self_audit import ordered
+    items = ordered(audit.get("ledger") or {})
+    op = [e for e in items if e.get("status") == "deschisa"]
+    done = [e for e in items if e.get("status") == "rezolvata"][:5]
+    rows = []
+    for e in op:
+        files = ", ".join(f"<code>{e_(f)}</code>" for f in (e.get("files") or [])[:6])
+        rows.append(
+            f'<details class="sc-item {SEV_CLS.get(e.get("severity"), "sc-warn")}"><summary>'
+            f'<span class="tag {"tag-bear" if e.get("severity") == "mare" else "tag-info"}">{e_(e.get("severity")).upper()}</span> '
+            f'<strong>{e_(e.get("title"))}</strong> <span class="au-ev">din {e_(e.get("first_seen"))}'
+            + (f', redeschisa de {e.get("reopened")} ori' if e.get("reopened") else "") + '</span></summary>'
+            f'<p>{e_(e.get("problem"))}</p><p><strong>Masurat:</strong> {e_(e.get("evidence"))}</p>'
+            f'<p><strong>Ce trebuie schimbat:</strong> {e_(e.get("action"))}</p>'
+            + (f'<p class="au-ev">Unde: {files}</p>' if files else "") + '</details>')
+    res = "".join(f'<li>{e_(e.get("title"))} <span class="au-ev">- rezolvata {e_(e.get("resolved"))}</span></li>'
+                  for e in done)
+    err = (f'<p class="au-ev">Ultima rulare a auto-auditului a esuat: {e_(audit.get("error"))}</p>'
+           if audit.get("error") else "")
+    return (f'<h4 class="scan-h">Parghiile de decizie si dovada lor (auto-audit, {e_(audit.get("when"))})</h4>'
+            f'<ul class="as-ul lv-list">{lev}</ul>'
+            f'<h4 class="scan-h">Imbunatatiri gasite de agent ({len(op)} deschise)</h4>'
+            + ("".join(rows) if rows else '<p class="dim">Nicio imbunatatire deschisa.</p>')
+            + (f'<p class="au-ev">Rezolvate recent:</p><ul class="as-ul">{res}</ul>' if res else "") + err
+            + '<p class="dim as-note">La fiecare scanare agentul isi verifica propriul cod (cifre scrise de mana, '
+              'intervale de incredere naive), urma planurilor live, dovada fiecarei parghii de decizie si textele '
+              'care descriu starea lui. O imbunatatire mare noua deschide un Issue; monitorizarea zilnica '
+              'scrie corectura de cod, iar aplicarea ramane a ta.</p>')
 
 
 def render_self_check(diag, repairs):
@@ -58,6 +103,7 @@ def render_self_check(diag, repairs):
             f'{diag.get("when")} &middot; {len(checks)} verificari</span></div>'
             + "".join(rows)
             + (f'<p class="dim sc-ok">In regula: {ok_list}</p>' if good else "")
+            + render_audit(diag.get("audit"))
             + mit + rep
             + (f'<h4 class="scan-h">Istoric (ultimele {min(48, len(diag.get("history") or []))} scanari)</h4>'
                f'<div class="sc-tl">{chips}</div>' if chips else "")

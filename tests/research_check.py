@@ -75,9 +75,11 @@ def main():
             fails.append("shadow")
         ada = next(r for r in sh if r["rule"].get("symbol") == "ADA" and not r["rule"].get("direction"))
 
+        # planurile live intinse pe ~3 zile (cate unul la 2 ore): confirmarea foloseste o eroare robusta
+        # la gruparea pe zile, iar planuri toate din aceeasi zi nu pot confirma nimic (un singur bloc)
         def live(sym, r, i):
             return {"symbol": sym, "direction": "LONG", "realized_r": r, "state": "SL_HIT" if r < 0 else "TP2_HIT",
-                    "created_ts": last + 7200 + i * 600, "components": {}, "score_at_entry": 60}
+                    "created_ts": last + 7200 + i * 7200, "components": {}, "score_at_entry": 60}
         lv = [live("ADA/USDT", -1.03, i) for i in range(25)] + [live("BTC/USDT", 0.4 if i % 2 else -0.2, i) for i in range(40)]
         store["plans"] = inj + lv
         active, _ = self_check.research_cycle(store, now=last + 4 * 86400)

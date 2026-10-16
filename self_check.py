@@ -35,6 +35,11 @@ CE FACE, CONCRET
    - MODUL DE SIGURANTA: la niveluri de plan imposibile, nu se mai emit planuri
 4. RAPORTARE: data/self_check.json (citit de dashboard) si un Issue GitHub
    deschis automat pentru fiecare eroare NOUA - notificare pe telefon.
+5. AUTO-AUDIT (core/self_audit.py): ce trebuie IMBUNATATIT, nu doar ce e stricat -
+   cifre masurate scrise de mana in cod, intervale de incredere naive, planuri live
+   disparute fara urma, parghii de decizie active fara dovada (sau dovedite si oprite),
+   texte care contrazic starea agentului. Registru cu id stabil (deschisa -> rezolvata),
+   afisat pe dashboard si in briefing; o imbunatatire mare noua deschide un Issue.
 
 CE NU FACE
 ----------
@@ -70,15 +75,6 @@ def _load(name, default):
 
 def _family(geo):
     return "-".join(str(geo or "").split("-")[:2])
-
-
-def _mean_se(v):
-    n = len(v)
-    if n < 2:
-        return None, None
-    m = sum(v) / n
-    var = sum((x - m) ** 2 for x in v) / (n - 1)
-    return m, math.sqrt(var / n)
 
 
 def _chk(cid, level, title, detail, examples=None, features=None):
@@ -332,13 +328,19 @@ def feature_health(store):
     feats = sorted({k for p in plans[-50:] for k in p["components"] if k.startswith("ev_")})
     checks, table = [], {}
 
+    from core.plans import cluster_diff_se
+
     def spread(group, f):
-        pos = [p["realized_r"] for p in group if (p["components"].get(f) or 0) > 0.1]
-        neg = [p["realized_r"] for p in group if (p["components"].get(f) or 0) < -0.1]
+        # diferenta R (evidenta pozitiva - negativa), cu eroare ROBUSTA LA GRUPAREA pe blocuri de timp:
+        # planurile aceleiasi saptamani sunt corelate, iar eroarea planurilor independente ar declara
+        # "inversari" de efect care sunt doar zgomot (si ar pune caracteristici in carantina degeaba)
+        ts = lambda p: p.get("closed_ts") or p.get("created_ts") or 0
+        pos = [(ts(p), p["realized_r"]) for p in group if (p["components"].get(f) or 0) > 0.1]
+        neg = [(ts(p), p["realized_r"]) for p in group if (p["components"].get(f) or 0) < -0.1]
         if len(pos) < 150 or len(neg) < 150:
             return None, None
-        (mp, sp), (mn, sn) = _mean_se(pos), _mean_se(neg)
-        return mp - mn, math.sqrt(sp ** 2 + sn ** 2)
+        d, se = cluster_diff_se(neg, pos)
+        return (None, None) if math.isinf(se) else (d, se)
 
     for f in feats:
         vals_r = [p["components"].get(f) for p in recent if f in p["components"]]
@@ -410,23 +412,44 @@ def backtest_edge(store):
     return _chk("edge", "OK", "Edge backtest pozitiv", txt)
 
 
-def elliott_filter_decision(store, previous):
-    """Filtrul de conflict Elliott se justifica doar cat timp datele RECENTE arata
-    ca planurile contra Elliott rezulta mai slab. Decis din nou la fiecare rulare,
-    cu histerezis: in zona nesigura pastreaza starea anterioara."""
+def elliott_stats(store):
+    """Efectul conflictului Elliott pe ultimele 3000 de planuri inchise: R contra Elliott vs restul,
+    diferenta si IC95 pe BLOCURI de timp (core.plans.block_diff_ci). Folosit de decizia filtrului si
+    de auto-audit (parghia filtru_elliott). {"why": motiv} cand nu se poate masura."""
     plans = [p for p in store.get("plans") or [] if p.get("realized_r") is not None
              and p.get("state") != "NO_ENTRY" and (p.get("components") or {}).get("ev_elliott") is not None]
     plans.sort(key=lambda p: p.get("closed_ts") or 0)
     rec = plans[-3000:]
-    con = [p["realized_r"] for p in rec if p["components"]["ev_elliott"] <= -0.1]
-    rest = [p["realized_r"] for p in rec if p["components"]["ev_elliott"] > -0.1]
+    ts = lambda p: p.get("closed_ts") or p.get("created_ts") or 0
+    con = [(ts(p), p["realized_r"]) for p in rec if p["components"]["ev_elliott"] <= -0.1]
+    rest = [(ts(p), p["realized_r"]) for p in rec if p["components"]["ev_elliott"] > -0.1]
     if len(con) < 150 or len(rest) < 150:
-        return previous, "prea putine date recente - pastrez starea"
-    (mc, sc), (mr, sr) = _mean_se(con), _mean_se(rest)
-    d, se = mr - mc, math.sqrt(sc ** 2 + sr ** 2)
-    txt = (f"ultimele {len(rec)} planuri: contra Elliott {mc:+.3f}R, fara conflict {mr:+.3f}R, "
-           f"diferenta {d:+.3f}R (IC95 {d - 1.96 * se:+.3f}..{d + 1.96 * se:+.3f})")
-    if d - 1.96 * se > 0:
+        return {"why": "prea putine date recente - pastrez starea"}
+    # IC95 pe BLOCURI de timp (ca in restul masuratorilor, core.plans.block_mean_ci): planurile din
+    # aceeasi saptamana sunt corelate. Cu eroarea standard a planurilor independente, 14.10.2026
+    # dadea IC95 +0.004..+0.259 ("justificat"); pe blocuri saptamanale -0.034..+0.306 (include zero).
+    from core.plans import block_diff_ci
+    mc = sum(v for _, v in con) / len(con)
+    mr = sum(v for _, v in rest) / len(rest)
+    lo, hi = block_diff_ci(con, rest)
+    if lo is None:
+        return {"why": "prea putine saptamani de date - pastrez starea"}
+    n_live = sum(1 for p in rec if p.get("source") != "backtest")
+    return {"n": len(rec), "n_live": n_live, "mc": mc, "mr": mr, "d": mr - mc, "lo": lo, "hi": hi}
+
+
+def elliott_filter_decision(store, previous, stats=None):
+    """Filtrul de conflict Elliott se justifica doar cat timp datele RECENTE arata
+    ca planurile contra Elliott rezulta mai slab. Decis din nou la fiecare rulare,
+    cu histerezis: in zona nesigura pastreaza starea anterioara."""
+    s = stats if stats is not None else elliott_stats(store)
+    if "why" in s:
+        return previous, s["why"]
+    d, lo, hi = s["d"], s["lo"], s["hi"]
+    txt = (f"ultimele {s['n']} planuri ({s['n'] - s['n_live']} backtest, {s['n_live']} live): contra Elliott "
+           f"{s['mc']:+.3f}R, fara conflict {s['mr']:+.3f}R, diferenta {d:+.3f}R (IC95 pe blocuri de timp "
+           f"{lo:+.3f}..{hi:+.3f})")
+    if lo > 0:
         return True, "justificat: " + txt
     if d <= 0:
         return False, "oprit automat, nu mai e justificat: " + txt
@@ -540,6 +563,94 @@ def research_cycle(store, now=None):
     return active, chk
 
 
+ROOT = os.path.dirname(os.path.abspath(__file__))
+# codul propriu pe care il citeste auto-auditul: tot ce ruleaza in productie (fara teste, unelte,
+# date si pagini generate)
+AUDIT_SKIP_DIRS = {"tests", "tools", "data", "docs", "__pycache__", "node_modules"}
+
+
+def own_sources(root=None):
+    """{cale relativa: text} pentru fisierele .py de productie ale agentului."""
+    root = root or ROOT
+    out = {}
+    for d, dirs, files in os.walk(root):
+        dirs[:] = sorted(x for x in dirs if x not in AUDIT_SKIP_DIRS and not x.startswith("."))
+        for f in sorted(files):
+            if f.endswith(".py"):
+                p = os.path.join(d, f)
+                try:
+                    with open(p, encoding="utf-8") as fh:
+                        out[os.path.relpath(p, root).replace(os.sep, "/")] = fh.read()
+                except OSError:
+                    continue
+    return out
+
+
+def _strings(o, label, out):
+    """Toate textele dintr-un JSON, cu eticheta sursei (pentru sonda text vs stare)."""
+    if isinstance(o, str):
+        out.append((label, o))
+    elif isinstance(o, dict):
+        for k, v in o.items():
+            _strings(v, label, out)
+    elif isinstance(o, list):
+        for v in o:
+            _strings(v, label, out)
+    return out
+
+
+def decision_items(doc):
+    """Deciziile ultimei scanari ca perechi (simbol, decizie). In data/decisions.json "decisions" e un
+    dict {simbol: decizie} (generat de crypto_ai_scanner); accept si o lista de decizii cu "symbol".
+    Bug prins pe datele din 16.10.2026: auditul trata dictul ca lista si cadea (pe 14.10 era gol)."""
+    dec = (doc or {}).get("decisions") or {}
+    if isinstance(dec, dict):
+        return [(str(k), v) for k, v in dec.items() if isinstance(v, dict)]
+    return [(str(d.get("symbol", "?")), d) for d in dec if isinstance(d, dict)]
+
+
+def audit_cycle(store, prev_audit, ew_on, ew_stats, quarantine, now=None, sources=None):
+    """AUTO-AUDITUL (core/self_audit.py): sondele pe cod, pe date si pe parghiile de decizie, plus
+    registrul de imbunatatiri. Intoarce sectiunea "audit" din self_check.json si constatarile noi."""
+    from core import self_audit as SA
+    from core import plans as P
+    now = now if now is not None else time.time()
+    when = time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime(now))
+    prev_audit = prev_audit or {}
+    plans = store.get("plans") or []
+    src = sources if sources is not None else own_sources()
+    found = SA.probe_hardcoded_claims(src) + SA.probe_naive_ci(src)
+    f_data, state = SA.probe_data_trace(prev_audit.get("state"), plans, _load("plan_audit.json", {}) or {})
+    found += f_data
+    bt = [p for p in plans if p.get("source") == "backtest" and p.get("realized_r") is not None
+          and p.get("state") != "NO_ENTRY"]
+    agent = _load("agent_model.json", {}) or {}
+    ew = dict(ew_stats or {})
+    ew["on"] = ew_on
+    ctx = {"edge": P.edge_by_period(bt) if bt else {}, "elliott": ew, "agent": agent,
+           "agent_gain": SA.ranking_gain_ci(agent.get("pairs"), block_diff_ci=P.block_diff_ci),
+           "gate_on": P.USE_DECISION_GATE, "walkforward": _load("walkforward.json", None),
+           "eval_rules": P.EVAL_RULES, "research": _load(RESEARCH_FILE, {}) or {}, "quarantine": quarantine}
+    lever_rows, f_lev = SA.levers(ctx)
+    found += f_lev
+    texts = _strings(_load("briefing.json", {}) or {}, "briefing.json", [])
+    for sym, d in decision_items(_load("decisions.json", {}) or {}):
+        _strings(d, f"decisions.json:{sym}", texts)
+    found += SA.probe_text_state(texts, ctx)
+    ledger, fresh = SA.update_ledger(prev_audit.get("ledger"), found, now, when)
+    for fid in fresh:
+        e = ledger[fid]
+        if e["severity"] == "mare" and not e.get("issue"):
+            body = (f"**{e['title']}**\n\n{e['problem']}\n\nMasurat: {e['evidence']}\n\nCe trebuie schimbat: "
+                    f"{e['action']}\n\nUnde: " + ", ".join(e.get("files") or []) +
+                    "\n\n_Deschis automat de auto-audit (core/self_audit.py)._")
+            if open_issue(f"[auto-audit] {e['title']}", body):
+                e["issue"] = True
+    return {"when": when, "levers": lever_rows, "ledger": ledger, "state": state,
+            "summary": SA.summary_line(ledger),
+            "open": sum(1 for e in ledger.values() if e.get("status") == "deschisa")}, fresh
+
+
 def run():
     details = _load("latest_details.json", {}) or {}
     store = _load("plans.json", {}) or {}
@@ -567,7 +678,8 @@ def run():
             if quarantine[f]["clean_runs"] >= RELEASE_AFTER:
                 del quarantine[f]
 
-    ew_on, ew_why = elliott_filter_decision(store, pm.get("elliott_filter", True))
+    ew_stats = elliott_stats(store)
+    ew_on, ew_why = elliott_filter_decision(store, pm.get("elliott_filter", True), ew_stats)
     geo_err = any(c["id"] == "plan_geometry" and c["level"] == "ERROR" for c in checks)
     try:
         research_rules, research_chk = research_cycle(store)
@@ -579,6 +691,15 @@ def run():
              "research_rules": research_rules,
              "safe_mode": geo_err,
              "safe_reason": "niveluri de plan imposibile - vezi auto-diagnosticul" if geo_err else None}
+
+    # AUTO-AUDITUL: ce trebuie imbunatatit (cod, date, parghii de decizie, texte). Nu are voie sa
+    # opreasca diagnosticul; la esec, registrul anterior ramane neschimbat.
+    try:
+        audit, fresh = audit_cycle(store, prev.get("audit"), ew_on, ew_stats, quarantine)
+    except Exception as e:
+        audit, fresh = dict(prev.get("audit") or {}), []
+        audit["error"] = f"{type(e).__name__}: {e}"
+        print(f"[!] auto-auditul a esuat: {audit['error']}")
 
     status = ("ERROR" if any(c["level"] == "ERROR" for c in checks)
               else "WARN" if any(c["level"] == "WARN" for c in checks) else "OK")
@@ -596,7 +717,7 @@ def run():
     hist = (prev.get("history") or [])[-199:] + [{"ts": int(time.time()), "status": status}]
     out = {"ts": time.time(), "when": time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime()),
            "status": status, "checks": checks, "mitigations": mitig, "feature_health": fh_table,
-           "reported": sorted(reported & current_err | current_err), "history": hist}
+           "reported": sorted(reported & current_err | current_err), "history": hist, "audit": audit}
     # calea se calculeaza ACUM, din DATA - fixata la import, nu urma un DATA
     # schimbat ulterior (prins de testul buclei de auto-reparare)
     out_path = os.path.join(DATA, "self_check.json")
@@ -611,6 +732,10 @@ def run():
     for c in checks:
         if c["level"] != "OK":
             print(f"  [{c['level']}] {c['title']}: {c['detail']}")
+    print(f"Auto-audit: {audit.get('summary', '-')}")
+    for e in (audit.get("ledger") or {}).values():
+        if e.get("status") == "deschisa":
+            print(f"  [{e['severity']}] {e['title']}" + (" (NOU)" if e["id"] in fresh else ""))
     return out
 
 

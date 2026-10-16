@@ -3,6 +3,8 @@
 
 import html as _html
 
+from core import research as _R
+
 STATE = {"shadow": ("tag-shadow", "SHADOW - masurata live, nu filtreaza"),
          "activa": ("tag-learn", "ACTIVA - filtreaza semnalele"),
          "retrasa": ("tag-info", "RETRASA")}
@@ -28,7 +30,7 @@ def render_research(state):
            f'<p class="dim res-note">Cautare: {sr.get("n")} planuri, {_num(sr.get("r"))}R/plan. Perioada rezervata '
            f'(ultimele {hd.get("days")} zile, nefolosita la cautare): {hd.get("n")} planuri, {_num(hd.get("r"))}R/plan. '
            f'O regula trece doar daca planurile excluse pierd in cautare (prag Bonferroni p &lt; {rep.get("alpha")}), '
-           f'in 3 din 4 perioade si pe perioada rezervata.</p>']
+           f'in {_R.FOLDS - 1} din {_R.FOLDS} perioade si pe perioada rezervata.</p>']
     rules = sorted((state.get("rules") or {}).values(), key=lambda r: ("activa", "shadow", "retrasa").index(r.get("state", "retrasa")))
     if rules:
         rows = []

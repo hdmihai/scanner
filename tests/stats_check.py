@@ -142,6 +142,43 @@ def check_gate(fails):
     print("  4. poarta de echivalenta: excluderea pe cai JSON ascunde exact calea declarata")
 
 
+def check_block_diff(fails):
+    """core.plans.block_diff_ci: (a) cu un efect saptamanal comun planurilor aceluiasi grup si fara diferenta
+    reala, IC95 include zero in cel putin 90% din incercari, desi eroarea standard a planurilor
+    independente ar declara "diferenta distincta" mult mai des; (b) o diferenta reala mare e gasita."""
+    import random
+    from core.plans import block_diff_ci
+    rnd = random.Random(7)
+    cover = naive_false = trials = 0
+    for _ in range(40):
+        a, b = [], []
+        for w in range(40):
+            sa, sb = rnd.gauss(0, 0.6), rnd.gauss(0, 0.6)   # aceeasi saptamana loveste tot grupul
+            for i in range(15):
+                t = w * 7 * 86400 + i * 3600
+                if rnd.random() < 0.35:
+                    a.append((t, sa + rnd.gauss(0, 1)))
+                else:
+                    b.append((t, sb + rnd.gauss(0, 1)))
+        lo, hi = block_diff_ci(a, b, block_s=7 * 86400, n_boot=400)
+        trials += 1
+        cover += lo <= 0 <= hi
+        va, vb = [v for _, v in a], [v for _, v in b]
+        ma, mb = sum(va) / len(va), sum(vb) / len(vb)
+        se = ((sum((x - ma) ** 2 for x in va) / (len(va) - 1)) / len(va)
+              + (sum((x - mb) ** 2 for x in vb) / (len(vb) - 1)) / len(vb)) ** 0.5
+        naive_false += abs(mb - ma) > 1.96 * se
+    if cover < 0.9 * trials:
+        fails.append(f"block_diff_ci: IC95 acopera zero doar in {cover}/{trials} cazuri fara efect real")
+    a = [(w * 604800 + i, rnd.gauss(0, 1)) for w in range(30) for i in range(10)]
+    b = [(w * 604800 + i, rnd.gauss(0.8, 1)) for w in range(30) for i in range(10)]
+    lo, hi = block_diff_ci(a, b, block_s=604800, n_boot=400)
+    if not (lo > 0):
+        fails.append(f"block_diff_ci: o diferenta reala de +0.8 nu e gasita (IC {lo}..{hi})")
+    print(f"  5. IC al diferentei pe blocuri de timp: fara efect real acopera zero {cover}/{trials} "
+          f"(eroarea standard naiva ar fi declarat efect in {naive_false}/{trials}); efect real gasit")
+
+
 def main():
     store = _store()
     fails = []
@@ -149,6 +186,7 @@ def main():
     check_calibration(store, fails)
     check_neighbors(store, fails)
     check_gate(fails)
+    check_block_diff(fails)
     print("\nVERIFICARE STATISTICA: " + ("RESPINS - " + "; ".join(fails) if fails else "OK"))
     return 1 if fails else 0
 

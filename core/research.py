@@ -38,6 +38,8 @@ nicio regula sa nu treaca - un raspuns valid: erodarea vine din piata.
 
 import math
 
+from core.plans import WEEK_S, cluster_diff_se, cluster_mean_se
+
 HOLDOUT_DAYS = 180
 FOLDS = 4
 ALPHA = 0.05
@@ -114,13 +116,14 @@ def candidate_rules(plans):
     return out
 
 
-def _mean_se(v):
-    n = len(v)
-    if n < 2:
-        return (v[0] if v else 0.0), float("inf")
-    m = sum(v) / n
-    var = sum((x - m) ** 2 for x in v) / (n - 1)
-    return m, math.sqrt(var / n) if var > 0 else 1e-9
+def _mean_se(rows, block_s=WEEK_S):
+    """(medie, eroare standard) pe randuri (ts, R), ROBUSTA LA GRUPAREA pe blocuri de timp
+    (core.plans.cluster_mean_se): planurile aceleiasi saptamani sunt corelate. Eroarea standard a
+    planurilor independente facea p-valorile prea mici - pragul Bonferroni si perioada rezervata
+    pareau trecute mai usor decat sunt."""
+    if len(rows) < 2:
+        return (rows[0][1] if rows else 0.0), float("inf")
+    return cluster_mean_se(rows, block_s)
 
 
 def _p_below(m, se, ref=0.0):
@@ -132,12 +135,13 @@ def _p_below(m, se, ref=0.0):
 
 
 def _p_diff_below(a, b):
-    """p unilateral pentru media(a) < media(b) (Welch, aproximare normala)."""
-    (ma, sa), (mb, sb) = _mean_se(a), _mean_se(b)
-    if math.isinf(sa) or math.isinf(sb):
+    """p unilateral pentru media(a) < media(b), randuri (ts, R), eroare robusta la grupare."""
+    if len(a) < 2 or len(b) < 2:
         return 1.0
-    se = math.sqrt(sa ** 2 + sb ** 2) or 1e-9
-    return 0.5 * math.erfc(-((ma - mb) / se) / math.sqrt(2))
+    d, se = cluster_diff_se(b, a)          # media(a) - media(b)
+    if math.isinf(se):
+        return 1.0
+    return 0.5 * math.erfc(-(d / (se or 1e-9)) / math.sqrt(2))
 
 
 def _r(v, n=3):
@@ -160,11 +164,11 @@ def investigate(plans, holdout_days=HOLDOUT_DAYS):
     alpha = ALPHA / n_tests
     fold_len = max(1, len(search) // FOLDS)
     folds = [search[i * fold_len:(i + 1) * fold_len if i < FOLDS - 1 else len(search)] for i in range(FOLDS)]
-    base_s = _mean_se([p["realized_r"] for p in search])[0]
-    base_h = _mean_se([p["realized_r"] for p in hold])[0]
+    base_s = sum(p["realized_r"] for p in search) / len(search)
+    base_h = (sum(p["realized_r"] for p in hold) / len(hold)) if hold else None
     accepted, scored = [], []
     for rule in rules:
-        ex = [p["realized_r"] for p in search if matches(rule, p)]
+        ex = [(_ts(p), p["realized_r"]) for p in search if matches(rule, p)]
         kept = [p["realized_r"] for p in search if not matches(rule, p)]
         res = {"id": rule["id"], "text": rule["text"], "rule": {k: v for k, v in rule.items() if k not in ("id", "text")},
                "n_ex": len(ex), "frac_ex": round(len(ex) / len(search), 3)}
@@ -177,14 +181,15 @@ def investigate(plans, holdout_days=HOLDOUT_DAYS):
             fv = [q["realized_r"] for q in f if matches(rule, q)]
             if len(fv) >= 20 and sum(fv) / len(fv) < 0:
                 neg_folds += 1
-        hx = [q["realized_r"] for q in hold if matches(rule, q)]
+        hx_rows = [(_ts(q), q["realized_r"]) for q in hold if matches(rule, q)]
+        hx = [v for _, v in hx_rows]
         hk = [q["realized_r"] for q in hold if not matches(rule, q)]
-        hm, hse = _mean_se(hx) if hx else (None, float("inf"))
+        hm, hse = _mean_se(hx_rows) if hx_rows else (None, float("inf"))
         hp = _p_below(hm, hse) if hx else 1.0
-        res.update({"r_ex": _r(m), "r_kept": _r(_mean_se(kept)[0]), "p": float(f"{p:.2e}"),
+        res.update({"r_ex": _r(m), "r_kept": _r(sum(kept) / len(kept)) if kept else None, "p": float(f"{p:.2e}"),
                     "folds_negative": neg_folds, "n_ex_holdout": len(hx), "r_ex_holdout": _r(hm),
-                    "r_kept_holdout": _r(_mean_se(hk)[0]) if hk else None, "p_holdout": round(hp, 4),
-                    "gain_r_per_plan_holdout": _r((sum(hk) / len(hk) - base_h) if hk else None)})
+                    "r_kept_holdout": _r(sum(hk) / len(hk)) if hk else None, "p_holdout": round(hp, 4),
+                    "gain_r_per_plan_holdout": _r((sum(hk) / len(hk) - base_h) if hk and base_h is not None else None)})
         why = None
         if not (m < 0 and p < alpha):
             why = f"in cautare: R exclus {m:+.3f}, p={p:.1e} (prag Bonferroni {alpha:.1e})"
@@ -202,7 +207,7 @@ def investigate(plans, holdout_days=HOLDOUT_DAYS):
     if accepted:
         ar = [{**a["rule"]} for a in accepted]
         kept_h = [q["realized_r"] for q in hold if not any(matches(r, q) for r in ar)]
-        combo = {"r_before": _r(base_h), "r_after": _r(_mean_se(kept_h)[0]) if kept_h else None,
+        combo = {"r_before": _r(base_h), "r_after": _r(sum(kept_h) / len(kept_h)) if kept_h else None,
                  "n_before": len(hold), "n_after": len(kept_h)}
     return {"status": "ok", "n_plans": len(rows), "n_rules": n_tests, "alpha": float(f"{alpha:.2e}"),
             "search": {"n": len(search), "r": _r(base_s)}, "holdout": {"n": len(hold), "r": _r(base_h),
@@ -214,10 +219,10 @@ def live_verdict(rule, live_closed, since_ts):
     """Confirmarea pe planuri LIVE create dupa acceptare: planurile pe care regula le-ar
     fi exclus pierd mai mult decat celelalte? 'confirma' / 'infirma' / 'asteapta'."""
     after = [p for p in live_closed if _ts(p) >= since_ts]
-    m = [p["realized_r"] for p in after if matches(rule, p)]
-    k = [p["realized_r"] for p in after if not matches(rule, p)]
-    out = {"n_match": len(m), "n_rest": len(k), "r_match": _r(_mean_se(m)[0]) if m else None,
-           "r_rest": _r(_mean_se(k)[0]) if k else None}
+    m = [(_ts(p), p["realized_r"]) for p in after if matches(rule, p)]
+    k = [(_ts(p), p["realized_r"]) for p in after if not matches(rule, p)]
+    out = {"n_match": len(m), "n_rest": len(k), "r_match": _r(sum(v for _, v in m) / len(m)) if m else None,
+           "r_rest": _r(sum(v for _, v in k) / len(k)) if k else None}
     if len(m) < LIVE_MIN or len(k) < LIVE_MIN:
         return "asteapta", out
     p = _p_diff_below(m, k)
