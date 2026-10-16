@@ -66,6 +66,8 @@ PHASE_TIER = {0: None, 1: None, 2: "large", 3: "large", 4: "large", 5: "mid",
 
 # Cat favorizeaza faza pozitiile LONG pe altcoins, respectiv pe BTC, in [-1, 1].
 # Alimenteaza evidenta "altseason" a agentului.
+ALT_INDEX_MARGIN_PP = 3.0  # moneda la cel mult 3 pp de BTC pe 90 de zile = "la limita" in indicele Altcoin Season
+
 ALT_BIAS = {0: -0.8, 1: -0.5, 2: -0.4, 3: 0.2, 4: 0.5, 5: 0.7, 6: 0.6, 7: 0.2, 8: -0.8}
 
 
@@ -163,6 +165,11 @@ def indicators(glob, markets, perf90):
     beat90 = [perf[(c.get("symbol") or "").lower()] > btc90 for c in top100
               if (c.get("symbol") or "").lower() in perf] if btc90 is not None else []
     alt_index = round(100 * sum(beat90) / len(beat90), 1) if len(beat90) >= 40 else None
+    # monedele LA LIMITA (cel mult ALT_INDEX_MARGIN_PP de BTC pe 90 de zile), pe EXACT multimea
+    # indicelui (top 100 cu randament): pot schimba tabara de la o zi la alta
+    marginal90 = (sum(1 for c in top100 if (c.get("symbol") or "").lower() in perf
+                      and abs(perf[(c.get("symbol") or "").lower()] - btc90) <= ALT_INDEX_MARGIN_PP)
+                  if btc90 is not None else None)
 
     med_rel = {t: _median([_rel(r(c, "30d"), rb30) for c in g]) for t, g in tiers.items()}
     small = tiers["small"]
@@ -185,6 +192,8 @@ def indicators(glob, markets, perf90):
         "btc_price": btc.get("current_price"),
         "alt_index_90d": alt_index,
         "alt_index_coverage": len(beat90),
+        "alt_index_universe": len(top100),
+        "alt_index_marginal": marginal90,
         "breadth30": breadth(top100, "30d", rb30),
         "breadth30_tier": {t: breadth(g, "30d", rb30) for t, g in tiers.items()},
         "med_rel30_tier": {t: (round(v, 2) if v is not None else None) for t, v in med_rel.items()},

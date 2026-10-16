@@ -15,8 +15,8 @@ from dashboard.sections.analyst import render_analyst, render_token_steps
 from dashboard.sections.tokens import token_anchor
 from dashboard.sections.exchanges import page_href, render_exchange_modules, render_nav
 from dashboard.sections.market import render_briefing, render_evidence, render_indicators, render_levels, render_liquidity, render_opportunity_rows
-from dashboard.sections.plan import (elliott_outcome_stats, recent_calibration, render_calibration, render_plan,
-                                     render_plan_memory, tracked_plan)
+from dashboard.sections.plan import (elliott_outcome_stats, exploration_stats, recent_calibration, render_calibration,
+                                     render_plan, render_plan_memory, tracked_plan)
 from dashboard.sections.health import health_items, render_health
 from dashboard.sections.memory import render_memory
 from dashboard.sections.research import render_research
@@ -68,7 +68,8 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
                             elliott_outcome_stats(plans_store),
                             open_plan=tracked_plan(plans_store, (best or {}).get("symbol"),
                                                    (best or {}).get("direction")),
-                            recent=recent_calibration(plans_store))
+                            recent=recent_calibration(plans_store),
+                            explore=exploration_stats(plans_store))
     levels_html = _safe("render_levels", render_levels, deep)
     liquidity_html = _safe("render_liquidity", render_liquidity, deep)
     selfcheck_html = _safe("render_self_check", render_self_check, load_json(os.path.join(DATA_DIR, "self_check.json"), None),

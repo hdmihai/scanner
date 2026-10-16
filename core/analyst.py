@@ -206,6 +206,28 @@ def rotation_phase(cls, ind):
             "relative": rel, "relative_text": rel_text, "text": text}
 
 
+def alt_index_uncertainty(ind):
+    """CAT DE SIGURA E VALOAREA INDICELUI. Indicele numara cate din top 100 altcoins bat BTC pe 90
+    de zile, dar se calculeaza doar pe `cov` monede (cele cu lumanari zilnice pe bursa). Cele fara
+    date NU sunt un esantion aleator (lipsesc monedele fara piata pe bursele urmarite), deci un
+    interval statistic (ex. Wilson pe k/cov) ar sugera o precizie pe care nu o avem. Spun doar ce
+    e sigur: LIMITELE indicelui complet - toate monedele fara date sub BTC, respectiv toate peste.
+    Plus sensibilitatea zilnica: monedele aflate la cel mult ALT_INDEX_MARGIN_PP de BTC pe 90 de
+    zile (masurate de core.altseason.indicators pe EXACT multimea indicelui) pot schimba tabara
+    intr-o zi; fiecare muta indicele cu 100/cov puncte. None daca lipseste valoarea."""
+    ind = ind or {}
+    v, cov = ind.get("alt_index_90d"), ind.get("alt_index_coverage")
+    if v is None or not cov:
+        return None
+    k = int(round(v * cov / 100))
+    uni = ind.get("alt_index_universe") or 100
+    missing = max(uni - cov, 0)
+    bounds = (round(100 * k / uni, 1), round(100 * (k + missing) / uni, 1)) if missing else None
+    marg = ind.get("alt_index_marginal")
+    return {"k": k, "n": cov, "universe": uni, "missing": missing, "bounds": bounds, "marginal": marg,
+            "swing": round(100 * marg / cov, 1) if marg else None}
+
+
 def alt_index(ind, hist, live=None):
     """Indicele Altcoin Season de acum (definitia CoinMarketCap: cate din top 100 altcoins bat BTC
     pe 90 de zile) si trendul lui pe 90 de zile. Trendul vine din seria LIVE salvata la fiecare
@@ -229,13 +251,24 @@ def alt_index(ind, hist, live=None):
     parts = [f"{v:.0f}/100 ({season}" + (f"; calculat pe {cov} din top 100 altcoins, cele cu lumânări zilnice pe bursă"
                                           if cov else "") + ")" if v is not None
              else "indice indisponibil (prea puține randamente pe 90 de zile)"]
+    unc = alt_index_uncertainty(ind)
+    if unc and (unc["bounds"] or unc["marginal"]):
+        bits = []
+        if unc["bounds"]:
+            bits.append(f"{unc['k']} din {unc['n']} bat BTC; cu cele {unc['missing']} fără date, indicele complet "
+                        f"ar fi între {unc['bounds'][0]:.0f} și {unc['bounds'][1]:.0f}")
+        if unc["marginal"]:
+            bits.append(f"{unc['marginal']} monede la ±3 pp de BTC pe 90 de zile - indicele poate sări cu până "
+                        f"la ~{unc['swing']:.0f} puncte de la o zi la alta")
+        parts.append("; ".join(bits))
     if delta is not None:
         parts.append(f"trend 90 de zile: {a0:.0f} → {a1:.0f} ({delta:+.0f}, {trend})"
                      + ("" if src == "live" else " pe indicele istoric comparabil"))
     if pos.get("ai_percentile") is not None:
         parts.append(f"percentila {pos['ai_percentile']} din 10 ani (indicele istoric comparabil)")
     return {"value": v, "coverage": cov, "season": season, "from": a0, "to": a1, "delta": delta, "trend": trend,
-            "trend_source": src, "series": series, "percentile": pos.get("ai_percentile"), "text": " · ".join(parts)}
+            "trend_source": src, "series": series, "percentile": pos.get("ai_percentile"),
+            "uncertainty": unc, "text": " · ".join(parts)}
 
 
 def ten_year(hist, btcd):

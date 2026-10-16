@@ -135,13 +135,13 @@ def check_agent_source_follows_geometry():
 
 
 def check_decision_gate():
-    """Poarta trebuie sa fie comutabila si implicit dezactivata - walk-forward
-    a aratat ca inrautateste rezultatul in 2 din 3 rulari."""
+    """Poarta trebuie sa fie comutabila si implicit dezactivata: o activeaza doar dovada
+    walk-forward (backtest --walk-forward -> data/walkforward.json, evaluata de auto-audit)."""
     pt = (read("plan_tracker.py") or "") + (read(os.path.join("core", "plans.py")) or "")
     if "USE_DECISION_GATE" not in pt:
         problems.append(
-            "plan_tracker.py nu are USE_DECISION_GATE. Poarta filtreaza mereu, "
-            "desi walk-forward a masurat -0.0278R/plan pe cel mai mare esantion.")
+            "plan_tracker.py nu are USE_DECISION_GATE. Poarta filtreaza mereu, fara "
+            "comutator - dovada ei vine din walk-forward (data/walkforward.json), nu e garantata.")
     if "superior" not in pt:
         problems.append(
             "plan_tracker.decide() nu verifica `superior` inainte de a folosi "

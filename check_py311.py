@@ -73,14 +73,18 @@ def check_source(path):
             if tok.type == tokenize.FSTRING_START:
                 # tok.string arata ca f" / rf' / F""" etc. Ultimul caracter e
                 # delimitatorul; pentru triple, tot acelasi caracter.
-                quote = tok.string[-1]
+                # Pentru f"""...""" delimitatorul e TREI ghilimele: pe 3.11 un sir "a" in
+                # expresie e valid (tokenizer-ul vechi cauta doar """ ca sfarsit). Comparatia pe
+                # un singur caracter dadea fals pozitiv pe dashboard/page.py (7 "probleme",
+                # 11 oct 2026), desi python3.11 -m py_compile trece si scanarea ruleaza pe 3.11.
+                quote = tok.string[-3:] if tok.string[-3:] in ('"""', "'''") else tok.string[-1]
                 fstring_stack.append(quote)
             elif tok.type == tokenize.FSTRING_END:
                 if fstring_stack:
                     fstring_stack.pop()
             elif fstring_stack and tok.type == tokenize.STRING:
                 inner = tok.string.lstrip("rRbBuUfF")
-                if inner and inner[0] == fstring_stack[-1]:
+                if inner and inner.startswith(fstring_stack[-1]):
                     problems.append((
                         tok.start[0],
                         f"ghilimea {fstring_stack[-1]!r} reutilizata in expresia unui "

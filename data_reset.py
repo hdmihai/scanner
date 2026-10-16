@@ -147,7 +147,13 @@ def rebuild(store, fresh, weights, same_family, family, fv):
     log["rebuild"] = summary
     # separat de `removed` (planurile scoase de audit pentru date false): acestea erau corecte la
     # vremea lor, dar create de o versiune anterioara a agentului
-    log["rebuild_removed_live"] = live_removed[-500:]
+    # ARHIVA SE ACUMULEAZA: o reconstructie ulterioara (11.10 20:52 UTC, doar backtest regenerat,
+    # 0 planuri live scoase) suprascria lista cu [] si pierdea cele 64 de planuri live scoase pe
+    # 10.10 - singura urma a 49 de tranzactii reale inchise. Acum intrarile vechi raman (unice pe
+    # id), cele noi se adauga la coada; limita de 500 taie doar cele mai vechi.
+    _prev = [r for r in (log.get("rebuild_removed_live") or []) if isinstance(r, dict)]
+    _new_ids = {r.get("id") for r in live_removed}
+    log["rebuild_removed_live"] = ([r for r in _prev if r.get("id") not in _new_ids] + live_removed)[-500:]
     _save(AUDIT_FILE, log)
 
     print("\nRECONSTRUCTIA MEMORIEI (epoca %d)" % audit_core.DATA_EPOCH)

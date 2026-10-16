@@ -72,6 +72,59 @@ def _universe_facts():
             "recent": e.get("recent"), "status": e.get("status"), "when": u.get("when"), "rules": u.get("rules")}
 
 
+def _bucket_r_ci(closed, bucket_size=20):
+    """IC95 al R-ului mediu pe interval de scor (core.plans.bucket_r_ci: bootstrap pe blocuri de
+    timp, ca toate intervalele din proiect). Eroarea standard a planurilor independente dadea un
+    interval de ~2 ori prea ingust: 14.10.2026, 20-39 si 40-59 ieseau "distincte de zero" cu ea;
+    pe blocuri saptamanale niciunul nu e."""
+    from core.plans import bucket_r_ci
+    return bucket_r_ci(closed, bucket_size)
+
+
+def _decision_gate_on():
+    """Poarta de calibrare (core.plans.USE_DECISION_GATE) decide emiterea? Implicit NU: pe
+    dovada lui e walk-forward-ul evaluat de auto-audit, deci intervalele de scor se afiseaza, dar nu decid."""
+    try:
+        from core.plans import USE_DECISION_GATE
+        return bool(USE_DECISION_GATE)
+    except Exception:
+        return None
+
+
+def _bucket_line(f):
+    """Propozitia despre intervalele de scor, doar cu ce e distinct statistic de zero (IC95 pe
+    R mediu). None daca nu exista intervale fiabile cu IC."""
+    rows = f.get("buckets") or []
+    if not rows:
+        return None
+    fmt = lambda b: (f"{b['range']} ({b['avg_r']:+.3f}R, IC95 {b['r_ci'][0]:+.3f}..{b['r_ci'][1]:+.3f}, "
+                     f"castig {b['win_rate']}%, n={b['total']})")
+    pos = [b for b in rows if b["r_ci"][0] > 0]
+    neg = [b for b in rows if b["r_ci"][1] < 0]
+    rest = [b["range"] for b in rows if b not in pos and b not in neg]
+    bits = []
+    if pos:
+        bits.append("distinct pozitive: " + "; ".join(fmt(b) for b in pos))
+    if neg:
+        bits.append("distinct negative: " + "; ".join(fmt(b) for b in neg))
+    if rest:
+        bits.append(("restul" if (pos or neg) else "toate") + " (" + ", ".join(rest) + ") in marja zgomotului "
+                    "(IC95 al R-ului mediu include zero)")
+    return ("R mediu pe intervalele de scor cu destule date (IC95 pe blocuri de timp) - "
+            + "; ".join(bits) + ".")
+
+
+def _gate_line(f):
+    g = f.get("decision_gate")
+    if g is True:
+        return "Deciziile de a deschide sau refuza planuri se bazeaza pe aceste cifre masurate, nu pe scorul brut."
+    if g is False:
+        return ("Poarta pe aceste cifre e dezactivata (USE_DECISION_GATE=false; dovada walk-forward e in "
+                "auto-audit): ele se "
+                "afiseaza, dar nu decid emiterea planurilor.")
+    return ""
+
+
 def gather_facts():
     plans_store = load_json(PLANS_FILE, {})
     agent = load_json(AGENT_FILE, {})
@@ -110,6 +163,10 @@ def gather_facts():
     reliable = {b: c for b, c in calibration.items() if c.get("reliable")}
     best_bucket = max(reliable.items(), key=lambda kv: kv[1]["avg_r"], default=None)
     worst_bucket = min(reliable.items(), key=lambda kv: kv[1]["avg_r"], default=None)
+    # IC95 PE R-UL MEDIU al fiecarui interval: "cel mai bine merge 0-19 (+0.14R, n=201)" era
+    # maximul a 5 medii, desi IC95 al lui 0-19 era -0.155..+0.446 (14 oct 2026) - include zero
+    # si se suprapune cu toate celelalte intervale. Cu IC, textul spune doar ce e distinct de zero.
+    bucket_r_ci = _bucket_r_ci(closed)
 
     last_scan = history[-1] if history else {}
 
@@ -189,6 +246,11 @@ def gather_facts():
                          **best_bucket[1]} if best_bucket else None),
         "worst_bucket": ({"range": f"{worst_bucket[0]}-{int(worst_bucket[0])+19}",
                           **worst_bucket[1]} if worst_bucket else None),
+        # toate intervalele fiabile, cu IC95 pe R mediu (ordonate dupa scor)
+        "buckets": [{"range": f"{b}-{int(b)+19}", "total": c["total"], "win_rate": c["win_rate"],
+                     "avg_r": c["avg_r"], "r_ci": bucket_r_ci[b]}
+                    for b, c in sorted(reliable.items(), key=lambda kv: int(kv[0])) if b in bucket_r_ci],
+        "decision_gate": _decision_gate_on(),
         "agent_status": agent.get("status"),
         "agent_reason": agent.get("status_reason"),
         "agent_samples": (agent.get("agent") or {}).get("total", 0),
@@ -197,6 +259,8 @@ def gather_facts():
         "agent_weights": (agent.get("model") or {}).get("weights"),
         "real": real,
         "simulated": simulated,
+        # auto-auditul (core/self_audit.py, rulat de self_check): imbunatatirile deschise
+        "audit_summary": ((load_json(os.path.join(DATA_DIR, "self_check.json"), {}) or {}).get("audit") or {}).get("summary"),
     }
 
 
@@ -251,14 +315,17 @@ def deterministic_briefing(f):
         items = ", ".join(f"#{p['id']} {p['symbol']} {p['r']:+.2f}R" for p in f["recent_closed"][:3])
         parts.append(f"Ultimele inchise: {items}.")
 
-    if f["best_bucket"] and f["worst_bucket"] and f["best_bucket"]["range"] != f["worst_bucket"]["range"]:
+    bl = _bucket_line(f)
+    if bl:
+        # cu IC95: maximul a cinci medii nu e "cel mai bun interval" daca IC-ul lui include zero
+        parts.append(bl + (" " + _gate_line(f) if _gate_line(f) else ""))
+    elif f["best_bucket"] and f["worst_bucket"] and f["best_bucket"]["range"] != f["worst_bucket"]["range"]:
         b, w = f["best_bucket"], f["worst_bucket"]
         parts.append(
             f"Pe intervalele de scor cu destule date, cel mai bine merge {b['range']} "
             f"({b['win_rate']}%, {b['avg_r']:+.2f}R mediu, n={b['total']}), "
             f"iar cel mai slab {w['range']} ({w['win_rate']}%, {w['avg_r']:+.2f}R, n={w['total']}). "
-            f"Deciziile de a deschide sau refuza planuri se bazeaza pe aceste cifre masurate, "
-            f"nu pe scorul brut.")
+            + _gate_line(f))
     else:
         parts.append(
             "Inca nu am destule planuri inchise pe niciun interval de scor ca sa pronunt "
@@ -275,6 +342,8 @@ def deterministic_briefing(f):
         parts.append(
             f"Agentul cu invatare online e in modul SHADOW - invata si isi masoara "
             f"performanta, dar nu influenteaza inca deciziile ({f['agent_reason']}).")
+    if f.get("audit_summary"):
+        parts.append(f["audit_summary"])
 
     return " ".join(parts)
 
@@ -346,7 +415,10 @@ def sections(f):
                       f"{er['n']} planuri - " + {"pozitiv": "distinct pozitiv", "neconcludent": "nu e distinct de zero",
                                                  "negativ": "negativ"}.get(sim.get("edge_status"), "") + ".")
         b, w = f.get("best_bucket"), f.get("worst_bucket")
-        if b and w and b["range"] != w["range"]:
+        bl = _bucket_line(f)
+        if bl:
+            s_.append("Calibrare (dominata de backtest): " + bl)
+        elif b and w and b["range"] != w["range"]:
             s_.append(f"Calibrare (dominata de backtest): cel mai bun interval de scor {b['range']} ({b['win_rate']}%, "
                       f"{b['avg_r']:+.2f}R), cel mai slab {w['range']} ({w['win_rate']}%, {w['avg_r']:+.2f}R).")
         uv = sim.get("universe") or {}

@@ -7,6 +7,8 @@ from core.plans import open_plan_for
 from dashboard.config import SL_AFTER_TP1_LABEL, STATE_STYLE
 from dashboard.components import fmt_price
 
+import html as _html
+
 
 def elliott_outcome_stats(plans_store):
     """Masurat live din planurile inchise: rezultatul planurilor luate CONTRA
@@ -37,6 +39,64 @@ def tracked_plan(plans_store, symbol, direction):
     except (AttributeError, TypeError) as e:       # date stricate: cardul ramane ca inainte
         print(f"[!] tracked_plan: {e}")
         return None
+
+
+EXPLORE_MODES = ("EXPLORARE_FILTRU", "EXPLORARE_ELLIOTT", "EXPLORARE_REGULA")
+EXPLORE_MIN_N = 30   # sub atatea planuri inchise, rezultatul unui mod de explorare e doar anecdotic
+# cine a respins semnalul emis totusi pentru explorare (core.plans.decide)
+EXPLORE_WHO = {"EXPLORARE_FILTRU": "agentul a respins semnalul",
+               "EXPLORARE_ELLIOTT": "filtrul de conflict Elliott a respins semnalul",
+               "EXPLORARE_REGULA": "o regula din cercetarea autonoma a respins semnalul"}
+
+
+def exploration_stats(plans_store):
+    """Rezultatul MASURAT live al planurilor emise doar pentru explorare (semnale pe care
+    un filtru le-a respins, emise totusi ca efectul filtrului sa ramana masurat), SEPARAT
+    pe fiecare mod: {mod: {n, wins, ci, avg_r, open}} - castig k/n cu IC Wilson si R mediu,
+    pe planurile live inchise cu intrarea atinsa, plus cate sunt inca deschise.
+    Pe mod, nu doar EXPLORARE_FILTRU: 14 oct 2026 singurul plan de explorare emis in ultimele
+    5 zile era EXPLORARE_ELLIOTT (ATOM #342761), iar cele 3 inchise de acest tip pierdusera
+    toate (-1.03R mediu) - cifra care lipsea cu varianta pe un singur mod. {} daca nu exista."""
+    from core.plans import wilson_interval
+    out = {}
+    for mode in EXPLORE_MODES:
+        live = [p for p in (plans_store or {}).get("plans") or []
+                if p.get("source") != "backtest" and (p.get("decision") or {}).get("mode") == mode]
+        if not live:
+            continue
+        closed = [p for p in live if p.get("realized_r") is not None and p.get("state") != "NO_ENTRY"]
+        n, k = len(closed), sum(1 for p in closed if p["realized_r"] > 0)
+        ci = tuple(round(100 * x, 1) for x in wilson_interval(k, n)) if n else None   # procente
+        out[mode] = {"mode": mode, "n": n, "wins": k, "ci": ci,
+                     "avg_r": round(sum(p["realized_r"] for p in closed) / n, 3) if n else None,
+                     "open": sum(1 for p in live if p.get("realized_r") is None)}
+    return out
+
+
+def _explore_note(op, xs):
+    """Avertismentul pentru un plan urmarit emis DOAR pentru explorare: un filtru l-a
+    respins, iar probabilitatea pe intervalul de scor nu tine cont de asta. `xs` =
+    exploration_stats (pe mod)."""
+    dec = op.get("decision") or {}
+    mode = dec.get("mode")
+    if mode not in EXPLORE_MODES:
+        return ""
+    why = _html.escape(str(dec.get("reason") or "").strip().rstrip("."))
+    agp = dec.get("agent_prob") if mode == "EXPLORARE_FILTRU" else None
+    st = (xs or {}).get(mode) or {}
+    stat = ""
+    if st.get("n"):
+        lo, hi = st["ci"] if st.get("ci") else (None, None)
+        stat = (f' Planurile live de acest tip inchise pana acum: {st["wins"]} castigatoare din {st["n"]}'
+                + (f' (IC {lo:.1f}-{hi:.1f}%)' if lo is not None else "")
+                + f', R mediu {st["avg_r"]:+.3f}R'
+                + (' - prea putine ca rezultatul sa conteze statistic' if st["n"] < EXPLORE_MIN_N else '')
+                + f'; inca deschise: {st["open"]}.')
+    return (f'<div class="plan-conflict explore"><strong>EMIS DOAR PENTRU EXPLORARE</strong> &middot; '
+            + EXPLORE_WHO[mode]
+            + (f' (agent {agp * 100:.1f}%)' if isinstance(agp, (int, float)) else "")
+            + f': {why}. Planul e urmarit ca efectul filtrului sa ramana masurat, nu pentru ca ar fi recomandat; '
+            f'probabilitatea de mai jos e a intervalului de scor si nu include verdictul filtrului.{stat}</div>')
 
 
 def recent_calibration(plans_store):
@@ -95,7 +155,8 @@ def _r_tp2(lv):
         return None
 
 
-def render_plan(best, deep, calibration=None, decision=None, ew_stats=None, open_plan=None, recent=None):
+def render_plan(best, deep, calibration=None, decision=None, ew_stats=None, open_plan=None, recent=None,
+                explore=None):
     """Cardul "AI plan". CONFIDENCE afisa formula din scor (ex. 76.2%), desi
     probabilitatea MASURATA pe acelasi interval de scor era mult mai mica - iar
     cardul nu spunea nimic cand Elliott contrazicea planul. Acum: probabilitatea
@@ -107,7 +168,13 @@ def render_plan(best, deep, calibration=None, decision=None, ew_stats=None, open
     SEMNALULUI CURENT ca si cum ar fi fost planul agentului (8 oct: DASH SHORT,
     49.9% la scor 80, entry 54.945), desi planul real #293318 avea entry 54.52 si
     SL 55.88. Acum cardul arata planul urmarit, iar semnalul curent doar ca
-    informatie. `recent` = calibrarea pe ultimele 12 luni (recent_calibration)."""
+    informatie. `recent` = calibrarea pe ultimele 12 luni (recent_calibration).
+
+    PLAN DE EXPLORARE: 10 oct 2026, SOL SHORT #293334 era aratat ca plan urmarit
+    cu 49.9% (intervalul de scor 80-99), desi agentul il respinsese (0.179 < prag
+    0.210) si fusese emis doar pentru explorare; planurile live de explorare
+    inchise pana atunci: 1 castigator din 9. Acum cardul o spune, cu filtrul care
+    l-a respins si rezultatul masurat al modului (`explore` = exploration_stats)."""
     if not best or not deep:
         return '<p class="dim">Niciun candidat cu semnal clar in scanarea curenta.</p>'
     plan = deep["plan"]
@@ -115,7 +182,8 @@ def render_plan(best, deep, calibration=None, decision=None, ew_stats=None, open
     b = _bucket(best.get("risk_adjusted") or best.get("score"))
     cal = (calibration or {}).get(b) or {}
     if open_plan and not decision:
-        return _render_tracked(best, plan, open_plan, calibration or {}, b, cal, direction_cls, ew_stats, recent)
+        return _render_tracked(best, plan, open_plan, calibration or {}, b, cal, direction_cls, ew_stats, recent,
+                               explore)
     rn = _recent_note(recent, b)
     if cal.get("reliable"):
         conf_html = (f'<span class="confidence-value">{cal["win_rate"]}%</span>'
@@ -171,7 +239,7 @@ def _ew_stats_html(ew_stats):
             f'{ew_stats["r_rest"]:+.3f}R/plan (n={ew_stats["n_rest"]})</div>')
 
 
-def _render_tracked(best, cur, op, calibration, b_now, cal_now, direction_cls, ew_stats, recent):
+def _render_tracked(best, cur, op, calibration, b_now, cal_now, direction_cls, ew_stats, recent, explore=None):
     """Cardul cand candidatul principal are deja un plan activ (vezi render_plan):
     nivelurile si probabilitatea PLANULUI REAL, de la emitere; semnalul curent e
     doar informativ."""
@@ -210,6 +278,7 @@ def _render_tracked(best, cur, op, calibration, b_now, cal_now, direction_cls, e
     <div class="plan-ok"><strong>PLAN URMARIT #{op.get("id")}</strong> &middot; {label}
       &middot; emis {op.get("created_time") or "-"}.{note_state}
       Nivelurile de mai jos sunt ale planului urmarit, nu ale semnalului curent.</div>
+    {_explore_note(op, explore)}
     <div class="confidence-row">
       <span class="dim">PROBABILITATE</span>
       <div>{prob}</div>

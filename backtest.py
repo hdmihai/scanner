@@ -68,6 +68,9 @@ from core import relative as rel_mod
 
 DATA_DIR = "data"
 BACKTEST_FILE = os.path.join(DATA_DIR, "backtest_plans.json")
+# ultimul walk-forward al portii de calibrare: dovada pe care auto-auditul (core/self_audit.py)
+# o citeste pentru parghia USE_DECISION_GATE - fara fisier, poarta nu are dovada masurata
+WALKFORWARD_FILE = os.path.join(DATA_DIR, "walkforward.json")
 PLANS_FILE = os.path.join(DATA_DIR, "plans.json")
 
 DEFAULT_DAYS = 180
@@ -655,6 +658,24 @@ def run_sweep(symbols, histories, weights):
 # ===================== VALIDARE WALK-FORWARD ==============================
 
 def walk_forward(plans, n_windows=6, min_train=400, mode="anchored"):
+    """Walk-forward-ul portii de calibrare, cu poarta PORNITA pe durata masuratorii.
+
+    BUG GASIT 14.10.2026: poarta e oprita implicit (USE_DECISION_GATE=false), iar decide() cu
+    poarta oprita emite TOT - deci walk-forward-ul compara "toate" cu "toate" si raporta un
+    castig 0 indiferent de date. Masuratoarea pe care se sprijina decizia de a tine poarta
+    oprita nu se mai putea repeta. Acum poarta e pornita doar aici, fara atenuarile din
+    auto-diagnostic (filtrul Elliott, regulile, modul de siguranta - semnalele de backtest nu
+    au contextul lor), si starea se reface la iesire."""
+    core = plan_tracker._core
+    old = core.USE_DECISION_GATE, core.MITIGATIONS_SOURCE
+    core.USE_DECISION_GATE, core.MITIGATIONS_SOURCE = True, (lambda: {})
+    try:
+        return _walk_forward(plans, n_windows, min_train, mode)
+    finally:
+        core.USE_DECISION_GATE, core.MITIGATIONS_SOURCE = old
+
+
+def _walk_forward(plans, n_windows=6, min_train=400, mode="anchored"):
     """Validare walk-forward pe ferestre multiple.
 
     DE CE E NECESARA: calibrarea invata pragurile din rezultate, iar poarta de
@@ -693,7 +714,7 @@ def walk_forward(plans, n_windows=6, min_train=400, mode="anchored"):
           f"{'%emise':>7s} {'R emise':>9s} {'R toate':>9s}")
     print("-" * 74)
 
-    all_issued, all_test = [], []
+    all_issued, all_test, all_issued_rows, all_test_rows = [], [], [], []
     for i in range(n_windows):
         lo, hi = edges[i], edges[i + 1]
         test = usable[lo:hi]
@@ -701,10 +722,13 @@ def walk_forward(plans, n_windows=6, min_train=400, mode="anchored"):
         if len(train) < min_train or not test:
             continue
         cal = plan_tracker.build_calibration({"plans": train})
-        issued = [p["realized_r"] for p in test
-                  if plan_tracker.decide(
-                      cal, {"risk_adjusted": p.get("score_at_entry") or 0})["action"] == "ISSUE"]
+        issued_rows = [((p.get("created_ts") or 0), p["realized_r"]) for p in test
+                       if plan_tracker.decide(
+                           cal, {"risk_adjusted": p.get("score_at_entry") or 0})["action"] == "ISSUE"]
+        issued = [r for _, r in issued_rows]
+        all_issued_rows += issued_rows
         every = [p["realized_r"] for p in test]
+        all_test_rows += [((p.get("created_ts") or 0), p["realized_r"]) for p in test]
         all_issued += issued
         all_test += every
         r_iss = (sum(issued) / len(issued)) if issued else 0.0
@@ -719,15 +743,19 @@ def walk_forward(plans, n_windows=6, min_train=400, mode="anchored"):
 
     print("-" * 74)
     m = sum(all_issued) / len(all_issued)
-    var = sum((x - m) ** 2 for x in all_issued) / max(len(all_issued) - 1, 1)
-    ci = 1.96 * math.sqrt(var / len(all_issued))
+    # IC95 pe BLOCURI de timp (plan_tracker.block_mean_ci), ca peste tot in proiect: planurile
+    # aceleiasi saptamani sunt corelate, iar eroarea standard a planurilor independente dadea un
+    # interval de ~2 ori prea ingust - verdictul "semnificativ" de aici decide USE_DECISION_GATE
+    lo_ci, hi_ci = plan_tracker.block_mean_ci(all_issued_rows)
+    ci = ((hi_ci - lo_ci) / 2) if lo_ci is not None else float("inf")
     m_all = sum(all_test) / len(all_test)
     wins = [x for x in all_issued if x > 0]
     losses = [abs(x) for x in all_issued if x <= 0]
     pf = (sum(wins) / sum(losses)) if losses else float("inf")
 
     print(f"AGREGAT OUT-OF-SAMPLE ({len(all_issued)} planuri emise din {len(all_test)}):")
-    print(f"  R mediu emise : {m:+.4f}  (IC95 {m - ci:+.4f} .. {m + ci:+.4f})")
+    print(f"  R mediu emise : {m:+.4f}  (IC95 pe blocuri de timp "
+          + (f"{lo_ci:+.4f} .. {hi_ci:+.4f})" if lo_ci is not None else "indisponibil - prea putine saptamani)"))
     print(f"  R mediu toate : {m_all:+.4f}   -> poarta adauga {m - m_all:+.4f}R/plan")
     print(f"  rata de castig: {100 * len(wins) / len(all_issued):.1f}%  |  profit factor {pf:.2f}")
     if wins and losses:
@@ -735,15 +763,18 @@ def walk_forward(plans, n_windows=6, min_train=400, mode="anchored"):
         print(f"  castig {aw:+.2f}R / pierdere {al:.2f}R = raport {aw / al:.2f}:1 "
               f"(break-even la {100 * al / (aw + al):.0f}%)")
     print()
-    if m - ci > 0:
+    if lo_ci is not None and lo_ci > 0:
         print("  VERDICT: pozitiv SI semnificativ statistic pe date nevazute.")
     elif m > 0:
         print(f"  VERDICT: pozitiv dar NU semnificativ - intervalul include zero.")
-        need = int(var / (m / 1.96) ** 2) + 1 if m > 0 else 0
-        print(f"  Ar fi nevoie de ~{need} planuri emise pentru semnificatie la acest efect.")
+        need = int(len(all_issued) * (ci / m) ** 2) + 1 if m > 0 and ci != float("inf") else 0
+        print(f"  Ar fi nevoie de ~{need} planuri emise pentru semnificatie la acest efect "
+              f"(la aceeasi corelatie intre planuri).")
     else:
         print("  VERDICT: negativ pe date nevazute - filtrul nu se transfera.")
-    return {"mean": m, "ci": ci, "n": len(all_issued)}
+    g_lo, g_hi = plan_tracker.block_diff_ci(all_test_rows, all_issued_rows)
+    return {"mean": m, "ci": ci, "n": len(all_issued), "ci_low": lo_ci, "ci_high": hi_ci,
+            "r_all": m_all, "n_all": len(all_test), "gain": m - m_all, "gain_ci_low": g_lo, "gain_ci_high": g_hi}
 
 
 # Backtest-ul cere `days` de zile, dar bursa da cat are. Raportul de acoperire
@@ -821,7 +852,16 @@ def main():
         return
 
     if wf:
-        walk_forward(all_plans, n_windows=n_windows, mode=wf_mode)
+        res = walk_forward(all_plans, n_windows=n_windows, mode=wf_mode)
+        if res:
+            r4 = lambda v: None if v is None or v == float("inf") else round(v, 4)
+            save_json(WALKFORWARD_FILE, {
+                "when": time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime()), "ts": time.time(),
+                "what": "poarta de calibrare (core.plans.decide pe intervale de scor), ferestre nevazute",
+                "mode": wf_mode, "windows": n_windows, "er": plan_tracker.EVAL_RULES,
+                "n_issued": res["n"], "n_all": res["n_all"], "r_issued": r4(res["mean"]),
+                "r_issued_ci": [r4(res["ci_low"]), r4(res["ci_high"])], "r_all": r4(res["r_all"]),
+                "gain": r4(res["gain"]), "gain_ci": [r4(res["gain_ci_low"]), r4(res["gain_ci_high"])]})
 
     # RAPORT DE ACOPERIRE: bursele limiteaza adancimea istoricului pe lumanari
     # de 1h (frecvent 1-2 ani), iar unele tokene nici nu existau acum 5 ani.

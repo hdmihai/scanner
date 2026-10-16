@@ -901,9 +901,22 @@ def decide(calibration, signal, agent_pred=None, bucket_size=20):
                     "expected_value_r": None,
                     "calibrated_prob": cal["win_rate"] if cal else None,
                     "agent_prob": (agent_pred or {}).get("probability"), "agent_used": False}
+        # CIFRELE MASURATE, nu constante: textul spunea mereu "+0.04R/plan, fata de +0.11R fara
+        # conflict" (scrise de mana), desi auto-diagnosticul masura pe 12.10 contra Elliott -0.159R
+        # si fara conflict -0.023R (ultimele 3000 de planuri). Acum motivul preia exact masuratoarea
+        # care a decis filtrul (self_check.elliott_filter_decision -> mitigations).
+        # Starea filtrului se spune explicit: "justificat" (IC95 pe blocuri de timp peste zero) sau
+        # "zona nesigura" (diferenta pozitiva, dar IC95 include zero - filtrul ramane activ doar prin
+        # histerezis, nu pentru ca ar fi dovedit).
+        _ew_why = str(auto.get("elliott_filter_reason") or "")
+        _ew_head, _ew_txt = _ew_why.split(": ", 1) if ": " in _ew_why else ("", "")
+        _ew_state = (" Filtrul e justificat de masuratoare" if _ew_head.startswith("justificat") else
+                     " Filtrul ramane activ prin histerezis - efectul nu e distinct de zero"
+                     if _ew_head.startswith("zona nesigura") else " Filtrul e activ")
+        hist = (f"{_ew_state} (auto-diagnostic, {_ew_txt})." if _ew_txt.startswith("ultimele")
+                else _ew_state + "; masuratoarea efectului apare in auto-diagnostic.")
         return {"action": "SKIP", "mode": "ASTEAPTA_CORECTIA",
-                "reason": (base + " Istoric: planurile contra Elliott n-au avut avantaj "
-                           "(+0.04R/plan, fata de +0.11R fara conflict)." + watch),
+                "reason": (base + hist + watch),
                 "expected_value_r": None,
                 "calibrated_prob": cal["win_rate"] if cal else None,
                 "agent_prob": (agent_pred or {}).get("probability"), "agent_used": False}
@@ -912,8 +925,10 @@ def decide(calibration, signal, agent_pred=None, bucket_size=20):
         # Masuram si raportam in continuare - cifrele apar in dashboard si pe
         # plan - dar nu refuzam nimic. Vezi nota de la USE_DECISION_GATE.
         return {"action": "ISSUE", "mode": "POARTA_DEZACTIVATA",
-                "reason": ("poarta dezactivata: pe walk-forward a inrautatit "
-                           "rezultatul in 2 din 3 rulari"),
+                # fara cifre scrise de mana: dovada portii (walk-forward) e masurata de backtest in
+                # data/walkforward.json si evaluata de auto-audit (core/self_audit.py, parghia "poarta")
+                "reason": ("poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; "
+                           "dovada walk-forward a portii e evaluata in auto-audit"),
                 "expected_value_r": None,
                 "calibrated_prob": cal["win_rate"] if cal else None,
                 "agent_prob": (agent_pred or {}).get("probability"),
@@ -1022,6 +1037,108 @@ def block_mean_ci(rows, block_s=None, n_boot=600, seed=13):
         means.append(tot / cnt)
     means.sort()
     return means[int(0.025 * n_boot)], means[int(0.975 * n_boot) - 1]
+
+
+def block_diff_ci(rows_a, rows_b, block_s=None, n_boot=1000, seed=13):
+    """IC95 al DIFERENTEI de medii mean(b) - mean(a), prin bootstrap pe aceleasi BLOCURI de timp
+    (un bloc tras contribuie cu planurile lui din ambele grupuri, deci corelatia din aceeasi
+    saptamana se pastreaza si intre grupuri). `rows_*` = [(ts, valoare)]. (None, None) cu mai
+    putin de 2 blocuri."""
+    import random as _r
+    if block_s is None:
+        block_s = block_size([t for t, _ in rows_a] + [t for t, _ in rows_b])
+    by = {}
+    for g, rows in ((0, rows_a), (1, rows_b)):
+        for t, v in rows:
+            b = by.setdefault(int(t // block_s), [0.0, 0, 0.0, 0])
+            b[2 * g] += v
+            b[2 * g + 1] += 1
+    blocks = list(by.values())
+    k = len(blocks)
+    if k < 2:
+        return None, None
+    rnd = _r.Random(seed)
+    diffs = []
+    for _ in range(n_boot):
+        sa = na = sb = nb = 0
+        for _i in range(k):
+            b = blocks[rnd.randrange(k)]
+            sa, na, sb, nb = sa + b[0], na + b[1], sb + b[2], nb + b[3]
+        if na and nb:
+            diffs.append(sb / nb - sa / na)
+    if len(diffs) < n_boot // 2:
+        return None, None
+    diffs.sort()
+    m = len(diffs)
+    return diffs[int(0.025 * m)], diffs[int(0.975 * m) - 1]
+
+
+def cluster_mean_se(rows, block_s=None):
+    """(medie, eroare standard) cu varianta ROBUSTA LA GRUPARE pe blocuri de timp - varianta
+    analitica (fara bootstrap) a lui block_mean_ci, pentru locurile unde se testeaza sute de
+    ipoteze (core.research) si bootstrap-ul ar fi prea lent. `rows` = [(ts, valoare)].
+    Planurile aceluiasi bloc se misca impreuna; eroarea standard a planurilor independente
+    (sd/sqrt(n)) le numara ca observatii separate si da un interval prea ingust.
+    Cu mai putin de 2 blocuri: (medie, inf)."""
+    n = len(rows)
+    if not n:
+        return 0.0, float("inf")
+    if block_s is None:
+        block_s = block_size([t for t, _ in rows])
+    m = sum(v for _, v in rows) / n
+    res = {}
+    for t, v in rows:
+        b = int(t // block_s)
+        res[b] = res.get(b, 0.0) + (v - m)
+    g = len(res)
+    if g < 2:
+        return m, float("inf")
+    var = sum(e * e for e in res.values()) / (n * n) * g / (g - 1)
+    return m, math.sqrt(var) if var > 0 else 1e-9
+
+
+def cluster_diff_se(rows_a, rows_b, block_s=None):
+    """(mean(b) - mean(a), eroare standard robusta la grupare) - aceleasi blocuri de timp pentru
+    ambele grupuri, deci si corelatia dintre grupuri in aceeasi saptamana intra in varianta.
+    Cu un grup gol sau sub 2 blocuri: (diferenta sau 0, inf)."""
+    na, nb = len(rows_a), len(rows_b)
+    if not na or not nb:
+        return 0.0, float("inf")
+    if block_s is None:
+        block_s = block_size([t for t, _ in rows_a] + [t for t, _ in rows_b])
+    ma = sum(v for _, v in rows_a) / na
+    mb = sum(v for _, v in rows_b) / nb
+    res = {}
+    for rows, m, n, sign in ((rows_a, ma, na, -1.0), (rows_b, mb, nb, 1.0)):
+        for t, v in rows:
+            b = int(t // block_s)
+            res[b] = res.get(b, 0.0) + sign * (v - m) / n
+    g = len(res)
+    if g < 2:
+        return mb - ma, float("inf")
+    var = sum(e * e for e in res.values()) * g / (g - 1)
+    return mb - ma, math.sqrt(var) if var > 0 else 1e-9
+
+
+def bucket_r_ci(closed, bucket_size=20):
+    """IC95 al R-ului mediu pe interval de scor, prin bootstrap pe blocuri de timp (block_mean_ci;
+    saptamani cand datele acopera o jumatate de an). `closed` = planurile inchise ale familiei
+    curente, fara NO_ENTRY. {"40": (lo, hi), ...}. Folosit de briefing si de auto-audit (poarta de
+    calibrare) - aceeasi masuratoare in ambele locuri."""
+    rows = {}
+    for p in closed:
+        sc = p.get("score_at_entry")
+        t = p.get("created_ts") or p.get("closed_ts")
+        if sc is None or p.get("realized_r") is None or t is None:
+            continue
+        rows.setdefault(str(int(sc // bucket_size) * bucket_size), []).append((t, p["realized_r"]))
+    bs = block_size([t for r in rows.values() for t, _ in r])
+    out = {}
+    for b, r in rows.items():
+        lo, hi = block_mean_ci(r, block_s=bs, n_boot=1000)
+        if lo is not None:
+            out[b] = (round(lo, 3), round(hi, 3))
+    return out
 
 
 def _split_stats(closed):
