@@ -2,7 +2,7 @@
   "text": "Din 21219 planuri inchise, rata de succes e 32.6%, cu +25.48R cumulat (+0.001R in medie pe plan) si profit factor 1.0. 18 planuri sunt inca deschise. Atentie: 21114 dintre ele sunt din backtest. LIVE, din 2026-09-28: 105 planuri inchise, castig 26.7% (IC 19.1-35.8%), R mediu -0.061R (IC95 -0.455..+0.445R), total -6.37R. Ultimele inchise: #342790 FIL/USDT +0.82R, #293334 SOL/USDT +2.91R, #349415 DOT/USDT -1.03R. R mediu pe intervalele de scor cu destule date (IC95 pe blocuri de timp) - toate (0-19, 20-39, 40-59, 60-79, 80-99) in marja zgomotului (IC95 al R-ului mediu include zero). Poarta pe aceste cifre e dezactivata (USE_DECISION_GATE=false; dovada walk-forward e in auto-audit): ele se afiseaza, dar nu decid emiterea planurilor. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (AUC live 0.438 (IC95 0.302-0.575) pe 105 planuri live nu e peste hazard - filtrul nu se aplica). Auto-auditul are 3 imbunatatiri deschise (1 mari, 2 medii, 0 mici); cea mai importanta: Semnalul nu are avantaj masurabil recent.",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-10-17 17:05 UTC",
+    "scan_time": "2026-10-17 18:07 UTC",
     "universe_size": 30,
     "plans_total": 27980,
     "plans_open": 18,
