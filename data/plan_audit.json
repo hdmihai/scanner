@@ -24,18 +24,20 @@
     }
   },
   "rebuild_removed_live": [],
-  "when": "2026-10-17 15:43 UTC",
-  "ts": 1792251804.2260957,
+  "when": "2026-10-17 16:43 UTC",
+  "ts": 1792255414.0021565,
   "checked": 27989,
-  "reevaluated": 148,
-  "live_flagged": 0,
-  "removed_now": 0,
+  "reevaluated": 141,
+  "live_flagged": 9,
+  "removed_now": 9,
   "blocked": null,
   "backtest_flagged": 0,
   "backtest_examples": [],
-  "by_reason": {},
+  "by_reason": {
+    "rezultat contrazis de lumanarile reale": 9
+  },
   "pending_live": [],
-  "retrained": false,
+  "retrained": true,
   "epoch": 2,
   "removed": [
     {
@@ -193,6 +195,114 @@
       "created_ts": 1790800808.495052,
       "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.026R in memorie, NO_ENTRY 0.0R la reevaluare",
       "removed": "2026-10-17 08:21 UTC"
+    },
+    {
+      "id": 164050,
+      "symbol": "LINK/USDT",
+      "direction": "LONG",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "NO_ENTRY",
+      "realized_r": 0.0,
+      "created_ts": 1790598585.682955,
+      "reason": "rezultat contrazis de lumanarile reale: NO_ENTRY 0.0R in memorie, SL_HIT -1.043R la reevaluare",
+      "removed": "2026-10-17 16:43 UTC"
+    },
+    {
+      "id": 164056,
+      "symbol": "ZEN/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": -1.021,
+      "created_ts": 1790626946.9689531,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.021R in memorie, EXPIRED 1.358R la reevaluare",
+      "removed": "2026-10-17 16:43 UTC"
+    },
+    {
+      "id": 164064,
+      "symbol": "CHZ/USDT",
+      "direction": "LONG",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": 0.828,
+      "created_ts": 1790688488.4056025,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT 0.828R in memorie, SL_HIT -1.035R la reevaluare",
+      "removed": "2026-10-17 16:43 UTC"
+    },
+    {
+      "id": 164065,
+      "symbol": "XRP/USDT",
+      "direction": "LONG",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": 0.675,
+      "created_ts": 1790699229.9381564,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT 0.675R in memorie, SL_HIT -1.043R la reevaluare",
+      "removed": "2026-10-17 16:43 UTC"
+    },
+    {
+      "id": 164076,
+      "symbol": "SUI/USDT",
+      "direction": "LONG",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "NO_ENTRY",
+      "realized_r": 0.0,
+      "created_ts": 1790800807.7876766,
+      "reason": "rezultat contrazis de lumanarile reale: NO_ENTRY 0.0R in memorie, SL_HIT 0.98R la reevaluare",
+      "removed": "2026-10-17 16:43 UTC"
+    },
+    {
+      "id": 207104,
+      "symbol": "ZEC/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": -1.025,
+      "created_ts": 1790891308.2536948,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.025R in memorie, EXPIRED 2.218R la reevaluare",
+      "removed": "2026-10-17 16:43 UTC"
+    },
+    {
+      "id": 207106,
+      "symbol": "XRP/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": -1.059,
+      "created_ts": 1790905183.606143,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.059R in memorie, EXPIRED 4.323R la reevaluare",
+      "removed": "2026-10-17 16:43 UTC"
+    },
+    {
+      "id": 207107,
+      "symbol": "MANA/USDT",
+      "direction": "LONG",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": 0.466,
+      "created_ts": 1790929579.816449,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT 0.466R in memorie, SL_HIT -1.034R la reevaluare",
+      "removed": "2026-10-17 16:43 UTC"
+    },
+    {
+      "id": 207110,
+      "symbol": "POL/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "EXPIRED",
+      "realized_r": 3.833,
+      "created_ts": 1790929581.8900201,
+      "reason": "rezultat contrazis de lumanarile reale: EXPIRED 3.833R in memorie, NO_ENTRY 0.0R la reevaluare",
+      "removed": "2026-10-17 16:43 UTC"
     }
   ]
 }
