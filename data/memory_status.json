@@ -18,7 +18,7 @@
    "rows": 5703120
   },
   "candles": {
-   "bytes": 58586980,
+   "bytes": 58608448,
    "coverage": {
     "okx:1d": {
      "symbols": 439,
@@ -29,18 +29,18 @@
      "with_data": 437
     }
    },
-   "max_ts": 1792209600000,
+   "max_ts": 1792224000000,
    "min_ts": 1515628800000,
    "partitions": 18,
-   "rows": 2784869
+   "rows": 2785306
   },
   "plans": {
-   "bytes": 3001615,
+   "bytes": 3002082,
    "coverage": {},
-   "max_ts": 1792225193.9184618,
+   "max_ts": 1792239358.6911156,
    "min_ts": 1518552000.0,
    "partitions": 10,
-   "rows": 27987
+   "rows": 27989
   }
  },
  "history": [
@@ -273,6 +273,16 @@
    },
    "s": 269.3,
    "when": "2026-10-17 11:15 UTC"
+  },
+  {
+   "errors": 0,
+   "rows": {
+    "binance": 5703120,
+    "candles": 2785306,
+    "plans": 27989
+   },
+   "s": 298.4,
+   "when": "2026-10-17 16:01 UTC"
   }
  ],
  "last_run": {
@@ -312,10 +322,10 @@
    },
    "plans": {
     "partitions_written": 1,
-    "plans": 27987
+    "plans": 27989
    },
    "universe": {
-    "skipped": "masurat acum 13 ore (o data pe zi)"
+    "skipped": "masurat acum 18 ore (o data pe zi)"
    },
    "verdict": {
     "from": "2018-06-10",
@@ -324,23 +334,23 @@
     "tokens": 231
    }
   },
-  "duration_s": 269.3,
+  "duration_s": 298.4,
   "errors": [],
-  "finished": "2026-10-17 11:15 UTC",
-  "started": "2026-10-17 11:10 UTC"
+  "finished": "2026-10-17 16:01 UTC",
+  "started": "2026-10-17 15:56 UTC"
  },
  "probe": {
   "binance_vision": {
    "detail": "31 lumanari BTCUSDT 1d ianuarie 2024",
    "ok": true,
-   "s": 0.8
+   "s": 0.6
   },
   "cpu": 4,
   "disk_free_gb": 91.8,
   "exchange": {
    "id": "okx",
    "ok": true,
-   "s": 2.0
+   "s": 3.3
   },
   "ram_gb": 16.4
  },
@@ -551,7 +561,7 @@
   "obs": 158122,
   "to": "2026-10-09",
   "tokens": 231,
-  "when": "2026-10-17 11:12 UTC"
+  "when": "2026-10-17 15:57 UTC"
  },
  "where": "hdmihai/scanner"
 }
