@@ -1,4 +1,23 @@
 {
-  "scan_time": "2026-10-17 11:15 UTC",
-  "decisions": {}
+  "scan_time": "2026-10-17 12:15 UTC",
+  "decisions": {
+    "FIL/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; dovada walk-forward a portii e evaluata in auto-audit",
+      "calibrated_prob": 28.8,
+      "agent_prob": 0.362,
+      "elliott_bias": null,
+      "next_entry": null
+    },
+    "ADA/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; dovada walk-forward a portii e evaluata in auto-audit",
+      "calibrated_prob": 29.7,
+      "agent_prob": 0.2982,
+      "elliott_bias": 0.11,
+      "next_entry": 0.2408404416
+    }
+  }
 }
