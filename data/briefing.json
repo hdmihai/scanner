@@ -1,27 +1,27 @@
 {
-  "text": "Din 21226 planuri inchise, rata de succes e 32.6%, cu +22.39R cumulat (+0.001R in medie pe plan) si profit factor 1.0. 17 planuri sunt inca deschise. Atentie: 21114 dintre ele sunt din backtest. LIVE, din 2026-09-28: 112 planuri inchise, castig 26.8% (IC 19.5-35.7%), R mediu -0.084R (IC95 -0.491..+0.394R), total -9.45R. Ultimele inchise: #349415 DOT/USDT -1.03R, #353961 SEI/USDT -1.03R, #342791 AVAX/USDT -1.04R. R mediu pe intervalele de scor cu destule date (IC95 pe blocuri de timp) - toate (0-19, 20-39, 40-59, 60-79, 80-99) in marja zgomotului (IC95 al R-ului mediu include zero). Poarta pe aceste cifre e dezactivata (USE_DECISION_GATE=false; dovada walk-forward e in auto-audit): ele se afiseaza, dar nu decid emiterea planurilor. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (AUC live 0.472 (IC95 0.337-0.61) pe 112 planuri live nu e peste hazard - filtrul nu se aplica). Auto-auditul are 3 imbunatatiri deschise (1 mari, 2 medii, 0 mici); cea mai importanta: Semnalul nu are avantaj masurabil recent.",
+  "text": "Din 21225 planuri inchise, rata de succes e 32.6%, cu +27.36R cumulat (+0.001R in medie pe plan) si profit factor 1.0. 17 planuri sunt inca deschise. Atentie: 21114 dintre ele sunt din backtest. LIVE, din 2026-09-28: 111 planuri inchise, castig 27.9% (IC 20.4-36.9%), R mediu -0.040R (IC95 -0.434..+0.438R), total -4.49R. Ultimele inchise: #293334 SOL/USDT +2.91R, #349415 DOT/USDT -1.03R, #353961 SEI/USDT -1.03R. R mediu pe intervalele de scor cu destule date (IC95 pe blocuri de timp) - toate (0-19, 20-39, 40-59, 60-79, 80-99) in marja zgomotului (IC95 al R-ului mediu include zero). Poarta pe aceste cifre e dezactivata (USE_DECISION_GATE=false; dovada walk-forward e in auto-audit): ele se afiseaza, dar nu decid emiterea planurilor. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (AUC live 0.472 (IC95 0.341-0.615) pe 111 planuri live nu e peste hazard - filtrul nu se aplica). Auto-auditul are 3 imbunatatiri deschise (1 mari, 2 medii, 0 mici); cea mai importanta: Semnalul nu are avantaj masurabil recent.",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-10-17 07:19 UTC",
+    "scan_time": "2026-10-17 08:19 UTC",
     "universe_size": 30,
-    "plans_total": 27988,
+    "plans_total": 27987,
     "plans_open": 17,
-    "plans_closed": 21226,
+    "plans_closed": 21225,
     "legacy_closed": 0,
     "legacy_total_r": null,
     "win_rate": 32.6,
-    "total_r": 22.39,
+    "total_r": 27.36,
     "avg_r": 0.001,
     "profit_factor": 1.0,
     "live": {
-      "closed": 112,
-      "win_rate": 26.8,
-      "wr_ci_low": 19.5,
-      "wr_ci_high": 35.7,
-      "avg_r": -0.084,
-      "avg_r_ci_low": -0.491,
-      "avg_r_ci_high": 0.394,
-      "total_r": -9.45,
+      "closed": 111,
+      "win_rate": 27.9,
+      "wr_ci_low": 20.4,
+      "wr_ci_high": 36.9,
+      "avg_r": -0.04,
+      "avg_r_ci_low": -0.434,
+      "avg_r_ci_high": 0.438,
+      "total_r": -4.49,
       "since": "2026-09-28"
     },
     "backtest": {
@@ -36,6 +36,13 @@
       "since": "2018-02-13"
     },
     "recent_closed": [
+      {
+        "id": 293334,
+        "symbol": "SOL/USDT",
+        "direction": "SHORT",
+        "state": "EXPIRAT dupa 48 bare",
+        "r": 2.912
+      },
       {
         "id": 349415,
         "symbol": "DOT/USDT",
@@ -63,16 +70,15 @@
         "direction": "SHORT",
         "state": "SL HIT - INVALIDATED",
         "r": -1.03
-      },
-      {
-        "id": 346385,
-        "symbol": "AVAX/USDT",
-        "direction": "SHORT",
-        "state": "TP1 HIT - SL LA BREAKEVEN",
-        "r": 0.953
       }
     ],
     "open_now": [
+      {
+        "id": 370620,
+        "symbol": "LINK/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
       {
         "id": 370619,
         "symbol": "THETA/USDT",
@@ -96,12 +102,6 @@
         "symbol": "POL/USDT",
         "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 342793,
-        "symbol": "TRX/USDT",
-        "direction": "LONG",
-        "state": "INTRARE ATINSA - pozitie activa"
       }
     ],
     "best_bucket": {
@@ -117,7 +117,7 @@
     },
     "worst_bucket": {
       "range": "40-59",
-      "total": 10375,
+      "total": 10374,
       "win_rate": 29.7,
       "ci_low": 28.8,
       "ci_high": 30.6,
@@ -139,7 +139,7 @@
       },
       {
         "range": "20-39",
-        "total": 4271,
+        "total": 4270,
         "win_rate": 28.8,
         "avg_r": 0.073,
         "r_ci": [
@@ -149,7 +149,7 @@
       },
       {
         "range": "40-59",
-        "total": 10375,
+        "total": 10374,
         "win_rate": 29.7,
         "avg_r": -0.042,
         "r_ci": [
@@ -169,78 +169,84 @@
       },
       {
         "range": "80-99",
-        "total": 560,
-        "win_rate": 44.6,
-        "avg_r": -0.004,
+        "total": 561,
+        "win_rate": 44.7,
+        "avg_r": 0.001,
         "r_ci": [
-          -0.146,
-          0.165
+          -0.14,
+          0.166
         ]
       }
     ],
     "decision_gate": false,
     "agent_status": "SHADOW",
-    "agent_reason": "AUC live 0.472 (IC95 0.337-0.61) pe 112 planuri live nu e peste hazard - filtrul nu se aplica",
-    "agent_samples": 21114,
-    "agent_balanced": 66.31072330386836,
-    "baseline_balanced": 32.610952257707794,
+    "agent_reason": "AUC live 0.472 (IC95 0.341-0.615) pe 111 planuri live nu e peste hazard - filtrul nu se aplica",
+    "agent_samples": 21225,
+    "agent_balanced": 66.34155030943623,
+    "baseline_balanced": 32.58552750070459,
     "agent_weights": {
-      "trend": -0.019151,
-      "momentum": 0.022621,
-      "volatility": -0.284254,
-      "volume": -0.1227,
+      "trend": -0.030927,
+      "momentum": 0.022319,
+      "volatility": -0.275981,
+      "volume": -0.125789,
       "persistence_n": 0.0,
-      "ev_ema_fast": -0.049319,
-      "ev_ema_stack": 0.262864,
-      "ev_supertrend": -0.006117,
-      "ev_macd": 0.203069,
-      "ev_vwap": 0.203805,
-      "ev_poc": 0.027071,
-      "ev_value_area": 0.041433,
-      "ev_rsi": -0.139383,
+      "ev_ema_fast": -0.050288,
+      "ev_ema_stack": 0.21995,
+      "ev_supertrend": 0.000594,
+      "ev_macd": 0.204464,
+      "ev_vwap": 0.206181,
+      "ev_poc": -0.019061,
+      "ev_value_area": 0.017188,
+      "ev_rsi": -0.143811,
       "ev_volume": 0.0,
       "ev_volatility": 0.0,
       "ev_order_flow": 0.0,
       "ev_book_imbalance": 0.0,
       "ev_liq_magnet": 0.0,
-      "ev_ichimoku": 0.05767,
-      "ev_ma_cross": 0.21129,
-      "ev_regime": 0.248519,
-      "ev_mtf_align": -0.107302,
-      "ev_elliott": 0.039658,
-      "ev_liq_struct": -0.051541,
-      "ev_liq_sweep": -0.015591,
-      "ev_altseason": -0.07012,
-      "ev_analyst": 0.048156,
-      "ev_fusion": 0.053698
+      "ev_ichimoku": 0.054396,
+      "ev_ma_cross": 0.169218,
+      "ev_regime": 0.239895,
+      "ev_mtf_align": -0.121293,
+      "ev_elliott": 0.013805,
+      "ev_liq_struct": -0.026039,
+      "ev_liq_sweep": -0.023352,
+      "ev_altseason": -0.048665,
+      "ev_analyst": 0.053901,
+      "ev_fusion": 0.040344
     },
     "real": {
       "all": {
-        "n": 112,
-        "win_rate": 26.8,
-        "avg_r": -0.084,
-        "total_r": -9.45,
-        "profit_factor": 0.89
+        "n": 111,
+        "win_rate": 27.9,
+        "avg_r": -0.04,
+        "total_r": -4.49,
+        "profit_factor": 0.95
       },
       "by_direction": {
         "LONG": {
-          "n": 70,
-          "win_rate": 21.4,
-          "avg_r": -0.46,
-          "total_r": -32.23,
-          "profit_factor": 0.44
+          "n": 68,
+          "win_rate": 22.1,
+          "avg_r": -0.444,
+          "total_r": -30.17,
+          "profit_factor": 0.45
         },
         "SHORT": {
-          "n": 42,
-          "win_rate": 35.7,
-          "avg_r": 0.542,
-          "total_r": 22.77,
-          "profit_factor": 1.81
+          "n": 43,
+          "win_rate": 37.2,
+          "avg_r": 0.597,
+          "total_r": 25.69,
+          "profit_factor": 1.91
         }
       },
       "no_entry": 37,
       "open": 17,
       "recent": [
+        {
+          "id": 293334,
+          "symbol": "SOL/USDT",
+          "direction": "SHORT",
+          "r": 2.912
+        },
         {
           "id": 342791,
           "symbol": "AVAX/USDT",
@@ -252,44 +258,38 @@
           "symbol": "GRAM/USDT",
           "direction": "SHORT",
           "r": 0.909
-        },
-        {
-          "id": 342779,
-          "symbol": "THETA/USDT",
-          "direction": "SHORT",
-          "r": -1.031
         }
       ],
       "divergence": {
-        "n_live": 112,
+        "n_live": 111,
         "vs_all": {
-          "diff": -0.086,
-          "ci_low": -0.463,
-          "ci_high": 0.407,
+          "diff": -0.042,
+          "ci_low": -0.438,
+          "ci_high": 0.458,
           "status": "in_marja",
-          "live_r": -0.084,
+          "live_r": -0.04,
           "bt_r": 0.002
         },
-        "n_live_window": 111,
+        "n_live_window": 110,
         "n_bt_window": 189,
         "window": [
           "2026-09-28",
           "2026-10-16"
         ],
-        "diff": 0.035,
-        "ci_low": -0.54,
-        "ci_high": 0.579,
+        "diff": 0.079,
+        "ci_low": -0.502,
+        "ci_high": 0.632,
         "status": "in_marja",
-        "live_r": -0.076,
+        "live_r": -0.031,
         "bt_r": -0.111,
         "basis": "aceeasi_perioada"
       },
       "agent_live": {
-        "n": 112,
+        "n": 111,
         "auc": 0.472,
-        "ci_low": 0.337,
-        "ci_high": 0.61,
-        "avg_r": -0.084
+        "ci_low": 0.341,
+        "ci_high": 0.615,
+        "avg_r": -0.04
       }
     },
     "simulated": {
@@ -348,11 +348,11 @@
   },
   "sections": {
     "real": [
-      "Pe piata reala din 2026-09-28: 112 planuri inchise, castig 26.8%, R mediu -0.084R (IC95 -0.491..+0.394R), total -9.45R, profit factor 0.89.",
-      "Pe directii: LONG 70 planuri -0.460R; SHORT 42 planuri +0.542R.",
-      "Real vs simulat: pe aceeasi perioada (2026-09-28 - 2026-10-16, 189 planuri simulate) +0.035R/plan (IC95 -0.540..+0.579), in marja statistica; fata de tot istoricul simulat -0.086R/plan (IC95 -0.463..+0.407), in marja statistica.",
-      "Agentul pe date reale: AUC 0.472 (IC 0.337-0.61) pe 112/100 planuri necesare confirmarii.",
-      "Ultimele inchise live: #342791 AVAX/USDT -1.04R, #342764 GRAM/USDT +0.91R, #342779 THETA/USDT -1.03R.",
+      "Pe piata reala din 2026-09-28: 111 planuri inchise, castig 27.9%, R mediu -0.040R (IC95 -0.434..+0.438R), total -4.49R, profit factor 0.95.",
+      "Pe directii: LONG 68 planuri -0.444R; SHORT 43 planuri +0.597R.",
+      "Real vs simulat: pe aceeasi perioada (2026-09-28 - 2026-10-16, 189 planuri simulate) +0.079R/plan (IC95 -0.502..+0.632), in marja statistica; fata de tot istoricul simulat -0.042R/plan (IC95 -0.438..+0.458), in marja statistica.",
+      "Agentul pe date reale: AUC 0.472 (IC 0.341-0.615) pe 111/100 planuri necesare confirmarii.",
+      "Ultimele inchise live: #293334 SOL/USDT +2.91R, #342791 AVAX/USDT -1.04R, #342764 GRAM/USDT +0.91R.",
       "Deschise acum: 17; anulate fara intrare (pretul nu a revenit): 37."
     ],
     "simulated": [
@@ -362,7 +362,7 @@
       "Pe tot universul bursei (279 simboluri lichide, aceeasi strategie): +0.002R/plan (IC95 -0.048..+0.048, n=58885); ultimele 12 luni -0.082R/plan (IC95 -0.193..+0.040).",
       "Rol: pre-antrenarea agentului, calibrarea si cercetarea regulilor - nu e rezultat pe piata reala."
     ],
-    "agent": "Agentul e in SHADOW: invata, dar nu filtreaza (AUC live 0.472 (IC95 0.337-0.61) pe 112 planuri live nu e peste hazard - filtrul nu se aplica)."
+    "agent": "Agentul e in SHADOW: invata, dar nu filtreaza (AUC live 0.472 (IC95 0.341-0.615) pe 111 planuri live nu e peste hazard - filtrul nu se aplica)."
   },
   "llm_error": "GEMINI_API_KEY lipseste"
 }
