@@ -18,7 +18,7 @@
    "rows": 5703120
   },
   "candles": {
-   "bytes": 58648339,
+   "bytes": 58654653,
    "coverage": {
     "okx:1d": {
      "symbols": 439,
@@ -29,18 +29,18 @@
      "with_data": 437
     }
    },
-   "max_ts": 1792281600000,
+   "max_ts": 1792296000000,
    "min_ts": 1515628800000,
    "partitions": 18,
-   "rows": 2787491
+   "rows": 2787928
   },
   "plans": {
-   "bytes": 3000361,
+   "bytes": 3000020,
    "coverage": {},
    "max_ts": 1792299565.0923789,
    "min_ts": 1518552000.0,
    "partitions": 10,
-   "rows": 27980
+   "rows": 27979
   }
  },
  "history": [
@@ -303,6 +303,16 @@
    },
    "s": 431.4,
    "when": "2026-10-18 05:15 UTC"
+  },
+  {
+   "errors": 0,
+   "rows": {
+    "binance": 5703120,
+    "candles": 2787928,
+    "plans": 27979
+   },
+   "s": 350.0,
+   "when": "2026-10-18 11:48 UTC"
   }
  ],
  "last_run": {
@@ -327,25 +337,25 @@
      "complete": 437,
      "covered": 437,
      "no_data": 2,
-     "rows_added": 437,
-     "symbols_updated": 437,
+     "rows_added": 0,
+     "symbols_updated": 0,
      "universe": 439
     },
     "4h": {
      "complete": 437,
      "covered": 437,
      "no_data": 2,
-     "rows_added": 874,
+     "rows_added": 437,
      "symbols_updated": 437,
      "universe": 439
     }
    },
    "plans": {
     "partitions_written": 1,
-    "plans": 27980
+    "plans": 27979
    },
    "universe": {
-    "skipped": "masurat acum 8 ore (o data pe zi)"
+    "skipped": "masurat acum 15 ore (o data pe zi)"
    },
    "verdict": {
     "from": "2018-06-10",
@@ -354,23 +364,23 @@
     "tokens": 231
    }
   },
-  "duration_s": 431.4,
+  "duration_s": 350.0,
   "errors": [],
-  "finished": "2026-10-18 05:15 UTC",
-  "started": "2026-10-18 05:08 UTC"
+  "finished": "2026-10-18 11:48 UTC",
+  "started": "2026-10-18 11:42 UTC"
  },
  "probe": {
   "binance_vision": {
    "detail": "31 lumanari BTCUSDT 1d ianuarie 2024",
    "ok": true,
-   "s": 0.8
+   "s": 1.1
   },
   "cpu": 4,
   "disk_free_gb": 91.8,
   "exchange": {
    "id": "okx",
    "ok": true,
-   "s": 2.2
+   "s": 2.4
   },
   "ram_gb": 16.4
  },
@@ -581,7 +591,7 @@
   "obs": 158197,
   "to": "2026-10-10",
   "tokens": 231,
-  "when": "2026-10-18 05:11 UTC"
+  "when": "2026-10-18 11:44 UTC"
  },
  "where": "hdmihai/scanner"
 }
