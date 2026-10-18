@@ -8,6 +8,10 @@ name: Memorie agent
 # Ruleaza la 6 ore: completarea initiala a istoricului (tot universul bursei, de la listare; arhiva
 # Binance, luna cu luna) se face in mai multe rulari, fiecare continuand de unde a ramas; dupa aceea,
 # o rulare doar adauga barele noi. De pe telefon: Actions -> Memorie agent -> Run workflow.
+#
+# LABORATORUL (research_lab.py), o data pe zi in acest job: agentul invata din tot depozitul (milioane de
+# bare de 4h), valideaza walk-forward si pe o perioada rezervata, verifica alegerile live si publica
+# modelul in data/memory_status.json -> "lab". Are nevoie de ~20-40 de minute: de aici bugetul de 80.
 on:
   schedule:
     - cron: "41 */6 * * *"
@@ -16,11 +20,15 @@ on:
       budget:
         description: "Buget de timp, minute (job-ul se opreste curat si continua la rularea urmatoare)"
         required: true
-        default: "45"
+        default: "80"
       datasets:
         description: "Seturile de date: plans, candles, binance (separate prin virgula)"
         required: true
         default: "plans,candles,binance"
+      lab_force:
+        description: "1 = antreneaza laboratorul acum, chiar daca s-a antrenat azi"
+        required: false
+        default: "0"
 
 permissions:
   contents: write
@@ -34,7 +42,7 @@ concurrency:
 jobs:
   memory:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 100
     steps:
       - name: Descarca repo-ul
         uses: actions/checkout@v4
@@ -46,12 +54,14 @@ jobs:
           cache: "pip"
 
       - name: Instaleaza dependinte
-        run: pip install ccxt requests duckdb==1.2.2
+        # numpy: laboratorul (research_lab.py). Daca lipseste, memory_sync.py il instaleaza singur.
+        run: pip install ccxt requests duckdb==1.2.2 numpy==2.2.6
 
       - name: Sincronizeaza depozitul de memorie
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          MEMORY_BUDGET_MIN: ${{ inputs.budget || '45' }}
+          MEMORY_BUDGET_MIN: ${{ inputs.budget || '80' }}
+          LAB_FORCE: ${{ inputs.lab_force || '0' }}
           MEMORY_DATASETS: ${{ inputs.datasets || 'plans,candles,binance' }}
           MEMORY_CACHE_DIR: ${{ runner.temp }}/memory-cache
         run: python memory_sync.py
