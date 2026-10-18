@@ -168,6 +168,9 @@ def build_symbol_details(r, candles, hist_tab, daily=None, htf=None):
         # confirmare se descarca doar pentru simbolul afisat pe graficul
         # principal, unde chiar sunt privite.
         "liq_structure": _liqs,
+        # LICHIDITATEA PE 1D SI 1W (din lumanarile zilnice deja aduse pentru zone): bazinele de stopuri
+        # de pe timeframe-urile mari, cu rolul fata de directia planului (TARGET / ENTRY/OBST)
+        "liq_mtf": ls_mod.mtf(daily, r["price"], r["direction"]) if daily else None,
         # `offset` aliniaza indicii punctelor (calculati pe seria completa)
         # cu cele CHART_BARS lumanari pastrate pentru grafic. Fara el,
         # punctele cele mai VECHI erau desenate peste barele cele mai NOI.

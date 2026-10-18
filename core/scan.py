@@ -88,6 +88,8 @@ VENUES = _Unbound("VENUES")            # ports.market_data.Venues (bursele, prin
 NOTIFIER = _Unbound("NOTIFIER")        # ports.notifier.Notifier (Telegram)
 ALTSEASON = _Unbound("ALTSEASON")      # (conexiune, rezultate) -> starea altseason
 TOP_SYMBOLS = _Unbound("TOP_SYMBOLS")  # (n) -> simbolurile din top-n CoinGecko
+LAB = _Unbound("LAB")                  # (conexiune, lumanari inchise per simbol, timeframe, bursa) ->
+                                       #  instantaneele laboratorului (data/lab_live.json, lab_live.py)
 ANALYST = _Unbound("ANALYST")          # (conexiune, altseason, detalii, rezultate, statistici zone,
                                        #  lumanari zilnice) -> raportul analistului (data/analyst.json)
 
@@ -622,6 +624,15 @@ def main():
         persistence, age_minutes = compute_persistence_and_age(history, symbol, scored["direction"], now_ts)
         results.append({"symbol": symbol, "persistence": persistence, "age_minutes": age_minutes, **scored})
 
+    # LABORATORUL (core/lab.py): caracteristicile fiecarei monede scanate la ultima bara inchisa,
+    # EV-ul modelului invatat din memorie si alegerea lui - salvate ca instantanee din care jobul de
+    # memorie invata dupa ce tranzactiile se incheie. Nu opreste niciodata scanarea.
+    try:
+        _lab = LAB(exchange, ohlcv_cache, CONFIG["timeframe"], exchange_id)
+        print(f"Laborator: {_lab}")
+    except Exception as _e:
+        print(f"[!] laborator: {_e}")
+
     # FAZA CICLULUI ALTCOIN SEASON, evaluata la fiecare scanare pe date reale
     # (CoinGecko + lumanari zilnice de pe exchange). Nu opreste niciodata
     # scanarea: la o problema de date pastreaza ultima evaluare.
@@ -853,6 +864,8 @@ def main():
                                           [c[3] for c in best_ohlcv], closes,
                                           best["atr"], best["price"],
                                           CONFIG["timeframe"]),
+            # lichiditatea pe 1D si 1W a candidatului (din detalii: aceleasi lumanari zilnice)
+            "liq_mtf": (details.get(best["symbol"]) or {}).get("liq_mtf"),
             "liquidation": (lambda mp: {
                 "clusters": mp.get("clusters", [])[:16],
                 "above": mp.get("above"), "below": mp.get("below"),

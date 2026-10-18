@@ -125,6 +125,23 @@ def _gate_line(f):
     return ""
 
 
+def lab_line(rep):
+    """O fraza despre laborator: starea, dovada din walk-forward si din perioada rezervata, alegerile live."""
+    if not rep or rep.get("error"):
+        return None
+    ch = (rep.get("walk_forward") or {}).get(rep.get("chosen")) or {}
+    ho = rep.get("holdout") or {}
+    lv = (rep.get("live") or {}).get("forward") or {}
+
+    def r(x):
+        if not x or x.get("mean") is None:
+            return "n/d"
+        return f"{x['mean']:+.3f}R" + (f" (IC95 {x['lo']:+.3f}..{x['hi']:+.3f})" if x.get("lo") is not None else "")
+    return (f"Laboratorul (model invatat din memorie, {rep.get('chosen')}): stare {rep.get('state')} - "
+            f"{rep.get('reason')}. Walk-forward {r(ch)} pe alegere, n={ch.get('n', 0)}; perioada rezervata {r(ho)}; "
+            f"test inainte (live, tot universul): {lv.get('n', 0)} alegeri incheiate" + (f", {r(lv)}" if lv.get("n") else "") + ".")
+
+
 def gather_facts():
     plans_store = load_json(PLANS_FILE, {})
     agent = load_json(AGENT_FILE, {})
@@ -261,6 +278,8 @@ def gather_facts():
         "simulated": simulated,
         # auto-auditul (core/self_audit.py, rulat de self_check): imbunatatirile deschise
         "audit_summary": ((load_json(os.path.join(DATA_DIR, "self_check.json"), {}) or {}).get("audit") or {}).get("summary"),
+        # laboratorul (core/lab.py): modelul invatat din memorie, cu starea si dovada lui
+        "lab_line": lab_line((load_json(os.path.join(DATA_DIR, "memory_status.json"), {}) or {}).get("lab")),
     }
 
 
@@ -344,6 +363,8 @@ def deterministic_briefing(f):
             f"performanta, dar nu influenteaza inca deciziile ({f['agent_reason']}).")
     if f.get("audit_summary"):
         parts.append(f["audit_summary"])
+    if f.get("lab_line"):
+        parts.append(f["lab_line"])
 
     return " ".join(parts)
 

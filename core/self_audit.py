@@ -249,6 +249,8 @@ def levers(ctx):
       agent           - agent_model.json; agent_gain = ranking_gain_ci(...)
       gate_on         - USE_DECISION_GATE; walkforward = data/walkforward.json; eval_rules = EVAL_RULES
       research        - research.json; quarantine - mitigatii
+      lab, lab_live   - raportul laboratorului (memory_status.json -> lab) si data/lab_live.json;
+      lab_expected    - laboratorul e instalat (sondele lui ruleaza); now - momentul rularii
     Intoarce (randuri, constatari)."""
     rows, out = [], []
 
@@ -266,9 +268,9 @@ def levers(ctx):
                 "Parghiile de decizie (filtre, poarta, agent) doar aleg dintre semnale; daca semnalul nu are "
                 "avantaj, ele nu pot crea unul. Cea mai mare imbunatatire posibila e un semnal nou.",
                 rows[-1]["evidence"] + f" - {st}",
-                "Cauta familii de semnal noi pe tot universul din depozitul de memorie (replay rapid), cu "
-                "validare pe ani nefolositi la constructie si confirmare live, inainte de orice filtru nou.",
-                ["core/scan.py", "backtest.py", "memory_sync.py"]))
+                "Laboratorul (core/lab.py, research_lab.py) cauta zilnic un model pe tot depozitul, cu walk-forward, "
+                "perioada rezervata si confirmare live; urmareste-i starea in parghia 'laborator'.",
+                ["core/lab.py", "research_lab.py", "memory_sync.py"]))
 
     # FILTRUL ELLIOTT
     ew = ctx.get("elliott") or {}
@@ -376,6 +378,46 @@ def levers(ctx):
     n_act = sum(1 for r in rs.values() if r.get("state") == "activa")
     n_sh = sum(1 for r in rs.values() if r.get("state") == "shadow")
     rep = (ctx.get("research") or {}).get("report") or {}
+    # LABORATORUL: modelul invatat direct din memorie (core/lab.py), cu dovada lui
+    lab, now = ctx.get("lab"), ctx.get("now") or 0
+    if ctx.get("lab_expected"):
+        if not lab:
+            out.append(finding(
+                "laborator.neantrenat", "laborator", "medie", "Laboratorul nu s-a antrenat inca",
+                "Agentul nu are inca un model invatat din depozitul de memorie; decide doar regula de semnal.",
+                "data/memory_status.json nu are sectiunea lab",
+                "Ruleaza Actions -> Memorie agent (antrenarea zilnica porneste singura; LAB_FORCE=1 o forteaza).",
+                ["memory_sync.py", "research_lab.py"]))
+        elif lab.get("error"):
+            out.append(finding(
+                "laborator.eroare", "laborator", "mare", "Antrenarea laboratorului a esuat",
+                "Laboratorul n-a putut produce un model la ultima rulare.", str(lab["error"])[:200],
+                "Vezi jurnalul jobului Memorie agent, pasul lab.", ["research_lab.py", "memory_sync.py"]))
+        else:
+            wf = (lab.get("walk_forward") or {}).get(lab.get("chosen")) or {}
+            ho, lvp = lab.get("holdout") or {}, (lab.get("live") or {}).get("forward") or {}
+            verdict = {"ACTIV": "dovedit", "SHADOW": "in proba live", "RETRAS": "daunator"}.get(lab.get("state"), "nedovedit")
+            rows.append({"lever": "laborator", "name": "Laboratorul (model invatat din memorie)",
+                         "state": str(lab.get("state", "?")).lower(),
+                         "evidence": (f"walk-forward {_f(wf.get('mean'))}R/alegere (IC95 {_f(wf.get('lo'))}.."
+                                      f"{_f(wf.get('hi'))}, n={wf.get('n', 0)}); rezervat {_f(ho.get('mean'))}R "
+                                      f"(n={ho.get('n', 0)}); test inainte n={lvp.get('n', 0)}"),
+                         "verdict": verdict})
+            age_h = (now - (lab.get("ts") or 0)) / 3600 if now else 0
+            if age_h > 48:
+                out.append(finding(
+                    "laborator.vechi", "laborator", "medie", "Laboratorul nu s-a mai antrenat",
+                    "Modelul publicat nu a mai fost reantrenat de peste doua zile: nu invata din datele noi.",
+                    f"ultima antrenare acum {age_h:.0f} ore ({lab.get('when')})",
+                    "Verifica jobul Memorie agent (buget de timp, numpy, erori la pasul lab).",
+                    ["memory_sync.py", "research_lab.py"]))
+        live = ctx.get("lab_live") or {}
+        if live.get("error"):
+            out.append(finding(
+                "laborator.scanare", "laborator", "medie", "Scanarea nu salveaza instantaneele laboratorului",
+                "Fara instantanee, agentul nu invata din scanari si alegerile lui live nu se pot verifica.",
+                str(live["error"])[:200], "Vezi lab_live.py si jurnalul scanarii.", ["lab_live.py"]))
+
     rows.append({"lever": "reguli_cercetare", "name": "Reguli din cercetarea autonoma",
                  "state": f"{n_act} active, {n_sh} in shadow",
                  "evidence": (f"ultima investigatie: {rep.get('n_rules')} reguli testate pe {rep.get('n_plans')} planuri, "

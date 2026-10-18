@@ -180,3 +180,77 @@ def bias(result, direction):
         return None
     net = (pull_up - pull_dn) / total
     return round(net if direction == "LONG" else -net, 4)
+
+
+# ------------------------------------------------------------------ lichiditatea pe 1D si 1W
+WEEK_MS = 7 * 86400 * 1000
+WEEK_OFFSET_MS = 4 * 86400 * 1000      # 1970-01-01 a fost joi: saptamanile bursei incep luni 00:00 UTC
+MTF_KEEP = 3                           # cele mai apropiate niveluri pe parte, pe fiecare timeframe
+KIND_SHORT = {"EQUAL HIGHS": "EQ HIGHS", "EQUAL LOWS": "EQ LOWS",
+              "MAJOR SWING HIGH": "SWING HIGH", "MAJOR SWING LOW": "SWING LOW"}
+
+
+def weekly_from_daily(daily):
+    """Bare saptamanale (luni-duminica, UTC) din bare zilnice inchise; doar saptamanile complete."""
+    weeks = {}
+    for c in daily or []:
+        k = (int(c[0]) - WEEK_OFFSET_MS) // WEEK_MS
+        weeks.setdefault(k, []).append(c)
+    out = []
+    for k in sorted(weeks):
+        ds = weeks[k]
+        if len(ds) < 7:
+            continue
+        out.append([k * WEEK_MS + WEEK_OFFSET_MS, ds[0][1], max(d[2] for d in ds), min(d[3] for d in ds),
+                    ds[-1][4], sum((d[5] or 0) for d in ds)])
+    return out
+
+
+def _atr_simple(bars, n=14):
+    if len(bars) < n + 1:
+        return None
+    trs = [max(b[2] - b[3], abs(b[2] - p[4]), abs(b[3] - p[4])) for p, b in zip(bars[-n - 1:-1], bars[-n:])]
+    return sum(trs) / n
+
+
+def role_for(side, direction):
+    """Rolul unui bazin de lichiditate pentru planul in `direction`, ca in capturile de referinta: in
+    directia planului e TINTA (pretul e atras spre stopurile de acolo); in sens opus e intrarea sau
+    obstacolul (acolo se cauta intrarea pe retragere, iar o depasire a lui invalideaza ideea)."""
+    if direction == "SHORT":
+        return "TARGET" if side == "SELL" else "ENTRY/OBST"
+    return "TARGET" if side == "BUY" else "ENTRY/OBST"
+
+
+def mtf(daily, price, direction):
+    """Lichiditatea structurala pe 1D si 1W, din lumanarile zilnice inchise (1W agregat din ele). Pentru
+    fiecare timeframe: cele mai apropiate MTF_KEEP niveluri de fiecare parte a pretului, cu rolul fata de
+    directia planului; plus sweep-ul bilateral. {"levels": [...], "sweep": {"1d": bool, "1w": bool}}."""
+    out, sweep = [], {}
+    if not daily or not price:
+        return {"levels": [], "sweep": {}}
+    for tf, bars in (("1d", daily), ("1w", weekly_from_daily(daily))):
+        atr = _atr_simple(bars)
+        if not atr or len(bars) < 30:
+            continue
+        res = build([b[2] for b in bars], [b[3] for b in bars], [b[4] for b in bars], atr, price, tf, top=8)
+        sweep[tf] = bool(res.get("two_sided_sweep"))
+        for side in ("BUY", "SELL"):
+            lv = sorted((l for l in res["levels"] if l["side"] == side), key=lambda l: abs(l["price"] - price))
+            for l in lv[:MTF_KEEP]:
+                out.append({"price": l["price"], "side": side, "tf": tf, "kind": KIND_SHORT.get(l["kind"], l["kind"]),
+                            "role": role_for(side, direction), "swept": l["swept"], "touches": l["touches"],
+                            "distance_pct": l["distance_pct"], "strength": l["strength"]})
+    # acelasi varf pe 1D si pe 1W e UN singur bazin (confirmat pe doua timeframe-uri), nu doua
+    merged = []
+    for l in sorted(out, key=lambda l: (l["side"], l["price"], l["tf"])):
+        prev = merged[-1] if merged else None
+        if prev and prev["side"] == l["side"] and abs(prev["price"] - l["price"]) <= 0.001 * price:
+            if l["tf"] not in prev["tf"].split("+"):
+                prev["tf"] = "1d+1w"
+            prev["swept"] = prev["swept"] or l["swept"]
+            prev["touches"] = max(prev["touches"], l["touches"])
+            prev["strength"] = max(prev["strength"], l["strength"])
+            continue
+        merged.append(dict(l))
+    return {"levels": merged, "sweep": sweep}

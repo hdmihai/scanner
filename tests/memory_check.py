@@ -337,6 +337,32 @@ def check_release(tmp):
         srv.shutdown()
 
 
+def check_lab(tmp):
+    """Instantaneele laboratorului ajung in depozit o singura data (unice pe moneda + bara; prima
+    inregistrare castiga), iar antrenarea ruleaza o data pe zi."""
+    from adapters.memory.local_store import LocalStore
+    store = LocalStore(os.path.join(tmp, "lab-store"))
+    live = os.path.join(tmp, "lab_live.json")
+    orig = MS.LIVE_FILE
+    MS.LIVE_FILE = live
+    try:
+        snaps = [{"symbol": "SOL/USDT", "ts": 1_790_000_000_000 + k * 14_400_000, "pick": k == 0, "ev_long": 0.1}
+                 for k in range(3)]
+        json.dump({"snapshots": snaps}, open(live, "w"))
+        allr, added = MS.ship_lab_snapshots(store)
+        snaps2 = snaps + [dict(snaps[0], ev_long=9.9), {"symbol": "ETH/USDT", "ts": snaps[0]["ts"]}]
+        json.dump({"snapshots": snaps2}, open(live, "w"))
+        allr2, added2 = MS.ship_lab_snapshots(store)
+        first = [r for r in allr2 if r["symbol"] == "SOL/USDT" and r["ts"] == snaps[0]["ts"]]
+        ok(added == 3 and added2 == 1 and len(allr2) == 4 and first and first[0]["ev_long"] == 0.1,
+           f"instantaneele laboratorului: +{added}, apoi +{added2} (fara dubluri; prima inregistrare ramane)")
+        st = {"lab": {"ts": time.time() - 3600}}
+        res = MS.lab_step(store, "okx", time.monotonic() + 3600, st)
+        ok("skipped" in res and "o data pe zi" in res["skipped"], f"antrenarea o data pe zi: {res}")
+    finally:
+        MS.LIVE_FILE = orig
+
+
 def main():
     tmp = tempfile.mkdtemp(prefix="memorie-")
     orig_status = MS.STATUS_FILE
@@ -348,6 +374,7 @@ def main():
         check_candles(tmp)
         check_binance(tmp)
         check_release(tmp)
+        check_lab(tmp)
     finally:
         MS.STATUS_FILE = orig_status
         shutil.rmtree(tmp, ignore_errors=True)
