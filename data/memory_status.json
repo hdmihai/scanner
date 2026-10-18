@@ -18,7 +18,7 @@
    "rows": 5703120
   },
   "candles": {
-   "bytes": 58664447,
+   "bytes": 58685834,
    "coverage": {
     "okx:1d": {
      "symbols": 439,
@@ -29,18 +29,18 @@
      "with_data": 437
     }
    },
-   "max_ts": 1792324800000,
+   "max_ts": 1792339200000,
    "min_ts": 1515628800000,
    "partitions": 18,
-   "rows": 2788802
+   "rows": 2789239
   },
   "plans": {
-   "bytes": 2999850,
+   "bytes": 3000680,
    "coverage": {},
-   "max_ts": 1792328153.212242,
+   "max_ts": 1792353758.2568653,
    "min_ts": 1518552000.0,
    "partitions": 10,
-   "rows": 27979
+   "rows": 27982
   }
  },
  "history": [
@@ -323,6 +323,16 @@
    },
    "s": 381.1,
    "when": "2026-10-18 16:14 UTC"
+  },
+  {
+   "errors": 0,
+   "rows": {
+    "binance": 5703120,
+    "candles": 2789239,
+    "plans": 27982
+   },
+   "s": 419.7,
+   "when": "2026-10-18 21:09 UTC"
   }
  ],
  "last_run": {
@@ -355,17 +365,19 @@
      "complete": 437,
      "covered": 437,
      "no_data": 2,
-     "rows_added": 874,
+     "rows_added": 437,
      "symbols_updated": 437,
      "universe": 439
     }
    },
    "plans": {
     "partitions_written": 1,
-    "plans": 27979
+    "plans": 27982
    },
    "universe": {
-    "skipped": "masurat acum 19 ore (o data pe zi)"
+    "liquid": 279,
+    "plans": 179090,
+    "symbols": 379
    },
    "verdict": {
     "from": "2018-06-10",
@@ -374,23 +386,23 @@
     "tokens": 231
    }
   },
-  "duration_s": 381.1,
+  "duration_s": 419.7,
   "errors": [],
-  "finished": "2026-10-18 16:14 UTC",
-  "started": "2026-10-18 16:08 UTC"
+  "finished": "2026-10-18 21:09 UTC",
+  "started": "2026-10-18 21:02 UTC"
  },
  "probe": {
   "binance_vision": {
    "detail": "31 lumanari BTCUSDT 1d ianuarie 2024",
    "ok": true,
-   "s": 0.4
+   "s": 0.6
   },
   "cpu": 4,
   "disk_free_gb": 91.8,
   "exchange": {
    "id": "okx",
    "ok": true,
-   "s": 2.7
+   "s": 2.4
   },
   "ram_gb": 16.4
  },
@@ -403,10 +415,10 @@
  "store": "github-releases",
  "universe_backtest": {
   "all": {
-   "ci_high": 0.0194,
-   "ci_low": -0.0734,
-   "n": 136939,
-   "r": -0.0297,
+   "ci_high": 0.022,
+   "ci_low": -0.0721,
+   "n": 137025,
+   "r": -0.0281,
    "win": 31.9
   },
   "edge": {
@@ -461,66 +473,66 @@
     },
     "2026": {
      "ci_high": 0.057,
-     "ci_low": -0.193,
-     "n": 5410,
-     "r": -0.078
+     "ci_low": -0.184,
+     "n": 5426,
+     "r": -0.074
     }
    },
    "recent": {
-    "ci_high": 0.023,
-    "ci_low": -0.198,
-    "n": 7312,
-    "r": -0.084
+    "ci_high": 0.049,
+    "ci_low": -0.192,
+    "n": 7310,
+    "r": -0.079
    },
    "recent_days": 365,
    "status": "neconcludent",
-   "until": "2026-10-17"
+   "until": "2026-10-18"
   },
-  "entered": 136939,
+  "entered": 137025,
   "exchange": "okx",
   "liquid": {
-   "ci_high": 0.0487,
-   "ci_low": -0.0494,
-   "n": 58899,
-   "r": 0.0018,
+   "ci_high": 0.0461,
+   "ci_low": -0.0442,
+   "n": 58915,
+   "r": 0.0022,
    "win": 32.8
   },
   "long": {
-   "ci_high": 0.0564,
-   "ci_low": -0.105,
-   "n": 29702,
-   "r": -0.0243,
+   "ci_high": 0.0588,
+   "ci_low": -0.0971,
+   "n": 29710,
+   "r": -0.0246,
    "win": 32.4
   },
   "min_qv": 200000.0,
-  "plans": 178925,
+  "plans": 179090,
   "rest": {
-   "ci_high": 0.0457,
-   "ci_low": -0.0492,
-   "n": 43715,
-   "r": -0.0027,
+   "ci_high": 0.0417,
+   "ci_low": -0.0497,
+   "n": 44134,
+   "r": -0.0028,
    "win": 32.7
   },
   "rules": 2,
   "short": {
    "ci_high": 0.1088,
-   "ci_low": -0.0442,
-   "n": 29197,
-   "r": 0.0284,
+   "ci_low": -0.0443,
+   "n": 29205,
+   "r": 0.0295,
    "win": 33.2
   },
   "symbols": 379,
   "symbols_liquid": 279,
   "tf": "4h",
-  "ts": 1792270858.1099017,
+  "ts": 1792357571.8347182,
   "watchlist": {
-   "ci_high": 0.0804,
-   "ci_low": -0.0402,
-   "n": 15184,
-   "r": 0.0149,
-   "win": 33.0
+   "ci_high": 0.0821,
+   "ci_low": -0.0393,
+   "n": 14781,
+   "r": 0.0172,
+   "win": 33.1
   },
-  "when": "2026-10-17 21:00 UTC"
+  "when": "2026-10-18 21:06 UTC"
  },
  "verdict_track": {
   "exchange": "okx",
@@ -601,7 +613,7 @@
   "obs": 158197,
   "to": "2026-10-10",
   "tokens": 231,
-  "when": "2026-10-18 16:10 UTC"
+  "when": "2026-10-18 21:04 UTC"
  },
  "where": "hdmihai/scanner"
 }
