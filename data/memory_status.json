@@ -34,6 +34,14 @@
    "partitions": 18,
    "rows": 2789239
   },
+  "lab": {
+   "bytes": 0,
+   "coverage": {},
+   "max_ts": null,
+   "min_ts": null,
+   "partitions": 0,
+   "rows": 0
+  },
   "plans": {
    "bytes": 3000680,
    "coverage": {},
@@ -333,10 +341,21 @@
    },
    "s": 419.7,
    "when": "2026-10-18 21:09 UTC"
+  },
+  {
+   "errors": 1,
+   "rows": {
+    "binance": 5703120,
+    "candles": 2789239,
+    "lab": 0,
+    "plans": 27982
+   },
+   "s": 297.7,
+   "when": "2026-10-18 21:37 UTC"
   }
  ],
  "last_run": {
-  "budget_min": 45.0,
+  "budget_min": 80.0,
   "done": {
    "binance": {
     "1d": {
@@ -365,19 +384,17 @@
      "complete": 437,
      "covered": 437,
      "no_data": 2,
-     "rows_added": 437,
-     "symbols_updated": 437,
+     "rows_added": 0,
+     "symbols_updated": 0,
      "universe": 439
     }
    },
    "plans": {
-    "partitions_written": 1,
+    "partitions_written": 0,
     "plans": 27982
    },
    "universe": {
-    "liquid": 279,
-    "plans": 179090,
-    "symbols": 379
+    "skipped": "masurat acum 0 ore (o data pe zi)"
    },
    "verdict": {
     "from": "2018-06-10",
@@ -386,29 +403,32 @@
     "tokens": 231
    }
   },
-  "duration_s": 419.7,
-  "errors": [],
-  "finished": "2026-10-18 21:09 UTC",
-  "started": "2026-10-18 21:02 UTC"
+  "duration_s": 297.7,
+  "errors": [
+   "lab: Parser Error: syntax error at or near \")\""
+  ],
+  "finished": "2026-10-18 21:37 UTC",
+  "started": "2026-10-18 21:32 UTC"
  },
  "probe": {
   "binance_vision": {
    "detail": "31 lumanari BTCUSDT 1d ianuarie 2024",
    "ok": true,
-   "s": 0.6
+   "s": 0.7
   },
   "cpu": 4,
-  "disk_free_gb": 91.8,
+  "disk_free_gb": 91.7,
   "exchange": {
    "id": "okx",
    "ok": true,
-   "s": 2.4
+   "s": 4.4
   },
   "ram_gb": 16.4
  },
  "releases": {
   "binance": "memory-binance",
   "candles": "memory-candles",
+  "lab": "memory-lab",
   "plans": "memory-plans"
  },
  "schema": 2,
@@ -613,7 +633,7 @@
   "obs": 158197,
   "to": "2026-10-10",
   "tokens": 231,
-  "when": "2026-10-18 21:04 UTC"
+  "when": "2026-10-18 21:32 UTC"
  },
  "where": "hdmihai/scanner"
 }
