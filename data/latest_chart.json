@@ -1556,6 +1556,102 @@
       "strength": 0.1029
     }
   },
+  "liq_mtf": {
+    "levels": [
+      {
+        "price": 0.025407500000000003,
+        "side": "BUY",
+        "tf": "1d",
+        "kind": "EQ HIGHS",
+        "role": "ENTRY/OBST",
+        "swept": true,
+        "touches": 4,
+        "distance_pct": 12.03,
+        "strength": 0.3916
+      },
+      {
+        "price": 0.02661,
+        "side": "BUY",
+        "tf": "1d",
+        "kind": "SWING HIGH",
+        "role": "ENTRY/OBST",
+        "swept": true,
+        "touches": 1,
+        "distance_pct": 17.33,
+        "strength": 0.0746
+      },
+      {
+        "price": 0.02843,
+        "side": "BUY",
+        "tf": "1d",
+        "kind": "SWING HIGH",
+        "role": "ENTRY/OBST",
+        "swept": false,
+        "touches": 1,
+        "distance_pct": 25.35,
+        "strength": 0.0549
+      },
+      {
+        "price": 0.03035,
+        "side": "BUY",
+        "tf": "1w",
+        "kind": "SWING HIGH",
+        "role": "ENTRY/OBST",
+        "swept": true,
+        "touches": 1,
+        "distance_pct": 33.82,
+        "strength": 0.0429
+      },
+      {
+        "price": 0.013,
+        "side": "SELL",
+        "tf": "1w",
+        "kind": "SWING LOW",
+        "role": "TARGET",
+        "swept": false,
+        "touches": 1,
+        "distance_pct": -42.68,
+        "strength": 0.035
+      },
+      {
+        "price": 0.01587,
+        "side": "SELL",
+        "tf": "1d",
+        "kind": "SWING LOW",
+        "role": "TARGET",
+        "swept": false,
+        "touches": 1,
+        "distance_pct": -30.03,
+        "strength": 0.0476
+      },
+      {
+        "price": 0.017153333333333333,
+        "side": "SELL",
+        "tf": "1d",
+        "kind": "EQ LOWS",
+        "role": "TARGET",
+        "swept": false,
+        "touches": 6,
+        "distance_pct": -24.37,
+        "strength": 0.3405
+      },
+      {
+        "price": 0.01861,
+        "side": "SELL",
+        "tf": "1d",
+        "kind": "EQ LOWS",
+        "role": "TARGET",
+        "swept": true,
+        "touches": 3,
+        "distance_pct": -17.95,
+        "strength": 0.2179
+      }
+    ],
+    "sweep": {
+      "1d": true,
+      "1w": false
+    }
+  },
   "liquidation": {
     "clusters": [
       {
