@@ -630,7 +630,10 @@ def audit_cycle(store, prev_audit, ew_on, ew_stats, quarantine, now=None, source
     ctx = {"edge": P.edge_by_period(bt) if bt else {}, "elliott": ew, "agent": agent,
            "agent_gain": SA.ranking_gain_ci(agent.get("pairs"), block_diff_ci=P.block_diff_ci),
            "gate_on": P.USE_DECISION_GATE, "walkforward": _load("walkforward.json", None),
-           "eval_rules": P.EVAL_RULES, "research": _load(RESEARCH_FILE, {}) or {}, "quarantine": quarantine}
+           "eval_rules": P.EVAL_RULES, "research": _load(RESEARCH_FILE, {}) or {}, "quarantine": quarantine,
+           "lab": {k: v for k, v in ((_load("memory_status.json", {}) or {}).get("lab") or {}).items() if k != "model"},
+           "lab_live": {k: v for k, v in (_load("lab_live.json", {}) or {}).items() if k != "snapshots"},
+           "lab_expected": True, "now": now}
     lever_rows, f_lev = SA.levers(ctx)
     found += f_lev
     texts = _strings(_load("briefing.json", {}) or {}, "briefing.json", [])

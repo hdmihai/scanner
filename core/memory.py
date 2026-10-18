@@ -20,7 +20,9 @@ SETURI DE DATE
                 CARACTERISTICI pe care invata agentul (fara textele evidentelor, care sunt afisare);
   candles     - lumanarile bursei principale pentru TOT universul ei USDT spot (nu doar cele 30 de
                 simboluri scanate), pe 4h si 1d, de la listare;
-  binance     - arhiva publica Binance (data.binance.vision) pe 4h si 1d, cand e accesibila din runner.
+  binance     - arhiva publica Binance (data.binance.vision) pe 4h si 1d, cand e accesibila din runner;
+  lab         - instantaneele scanarilor (core/lab.py): caracteristicile fiecarei monede scanate la
+                fiecare bara inchisa, EV-ul modelului si alegerea agentului - etichetate ulterior.
 
 Nucleul defineste ce se stocheaza si cum se imparte; adaptoarele fac I/O.
 """
@@ -36,6 +38,7 @@ DATASETS = {
     "plans": "memory-plans",
     "candles": "memory-candles",
     "binance": "memory-binance",
+    "lab": "memory-lab",
 }
 
 # campurile scalare ale unui plan pastrate in memorie (restul - evidente text, vecini - sunt afisare)
@@ -49,6 +52,10 @@ PLAN_FIELDS = (
     ("bar_seconds", "DOUBLE"),
 )
 FEATURE_PREFIX = "f_"
+# instantaneele laboratorului (lab_live.py): o moneda la inchiderea unei bare, cu caracteristicile, EV-ul
+# modelului de atunci si alegerea agentului - in `payload` (JSON), ca schema sa nu depinda de lista de
+# caracteristici a unei versiuni a laboratorului
+LAB_FIELDS = (("symbol", "VARCHAR"), ("ts", "BIGINT"), ("exchange", "VARCHAR"), ("payload", "VARCHAR"))
 CANDLE_FIELDS = (("symbol", "VARCHAR"), ("ts", "BIGINT"), ("open", "DOUBLE"), ("high", "DOUBLE"),
                  ("low", "DOUBLE"), ("close", "DOUBLE"), ("volume", "DOUBLE"))
 

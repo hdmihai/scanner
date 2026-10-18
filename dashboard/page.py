@@ -19,6 +19,7 @@ from dashboard.sections.plan import (elliott_outcome_stats, exploration_stats, r
                                      render_plan, render_plan_memory, tracked_plan)
 from dashboard.sections.health import health_items, render_health
 from dashboard.sections.memory import render_memory
+from dashboard.sections import lab as lab_section
 from dashboard.sections.research import render_research
 from dashboard.sections.status import render_self_check, render_similar_projects
 
@@ -95,6 +96,9 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
     _audit = load_json(os.path.join(DATA_DIR, "plan_audit.json"), None)
     _mem = load_json(os.path.join(DATA_DIR, "memory_status.json"), None)
     _memory_html = _safe("render_memory", render_memory, _mem, (_mem or {}).get("where"))
+    _lab_rep = (_mem or {}).get("lab")
+    _lab_live = load_json(os.path.join(DATA_DIR, "lab_live.json"), None)
+    _lab_html = _safe("render_lab", lab_section.render_lab, _lab_rep, _lab_live)
     _policy = load_json(os.path.join(DATA_DIR, "scoring_policy.json"), None)
     agent_html = _safe("render_agent_card", render_agent_card, agent_state, _audit)
     plans_html = _safe("render_plan_memory", render_plan_memory, plans_store)
@@ -153,6 +157,9 @@ def build_html(scan, best, deep, chart, health, weights, session, token_meta, na
                   '<th>Pers</th></tr>')
     top_cards = "\n\n  ".join([
         fold("Starea sistemului", health_html, _hw, anchor="stare"),
+        # LABORATORUL: ce a invatat agentul din memorie, cu dovada, si ce alege acum (core/lab.py)
+        fold('Laboratorul agentului &middot; <span class="dim">ce a invatat din memorie si cu ce dovada</span>',
+             _lab_html, _sum("lab", lab_section.summary, _lab_rep, _lab_live), anchor="laborator"),
         # "#analist" (numele vechi al sectiunii) ramane valid: legaturile salvate deschid aceeasi sectiune
         fold("Web3 Researcher &middot; rotatia capitalului si risc (la fiecare scanare)",
              '<span id="analist"></span>' + analyst_html,

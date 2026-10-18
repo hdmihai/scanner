@@ -45,7 +45,7 @@ MAX_LABEL = 44     # etichete mai lungi se scurteaza (cea mai lunga eticheta
 # Straturile disponibile. Fiecare componenta foloseste un subset.
 ALL_LAYERS = {"ema", "plan", "locked", "ew_primary", "ew_all", "ew_levels",
               "ew_inv_primary", "projection", "indicators", "liq_heat",
-              "liq_struct", "price_axis", "zones", "marks"}
+              "liq_struct", "liq_mtf", "price_axis", "zones", "marks"}
 
 # ZONELE de suport (verde) si rezistenta (portocaliu) sunt pe graficul principal si pe graficul
 # fiecarui token: dreptunghiuri de la formarea zonei pana in prezent, cu marginile ca linii
@@ -55,6 +55,11 @@ MAIN_LAYERS = {"ema", "plan", "ew_primary", "ew_inv_primary", "projection",
 # marcaje care nu intind axa (ex. invalidarea analistului pe graficul unui token): se deseneaza
 # doar daca pretul lor intra in intervalul dat de lumanari, niveluri si zone
 SOFT_KINDS = {"invsoft"}
+# HARTA DE LICHIDITATE: nivelurile 1D/1W intind axa doar pana la LIQ_KEEP_PCT de pret. In capturile de
+# referinta, niveluri la de 6 ori pretul turteau lumanarile intr-o banda de cativa pixeli si scoteau axa
+# in preturi negative; aici cele departate se rezuma intr-o eticheta (cate sunt si cel mai apropiat).
+LIQ_KEEP_PCT = 15.0
+LIQ_LAYERS = {"ema", "plan", "liq_mtf", "indicators", "projection", "price_axis"}
 ZONE_KEEP_PCT = 8.0   # a doua zona de pe o parte intinde axa doar daca e la cel mult 8% de pret
 
 
@@ -148,6 +153,16 @@ def _collect_levels(chart, layers):
             lv.append((l["price"], f"{side}-SIDE LIQ · {l['kind']} · {l['role']}",
                        "liqb" if side == "BUY" else "liqs", 5))
 
+    if "liq_mtf" in layers:
+        px0 = chart.get("price") or ((chart.get("candles") or [[0] * 5])[-1])[4]
+        for l in ((chart.get("liq_mtf") or {}).get("levels") or []):
+            if px0 and abs(l["price"] - px0) / px0 * 100 > LIQ_KEEP_PCT:
+                continue
+            # BSL / SSL = buy-side / sell-side liquidity (vocabularul SMC)
+            lbl = (f"{'BSL' if l['side'] == 'BUY' else 'SSL'} {l['tf'].upper()} · {l['kind']} · {l['role']}"
+                   + (" · SWEPT" if l.get("swept") else ""))
+            lv.append((l["price"], lbl, "liqb" if l["side"] == "BUY" else "liqs", 5 if l["tf"] == "1d" else 6))
+
     marks = [m for m in (chart.get("marks") or []) if m.get("price")] if "marks" in layers else []
     if "zones" in layers:
         # o singura pastila pe pret: doua zone alaturate au o margine comuna, iar un marcaj
@@ -175,6 +190,24 @@ def _collect_levels(chart, layers):
     for m in marks:
         lv.append((m["price"], m.get("label", ""), m.get("kind", "inv"), 10))
     return lv
+
+
+def _far_liquidity(chart):
+    """Etichetele pentru lichiditatea 1D/1W prea departata ca sa intinda axa: una pe parte, cu numarul de
+    niveluri si cel mai apropiat (pret si distanta)."""
+    px = chart.get("price") or ((chart.get("candles") or [[0] * 5])[-1])[4]
+    out = []
+    if not px:
+        return out
+    lv = [l for l in ((chart.get("liq_mtf") or {}).get("levels") or [])
+          if abs(l["price"] - px) / px * 100 > LIQ_KEEP_PCT]
+    for side, arrow, name in (("BUY", "↑", "peste"), ("SELL", "↓", "sub")):
+        far = sorted((l for l in lv if l["side"] == side), key=lambda l: abs(l["price"] - px))
+        if far:
+            f = far[0]
+            out.append((f"{arrow} {len(far)} niveluri 1D/1W {name} grafic · cel mai apropiat {fmt(f['price'])} "
+                        f"({100 * (f['price'] - px) / px:+.0f}%)", "far"))
+    return out
 
 
 def _zone_frame(chart):
@@ -229,6 +262,8 @@ def render_chart(chart, layers=None, height=300, fullscreen_id=None, show_head=T
         for c in (ew.get("counts") or [])[:3]:
             if c is not pr and c.get("headline") and not c.get("invalidated"):
                 chips.append((c["headline"], "ewa"))
+    if "liq_mtf" in layers:
+        chips += _far_liquidity(chart)
     chips_h = len(chips) * (PILL_H + 2) + (4 if chips else 0)
 
     # COLOANA PASTILELOR: latimea celei mai late etichete de nivel. Lumanarile
@@ -243,6 +278,7 @@ def render_chart(chart, layers=None, height=300, fullscreen_id=None, show_head=T
     px = chart.get("price") or candles[-1][4]
     near = [l[0] for l in levels if abs(l[0] - px) / px < 0.6 and not str(l[2]).startswith("z")
             and l[2] not in SOFT_KINDS]
+    # niciun pret negativ pe axa: marja de 5% de sub minim nu coboara sub zero (vezi capturile de referinta)
     # ZONELE: cea mai apropiata de fiecare parte intra intreaga in axa (incadreaza pretul); din
     # urmatoarele intra doar marginea dinspre pret, si doar daca e aproape - zona apare ca banda
     # care continua dincolo de marginea graficului, fara sa turteasca lumanarile
@@ -258,7 +294,7 @@ def render_chart(chart, layers=None, height=300, fullscreen_id=None, show_head=T
     lo = min(lows + near + [p["price"] for p in ppath] + [p["price"] for p in solid])
     hi = max(highs + near + [p["price"] for p in ppath] + [p["price"] for p in solid])
     rng = (hi - lo) or (abs(hi) or 1)
-    lo -= rng * 0.05
+    lo = max(lo - rng * 0.05, lo * 0.5 if lo > 0 else lo - rng * 0.05)
     hi += rng * 0.05
     rng = hi - lo
     if chips_h:
@@ -628,6 +664,17 @@ def _component(title, meta, body, open_=False):
             f'<div class="cc-body">{body}</div></details>')
 
 
+def _liq_meta(chart):
+    m = chart.get("liq_mtf") or {}
+    lv = m.get("levels") or []
+    if not lv:
+        return "fara lumanari 1D pentru acest simbol"
+    sw = [tf.upper() for tf, v in (m.get("sweep") or {}).items() if v]
+    tgt = sum(1 for l in lv if l["role"] == "TARGET")
+    return (f"{len(lv)} bazine de lichiditate 1D/1W · {tgt} tinte in directia planului"
+            + (f" · sweep bilateral {'/'.join(sw)}" if sw else ""))
+
+
 def render_components(chart, uid="main"):
     """Graficul principal plus o componenta pliabila pentru fiecare zona de
     interes. Principalul si Elliott sunt deschise implicit; restul compacte."""
@@ -646,6 +693,9 @@ def render_components(chart, uid="main"):
         _component("Grafic principal",
                    pr.get("headline") or "nicio structura Elliott curenta",
                    render_chart(chart, MAIN_LAYERS, 390, fullscreen_id=f"max-{uid}"),
+                   open_=True),
+        _component("Hartă de lichiditate · 4H / 1D / 1W", _liq_meta(chart),
+                   render_chart(chart, LIQ_LAYERS, 390, show_head=False),
                    open_=True),
         _component("Elliott Wave · toate scenariile",
                    f"{ew.get('alive', 0)} din {ew.get('total', 0)} scenarii valide",
@@ -721,6 +771,7 @@ CSS = """
 .pill-sl,.pill-inv,.pill-sts{fill:#F8E9E8;stroke:#C8463F;}
 .pill-entry,.pill-vwap,.pill-val{fill:#E8EFF8;stroke:#2F6FB0;}
 .pill-locked{fill:#EEF0F3;stroke:#5B6675;}
+.pill-far{fill:#F3F4F6;stroke:#9AA4B2;}
 .pill-ew,.pill-ewh{fill:#EFEDF7;stroke:#6B5BA8;} .pill-ewa{fill:#E8F0F9;stroke:#3B7DC4;}
 .pill-hit{fill:#F3F4F6;stroke:#9AA4B2;} .pill-nextentry{fill:#F6F0E1;stroke:#A8832E;}
 .pill-vah,.pill-poc,.pill-liqb,.pill-zres{fill:#F8EFE3;stroke:#C98A3E;} .pill-liqs{fill:#F6EBDD;stroke:#A9672A;}

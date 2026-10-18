@@ -27,6 +27,7 @@ import requests
 import ai_agent
 import altseason as alt_mod
 import analyst as analyst_mod
+import lab_live
 import plan_tracker
 from adapters import compat
 from adapters.exchanges.venues import CcxtVenues
@@ -65,6 +66,7 @@ _core.VENUES = CcxtVenues(ccxt)
 _core.NOTIFIER = send_telegram
 _core.ALTSEASON = lambda market, results: alt_mod.update(market, results)
 _core.TOP_SYMBOLS = fetch_coingecko_top_symbols
+_core.LAB = (lambda market, cache, tf, eid: lab_live.update(market, cache, tf, eid))
 _core.ANALYST = (lambda market, alt, details, results, zone_stats, daily:
                  analyst_mod.update(market, alt, details, results, zone_stats, daily))
 

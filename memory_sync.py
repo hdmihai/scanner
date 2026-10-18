@@ -14,6 +14,11 @@ La fiecare rulare, cu buget de timp (MEMORY_BUDGET_MIN, implicit 45 de minute):
      o data pe zi - R mediu pe plan cu IC95, lista urmarita fata de rest, pe ani;
   5. BINANCE: arhiva publica data.binance.vision (1d, 4h), luna cu luna, verificata cu checksum - doar
      daca sonda o gaseste accesibila din runner.
+  6. LABORATOR (research_lab.py, o data pe zi): agentul invata din memorie - caracteristici si R-ul
+     tranzactiei LONG/SHORT pe fiecare bara de 4h a tuturor monedelor, modele validate walk-forward si
+     pe o perioada rezervata, confirmare pe alegerile live; modelul publicat ajunge in
+     data/memory_status.json -> "lab" si e aplicat de scanare la fiecare ora. Inainte, instantaneele
+     scanarilor (data/lab_live.json) se muta in depozit (setul `lab`).
 Depozitul: release-urile GitHub ale repo-ului (GITHUB_TOKEN + GITHUB_REPOSITORY, setate de workflow),
 altfel un dosar local (MEMORY_LOCAL_DIR, implicit memory_local/ - pentru teste). Nimic din acest job
 nu atinge planurile, agentul sau deciziile: scrie doar in depozit si in data/memory_status.json.
@@ -314,6 +319,118 @@ def universe_backtest(store, exchange_id, deadline, status):
     return {"symbols": summ["symbols"], "liquid": summ["symbols_liquid"], "plans": summ["plans"]}
 
 
+# --------------------------------------------------------------------- 6. laboratorul
+
+LAB_EVERY_H = 20               # o antrenare pe zi
+LAB_MIN_BUDGET_S = 20 * 60
+LIVE_FILE = os.path.join("data", "lab_live.json")
+
+
+def _ensure_numpy():
+    """numpy e necesar doar laboratorului. Daca workflow-ul nu l-a instalat, il instalez aici (gratuit,
+    din PyPI) - laboratorul nu depinde de actualizarea manuala a fisierului de workflow."""
+    try:
+        import numpy  # noqa: F401
+        return True
+    except ImportError:
+        import subprocess
+        r = subprocess.run([sys.executable, "-m", "pip", "install", "-q", "numpy==2.2.6"], capture_output=True, text=True)
+        if r.returncode != 0:
+            print(f"  [!] pip install numpy: {r.stderr[-300:]}")
+            return False
+        import importlib
+        importlib.invalidate_caches()
+        try:
+            import numpy  # noqa: F401,F811
+            return True
+        except ImportError:
+            return False
+
+
+def ship_lab_snapshots(store):
+    """Instantaneele din data/lab_live.json -> setul `lab` din depozit (unice pe simbol + bara; prima
+    inregistrare castiga - e cea facuta cu modelul de atunci). Intoarce toate instantaneele din depozit."""
+    snaps = (_load(LIVE_FILE, {}) or {}).get("snapshots") or []
+    rows = [{"symbol": r["symbol"], "ts": int(r["ts"]), "exchange": r.get("exchange"),
+             "payload": json.dumps(r, separators=(",", ":"))} for r in snaps if r.get("symbol") and r.get("ts")]
+    groups = {}
+    for r in rows:
+        groups.setdefault(f"lab__snapshots__{M._year(r['ts'] / 1000)}.parquet", []).append(r)
+    idx = store.index("lab")
+    now = time.time()
+    added = 0
+    for name, new in sorted(groups.items()):
+        old = store.read("lab", name) if name in store.names("lab") else []
+        have = {(o["symbol"], o["ts"]) for o in old}
+        fresh = [r for r in new if (r["symbol"], r["ts"]) not in have]
+        if not fresh:
+            continue
+        allr = old + fresh
+        n = store.write("lab", name, allr, list(M.LAB_FIELDS))
+        idx[name] = {"rows": len(allr), "symbols": len({r["symbol"] for r in allr}),
+                     "min_ts": min(r["ts"] for r in allr), "max_ts": max(r["ts"] for r in allr),
+                     "bytes": n, "updated": now}
+        added += len(fresh)
+    if added:
+        store.save_index("lab", idx)
+    out = []
+    for name in sorted(store.names("lab")):
+        for r in store.read("lab", name):
+            try:
+                out.append(json.loads(r["payload"]))
+            except (TypeError, ValueError):
+                continue
+    return out, added
+
+
+def lab_step(store, exchange_id, deadline, status):
+    """Laboratorul (research_lab.run_lab), o data pe zi: invata din tot depozitul si din instantaneele
+    live etichetate; raportul si modelul publicat intra in data/memory_status.json -> "lab"."""
+    import research_lab as R
+    prev = status.get("lab") or {}
+    snaps, added = ship_lab_snapshots(store)
+    force = os.environ.get("LAB_FORCE") == "1"
+    if not force and time.time() - (prev.get("ts") or 0) < LAB_EVERY_H * 3600:
+        return {"snapshots_added": added, "skipped": f"antrenat acum {(time.time() - prev['ts']) / 3600:.0f} ore (o data pe zi)"}
+    if deadline - time.monotonic() < LAB_MIN_BUDGET_S:
+        return {"snapshots_added": added, "skipped": "buget de timp insuficient la aceasta rulare"}
+    if not _ensure_numpy():
+        return {"snapshots_added": added, "skipped": "numpy nu s-a putut instala"}
+    bfiles = [p for p in (store.local_path("binance", n) for n in sorted(store.names("binance"))
+                          if n.startswith("binance__spot__4h__")) if p]
+    efiles = [p for p in (store.local_path("candles", n) for n in sorted(store.names("candles"))
+                          if n.startswith(f"candles__{exchange_id}__4h__")) if p]
+    if not bfiles and not efiles:
+        return {"snapshots_added": added, "skipped": "fara lumanari de 4h in depozit"}
+    bend = max((r[2] for r in R.list_symbols(bfiles)), default=0) if bfiles else 0
+    sources = ([("binance", bfiles, 0)] if bfiles else []) + [(exchange_id, efiles, bend + R.BAR_MS if bfiles else 0)]
+    live = R.label_live(snaps, R.load_series(efiles, sorted({x.get("symbol") for x in snaps if x.get("symbol")})))
+    # TESTUL INAINTE: modelele publicate anterior (arhivate in depozit) aleg pe barele de dupa publicarea lor
+    versions = []
+    for v in (prev.get("versions") or [])[-R.FORWARD_DAYS:]:
+        p_ = store.local_path("lab", v["file"])
+        if p_:
+            try:
+                with open(p_) as f:
+                    versions.append({"version": v["version"], "ts": v["ts"], "model": json.load(f)})
+            except (OSError, ValueError):
+                continue
+    fwd = R.forward_picks(versions, efiles)
+    rep = R.run_lab(sources, prev=prev, live_rows=live, deadline=deadline, forward=fwd)
+    if rep.get("error"):
+        return {"snapshots_added": added, "error": rep["error"]}
+    # modelul publicat se arhiveaza in depozit: e cel care va fi testat inainte de la rularile urmatoare
+    name = f"lab__model__{rep['version']}.json"
+    tmp = os.path.join(os.environ.get("RUNNER_TEMP", "/tmp"), name)
+    with open(tmp, "w") as f:
+        json.dump(rep["model"], f, separators=(",", ":"))
+    store.put("lab", name, tmp)
+    rep["versions"] = ((prev.get("versions") or []) + [{"version": rep["version"], "ts": rep["ts"], "file": name}])[-R.FORWARD_DAYS:]
+    status["lab"] = rep
+    return {"snapshots_added": added, "state": rep["state"], "chosen": rep["chosen"],
+            "examples": rep["data"]["examples"], "seconds": rep["seconds"]}
+
+
 # --------------------------------------------------------------------- statusul
 
 def dataset_status(store, ds):
@@ -333,7 +450,7 @@ def main():
     if "candles" in wanted:
         # masurarile din depozit urmeaza lumanarile proaspete: verdictul Web3 Researcher si strategia
         # pe tot universul (o data pe zi)
-        wanted += [x for x in ("verdict", "universe") if x not in wanted]
+        wanted += [x for x in ("verdict", "lab", "universe") if x not in wanted]
     store, kind, where = make_store()
     exchange_id = (_load(EXCHANGES_FILE, {}) or {}).get("used") or "okx"
 
@@ -365,6 +482,7 @@ def main():
     steps = [("plans", lambda: sync_plans(store)),
              ("candles", lambda: sync_exchange_candles(store, exchange_id, open_exchange, deadline)),
              ("verdict", _verdict),
+             ("lab", lambda: lab_step(store, exchange_id, deadline, status)),
              ("universe", lambda: universe_backtest(store, exchange_id, deadline, status)),
              ("binance", lambda: (sync_binance(store, deadline)
                                   if (status.get("probe") or {}).get("binance_vision", {}).get("ok")

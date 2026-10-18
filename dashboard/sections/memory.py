@@ -5,7 +5,7 @@ import html as _html
 import time
 
 NAMES = {"plans": "Planuri (live + backtest, cu caracteristici)", "candles": "Lumanari bursa principala (1d, 4h)",
-         "binance": "Arhiva Binance (1d, 4h)"}
+         "binance": "Arhiva Binance (1d, 4h)", "lab": "Instantaneele laboratorului (fiecare scanare)"}
 
 
 def _d(ts, ms=False):
@@ -54,7 +54,7 @@ def render_memory(st, repo=None):
                 'Run workflow (ruleaza si zilnic, automat).</p>')
     rows = []
     dsets = st.get("datasets") or {}
-    for ds in [d for d in ("plans", "candles", "binance") if d in dsets] + [d for d in dsets if d not in NAMES]:
+    for ds in [d for d in ("plans", "candles", "binance", "lab") if d in dsets] + [d for d in dsets if d not in NAMES]:
         v = dsets[ds]
         ms = ds != "plans"
         cov = "; ".join(f"{k}: {c.get('with_data', 0)} simboluri" for k, c in sorted((v.get("coverage") or {}).items()))
@@ -96,6 +96,11 @@ def _done(name, v):
     if name == "universe":
         return (f"strategia pe tot universul: {v.get('symbols', 0)} simboluri ({v.get('liquid', 0)} lichide), "
                 f"{v.get('plans', 0):,} planuri")
+    if name == "lab":
+        extra = (f", antrenat: stare {_html.escape(str(v.get('state')))}, model {_html.escape(str(v.get('chosen')))}, "
+                 f"{v.get('examples', 0):,} exemple in {v.get('seconds', '?')} s" if v.get("state") else "")
+        return f"laborator: +{v.get('snapshots_added', 0)} instantanee live{extra}" + (
+            f" ({_html.escape(str(v['error']))})" if v.get("error") else "")
     if name == "verdict":
         return (f"verdictul Web3 Researcher masurat pe {v.get('tokens', 0)} tokeni, {v.get('obs', 0):,} zile-token "
                 f"({_html.escape(str(v.get('from') or '?'))} - {_html.escape(str(v.get('to') or '?'))})")
