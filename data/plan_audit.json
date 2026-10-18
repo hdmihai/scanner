@@ -24,18 +24,20 @@
     }
   },
   "rebuild_removed_live": [],
-  "when": "2026-10-18 11:57 UTC",
-  "ts": 1792324628.3327122,
-  "checked": 27979,
-  "reevaluated": 139,
-  "live_flagged": 0,
-  "removed_now": 0,
+  "when": "2026-10-18 12:57 UTC",
+  "ts": 1792328244.192062,
+  "checked": 27980,
+  "reevaluated": 141,
+  "live_flagged": 1,
+  "removed_now": 1,
   "blocked": null,
   "backtest_flagged": 0,
   "backtest_examples": [],
-  "by_reason": {},
+  "by_reason": {
+    "rezultat contrazis de lumanarile reale": 1
+  },
   "pending_live": [],
-  "retrained": false,
+  "retrained": true,
   "epoch": 2,
   "removed": [
     {
@@ -337,6 +339,18 @@
       "created_ts": 1790891309.279584,
       "reason": "rezultat contrazis de lumanarile reale: NO_ENTRY 0.0R in memorie, EXPIRED 2.633R la reevaluare",
       "removed": "2026-10-18 09:16 UTC"
+    },
+    {
+      "id": 164051,
+      "symbol": "FET/USDT",
+      "direction": "LONG",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": -1.025,
+      "created_ts": 1790598586.2908685,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.025R in memorie, TP2_HIT 4.039R la reevaluare",
+      "removed": "2026-10-18 12:57 UTC"
     }
   ]
 }
