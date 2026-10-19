@@ -1,46 +1,46 @@
 {
   "model": {
     "weights": {
-      "trend": -0.028979,
-      "momentum": 0.019727,
-      "volatility": -0.277618,
-      "volume": -0.127336,
+      "trend": -0.030461,
+      "momentum": 0.01789,
+      "volatility": -0.279685,
+      "volume": -0.129297,
       "persistence_n": 0.0,
-      "ev_ema_fast": -0.05024,
-      "ev_ema_stack": 0.217739,
-      "ev_supertrend": 0.004551,
-      "ev_macd": 0.199815,
-      "ev_vwap": 0.209296,
-      "ev_poc": 0.004587,
+      "ev_ema_fast": -0.051297,
+      "ev_ema_stack": 0.216169,
+      "ev_supertrend": 0.002196,
+      "ev_macd": 0.199034,
+      "ev_vwap": 0.206941,
+      "ev_poc": 0.002232,
       "ev_value_area": 0.0,
-      "ev_rsi": -0.142465,
+      "ev_rsi": -0.144631,
       "ev_volume": 0.0,
       "ev_volatility": 0.0,
       "ev_order_flow": 0.0,
       "ev_book_imbalance": 0.0,
       "ev_liq_magnet": 0.0,
-      "ev_ichimoku": 0.053676,
-      "ev_ma_cross": 0.167861,
-      "ev_regime": 0.23912,
-      "ev_mtf_align": -0.118874,
-      "ev_elliott": 0.012627,
-      "ev_liq_struct": -0.025661,
+      "ev_ichimoku": 0.052898,
+      "ev_ma_cross": 0.168151,
+      "ev_regime": 0.237377,
+      "ev_mtf_align": -0.119659,
+      "ev_elliott": 0.013894,
+      "ev_liq_struct": -0.027241,
       "ev_liq_sweep": -0.021352,
-      "ev_altseason": -0.043875,
+      "ev_altseason": -0.04488,
       "ev_analyst": 0.063418,
-      "ev_fusion": 0.037754
+      "ev_fusion": 0.035887
     },
-    "bias": -0.996144
+    "bias": -0.998499
   },
-  "samples_trained": 21219,
+  "samples_trained": 21221,
   "last_trained_scan_ts": 0.0,
   "agent": {
-    "correct": 14078,
-    "total": 21219
+    "correct": 14080,
+    "total": 21221
   },
   "baseline": {
     "correct": 6916,
-    "total": 21219
+    "total": 21221
   },
   "by_direction": {
     "LONG": {
@@ -49,23 +49,13 @@
       "total": 10306
     },
     "SHORT": {
-      "agent": 7181,
+      "agent": 7183,
       "baseline": 3588,
-      "total": 10913
+      "total": 10915
     }
   },
   "first_scan_ts": 1518552000.0,
   "pairs": [
-    [
-      0.36416,
-      0.0,
-      -1.136
-    ],
-    [
-      0.4222,
-      1.0,
-      0.744
-    ],
     [
       0.35099,
       0.0,
@@ -15055,11 +15045,19 @@
       0.2265,
       0.0,
       -1.167
+    ],
+    [
+      0.2801,
+      0.0,
+      -1.05
+    ],
+    [
+      0.2772,
+      0.0,
+      -1.041
     ]
   ],
   "recent": [
-    1,
-    1,
     0,
     1,
     0,
@@ -15257,11 +15255,11 @@
     0,
     1,
     0,
+    1,
+    1,
     1
   ],
   "recent_baseline": [
-    0,
-    0,
     1,
     0,
     1,
@@ -15459,6 +15457,8 @@
     1,
     0,
     1,
+    0,
+    0,
     0
   ],
   "curve": [
@@ -20555,14 +20555,6 @@
   "source": "plans-v6-4h",
   "feature_version": "f8",
   "score_pairs": [
-    [
-      0.26,
-      0.0
-    ],
-    [
-      0.64,
-      1.0
-    ],
     [
       0.35,
       0.0
@@ -32554,30 +32546,38 @@
     [
       0.37,
       0.0
+    ],
+    [
+      0.79,
+      0.0
+    ],
+    [
+      0.77,
+      0.0
     ]
   ],
-  "last_event_ts": 1792324800.0,
+  "last_event_ts": 1792353758.257,
   "learning_rate": 0.00424,
   "eval_version": "causal-v1",
   "live": {
-    "n": 105,
-    "auc": 0.427,
-    "ci_low": 0.283,
-    "ci_high": 0.575,
-    "avg_r": -0.006
+    "n": 107,
+    "auc": 0.426,
+    "ci_low": 0.288,
+    "ci_high": 0.571,
+    "avg_r": -0.026
   },
-  "status_reason": "AUC live 0.427 (IC95 0.283-0.575) pe 105 planuri live nu e peste hazard - filtrul nu se aplica",
-  "days_covered": 3168.83,
-  "balanced_agent": 66.36221772294321,
-  "balanced_baseline": 32.5850437263021,
+  "status_reason": "AUC live 0.426 (IC95 0.288-0.571) pe 107 planuri live nu e peste hazard - filtrul nu se aplica",
+  "days_covered": 3169.0,
+  "balanced_agent": 66.36535081921511,
+  "balanced_baseline": 32.58203152120469,
   "balanced_directions": [
     "LONG",
     "SHORT"
   ],
-  "auc": 0.5890129494223322,
-  "auc_score_baseline": 0.5534143201041521,
+  "auc": 0.588952239531996,
+  "auc_score_baseline": 0.5524640612399032,
   "agent_superior": true,
-  "majority_baseline": 68.13333333333334,
+  "majority_baseline": 68.16666666666667,
   "predicted_positive_rate": 5.533333333333333,
   "skew": {
     "ev_ema_fast": [
@@ -32633,7 +32633,7 @@
       35
     ],
     "ev_ichimoku": [
-      75,
+      76,
       74
     ],
     "ev_ma_cross": [
@@ -32649,7 +32649,7 @@
       83
     ],
     "ev_elliott": [
-      61,
+      62,
       76
     ],
     "ev_liq_struct": [
@@ -32657,7 +32657,7 @@
       92
     ],
     "ev_liq_sweep": [
-      9,
+      8,
       7
     ],
     "ev_altseason": [
@@ -32665,7 +32665,7 @@
       100
     ],
     "ev_analyst": [
-      44,
+      42,
       61
     ],
     "ev_fusion": [
