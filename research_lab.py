@@ -52,7 +52,7 @@ def _np():
 def load_series(files, symbols=None):
     """{simbol: [[ts, o, h, l, c, v], ...]} din fisierele Parquet de 4h, cu DuckDB."""
     import duckdb
-    if not files:
+    if not files or (symbols is not None and not list(symbols)):
         return {}
     src = "read_parquet([" + ", ".join("'" + f.replace("'", "''") + "'" for f in files) + "])"
     con = duckdb.connect()
