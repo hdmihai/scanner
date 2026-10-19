@@ -1,11 +1,11 @@
 {
-  "text": "Din 21220 planuri inchise, rata de succes e 32.6%, cu +29.86R cumulat (+0.001R in medie pe plan) si profit factor 1.0. 19 planuri sunt inca deschise. Atentie: 21114 dintre ele sunt din backtest. LIVE, din 2026-09-29: 106 planuri inchise, castig 27.4% (IC 19.8-36.5%), R mediu -0.019R (IC95 -0.472..+0.457R), total -1.99R. Ultimele inchise: #370629 TRX/USDT -1.25R, #370626 LINK/USDT -1.05R, #370628 ALGO/USDT -1.04R. R mediu pe intervalele de scor cu destule date (IC95 pe blocuri de timp) - toate (0-19, 20-39, 40-59, 60-79, 80-99) in marja zgomotului (IC95 al R-ului mediu include zero). Poarta pe aceste cifre e dezactivata (USE_DECISION_GATE=false; dovada walk-forward e in auto-audit): ele se afiseaza, dar nu decid emiterea planurilor. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (AUC live 0.438 (IC95 0.289-0.576) pe 106 planuri live nu e peste hazard - filtrul nu se aplica). Auto-auditul are 3 imbunatatiri deschise (1 mari, 2 medii, 0 mici); cea mai importanta: Semnalul nu are avantaj masurabil recent. Laboratorul (model invatat din memorie, gbm): stare SHADOW - trece walk-forward si perioada rezervata; asteapta confirmarea live (0/60 alegeri incheiate). Walk-forward +0.071R (IC95 +0.018..+0.130) pe alegere, n=8467; perioada rezervata +0.092R (IC95 -0.013..+0.201); test inainte (live, tot universul): 0 alegeri incheiate.",
+  "text": "Din 21220 planuri inchise, rata de succes e 32.6%, cu +29.86R cumulat (+0.001R in medie pe plan) si profit factor 1.0. 20 planuri sunt inca deschise. Atentie: 21114 dintre ele sunt din backtest. LIVE, din 2026-09-29: 106 planuri inchise, castig 27.4% (IC 19.8-36.5%), R mediu -0.019R (IC95 -0.472..+0.457R), total -1.99R. Ultimele inchise: #370629 TRX/USDT -1.25R, #370626 LINK/USDT -1.05R, #370628 ALGO/USDT -1.04R. R mediu pe intervalele de scor cu destule date (IC95 pe blocuri de timp) - toate (0-19, 20-39, 40-59, 60-79, 80-99) in marja zgomotului (IC95 al R-ului mediu include zero). Poarta pe aceste cifre e dezactivata (USE_DECISION_GATE=false; dovada walk-forward e in auto-audit): ele se afiseaza, dar nu decid emiterea planurilor. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (AUC live 0.438 (IC95 0.289-0.576) pe 106 planuri live nu e peste hazard - filtrul nu se aplica). Auto-auditul are 3 imbunatatiri deschise (1 mari, 2 medii, 0 mici); cea mai importanta: Semnalul nu are avantaj masurabil recent. Laboratorul (model invatat din memorie, gbm): stare SHADOW - trece walk-forward si perioada rezervata; asteapta confirmarea live (0/60 alegeri incheiate). Walk-forward +0.071R (IC95 +0.018..+0.130) pe alegere, n=8467; perioada rezervata +0.092R (IC95 -0.013..+0.201); test inainte (live, tot universul): 0 alegeri incheiate.",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-10-19 19:33 UTC",
+    "scan_time": "2026-10-19 20:34 UTC",
     "universe_size": 30,
-    "plans_total": 27987,
-    "plans_open": 19,
+    "plans_total": 27989,
+    "plans_open": 20,
     "plans_closed": 21220,
     "legacy_closed": 0,
     "legacy_total_r": null,
@@ -74,6 +74,18 @@
     ],
     "open_now": [
       {
+        "id": 370639,
+        "symbol": "AVAX/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
+        "id": 370638,
+        "symbol": "THETA/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
         "id": 370637,
         "symbol": "XRP/USDT",
         "direction": "SHORT",
@@ -88,18 +100,6 @@
       {
         "id": 370635,
         "symbol": "LINK/USDT",
-        "direction": "SHORT",
-        "state": "INTRARE ATINSA - pozitie activa"
-      },
-      {
-        "id": 370634,
-        "symbol": "POL/USDT",
-        "direction": "SHORT",
-        "state": "INTRARE ATINSA - pozitie activa"
-      },
-      {
-        "id": 370633,
-        "symbol": "ATOM/USDT",
         "direction": "SHORT",
         "state": "INTRARE ATINSA - pozitie activa"
       }
@@ -238,8 +238,8 @@
           "profit_factor": 1.94
         }
       },
-      "no_entry": 40,
-      "open": 19,
+      "no_entry": 41,
+      "open": 20,
       "recent": [
         {
           "id": 370629,
@@ -354,7 +354,7 @@
       "Real vs simulat: pe aceeasi perioada (2026-09-29 - 2026-10-16, 182 planuri simulate) +0.205R/plan (IC95 -0.400..+0.795), in marja statistica; fata de tot istoricul simulat -0.020R/plan (IC95 -0.421..+0.518), in marja statistica.",
       "Agentul pe date reale: AUC 0.438 (IC 0.289-0.576) pe 106/100 planuri necesare confirmarii.",
       "Ultimele inchise live: #370629 TRX/USDT -1.25R, #370626 LINK/USDT -1.05R, #370628 ALGO/USDT -1.04R.",
-      "Deschise acum: 19; anulate fara intrare (pretul nu a revenit): 40."
+      "Deschise acum: 20; anulate fara intrare (pretul nu a revenit): 41."
     ],
     "simulated": [
       "Backtest 2018-02-13-azi (regenerat 2026-10-11 20:52 UTC): 21114 planuri inchise, castig 32.6%, R mediu +0.002R, total +31.85R, profit factor 1.0.",
