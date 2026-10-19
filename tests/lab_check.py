@@ -291,6 +291,29 @@ def audit_lever_check():
        f"parghia laboratorului in tabel: {lab_rows and lab_rows[0]['evidence']}")
 
 
+def first_run_check():
+    """Prima rulare: nu exista instantanee, deci lista de monede ceruta e goala. Interogarea nu are voie sa cada
+    (la productie a dat 'syntax error near )' din `symbol IN ()`)."""
+    try:
+        import duckdb  # noqa: F401
+        import research_lab as R
+    except ImportError as e:
+        print(f"  --  sar testul primei rulari ({e})")
+        return
+    with tempfile.TemporaryDirectory() as d:
+        pq = os.path.join(d, "c.parquet")
+        _write_parquet(pq, [("A/USDT", 1_600_000_000_000 + i * 14_400_000, 1.0, 1.1, 0.9, 1.0, 10.0) for i in range(5)])
+        try:
+            empty = R.load_series([pq], [])
+            some = R.load_series([pq], ["A/USDT"])
+            none = R.load_series([], ["A/USDT"])
+            good = empty == {} and none == {} and len(some.get("A/USDT", [])) == 5
+        except Exception as e:  # noqa: BLE001
+            print("    " + repr(e))
+            good = False
+    ok(good, "load_series cu lista goala de monede nu cade (prima rulare, fara instantanee)")
+
+
 def main():
     print("LABORATORUL")
     features_check()
@@ -299,6 +322,7 @@ def main():
     select_promotion_check()
     live_snapshot_check()
     audit_lever_check()
+    first_run_check()
     end_to_end()
     print("\nLABORATOR: " + ("RESPINS - " + "; ".join(FAILS) if FAILS else "TRECUT"))
     return 1 if FAILS else 0
