@@ -24,18 +24,20 @@
     }
   },
   "rebuild_removed_live": [],
-  "when": "2026-10-20 19:30 UTC",
-  "ts": 1792524658.8137052,
-  "checked": 27986,
-  "reevaluated": 135,
-  "live_flagged": 0,
-  "removed_now": 0,
+  "when": "2026-10-20 20:30 UTC",
+  "ts": 1792528255.6447535,
+  "checked": 27988,
+  "reevaluated": 112,
+  "live_flagged": 3,
+  "removed_now": 3,
   "blocked": null,
   "backtest_flagged": 0,
   "backtest_examples": [],
-  "by_reason": {},
+  "by_reason": {
+    "rezultat contrazis de lumanarile reale": 3
+  },
   "pending_live": [],
-  "retrained": false,
+  "retrained": true,
   "epoch": 2,
   "removed": [
     {
@@ -481,6 +483,42 @@
       "created_ts": 1791119448.2476196,
       "reason": "rezultat contrazis de lumanarile reale: SL_HIT 1.424R in memorie, NO_ENTRY 0.0R la reevaluare",
       "removed": "2026-10-20 12:28 UTC"
+    },
+    {
+      "id": 250198,
+      "symbol": "MANA/USDT",
+      "direction": "LONG",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": -1.013,
+      "created_ts": 1791119450.7842693,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.013R in memorie, NO_ENTRY 0.0R la reevaluare",
+      "removed": "2026-10-20 20:30 UTC"
+    },
+    {
+      "id": 250199,
+      "symbol": "SEI/USDT",
+      "direction": "LONG",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": -1.042,
+      "created_ts": 1791119451.6677294,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.042R in memorie, NO_ENTRY 0.0R la reevaluare",
+      "removed": "2026-10-20 20:30 UTC"
+    },
+    {
+      "id": 271744,
+      "symbol": "AVAX/USDT",
+      "direction": "LONG",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": -1.054,
+      "created_ts": 1791159568.5204642,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.054R in memorie, SL_HIT 0.917R la reevaluare",
+      "removed": "2026-10-20 20:30 UTC"
     }
   ]
 }
