@@ -24,7 +24,7 @@ exceptie: o bursa care nu raspunde nu are voie sa opreasca scanarea.
 import time
 
 # Vocabularul capabilitatilor e al portului (comun nucleului si adaptoarelor).
-from ports.market_data import (ALL_CAPS, CAP_OHLCV, CAP_OPEN_INTEREST,  # noqa: F401,E402
+from ports.market_data import (ALL_CAPS, CAP_FUNDING, CAP_OHLCV, CAP_OPEN_INTEREST,  # noqa: F401,E402
                                CAP_ORDERBOOK_HISTORY, CAP_ORDERBOOK_LIVE, CAP_TRADES_LIVE)
 
 
@@ -100,6 +100,11 @@ class ExchangeAdapter:
                     card["available"].append(CAP_OPEN_INTEREST)
             except Exception:
                 pass
+        if CAP_FUNDING in self.declared:
+            try:
+                f=ex.fetch_funding_rate_history(sym,limit=10)
+                if f: card["available"].append(CAP_FUNDING)
+            except: pass
         if CAP_TRADES_LIVE in self.declared:
             try:
                 tr = ex.fetch_trades(sym, limit=50)

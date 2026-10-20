@@ -17,9 +17,10 @@ CAP_ORDERBOOK_HISTORY = "orderbook_history"
 # Open interest curent (ccxt fetch_open_interest). Rafineaza harta de lichidari;
 # lipsa lui schimba magnitudinea, nu forma.
 CAP_OPEN_INTEREST = "open_interest"
+CAP_FUNDING = "funding"
 
 ALL_CAPS = [CAP_OHLCV, CAP_ORDERBOOK_LIVE, CAP_TRADES_LIVE,
-            CAP_ORDERBOOK_HISTORY, CAP_OPEN_INTEREST]
+            CAP_ORDERBOOK_HISTORY, CAP_OPEN_INTEREST, CAP_FUNDING]
 
 
 class MarketData(Protocol):
@@ -36,6 +37,10 @@ class MarketData(Protocol):
     def fetch_trades(self, symbol, since=None, limit=None, params=None): ...
 
     def fetch_open_interest(self, symbol, params=None): ...
+
+    def fetch_funding_rate_history(self, symbol, since=None, limit=None, params=None): ...
+
+    def fetch_open_interest_history(self, symbol, timeframe="1h", since=None, limit=None, params=None): ...
 
 
 class Venues(Protocol):

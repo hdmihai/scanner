@@ -58,6 +58,7 @@ import os
 # nucleul importa DOAR din nucleu (garda: check_core_is_pure)
 from core import evidence as ev_mod
 from core import plans as plan_tracker
+from core import derivatives
 
 # Legata de geometria planurilor: v2 intra la piata, v3 intra pe pullback.
 # Acelasi vector de caracteristici duce la rezultate diferite sub cele doua
@@ -95,7 +96,7 @@ STATE_SOURCE = current_source()
 # Masurat inainte: greutatea `is_long` ajunsese -1.93 si domina tot restul -
 # modelul memorase regimul de piata, nu o relatie reala.
 BASE_FEATURES = ["trend", "momentum", "volatility", "volume", "persistence_n"]
-FEATURES = BASE_FEATURES + ev_mod.FEATURE_KEYS
+FEATURES = BASE_FEATURES + ev_mod.FEATURE_KEYS + derivatives.FEATURE_KEYS
 
 LEARNING_RATE = 0.05            # doar valoarea initiala a obiectului; antrenarea foloseste learning_rate(n)
 L2 = 1e-4
@@ -336,6 +337,8 @@ def extract_features(result):
         stored = ev_mod.evidence_features(result["evidence"], result.get("direction"))
     for k in ev_mod.FEATURE_KEYS:
         feats[k] = float(stored.get(k, 0.0))
+    for k in derivatives.FEATURE_KEYS:
+        feats[k] = float(comp.get(k, 0.0))
     # CARANTINA decisa de modulul selfrepair (data/self_check.json): o caracteristica al carei calcul a fost
     # gasit incoerent valoreaza 0 - la antrenare SI la predictie, deci agentul
     # nici nu invata din ea, nici nu decide pe baza ei, pana iese din carantina.
