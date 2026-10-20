@@ -7,7 +7,7 @@ si curata. Singura bursa cu arhive publice de order book istoric - declarate pen
 corectitudine, dar nefolosibile la scara noastra (zeci de mii de GB).
 """
 
-from adapters.exchanges.base import (CAP_OHLCV, CAP_OPEN_INTEREST, CAP_ORDERBOOK_HISTORY,
+from adapters.exchanges.base import (CAP_FUNDING, CAP_OHLCV, CAP_OPEN_INTEREST, CAP_ORDERBOOK_HISTORY,
                                      CAP_ORDERBOOK_LIVE, CAP_TRADES_LIVE, ExchangeAdapter)
 
 
@@ -15,6 +15,6 @@ class Bybit(ExchangeAdapter):
     id = "bybit"
     label = "Bybit"
     declared = (CAP_OHLCV, CAP_ORDERBOOK_LIVE, CAP_TRADES_LIVE, CAP_ORDERBOOK_HISTORY,
-                CAP_OPEN_INTEREST)
+                CAP_OPEN_INTEREST, CAP_FUNDING)
     note = ("Blocata geografic pentru runner-ele GitHub (raspunde 403); ramane afisata "
             "ca indisponibila, cu motivul exact.")

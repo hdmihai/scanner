@@ -41,6 +41,7 @@ from datetime import datetime, timezone
 
 # Nucleul importa DOAR din nucleu si din porturi (garda: check_core_is_pure).
 from core import agent as ai_agent
+from core import derivatives
 from core import elliott as ew_mod
 from core import evidence as ev_mod
 from core import indicators
@@ -51,7 +52,7 @@ from core import market_structure as struct_mod
 from core import plans as plan_tracker
 from core import relative as rel_mod
 from core import zones as zones_mod
-from ports.market_data import CAP_OHLCV, CAP_ORDERBOOK_LIVE
+from ports.market_data import CAP_FUNDING, CAP_OHLCV, CAP_OPEN_INTEREST, CAP_ORDERBOOK_LIVE
 from core.analysis import (_open_plan_for_base, build_signal_context, build_symbol_details,
                            fetch_liquidity_levels, light_details, proposal_record)
 from core.config import (CHART_FILE, CONFIG, DEFAULT_WEIGHTS, DETAILS_FILE, EXCHANGES_DIR,
@@ -63,6 +64,21 @@ from core.geometry import compute_fibonacci, compute_structure_levels, compute_t
 from core.learning import compute_persistence_and_age, evaluate_and_learn
 from core.scoring import ema_series_full, round_price, rsi, score_symbol
 from core.universe import build_eligible_pairs
+
+
+def _derivatives_into(target,ohlcv=None,order_book=None,exchange=None,symbol=None,caps=None):
+    fh=oi=None
+    if exchange and symbol and caps:
+        if CAP_FUNDING in caps:
+            try: fh=exchange.fetch_funding_rate_history(symbol,limit=50)
+            except: pass
+        if CAP_OPEN_INTEREST in caps:
+            try: oi=exchange.fetch_open_interest_history(symbol,timeframe="1h",limit=50)
+            except: pass
+    c=target.get("components") or {}
+    c.update(derivatives.derivatives_features(ohlcv=ohlcv,order_book=order_book,funding_history=fh,oi_history=oi))
+    target["components"]=c
+    return target
 
 
 # ================================ PORTURI ===================================
@@ -276,6 +292,7 @@ def analyze_exchange(adapter, handle, card, ctx):
                                                               sig.get("price")))
         if not levels:
             continue
+        _derivatives_into(sig_e,ohlcv=cache[sig["symbol"]],order_book=book,exchange=handle,symbol=sig["symbol"],caps=caps)
         sig_e["neighbors"] = ai_agent.comparable_entries(ai_agent.extract_features(sig_e), ctx["closed"])
         agent_pred = ai_agent.predict_for_signal(ctx["agent_model"], ctx["agent_state"], sig_e)
         sig_e = {**sig_e, "bar_seconds": timeframe_seconds()}
@@ -918,6 +935,7 @@ def main():
             print(f"  [!] {sig['symbol']}: niveluri invalide, sar peste")
             continue
 
+        _derivatives_into(sig,ohlcv=candles,order_book=book_levels,exchange=exchange,symbol=sig["symbol"],caps=active_caps)
         # Verdictul planurilor comparabile: se calculeaza din memoria acumulata
         # si se salveaza pe plan, ca sa apara in dashboard exact asa cum a fost
         # la momentul deciziei - nu recalculat mai tarziu, cu alte date.
