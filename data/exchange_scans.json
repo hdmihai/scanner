@@ -30,11 +30,24 @@
         "THETA/USDT",
         "TRX/USDT",
         "XRP/USDT",
-        "ZEC/USDT",
+        "ZEC/USDC",
         "ZEN/USDT"
       ],
       "missing": [],
       "results": [
+        {
+          "symbol": "ZEC/USDC",
+          "direction": "LONG",
+          "score": 64,
+          "price": 1356.05,
+          "atr": 46.715714,
+          "components": {
+            "trend": 0.308,
+            "momentum": 0.971,
+            "volatility": 0.278,
+            "volume": 1.0
+          }
+        },
         {
           "symbol": "DASH/USDT",
           "direction": "LONG",
@@ -59,19 +72,6 @@
             "momentum": 0.031,
             "volatility": 0.912,
             "volume": 1.0
-          }
-        },
-        {
-          "symbol": "ZEC/USDT",
-          "direction": "LONG",
-          "score": 51,
-          "price": 1356.89,
-          "atr": 46.706429,
-          "components": {
-            "trend": 0.308,
-            "momentum": 0.971,
-            "volatility": 0.279,
-            "volume": 0.464
           }
         },
         {
@@ -189,13 +189,13 @@
           "macd_hist": 275.68188811,
           "position": "IN VALUE AREA"
         },
-        "ZEC/USDT": {
+        "ZEC/USDC": {
           "supertrend": "BULLISH",
-          "vwap": 1214.8658562929434,
-          "poc": 1159.989375,
-          "vah": 1435.61020833,
-          "val": 1104.86520833,
-          "macd_hist": 23.23138135,
+          "vwap": 1272.8219292530182,
+          "poc": 1356.15875,
+          "vah": 1356.15875,
+          "val": 1110.97625,
+          "macd_hist": 23.33571731,
           "position": "IN VALUE AREA"
         },
         "NEAR/USDT": {
@@ -569,8 +569,8 @@
       "primary": false,
       "analysis": "completa",
       "proposals": 11,
-      "duration_s": 14.7,
-      "scan_time": "2026-10-21 20:07 UTC"
+      "duration_s": 16.5,
+      "scan_time": "2026-10-21 21:07 UTC"
     },
     "gate": {
       "resolved": [
@@ -858,8 +858,8 @@
       "primary": false,
       "analysis": "completa",
       "proposals": 11,
-      "duration_s": 18.9,
-      "scan_time": "2026-10-21 20:07 UTC"
+      "duration_s": 22.1,
+      "scan_time": "2026-10-21 21:07 UTC"
     },
     "mexc": {
       "resolved": [
@@ -1147,8 +1147,8 @@
       "primary": false,
       "analysis": "completa",
       "proposals": 11,
-      "duration_s": 13.8,
-      "scan_time": "2026-10-21 20:07 UTC"
+      "duration_s": 15.3,
+      "scan_time": "2026-10-21 21:07 UTC"
     },
     "kraken": {
       "resolved": [
@@ -1414,8 +1414,8 @@
       "primary": false,
       "analysis": "completa",
       "proposals": 10,
-      "duration_s": 92.8,
-      "scan_time": "2026-10-21 20:07 UTC"
+      "duration_s": 92.9,
+      "scan_time": "2026-10-21 21:07 UTC"
     }
   },
   "primary": "okx",
