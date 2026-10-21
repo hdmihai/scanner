@@ -971,7 +971,7 @@ def decide(calibration, signal, agent_pred=None, bucket_size=20):
     source = f"calibrare ({cal['win_rate']}%, n={cal['total']})"
     agent_used = False
     rank_cut = (agent_pred or {}).get("rank_cut")
-    if (agent_active and agent_p is not None and rank_cut is not None
+    if (USE_AGENT_FILTER and agent_active and agent_p is not None and rank_cut is not None
             and (agent_pred or {}).get("superior") and agent_p < rank_cut):
         return {"action": "SKIP", "mode": "EXPLOATARE",
                 "reason": (f"agentul pune semnalul in treimea de jos "
