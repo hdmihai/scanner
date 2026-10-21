@@ -86,8 +86,8 @@ def health_items(history, agent_state, plans_store, self_check, altseason, runs=
     # avertisment doar daca, cu 100+ planuri live, ordonarea tot nu se confirma, si
     # problema daca e semnificativ mai slaba decat hazardul.
     lvl = ("ERROR" if worse else "WARN" if (n_live >= 100 and not conf and a.get("status") != "ACTIVE") else "OK")
-    add(lvl, "Agent AI", a.get("status") or "n/d",
-        ((f"confirmare live {n_live}/100 planuri"
+    add(lvl, "Agent AI (filtru · prag 100)", a.get("status") or "n/d",
+        ((f"confirmare live {n_live}/100 planuri semnale proprii"
           + (f" &middot; AUC live {lv['auc']:.3f} (IC {lv.get('ci_low')}-{lv.get('ci_high')})" if lv.get("auc") is not None else "")
           + ("" if a.get("status") == "ACTIVE" or n_live >= 100 else " &middot; invata, normal pana la 100"))
          if lv else "fara date live inca"))

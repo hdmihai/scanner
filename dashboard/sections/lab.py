@@ -171,4 +171,4 @@ def summary(rep, live_doc):
     lv = (rep.get("live") or {}).get("forward") or {}
     return [f"Stare: {rep.get('state')} - {rep.get('reason', '')}",
             f"Walk-forward {_r(ch)}/alegere, n={ch.get('n', 0):,} · rezervat {_r(ho)}",
-            f"Test inainte (live): {lv.get('n', 0)} alegeri incheiate {('· ' + _r(lv)) if lv.get('n') else ''}".strip()]
+            f"Laborator (prag 60 · univers bursă): {lv.get('n', 0)} alegeri incheiate {('· ' + _r(lv)) if lv.get('n') else ''}".strip()]
