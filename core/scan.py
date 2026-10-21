@@ -67,28 +67,9 @@ from core.universe import build_eligible_pairs
 
 
 def _derivatives_into(target,ohlcv=None,order_book=None,exchange=None,symbol=None,caps=None):
-    """Robust: incearca direct exchange daca datele primite nu sunt in format ccxt.
-    Cost: 1-3 apeluri API extra per simbol. Beneficiu: features functionale pe orice exchange."""
-    fh=oi=None
-    ob_raw=order_book
-    # Verifica daca order_book e in format ccxt (bids/asks ca liste de [price, qty])
-    if not (ob_raw and ob_raw.get("bids") and ob_raw.get("asks")
-            and isinstance(ob_raw["bids"][0], (list, tuple))):
-        ob_raw=None
-    if exchange is not None and symbol is not None:
-        # Order book brut - daca nu l-am primit valid, cer direct
-        if ob_raw is None:
-            try: ob_raw=exchange.fetch_order_book(symbol,limit=50)
-            except Exception: pass
-        # Funding - incearca direct, indiferent de caps (fallback)
-        try: fh=exchange.fetch_funding_rate_history(symbol,limit=50)
-        except Exception: pass
-        # OI history - incearca direct, indiferent de caps (fallback)
-        try: oi=exchange.fetch_open_interest_history(symbol,timeframe="1h",limit=50)
-        except Exception: pass
-    c=target.get("components") or {}
-    c.update(derivatives.derivatives_features(ohlcv=ohlcv,order_book=ob_raw,funding_history=fh,oi_history=oi))
-    target["components"]=c
+    c = target.get("components") or {}
+    c.update(derivatives.derivatives_features(ohlcv=ohlcv))
+    target["components"] = c
     return target
 
 
