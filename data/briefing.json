@@ -1,11 +1,11 @@
 {
-  "text": "Din 21223 planuri inchise, rata de succes e 32.6%, cu +15.85R cumulat (+0.001R in medie pe plan) si profit factor 1.0. 14 planuri sunt inca deschise. Atentie: 21114 dintre ele sunt din backtest. LIVE, din 2026-09-29: 109 planuri inchise, castig 26.6% (IC 19.2-35.6%), R mediu -0.147R (IC95 -0.580..+0.319R), total -16.00R. Ultimele inchise: #370630 ALGO/USDT -1.04R, #370640 FLOW/USDT -1.04R, #342786 ETH/USDT +0.55R. R mediu pe intervalele de scor cu destule date (IC95 pe blocuri de timp) - toate (0-19, 20-39, 40-59, 60-79, 80-99) in marja zgomotului (IC95 al R-ului mediu include zero). Poarta pe aceste cifre e dezactivata (USE_DECISION_GATE=false; dovada walk-forward e in auto-audit): ele se afiseaza, dar nu decid emiterea planurilor. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (AUC live 0.411 (IC95 0.277-0.554) pe 109 planuri live nu e peste hazard - filtrul nu se aplica). Auto-auditul are 3 imbunatatiri deschise (1 mari, 2 medii, 0 mici); cea mai importanta: Semnalul nu are avantaj masurabil recent. Laboratorul (model invatat din memorie, gbm): stare CERCETARE - walk-forward fara avantaj dovedit: +0.057R/alegere (IC95 -0.001..+0.117, n=8356). Walk-forward +0.057R (IC95 -0.001..+0.117) pe alegere, n=8356; perioada rezervata +0.057R (IC95 -0.055..+0.164); test inainte (live, tot universul): 1 alegeri incheiate, +1.959R.",
+  "text": "Din 21223 planuri inchise, rata de succes e 32.6%, cu +15.85R cumulat (+0.001R in medie pe plan) si profit factor 1.0. 15 planuri sunt inca deschise. Atentie: 21114 dintre ele sunt din backtest. LIVE, din 2026-09-29: 109 planuri inchise, castig 26.6% (IC 19.2-35.6%), R mediu -0.147R (IC95 -0.580..+0.319R), total -16.00R. Ultimele inchise: #370630 ALGO/USDT -1.04R, #370640 FLOW/USDT -1.04R, #342786 ETH/USDT +0.55R. R mediu pe intervalele de scor cu destule date (IC95 pe blocuri de timp) - toate (0-19, 20-39, 40-59, 60-79, 80-99) in marja zgomotului (IC95 al R-ului mediu include zero). Poarta pe aceste cifre e dezactivata (USE_DECISION_GATE=false; dovada walk-forward e in auto-audit): ele se afiseaza, dar nu decid emiterea planurilor. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (AUC live 0.411 (IC95 0.277-0.554) pe 109 planuri live nu e peste hazard - filtrul nu se aplica). Auto-auditul are 3 imbunatatiri deschise (1 mari, 2 medii, 0 mici); cea mai importanta: Semnalul nu are avantaj masurabil recent. Laboratorul (model invatat din memorie, gbm): stare CERCETARE - walk-forward fara avantaj dovedit: +0.057R/alegere (IC95 -0.001..+0.117, n=8356). Walk-forward +0.057R (IC95 -0.001..+0.117) pe alegere, n=8356; perioada rezervata +0.057R (IC95 -0.055..+0.164); test inainte (live, tot universul): 1 alegeri incheiate, +1.959R.",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-10-21 07:37 UTC",
+    "scan_time": "2026-10-21 08:37 UTC",
     "universe_size": 30,
-    "plans_total": 27986,
-    "plans_open": 14,
+    "plans_total": 27987,
+    "plans_open": 15,
     "plans_closed": 21223,
     "legacy_closed": 0,
     "legacy_total_r": null,
@@ -74,6 +74,12 @@
     ],
     "open_now": [
       {
+        "id": 370648,
+        "symbol": "SEI/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
         "id": 370647,
         "symbol": "AVAX/USDT",
         "direction": "SHORT",
@@ -83,7 +89,7 @@
         "id": 370646,
         "symbol": "FIL/USDT",
         "direction": "SHORT",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
+        "state": "INTRARE ATINSA - pozitie activa"
       },
       {
         "id": 370645,
@@ -94,12 +100,6 @@
       {
         "id": 370644,
         "symbol": "GRAM/USDT",
-        "direction": "SHORT",
-        "state": "INTRARE ATINSA - pozitie activa"
-      },
-      {
-        "id": 370643,
-        "symbol": "POL/USDT",
         "direction": "SHORT",
         "state": "INTRARE ATINSA - pozitie activa"
       }
@@ -243,7 +243,7 @@
         }
       },
       "no_entry": 41,
-      "open": 14,
+      "open": 15,
       "recent": [
         {
           "id": 370630,
@@ -358,7 +358,7 @@
       "Real vs simulat: pe aceeasi perioada (2026-09-29 - 2026-10-16, 175 planuri simulate) +0.137R/plan (IC95 -0.513..+0.731), in marja statistica; fata de tot istoricul simulat -0.148R/plan (IC95 -0.566..+0.386), in marja statistica.",
       "Agentul pe date reale: AUC 0.411 (IC 0.277-0.554) pe 109/100 planuri necesare confirmarii.",
       "Ultimele inchise live: #370630 ALGO/USDT -1.04R, #370640 FLOW/USDT -1.04R, #342786 ETH/USDT +0.55R.",
-      "Deschise acum: 14; anulate fara intrare (pretul nu a revenit): 41."
+      "Deschise acum: 15; anulate fara intrare (pretul nu a revenit): 41."
     ],
     "simulated": [
       "Backtest 2018-02-13-azi (regenerat 2026-10-11 20:52 UTC): 21114 planuri inchise, castig 32.6%, R mediu +0.002R, total +31.85R, profit factor 1.0.",
