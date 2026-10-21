@@ -430,19 +430,6 @@
       "missing": [],
       "results": [
         {
-          "symbol": "CHZ/USDT",
-          "direction": "SHORT",
-          "score": 68,
-          "price": 0.01373,
-          "atr": 0.00029857143,
-          "components": {
-            "trend": 0.575,
-            "momentum": 0.275,
-            "volatility": 0.913,
-            "volume": 0.975
-          }
-        },
-        {
           "symbol": "ICP/USDT",
           "direction": "SHORT",
           "score": 59,
@@ -466,6 +453,19 @@
             "momentum": 0.147,
             "volatility": 0.849,
             "volume": 0.797
+          }
+        },
+        {
+          "symbol": "CHZ/USDT",
+          "direction": "SHORT",
+          "score": 55,
+          "price": 0.01388,
+          "atr": 0.00029142857,
+          "components": {
+            "trend": 0.544,
+            "momentum": 0.151,
+            "volatility": 0.95,
+            "volume": 0.547
           }
         },
         {
@@ -745,11 +745,11 @@
         },
         "CHZ/USDT": {
           "supertrend": "BEARISH",
-          "vwap": 0.015203319021578723,
+          "vwap": 0.015150587228639304,
           "poc": 0.0166875,
           "vah": 0.0170975,
           "val": 0.0144325,
-          "macd_hist": 2.915e-05,
+          "macd_hist": 4.402e-05,
           "position": "SUB VAL"
         },
         "FLOW/USDT": {
@@ -767,13 +767,13 @@
       "primary": false,
       "analysis": "completa",
       "proposals": 8,
-      "duration_s": 12.4,
-      "scan_time": "2026-10-21 00:52 UTC"
+      "duration_s": 12.0,
+      "scan_time": "2026-10-21 01:52 UTC"
     },
     "gate": {
       "resolved": [
         "ADA/USDT",
-        "ALGO/USDC",
+        "ALGO/USDT",
         "ATOM/USDT",
         "AVAX/USDT",
         "AXS/USDT",
@@ -898,6 +898,19 @@
           }
         },
         {
+          "symbol": "ALGO/USDT",
+          "direction": "SHORT",
+          "score": 42,
+          "price": 0.11376,
+          "atr": 0.00251,
+          "components": {
+            "trend": 0.419,
+            "momentum": 0.024,
+            "volatility": 0.897,
+            "volume": 0.347
+          }
+        },
+        {
           "symbol": "GRAM/USDT",
           "direction": "SHORT",
           "score": 40,
@@ -934,19 +947,6 @@
             "momentum": 0.226,
             "volatility": 0.448,
             "volume": 0.36
-          }
-        },
-        {
-          "symbol": "ALGO/USDC",
-          "direction": "SHORT",
-          "score": 36,
-          "price": 0.11358,
-          "atr": 0.0024535714,
-          "components": {
-            "trend": 0.422,
-            "momentum": 0.031,
-            "volatility": 0.92,
-            "volume": 0.069
           }
         },
         {
@@ -1093,13 +1093,13 @@
           "macd_hist": 0.00015333,
           "position": "IN VALUE AREA"
         },
-        "ALGO/USDC": {
+        "ALGO/USDT": {
           "supertrend": "BEARISH",
-          "vwap": 0.11588038195165722,
-          "poc": 0.11048187,
-          "vah": 0.13216062,
-          "val": 0.09843813,
-          "macd_hist": 0.00063983,
+          "vwap": 0.12096733428891969,
+          "poc": 0.11540208,
+          "vah": 0.13721958,
+          "val": 0.10570542,
+          "macd_hist": 0.0006393,
           "position": "IN VALUE AREA"
         },
         "ATOM/USDT": {
@@ -1144,8 +1144,8 @@
       "primary": false,
       "analysis": "completa",
       "proposals": 8,
-      "duration_s": 17.5,
-      "scan_time": "2026-10-21 00:52 UTC"
+      "duration_s": 18.9,
+      "scan_time": "2026-10-21 01:52 UTC"
     },
     "mexc": {
       "resolved": [
@@ -1543,8 +1543,8 @@
       "primary": false,
       "analysis": "completa",
       "proposals": 8,
-      "duration_s": 12.4,
-      "scan_time": "2026-10-21 00:52 UTC"
+      "duration_s": 13.7,
+      "scan_time": "2026-10-21 01:52 UTC"
     },
     "kraken": {
       "resolved": [
@@ -1788,15 +1788,6 @@
           "macd_hist": 0.00313571,
           "position": "IN VALUE AREA"
         },
-        "AVAX/USD": {
-          "supertrend": "BEARISH",
-          "vwap": 10.553964162859252,
-          "poc": 11.0994375,
-          "vah": 11.30089583,
-          "val": 9.8906875,
-          "macd_hist": 0.02566126,
-          "position": "SUB VAL"
-        },
         "ADA/USD": {
           "supertrend": "BEARISH",
           "vwap": 0.24516337607903596,
@@ -1805,6 +1796,15 @@
           "val": 0.21517577,
           "macd_hist": 0.00112929,
           "position": "IN VALUE AREA"
+        },
+        "AVAX/USD": {
+          "supertrend": "BEARISH",
+          "vwap": 10.553964162859252,
+          "poc": 11.0994375,
+          "vah": 11.30089583,
+          "val": 9.8906875,
+          "macd_hist": 0.02566126,
+          "position": "SUB VAL"
         },
         "DOT/USD": {
           "supertrend": "BEARISH",
@@ -1887,15 +1887,6 @@
           "macd_hist": 0.00018653,
           "position": "IN VALUE AREA"
         },
-        "AXS/USD": {
-          "supertrend": "BEARISH",
-          "vwap": 1.1882563996603956,
-          "poc": 1.2031875,
-          "vah": 1.29835417,
-          "val": 0.9890625,
-          "macd_hist": 0.00907451,
-          "position": "IN VALUE AREA"
-        },
         "FLOW/USD": {
           "supertrend": "BEARISH",
           "vwap": 0.03289376522317445,
@@ -1903,6 +1894,15 @@
           "vah": 0.03355417,
           "val": 0.02867917,
           "macd_hist": 0.00014336,
+          "position": "IN VALUE AREA"
+        },
+        "AXS/USD": {
+          "supertrend": "BEARISH",
+          "vwap": 1.1882563996603956,
+          "poc": 1.2031875,
+          "vah": 1.29835417,
+          "val": 0.9890625,
+          "macd_hist": 0.00907451,
           "position": "IN VALUE AREA"
         },
         "CHZ/USD": {
@@ -1921,7 +1921,7 @@
       "analysis": "completa",
       "proposals": 8,
       "duration_s": 80.9,
-      "scan_time": "2026-10-21 00:52 UTC"
+      "scan_time": "2026-10-21 01:52 UTC"
     }
   },
   "primary": "okx",
