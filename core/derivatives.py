@@ -1,9 +1,9 @@
-def ob_imbalance(ob,d=0.01):
+def ob_imbalance(ob, depth_pct=0.01):
     if not ob or not ob.get("bids") or not ob.get("asks"): return {"ob_imbalance":0.0,"ob_spread_bps":0.0}
     try: bb=float(ob["bids"][0][0]); ba=float(ob["asks"][0][0])
     except: return {"ob_imbalance":0.0,"ob_spread_bps":0.0}
     if bb<=0 or ba<=0: return {"ob_imbalance":0.0,"ob_spread_bps":0.0}
-    m=(bb+ba)/2; lo=m*(1-d); hi=m*(1+d); bu=au=0.0
+    m=(bb+ba)/2; lo=m*(1-depth_pct); hi=m*(1+depth_pct); bu=au=0.0
     for p,q in ob["bids"]:
         try:
             if float(p)>=lo: bu+=float(p)*float(q)
