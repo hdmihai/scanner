@@ -1,41 +1,14 @@
 {
-  "scan_time": "2026-10-21 12:53 UTC",
+  "scan_time": "2026-10-21 13:53 UTC",
   "decisions": {
-    "BTC/USDT": {
-      "action": "ISSUE",
-      "mode": "POARTA_DEZACTIVATA",
-      "reason": "poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; dovada walk-forward a portii e evaluata in auto-audit",
-      "calibrated_prob": 29.7,
-      "agent_prob": 0.2741,
-      "elliott_bias": 0.6085,
-      "next_entry": null
-    },
-    "ZEC/USDT": {
-      "action": "ISSUE",
-      "mode": "POARTA_DEZACTIVATA",
-      "reason": "poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; dovada walk-forward a portii e evaluata in auto-audit",
-      "calibrated_prob": 28.8,
-      "agent_prob": 0.231,
-      "elliott_bias": 0.5708,
-      "next_entry": null
-    },
     "ALGO/USDT": {
       "action": "SKIP",
       "mode": "ASTEAPTA_CORECTIA",
-      "reason": "Elliott contrazice planul SHORT (Primary Developing Motive W3 FORMING BULLISH 54%: unda 4 corectiva - continuarea (W5) e asteptata dupa ea). Filtrul ramane activ prin histerezis - efectul nu e distinct de zero (auto-diagnostic, ultimele 3000 planuri (2891 backtest, 109 live): contra Elliott -0.098R, fara conflict -0.023R, diferenta +0.075R (IC95 pe blocuri de timp -0.121..+0.282)). Nivel urmarit pentru intrare: ~0.119858.",
+      "reason": "Elliott contrazice planul SHORT (Primary Developing Motive W3 FORMING BULLISH 54%: unda 4 corectiva - continuarea (W5) e asteptata dupa ea). Filtrul ramane activ prin histerezis - efectul nu e distinct de zero (auto-diagnostic, ultimele 3000 planuri (2891 backtest, 109 live): contra Elliott -0.097R, fara conflict -0.023R, diferenta +0.074R (IC95 pe blocuri de timp -0.123..+0.282)). Nivel urmarit pentru intrare: ~0.119858.",
       "calibrated_prob": 29.7,
-      "agent_prob": 0.2619,
+      "agent_prob": 0.2636,
       "elliott_bias": -0.3191,
       "next_entry": 0.11985781999999999
-    },
-    "FET/USDT": {
-      "action": "ISSUE",
-      "mode": "POARTA_DEZACTIVATA",
-      "reason": "poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; dovada walk-forward a portii e evaluata in auto-audit",
-      "calibrated_prob": 28.8,
-      "agent_prob": 0.2919,
-      "elliott_bias": null,
-      "next_entry": null
     }
   }
 }
