@@ -43,6 +43,18 @@ def health_items(history, agent_state, plans_store, self_check, altseason, runs=
         tiles.append((level,) + a)
         worst = level if rank[level] > rank[worst] else worst
 
+    # STALLED: agentul e antrenat dar ponderile sunt inghetate de prea mult timp -
+    # invatarea ceruta de specificatie nu se mai intampla. Fapt de domeniu produs
+    # de ai_agent.py (learning_status), nu recalculat aici.
+    _ls = (agent_state or {}).get("learning_status")
+    _sd = (agent_state or {}).get("stalled_days")
+    if _ls == "STALLED":
+        add("WARN", "Invatare", "STALLED",
+            f"ponderi inghetate de {_sd} zile - agentul nu isi mai ajusteaza decizia")
+    elif _ls == "ACTIVE":
+        add("OK", "Invatare", "ACTIVE",
+            "ponderile se pot ajusta" if not _sd else f"ajustate acum {_sd} zile")
+
     ts = _scan_times(history)
     n24 = sum(1 for t in ts if now - t <= 86400)
     age = (now - ts[-1]) / 60 if ts else None

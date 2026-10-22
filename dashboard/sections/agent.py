@@ -39,8 +39,13 @@ def render_agent_card(agent_state, audit=None):
     # majoritara (mereu pierdere); ordonarea se vede in AUC fata de scorul brut.
     maj = agent_state.get("majority_baseline")
     auc_a, auc_s = agent_state.get("auc"), agent_state.get("auc_score_baseline")
+    _maj_verdict = ""
+    if ba is not None and maj is not None:
+        _maj_verdict = (' &middot; <strong>SUB majority</strong>' if ba < maj
+                        else ' &middot; peste majority')
     bal_line = ((f'{ba:.1f}% vs euristica {bb:.1f}% (euristica prezice mereu castig)'
-                 + (f' &middot; prag real, mereu pierdere: {maj:.1f}%' if maj is not None else ""))
+                 + (f' &middot; prag real, mereu pierdere: {maj:.1f}%' if maj is not None else "")
+                 + _maj_verdict)
                 if ba is not None else "in curs de acumulare")
     if auc_a is not None and auc_s is not None:
         bal_line += (f'<br><span class="dim">ordonare AUC pe evaluarea dominata de backtest: agent {auc_a:.3f} '

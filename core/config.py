@@ -102,6 +102,10 @@ WEIGHTS_HISTORY_FILE = os.path.join(CONFIG["data_dir"], "weights_history.json")
 # (core/learning.evaluate_and_learn) ramane doar diagnostic. Fara fisier: comportamentul vechi.
 SCORING_POLICY_FILE = os.path.join(CONFIG["data_dir"], "scoring_policy.json")
 
+# STALLED: dupa cate zile de ponderi inghetate (scoring_policy.json frozen) consideram
+# ca agentul NU mai invata. Prag de domeniu (observabilitate), nu de prezentare.
+STALLED_AFTER_DAYS = 7
+
 
 CHART_FILE = os.path.join(CONFIG["data_dir"], "latest_chart.json")
 
