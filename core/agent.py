@@ -51,6 +51,7 @@ Ruleaza dupa scanner:
     python3 crypto_ai_scanner.py && python3 ai_agent.py
 """
 
+import datetime
 import json
 import math
 import os
@@ -428,6 +429,28 @@ def ranking_edge(pairs, frac=1/3, min_top=100):
     # pragul de jos: sub el sunt cele mai slab ordonate semnale
     bottom_cut = ordered[len(ordered) - k][0]
     return round(r_top, 4), round(r_all, 4), len(top), round(bottom_cut, 5)
+
+
+def learning_status(policy, now=None):
+    """Starea de INVATARE a agentului (ortogonala de VALIDATED/DEVELOPING, care e
+    despre scan health). Returneaza (status, days):
+      ("ACTIVE", days)  - ponderile se pot ajusta (sau nu exista policy frozen)
+      ("STALLED", days) - scoring_policy.json inghetat de > STALLED_AFTER_DAYS zile
+    `now` e injectabil pentru testabilitate (default: acum UTC)."""
+    if not policy or not policy.get("frozen"):
+        return "ACTIVE", None
+    since = policy.get("since")
+    if not since:
+        return "ACTIVE", None
+    try:
+        dt = datetime.datetime.strptime(since, "%Y-%m-%d %H:%M UTC").replace(
+            tzinfo=datetime.timezone.utc)
+    except (ValueError, TypeError):
+        return "ACTIVE", None
+    ref = now or datetime.datetime.now(datetime.timezone.utc)
+    days = (ref - dt).days
+    from core.config import STALLED_AFTER_DAYS
+    return ("STALLED" if days > STALLED_AFTER_DAYS else "ACTIVE"), days
 
 
 def majority_class_accuracy(pairs):

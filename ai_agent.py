@@ -30,6 +30,9 @@ PLANS_FILE = os.path.join(DATA_DIR, "plans.json")
 MODEL_FILE = os.path.join(DATA_DIR, "agent_model.json")
 
 
+SCORING_POLICY_FILE = os.path.join(DATA_DIR, "scoring_policy.json")
+
+
 AUDIT_FILE = os.path.join(DATA_DIR, "plan_audit.json")
 DETAILS_FILE = os.path.join(DATA_DIR, "latest_details.json")
 
@@ -307,6 +310,8 @@ def main():
     sa, sb = state["auc"], state["auc_score_baseline"]
     state["agent_superior"] = bool(sa is not None and sb is not None and sa > sb)
     state["majority_baseline"] = _core.majority_class_accuracy(pairs)
+    _pol = load_json(SCORING_POLICY_FILE, None)
+    state["learning_status"], state["stalled_days"] = _core.learning_status(_pol)
     state["predicted_positive_rate"] = _core.predicted_positive_rate(pairs)
     state["skew"], state["skew_excluded"], state["feature_mask"] = _skew, _excl, _mask
     state["pending_features"] = _pending
@@ -332,6 +337,11 @@ def main():
     ppr = state.get("predicted_positive_rate")
     if maj is not None:
         print(f"Prag trivial (clasa majoritara): {maj:.2f}%  <- de batut, nu doar baseline-ul vechi")
+        if ba is not None:
+            if ba < maj:
+                print(f"  [!] SUB majority: agent {ba:.2f}% < {maj:.2f}% (predictia triviala e mai buna)")
+            else:
+                print(f"  Peste majority: agent {ba:.2f}% >= {maj:.2f}%")
     if ppr is not None:
         print(f"Prezice 'castig' in {ppr:.0f}% din cazuri" +
               ("  [!] model degenerat" if ppr < 5 or ppr > 95 else ""))
