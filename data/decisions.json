@@ -1,66 +1,48 @@
 {
-  "scan_time": "2026-10-22 00:17 UTC",
+  "scan_time": "2026-10-22 01:16 UTC",
   "decisions": {
-    "ZEN/USDT": {
-      "action": "ISSUE",
-      "mode": "POARTA_DEZACTIVATA",
-      "reason": "poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; dovada walk-forward a portii e evaluata in auto-audit",
-      "calibrated_prob": 29.7,
-      "agent_prob": 0.1765,
-      "elliott_bias": 0.3182,
-      "next_entry": null
-    },
     "AVAX/USDT": {
       "action": "SKIP",
       "mode": "ASTEAPTA_CORECTIA",
-      "reason": "Elliott contrazice planul SHORT (Primary Motive W5 BEARISH 50%: impulsul pare complet - W5 a atins 9.391, iar pretul a retras 59% din ea; urmeaza corectia A-B-C). Filtrul ramane activ prin histerezis - efectul nu e distinct de zero (auto-diagnostic, ultimele 3000 planuri (2884 backtest, 116 live): contra Elliott -0.096R, fara conflict -0.024R, diferenta +0.072R (IC95 pe blocuri de timp -0.127..+0.282)). Nivel urmarit pentru intrare: ~10.0626.",
+      "reason": "Elliott contrazice planul SHORT (Primary Motive W5 BEARISH 50%: impulsul pare complet - W5 a atins 9.391, iar pretul a retras 59% din ea; urmeaza corectia A-B-C). Filtrul ramane activ prin histerezis - efectul nu e distinct de zero (auto-diagnostic, ultimele 3000 planuri (2884 backtest, 116 live): contra Elliott -0.096R, fara conflict -0.024R, diferenta +0.072R (IC95 pe blocuri de timp -0.124..+0.282)). Nivel urmarit pentru intrare: ~10.0626.",
       "calibrated_prob": 29.7,
-      "agent_prob": 0.2945,
+      "agent_prob": 0.2977,
       "elliott_bias": -0.7,
       "next_entry": 10.06264539
     },
     "ICP/USDT": {
       "action": "SKIP",
       "mode": "ASTEAPTA_CORECTIA",
-      "reason": "Elliott contrazice planul SHORT (Primary Motive W5 BEARISH 54%: impulsul pare complet - W5 a atins 2.796, iar pretul a retras 64% din ea; urmeaza corectia A-B-C). Filtrul ramane activ prin histerezis - efectul nu e distinct de zero (auto-diagnostic, ultimele 3000 planuri (2884 backtest, 116 live): contra Elliott -0.096R, fara conflict -0.024R, diferenta +0.072R (IC95 pe blocuri de timp -0.127..+0.282)). Nivel urmarit pentru intrare: ~3.00062.",
+      "reason": "Elliott contrazice planul SHORT (Primary Motive W5 BEARISH 54%: impulsul pare complet - W5 a atins 2.796, iar pretul a retras 64% din ea; urmeaza corectia A-B-C). Filtrul ramane activ prin histerezis - efectul nu e distinct de zero (auto-diagnostic, ultimele 3000 planuri (2884 backtest, 116 live): contra Elliott -0.096R, fara conflict -0.024R, diferenta +0.072R (IC95 pe blocuri de timp -0.124..+0.282)). Nivel urmarit pentru intrare: ~3.00062.",
       "calibrated_prob": 29.7,
-      "agent_prob": 0.3026,
+      "agent_prob": 0.3038,
       "elliott_bias": -0.6342,
       "next_entry": 3.0006194420000005
-    },
-    "POL/USDT": {
-      "action": "ISSUE",
-      "mode": "POARTA_DEZACTIVATA",
-      "reason": "poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; dovada walk-forward a portii e evaluata in auto-audit",
-      "calibrated_prob": 29.7,
-      "agent_prob": 0.289,
-      "elliott_bias": 0.4,
-      "next_entry": null
     },
     "ALGO/USDT": {
       "action": "SKIP",
       "mode": "ASTEAPTA_CORECTIA",
-      "reason": "Elliott contrazice planul SHORT (Primary Developing Motive W3 FORMING BULLISH 56%: unda 4 corectiva - continuarea (W5) e asteptata dupa ea). Filtrul ramane activ prin histerezis - efectul nu e distinct de zero (auto-diagnostic, ultimele 3000 planuri (2884 backtest, 116 live): contra Elliott -0.096R, fara conflict -0.024R, diferenta +0.072R (IC95 pe blocuri de timp -0.127..+0.282)). Nivel urmarit pentru intrare: ~0.12034.",
+      "reason": "Elliott contrazice planul SHORT (Primary Developing Motive W3 FORMING BULLISH 56%: unda 4 corectiva - continuarea (W5) e asteptata dupa ea). Filtrul ramane activ prin histerezis - efectul nu e distinct de zero (auto-diagnostic, ultimele 3000 planuri (2884 backtest, 116 live): contra Elliott -0.096R, fara conflict -0.024R, diferenta +0.072R (IC95 pe blocuri de timp -0.124..+0.282)). Nivel urmarit pentru intrare: ~0.12034.",
       "calibrated_prob": 29.7,
-      "agent_prob": 0.2689,
+      "agent_prob": 0.2724,
       "elliott_bias": -0.3248,
       "next_entry": 0.12033985999999999
     },
     "MANA/USDT": {
       "action": "SKIP",
       "mode": "ASTEAPTA_CORECTIA",
-      "reason": "Elliott contrazice planul SHORT (Primary Developing Motive W3 FORMING BULLISH 58%: unda 4 corectiva - continuarea (W5) e asteptata dupa ea). Filtrul ramane activ prin histerezis - efectul nu e distinct de zero (auto-diagnostic, ultimele 3000 planuri (2884 backtest, 116 live): contra Elliott -0.096R, fara conflict -0.024R, diferenta +0.072R (IC95 pe blocuri de timp -0.127..+0.282)). Nivel urmarit pentru intrare: ~0.0921142.",
+      "reason": "Elliott contrazice planul SHORT (Primary Developing Motive W3 FORMING BULLISH 58%: unda 4 corectiva - continuarea (W5) e asteptata dupa ea). Filtrul ramane activ prin histerezis - efectul nu e distinct de zero (auto-diagnostic, ultimele 3000 planuri (2884 backtest, 116 live): contra Elliott -0.096R, fara conflict -0.024R, diferenta +0.072R (IC95 pe blocuri de timp -0.124..+0.282)). Nivel urmarit pentru intrare: ~0.0921142.",
       "calibrated_prob": 29.7,
-      "agent_prob": 0.266,
+      "agent_prob": 0.2677,
       "elliott_bias": -0.4,
       "next_entry": 0.09211421999999998
     },
     "ADA/USDT": {
       "action": "SKIP",
       "mode": "ASTEAPTA_CORECTIA",
-      "reason": "Elliott contrazice planul SHORT (Primary Developing Motive W3 FORMING BULLISH 57%: unda 4 corectiva - continuarea (W5) e asteptata dupa ea). Filtrul ramane activ prin histerezis - efectul nu e distinct de zero (auto-diagnostic, ultimele 3000 planuri (2884 backtest, 116 live): contra Elliott -0.096R, fara conflict -0.024R, diferenta +0.072R (IC95 pe blocuri de timp -0.127..+0.282)). Nivel urmarit pentru intrare: ~0.236539.",
+      "reason": "Elliott contrazice planul SHORT (Primary Developing Motive W3 FORMING BULLISH 57%: unda 4 corectiva - continuarea (W5) e asteptata dupa ea). Filtrul ramane activ prin histerezis - efectul nu e distinct de zero (auto-diagnostic, ultimele 3000 planuri (2884 backtest, 116 live): contra Elliott -0.096R, fara conflict -0.024R, diferenta +0.072R (IC95 pe blocuri de timp -0.124..+0.282)). Nivel urmarit pentru intrare: ~0.236539.",
       "calibrated_prob": 29.7,
-      "agent_prob": 0.2723,
+      "agent_prob": 0.2748,
       "elliott_bias": -0.4,
       "next_entry": 0.236539
     }
