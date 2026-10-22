@@ -32,25 +32,25 @@
       "ob_imbalance": -0.000496,
       "funding_z": 0.0,
       "oi_change": -9.2e-05,
-      "liq_change": -0.127598
+      "liq_change": -0.127602
     },
     "bias": -1.000157
   },
-  "samples_trained": 21232,
+  "samples_trained": 21233,
   "last_trained_scan_ts": 0.0,
   "agent": {
-    "correct": 14087,
-    "total": 21232
+    "correct": 14088,
+    "total": 21233
   },
   "baseline": {
     "correct": 6917,
-    "total": 21232
+    "total": 21233
   },
   "by_direction": {
     "LONG": {
-      "agent": 6891,
+      "agent": 6892,
       "baseline": 3322,
-      "total": 10297
+      "total": 10298
     },
     "SHORT": {
       "agent": 7196,
@@ -60,11 +60,6 @@
   },
   "first_scan_ts": 1518552000.0,
   "pairs": [
-    [
-      0.44382,
-      0.0,
-      -1.013
-    ],
     [
       0.40872,
       1.0,
@@ -15059,6 +15054,11 @@
       0.231,
       0.0,
       -1.029
+    ],
+    [
+      0.1928,
+      0.0,
+      -1.026
     ]
   ],
   "recent": [
@@ -15067,7 +15067,6 @@
     1,
     1,
     1,
-    1,
     0,
     1,
     1,
@@ -15256,6 +15255,7 @@
     1,
     0,
     0,
+    1,
     1,
     1,
     1,
@@ -15269,7 +15269,6 @@
     0,
     0,
     0,
-    0,
     1,
     0,
     0,
@@ -15458,6 +15457,7 @@
     0,
     1,
     1,
+    0,
     0,
     0,
     0,
@@ -20565,10 +20565,6 @@
   "source": "plans-v6-4h",
   "feature_version": "f8",
   "score_pairs": [
-    [
-      0.45,
-      0.0
-    ],
     [
       0.53,
       1.0
@@ -32564,28 +32560,32 @@
     [
       0.36,
       0.0
+    ],
+    [
+      0.51,
+      0.0
     ]
   ],
-  "last_event_ts": 1792670400.0,
+  "last_event_ts": 1792684800.0,
   "learning_rate": 0.00424,
   "eval_version": "causal-v1",
   "live": {
-    "n": 118,
-    "auc": 0.395,
-    "ci_low": 0.273,
-    "ci_high": 0.514,
-    "avg_r": -0.244
+    "n": 119,
+    "auc": 0.399,
+    "ci_low": 0.278,
+    "ci_high": 0.517,
+    "avg_r": -0.25
   },
-  "status_reason": "AUC live 0.395 (IC95 0.273-0.514) pe 118 planuri live nu e peste hazard - filtrul nu se aplica",
-  "days_covered": 3172.67,
-  "balanced_agent": 66.36472309668507,
-  "balanced_baseline": 32.56895489734492,
+  "status_reason": "AUC live 0.399 (IC95 0.278-0.517) pe 119 planuri live nu e peste hazard - filtrul nu se aplica",
+  "days_covered": 3172.83,
+  "balanced_agent": 66.36632911704903,
+  "balanced_baseline": 32.56738848523421,
   "balanced_directions": [
     "LONG",
     "SHORT"
   ],
-  "auc": 0.5891541198144972,
-  "auc_score_baseline": 0.5527126612032273,
+  "auc": 0.5895281174496025,
+  "auc_score_baseline": 0.5526422164431902,
   "agent_superior": true,
   "majority_baseline": 68.2,
   "predicted_positive_rate": 5.433333333333334,
@@ -32615,7 +32615,7 @@
       100
     ],
     "ev_value_area": [
-      40,
+      39,
       84
     ],
     "ev_rsi": [
