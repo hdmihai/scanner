@@ -15,9 +15,9 @@
         "trades_live"
       ],
       "connected": true,
-      "markets": 4581,
+      "markets": 4585,
       "error": null,
-      "checked_at": "2026-10-23 18:00 UTC"
+      "checked_at": "2026-10-23 19:01 UTC"
     },
     {
       "id": "kucoin",
@@ -28,11 +28,15 @@
         "trades_live",
         "open_interest"
       ],
-      "available": [],
-      "connected": false,
-      "markets": 0,
-      "error": "kucoin {\"code\":\"429000\",\"msg\":\"Too many requests. System-level rate limit exceeded.\"}",
-      "checked_at": "2026-10-23 18:00 UTC"
+      "available": [
+        "ohlcv",
+        "orderbook_live",
+        "trades_live"
+      ],
+      "connected": true,
+      "markets": 1675,
+      "error": null,
+      "checked_at": "2026-10-23 19:01 UTC"
     },
     {
       "id": "gate",
@@ -51,7 +55,7 @@
       "connected": true,
       "markets": 6699,
       "error": null,
-      "checked_at": "2026-10-23 18:01 UTC"
+      "checked_at": "2026-10-23 19:01 UTC"
     },
     {
       "id": "mexc",
@@ -70,7 +74,7 @@
       "connected": true,
       "markets": 3043,
       "error": null,
-      "checked_at": "2026-10-23 18:01 UTC"
+      "checked_at": "2026-10-23 19:01 UTC"
     },
     {
       "id": "kraken",
@@ -89,7 +93,7 @@
       "connected": true,
       "markets": 1463,
       "error": null,
-      "checked_at": "2026-10-23 18:01 UTC"
+      "checked_at": "2026-10-23 19:01 UTC"
     },
     {
       "id": "bybit",
@@ -106,7 +110,7 @@
       "connected": false,
       "markets": 0,
       "error": "bybit GET https://api.bybit.com/v5/market/instruments-info?category=spot 403 Forbidden {\n    error:The Amazon CloudFront distribution is configured to block access from your countr",
-      "checked_at": "2026-10-23 18:01 UTC"
+      "checked_at": "2026-10-23 19:01 UTC"
     }
   ],
   "used": "okx",
