@@ -24,18 +24,20 @@
     }
   },
   "rebuild_removed_live": [],
-  "when": "2026-10-23 08:41 UTC",
-  "ts": 1792744863.1789052,
-  "checked": 27996,
+  "when": "2026-10-23 09:41 UTC",
+  "ts": 1792748468.626331,
+  "checked": 27997,
   "reevaluated": 140,
-  "live_flagged": 0,
-  "removed_now": 0,
+  "live_flagged": 1,
+  "removed_now": 1,
   "blocked": null,
   "backtest_flagged": 0,
   "backtest_examples": [],
-  "by_reason": {},
+  "by_reason": {
+    "rezultat contrazis de lumanarile reale": 1
+  },
   "pending_live": [],
-  "retrained": false,
+  "retrained": true,
   "epoch": 2,
   "removed": [
     {
@@ -733,6 +735,18 @@
       "created_ts": 1791008753.0549238,
       "reason": "rezultat contrazis de lumanarile reale: NO_ENTRY 0.0R in memorie, SL_HIT -1.039R la reevaluare",
       "removed": "2026-10-23 04:19 UTC"
+    },
+    {
+      "id": 207119,
+      "symbol": "ZEC/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": -1.023,
+      "created_ts": 1790973681.7927585,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.023R in memorie, NO_ENTRY 0.0R la reevaluare",
+      "removed": "2026-10-23 09:41 UTC"
     }
   ]
 }
