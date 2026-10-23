@@ -24,18 +24,20 @@
     }
   },
   "rebuild_removed_live": [],
-  "when": "2026-10-23 12:01 UTC",
-  "ts": 1792756886.7112184,
-  "checked": 27996,
-  "reevaluated": 139,
-  "live_flagged": 0,
-  "removed_now": 0,
+  "when": "2026-10-23 13:02 UTC",
+  "ts": 1792760541.1610904,
+  "checked": 27998,
+  "reevaluated": 149,
+  "live_flagged": 8,
+  "removed_now": 8,
   "blocked": null,
   "backtest_flagged": 0,
   "backtest_examples": [],
-  "by_reason": {},
+  "by_reason": {
+    "rezultat contrazis de lumanarile reale": 8
+  },
   "pending_live": [],
-  "retrained": false,
+  "retrained": true,
   "epoch": 2,
   "removed": [
     {
@@ -745,6 +747,102 @@
       "created_ts": 1790973681.7927585,
       "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.023R in memorie, NO_ENTRY 0.0R la reevaluare",
       "removed": "2026-10-23 09:41 UTC"
+    },
+    {
+      "id": 164058,
+      "symbol": "SUI/USDT",
+      "direction": "LONG",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "NO_ENTRY",
+      "realized_r": 0.0,
+      "created_ts": 1790655856.6479259,
+      "reason": "rezultat contrazis de lumanarile reale: NO_ENTRY 0.0R in memorie, SL_HIT -1.02R la reevaluare",
+      "removed": "2026-10-23 13:02 UTC"
+    },
+    {
+      "id": 164059,
+      "symbol": "AVAX/USDT",
+      "direction": "LONG",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "NO_ENTRY",
+      "realized_r": 0.0,
+      "created_ts": 1790655858.1565092,
+      "reason": "rezultat contrazis de lumanarile reale: NO_ENTRY 0.0R in memorie, SL_HIT -1.028R la reevaluare",
+      "removed": "2026-10-23 13:02 UTC"
+    },
+    {
+      "id": 164073,
+      "symbol": "DASH/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "EXPIRED",
+      "realized_r": 4.15,
+      "created_ts": 1790771596.9438148,
+      "reason": "rezultat contrazis de lumanarile reale: EXPIRED 4.15R in memorie, EXPIRED 5.718R la reevaluare",
+      "removed": "2026-10-23 13:02 UTC"
+    },
+    {
+      "id": 164080,
+      "symbol": "TRX/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": -1.161,
+      "created_ts": 1790859485.8548496,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.161R in memorie, EXPIRED 0.137R la reevaluare",
+      "removed": "2026-10-23 13:02 UTC"
+    },
+    {
+      "id": 164081,
+      "symbol": "NEAR/USDT",
+      "direction": "LONG",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": 0.779,
+      "created_ts": 1790871766.7945313,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT 0.779R in memorie, SL_HIT -1.018R la reevaluare",
+      "removed": "2026-10-23 13:02 UTC"
+    },
+    {
+      "id": 207112,
+      "symbol": "MANA/USDT",
+      "direction": "LONG",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "NO_ENTRY",
+      "realized_r": 0.0,
+      "created_ts": 1790973676.9546652,
+      "reason": "rezultat contrazis de lumanarile reale: NO_ENTRY 0.0R in memorie, SL_HIT -1.02R la reevaluare",
+      "removed": "2026-10-23 13:02 UTC"
+    },
+    {
+      "id": 207114,
+      "symbol": "AXS/USDT",
+      "direction": "LONG",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "NO_ENTRY",
+      "realized_r": 0.0,
+      "created_ts": 1790973678.3704197,
+      "reason": "rezultat contrazis de lumanarile reale: NO_ENTRY 0.0R in memorie, SL_HIT 0.886R la reevaluare",
+      "removed": "2026-10-23 13:02 UTC"
+    },
+    {
+      "id": 250200,
+      "symbol": "ADA/USDT",
+      "direction": "LONG",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "NO_ENTRY",
+      "realized_r": 0.0,
+      "created_ts": 1791132447.9037879,
+      "reason": "rezultat contrazis de lumanarile reale: NO_ENTRY 0.0R in memorie, SL_HIT -1.049R la reevaluare",
+      "removed": "2026-10-23 13:02 UTC"
     }
   ]
 }
