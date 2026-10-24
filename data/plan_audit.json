@@ -24,18 +24,20 @@
     }
   },
   "rebuild_removed_live": [],
-  "when": "2026-10-24 19:08 UTC",
-  "ts": 1792868892.6274233,
-  "checked": 27993,
-  "reevaluated": 146,
-  "live_flagged": 0,
-  "removed_now": 0,
+  "when": "2026-10-24 20:08 UTC",
+  "ts": 1792872507.1114876,
+  "checked": 27996,
+  "reevaluated": 154,
+  "live_flagged": 1,
+  "removed_now": 1,
   "blocked": null,
   "backtest_flagged": 0,
   "backtest_examples": [],
-  "by_reason": {},
+  "by_reason": {
+    "rezultat contrazis de lumanarile reale": 1
+  },
   "pending_live": [],
-  "retrained": false,
+  "retrained": true,
   "epoch": 2,
   "removed": [
     {
@@ -925,6 +927,18 @@
       "created_ts": 1791536646.3141167,
       "reason": "rezultat contrazis de lumanarile reale: TP2_HIT 3.32R in memorie, NO_ENTRY 0.0R la reevaluare",
       "removed": "2026-10-24 16:27 UTC"
+    },
+    {
+      "id": 293331,
+      "symbol": "SEI/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": -1.038,
+      "created_ts": 1791480910.5875762,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.038R in memorie, NO_ENTRY 0.0R la reevaluare",
+      "removed": "2026-10-24 20:08 UTC"
     }
   ]
 }
