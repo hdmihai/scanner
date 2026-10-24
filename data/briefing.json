@@ -2,7 +2,7 @@
   "text": "Din 21235 planuri inchise, rata de succes e 32.6%, cu +6.49R cumulat (+0.000R in medie pe plan) si profit factor 1.0. 16 planuri sunt inca deschise. Atentie: 21114 dintre ele sunt din backtest. LIVE, din 2026-09-30: 121 planuri inchise, castig 25.6% (IC 18.7-34.1%), R mediu -0.210R (IC95 -0.599..+0.189R), total -25.35R. Ultimele inchise: #342783 CHZ/USDT +3.08R, #370651 FET/USDT +3.06R, #370672 ZEC/USDC -1.02R. R mediu pe intervalele de scor cu destule date (IC95 pe blocuri de timp) - toate (0-19, 20-39, 40-59, 60-79, 80-99) in marja zgomotului (IC95 al R-ului mediu include zero). Poarta pe aceste cifre e dezactivata (USE_DECISION_GATE=false; dovada walk-forward e in auto-audit): ele se afiseaza, dar nu decid emiterea planurilor. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (AUC live 0.419 (IC95 0.241-0.592) pe 121 planuri live nu e peste hazard - filtrul nu se aplica). Auto-auditul are 3 imbunatatiri deschise (1 mari, 2 medii, 0 mici); cea mai importanta: Semnalul nu are avantaj masurabil recent. Laboratorul (model invatat din memorie, gbm): stare SHADOW - trece walk-forward si perioada rezervata; asteapta confirmarea live (26/60 alegeri incheiate). Walk-forward +0.073R (IC95 +0.020..+0.131) pe alegere, n=8557; perioada rezervata +0.060R (IC95 -0.052..+0.172); test inainte (live, tot universul): 26 alegeri incheiate, -0.343R (IC95 -0.694..+0.089).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-10-24 20:43 UTC",
+    "scan_time": "2026-10-24 21:42 UTC",
     "universe_size": 30,
     "plans_total": 27995,
     "plans_open": 16,
@@ -322,29 +322,29 @@
       "rules": 2,
       "stale_rules": null,
       "universe": {
-        "symbols": 281,
+        "symbols": 282,
         "liquid": {
-          "ci_high": 0.0467,
-          "ci_low": -0.0457,
-          "n": 59057,
-          "r": 0.0021,
+          "ci_high": 0.0468,
+          "ci_low": -0.0456,
+          "n": 59081,
+          "r": 0.0022,
           "win": 32.8
         },
         "rest": {
-          "ci_high": 0.0425,
-          "ci_low": -0.0507,
-          "n": 43120,
+          "ci_high": 0.0406,
+          "ci_low": -0.0519,
+          "n": 43140,
           "r": -0.0017,
           "win": 32.7
         },
         "recent": {
-          "ci_high": 0.048,
-          "ci_low": -0.179,
-          "n": 7345,
-          "r": -0.075
+          "ci_high": 0.052,
+          "ci_low": -0.17,
+          "n": 7331,
+          "r": -0.069
         },
         "status": "neconcludent",
-        "when": "2026-10-23 21:45 UTC",
+        "when": "2026-10-24 21:14 UTC",
         "rules": 2
       }
     },
@@ -364,7 +364,7 @@
       "Backtest 2018-02-13-azi (regenerat 2026-10-11 20:52 UTC): 21114 planuri inchise, castig 32.6%, R mediu +0.002R, total +31.85R, profit factor 1.0.",
       "Ultimele 12 luni simulate: -0.055R/plan (IC95 -0.177..+0.071) pe 3752 planuri - nu e distinct de zero.",
       "Calibrare (dominata de backtest): R mediu pe intervalele de scor cu destule date (IC95 pe blocuri de timp) - toate (0-19, 20-39, 40-59, 60-79, 80-99) in marja zgomotului (IC95 al R-ului mediu include zero).",
-      "Pe tot universul bursei (281 simboluri lichide, aceeasi strategie): +0.002R/plan (IC95 -0.046..+0.047, n=59057); ultimele 12 luni -0.075R/plan (IC95 -0.179..+0.048).",
+      "Pe tot universul bursei (282 simboluri lichide, aceeasi strategie): +0.002R/plan (IC95 -0.046..+0.047, n=59081); ultimele 12 luni -0.069R/plan (IC95 -0.170..+0.052).",
       "Rol: pre-antrenarea agentului, calibrarea si cercetarea regulilor - nu e rezultat pe piata reala."
     ],
     "agent": "Agentul e in SHADOW: invata, dar nu filtreaza (AUC live 0.419 (IC95 0.241-0.592) pe 121 planuri live nu e peste hazard - filtrul nu se aplica)."
