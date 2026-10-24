@@ -179,6 +179,55 @@ def check_block_diff(fails):
           f"(eroarea standard naiva ar fi declarat efect in {naive_false}/{trials}); efect real gasit")
 
 
+def check_block_auc(fails):
+    """core.agent.live_ranking: AUC-ul live cu IC95 pe blocuri de timp.
+    (a) fara semnal real (prob independenta de rezultat) IC acopera 0.5 in
+    cel putin 90% din incercari; (b) un semnal real e detectat (IC exclude 0.5)."""
+    import random
+    from core.agent import live_ranking
+    rnd = random.Random(13)
+    cover = trials = 0
+    for _ in range(40):
+        plans = []
+        for w in range(20):
+            for i in range(6):
+                ts = w * 86400 + i * 3600
+                outcome = 1 if rnd.random() < 0.35 else 0
+                prob = min(0.99, max(0.01, rnd.gauss(0.5, 0.15)))
+                plans.append({
+                    "source": "live", "state": "OPENED",
+                    "created_ts": ts,
+                    "realized_r": 1.0 if outcome else -1.0,
+                    "decision": {"agent_prob": prob},
+                })
+        r = live_ranking(plans, n_boot=200)
+        trials += 1
+        lo, hi = r.get("ci_low"), r.get("ci_high")
+        if lo is None or hi is None:
+            continue
+        cover += lo <= 0.5 <= hi
+    if cover < 0.9 * trials:
+        fails.append(f"live_ranking: IC95 acopera AUC=0.5 doar in {cover}/{trials} cazuri fara semnal real")
+    plans = []
+    for w in range(20):
+        for i in range(6):
+            ts = w * 86400 + i * 3600
+            outcome = 1 if rnd.random() < 0.35 else 0
+            prob = min(0.99, max(0.01, rnd.gauss(0.55 if outcome else 0.45, 0.15)))
+            plans.append({
+                "source": "live", "state": "OPENED",
+                "created_ts": ts,
+                "realized_r": 1.0 if outcome else -1.0,
+                "decision": {"agent_prob": prob},
+            })
+    r = live_ranking(plans, n_boot=200)
+    lo, hi = r.get("ci_low"), r.get("ci_high")
+    if lo is None or not (lo > 0.5):
+        fails.append(f"live_ranking: un semnal real nu e detectat (IC {lo}..{hi}, auc {r.get('auc')})")
+    print(f"  6. IC al AUC pe blocuri de timp: fara semnal acopera 0.5 {cover}/{trials}; "
+          f"semnal real detectat (auc {r.get('auc')}, IC {lo}..{hi})")
+
+
 def main():
     store = _store()
     fails = []
@@ -187,6 +236,7 @@ def main():
     check_neighbors(store, fails)
     check_gate(fails)
     check_block_diff(fails)
+    check_block_auc(fails)
     print("\nVERIFICARE STATISTICA: " + ("RESPINS - " + "; ".join(fails) if fails else "OK"))
     return 1 if fails else 0
 

@@ -296,21 +296,48 @@ def skew_excluded(skew):
 
 def live_ranking(plans, n_boot=1000):
     """Ordonarea REALA pe planurile live: probabilitatea data de agent la momentul
-    deciziei, fata de rezultat. AUC cu interval de incredere bootstrap 95%."""
+    deciziei, fata de rezultat. AUC cu interval de incredere bootstrap 95% pe
+    BLOCURI de timp (planurile din aceeasi zi sunt corelate prin aceeasi miscare
+    de piata; iid ar subestima IC). Block_s vine din plans.block_size (zi pt
+    live scurt, saptamana pt istoric lung). (None, None) sub 2 blocuri."""
     import random as _r
-    pairs = [((p.get("decision") or {}).get("agent_prob"), 1.0 if p["realized_r"] > 0 else 0.0, p["realized_r"])
+    pairs = [(plan_tracker._ts(p),
+              (p.get("decision") or {}).get("agent_prob"),
+              1.0 if p["realized_r"] > 0 else 0.0,
+              p["realized_r"])
              for p in plans if p.get("source") != "backtest" and p.get("realized_r") is not None
              and p.get("state") != "NO_ENTRY" and (p.get("decision") or {}).get("agent_prob") is not None]
     out = {"n": len(pairs)}
     if len(pairs) < 10:
         return out
-    auc = auc_score(pairs)
+    auc = auc_score([(pp, y, r) for _, pp, y, r in pairs])
     if auc is None:
         return out
-    rnd = _r.Random(0)
-    boots = sorted(a for a in (auc_score([rnd.choice(pairs) for _ in pairs]) for _ in range(n_boot)) if a is not None)
-    out.update(auc=round(auc, 3), ci_low=round(boots[int(0.025 * len(boots))], 3),
-               ci_high=round(boots[int(0.975 * len(boots)) - 1], 3),
+    block_s = plan_tracker.block_size([t for t, *_ in pairs])
+    by = {}
+    for t, pp, y, r in pairs:
+        by.setdefault(int(t // block_s), []).append((pp, y, r))
+    blist = list(by.values())
+    k = len(blist)
+    if k < 2:
+        ci_low = ci_high = None
+    else:
+        rnd = _r.Random(0)
+        boots = []
+        for _ in range(n_boot):
+            sample = []
+            for _i in range(k):
+                sample.extend(blist[rnd.randrange(k)])
+            a = auc_score(sample)
+            if a is not None:
+                boots.append(a)
+        if boots:
+            boots.sort()
+            ci_low = round(boots[int(0.025 * len(boots))], 3)
+            ci_high = round(boots[int(0.975 * len(boots)) - 1], 3)
+        else:
+            ci_low = ci_high = None
+    out.update(auc=round(auc, 3), ci_low=ci_low, ci_high=ci_high,
                avg_r=round(sum(r for *_, r in pairs) / len(pairs), 3))
     return out
 
