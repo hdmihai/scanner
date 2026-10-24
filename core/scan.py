@@ -991,7 +991,21 @@ def main():
     save_json(HISTORY_FILE, history)
 
     weights_history = load_json(WEIGHTS_HISTORY_FILE, [])
-    weights_history.append({"ts": now_ts, "time": scan_record["scan_time"], **weights})
+    # Serie temporala a metricilor agentului, pentru A7 (agent_superior) si
+    # block bootstrap AUC (C3). Semantica: agent_state vine din
+    # AGENT_STORE.load_agent() (linia 901) si reflecta ULTIMA rulare ai_agent.py,
+    # nu antrenarea curenta - in scan.yml, scan ruleaza INAINTE de ai_agent.
+    # Deci weights_history[i] = starea agentului FOLOSITA de scanul i, adica
+    # antrenata la rularea i-1. Nu schimbati ordinea din workflow fara sa
+    # actualizati acest comentariu.
+    weights_history.append({
+        "ts": now_ts, "time": scan_record["scan_time"], **weights,
+        "auc": agent_state.get("auc"),
+        "auc_score_baseline": agent_state.get("auc_score_baseline"),
+        "balanced_agent": agent_state.get("balanced_agent"),
+        "majority_baseline": agent_state.get("majority_baseline"),
+        "predicted_positive_rate": agent_state.get("predicted_positive_rate"),
+    })
     save_json(WEIGHTS_HISTORY_FILE, weights_history)
 
     msg = format_message(scan_record)

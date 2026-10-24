@@ -470,6 +470,19 @@ def predicted_positive_rate(pairs):
 
 
 def balanced_accuracy(by_direction, which, min_per_direction=30):
+    # PRAG DE DOMENIU (min_per_direction=30), nu de prezentare:
+    # - Arhitectural: apartine domeniului (core/), nu UI-ului. Dashboard-ul doar
+    #   afiseaza valoarea 'used' returnata de aici; nu decide el pragul. Schimbarea
+    #   valorii cere analiza empirica pe 'by_direction' (distributia total pe
+    #   directie), nu un tweak de afisare. Vezi si comentariul din
+    #   dashboard/sections/agent.py (afiseaza 'balanced_directions' ca
+    #   observabilitate, fara sa impuna nimic).
+    # - Produs: 30 = minim statistic pentru ca media pe o directie sa nu fie zgomot.
+    #   Sub 30, o singura iesire extreme poate schimba media cu cateva procente bune.
+    #   Cu 30+, media e stabila la variatii de cateva exemple.
+    # - Consecinta: daca o directie are <30 exemple, 'used' o exclude si rezultatul
+    #   NU mai e echilibrat (vezi docstring). Apelantul (ai_agent.py:302) primeste
+    #   'used' si il scrie in stare ('balanced_directions'); dashboard-ul il afiseaza.
     """Media acuratetii pe LONG si pe SHORT, nu acuratetea bruta.
     Un model care prezice mereu SHORT intr-o piata in scadere are acuratete
     bruta mare, dar acuratete echilibrata ~50% - exact ce vreau sa expun.
