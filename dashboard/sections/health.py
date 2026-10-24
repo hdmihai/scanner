@@ -103,6 +103,18 @@ def health_items(history, agent_state, plans_store, self_check, altseason, runs=
           + (f" &middot; AUC live {lv['auc']:.3f} (IC {lv.get('ci_low')}-{lv.get('ci_high')})" if lv.get("auc") is not None else "")
           + ("" if a.get("status") == "ACTIVE" or n_live >= 100 else " &middot; invata, normal pana la 100"))
          if lv else "fara date live inca"))
+    # A6: rata de predictii pozitive - observabilitate dezechilibru LONG/SHORT.
+    # Fara prag: e informatie, nu defect. Degradare gratioasa daca lipseste.
+    ppr = a.get("predicted_positive_rate")
+    if ppr is not None:
+        try:
+            ppr_f = float(ppr)
+            pct = round(ppr_f)
+            add("OK", "Predictii LONG", f"{pct}%",
+                f"{pct}% LONG / {100 - pct}% SHORT &middot; proportia de semnale cumpara ale agentului")
+        except (TypeError, ValueError):
+            pass
+
     summ = (plans_store or {}).get("summary") or {}
     dv = summ.get("divergence") or {}
     if dv.get("status") in ("sub_backtest", "in_marja", "peste_backtest"):
