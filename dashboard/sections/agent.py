@@ -47,6 +47,11 @@ def render_agent_card(agent_state, audit=None):
                  + (f' &middot; prag real, mereu pierdere: {maj:.1f}%' if maj is not None else "")
                  + _maj_verdict)
                 if ba is not None else "in curs de acumulare")
+    _used = agent_state.get("balanced_directions") or []
+    if _used:
+        _used_txt = ("ambele directii" if len(_used) == 2
+                     else f"doar {_used[0]} (cealalta directie sub prag)")
+        bal_line += f'<br><span class="dim">directii echilibrate: {_used_txt}</span>'
     if auc_a is not None and auc_s is not None:
         bal_line += (f'<br><span class="dim">ordonare AUC pe evaluarea dominata de backtest: agent {auc_a:.3f} '
                      f'vs scor brut {auc_s:.3f} (0.5 = hazard)</span>')
