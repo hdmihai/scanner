@@ -1,41 +1,23 @@
 {
-  "scan_time": "2026-10-26 16:02 UTC",
+  "scan_time": "2026-10-26 17:03 UTC",
   "decisions": {
-    "SUI/USDT": {
-      "action": "ISSUE",
-      "mode": "POARTA_DEZACTIVATA",
-      "reason": "poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; dovada walk-forward a portii e evaluata in auto-audit",
-      "calibrated_prob": 44.5,
-      "agent_prob": 0.3197,
-      "elliott_bias": 1.0,
-      "next_entry": null
-    },
     "ICP/USDT": {
       "action": "SKIP",
       "mode": "ASTEAPTA_CORECTIA",
-      "reason": "Elliott contrazice planul SHORT (Primary Developing Motive W5 FORMING BEARISH 54%: impulsul pare complet - W5 a atins 2.558, iar pretul a retras 70% din ea; urmeaza corectia A-B-C). Filtrul ramane activ prin histerezis - efectul nu e distinct de zero (auto-diagnostic, ultimele 3000 planuri (2882 backtest, 118 live): contra Elliott -0.102R, fara conflict -0.027R, diferenta +0.075R (IC95 pe blocuri de timp -0.125..+0.279)). Nivel urmarit pentru intrare: ~2.77119.",
+      "reason": "Elliott contrazice planul SHORT (Primary Developing Motive W5 FORMING BEARISH 54%: impulsul pare complet - W5 a atins 2.558, iar pretul a retras 70% din ea; urmeaza corectia A-B-C). Filtrul ramane activ prin histerezis - efectul nu e distinct de zero (auto-diagnostic, ultimele 3000 planuri (2876 backtest, 124 live): contra Elliott -0.099R, fara conflict -0.026R, diferenta +0.073R (IC95 pe blocuri de timp -0.128..+0.274)). Nivel urmarit pentru intrare: ~2.77119.",
       "calibrated_prob": 44.5,
-      "agent_prob": 0.339,
+      "agent_prob": 0.3534,
       "elliott_bias": -0.2833,
       "next_entry": 2.7711948840000002
     },
     "AXS/USDT": {
       "action": "SKIP",
       "mode": "ASTEAPTA_CORECTIA",
-      "reason": "Elliott contrazice planul SHORT (Primary Motive W5 BEARISH 57%: impulsul pare complet - W5 a atins 0.9246, iar pretul a retras 103% din ea; urmeaza corectia A-B-C). Filtrul ramane activ prin histerezis - efectul nu e distinct de zero (auto-diagnostic, ultimele 3000 planuri (2882 backtest, 118 live): contra Elliott -0.102R, fara conflict -0.027R, diferenta +0.075R (IC95 pe blocuri de timp -0.125..+0.279)). Nivel urmarit pentru intrare: ~1.00272.",
+      "reason": "Elliott contrazice planul SHORT (Primary Motive W5 BEARISH 57%: impulsul pare complet - W5 a atins 0.9246, iar pretul a retras 103% din ea; urmeaza corectia A-B-C). Filtrul ramane activ prin histerezis - efectul nu e distinct de zero (auto-diagnostic, ultimele 3000 planuri (2876 backtest, 124 live): contra Elliott -0.099R, fara conflict -0.026R, diferenta +0.073R (IC95 pe blocuri de timp -0.128..+0.274)). Nivel urmarit pentru intrare: ~1.00272.",
       "calibrated_prob": 39.5,
-      "agent_prob": 0.3431,
+      "agent_prob": 0.3572,
       "elliott_bias": -0.3566,
       "next_entry": 1.0027229811999998
-    },
-    "FET/USDT": {
-      "action": "ISSUE",
-      "mode": "POARTA_DEZACTIVATA",
-      "reason": "poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; dovada walk-forward a portii e evaluata in auto-audit",
-      "calibrated_prob": 39.5,
-      "agent_prob": 0.3518,
-      "elliott_bias": 0.065,
-      "next_entry": 0.18696453080000003
     }
   }
 }
