@@ -1,13 +1,31 @@
 {
-  "scan_time": "2026-10-25 23:43 UTC",
+  "scan_time": "2026-10-26 00:13 UTC",
   "decisions": {
+    "ZEC/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; dovada walk-forward a portii e evaluata in auto-audit",
+      "calibrated_prob": 28.8,
+      "agent_prob": 0.1725,
+      "elliott_bias": null,
+      "next_entry": null
+    },
     "SEI/USDT": {
-      "action": "SKIP",
-      "mode": "ASTEAPTA_CORECTIA",
-      "reason": "Elliott contrazice planul SHORT (Primary Harmonic D BEARISH 59%: scenariul s-a realizat - toate tintele atinse; potential ramas redus). Filtrul ramane activ prin histerezis - efectul nu e distinct de zero (auto-diagnostic, ultimele 3000 planuri (2880 backtest, 120 live): contra Elliott -0.102R, fara conflict -0.027R, diferenta +0.075R (IC95 pe blocuri de timp -0.126..+0.277)).",
+      "action": "ISSUE",
+      "mode": "EXPLORARE_ELLIOTT",
+      "reason": "Elliott contrazice planul SHORT (Primary Harmonic D BEARISH 54%: scenariul s-a realizat - toate tintele atinse; potential ramas redus). Emis pentru explorare, ca efectul sa ramana masurat.",
+      "calibrated_prob": 44.6,
+      "agent_prob": 0.4154,
+      "elliott_bias": -0.2194,
+      "next_entry": null
+    },
+    "THETA/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; dovada walk-forward a portii e evaluata in auto-audit",
       "calibrated_prob": 39.5,
-      "agent_prob": 0.3817,
-      "elliott_bias": -0.2177,
+      "agent_prob": 0.3495,
+      "elliott_bias": 1.0,
       "next_entry": null
     }
   }
