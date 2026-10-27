@@ -1,4 +1,23 @@
 {
-  "scan_time": "2026-10-27 19:29 UTC",
-  "decisions": {}
+  "scan_time": "2026-10-27 20:29 UTC",
+  "decisions": {
+    "GRT/USDT": {
+      "action": "ISSUE",
+      "mode": "EXPLORARE_ELLIOTT",
+      "reason": "Elliott contrazice planul SHORT (Primary Motive W5 BEARISH 53%: impulsul pare complet - W5 a atins 0.02144, iar pretul a retras 67% din ea; urmeaza corectia A-B-C). Emis pentru explorare, ca efectul sa ramana masurat.",
+      "calibrated_prob": 39.5,
+      "agent_prob": 0.2124,
+      "elliott_bias": -0.3044,
+      "next_entry": 0.02419344262
+    },
+    "GRAM/USDT": {
+      "action": "SKIP",
+      "mode": "ASTEAPTA_CORECTIA",
+      "reason": "Elliott contrazice planul SHORT (Primary Developing Harmonic D FORMING BEARISH 50%: D inca nu a ajuns in zona PRZ). Filtrul ramane activ prin histerezis - efectul nu e distinct de zero (auto-diagnostic, ultimele 3000 planuri (2882 backtest, 118 live): contra Elliott -0.101R, fara conflict -0.024R, diferenta +0.077R (IC95 pe blocuri de timp -0.124..+0.279)). Nivel urmarit pentru intrare: ~1.23985.",
+      "calibrated_prob": 39.5,
+      "agent_prob": 0.3636,
+      "elliott_bias": -0.4,
+      "next_entry": 1.2398479999999998
+    }
+  }
 }
