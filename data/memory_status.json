@@ -18,7 +18,7 @@
    "rows": 5703120
   },
   "candles": {
-   "bytes": 59193067,
+   "bytes": 59212359,
    "coverage": {
     "okx:1d": {
      "symbols": 456,
@@ -29,39 +29,29 @@
      "with_data": 463
     }
    },
-   "max_ts": 1793088000000,
+   "max_ts": 1793102400000,
    "min_ts": 1515628800000,
    "partitions": 18,
-   "rows": 2816236
+   "rows": 2816698
   },
   "lab": {
-   "bytes": 277183,
+   "bytes": 282463,
    "coverage": {},
-   "max_ts": 1793088000000,
+   "max_ts": 1793102400000,
    "min_ts": 1792339200000,
    "partitions": 1,
-   "rows": 1592
+   "rows": 1622
   },
   "plans": {
-   "bytes": 3010720,
+   "bytes": 3010351,
    "coverage": {},
    "max_ts": 1793104037.3999624,
    "min_ts": 1518552000.0,
    "partitions": 10,
-   "rows": 28003
+   "rows": 28001
   }
  },
  "history": [
-  {
-   "errors": 0,
-   "rows": {
-    "binance": 331501,
-    "candles": 2768276,
-    "plans": 27868
-   },
-   "s": 2714.3,
-   "when": "2026-10-11 23:13 UTC"
-  },
   {
    "errors": 0,
    "rows": {
@@ -685,6 +675,17 @@
    },
    "s": 1369.9,
    "when": "2026-10-27 13:03 UTC"
+  },
+  {
+   "errors": 0,
+   "rows": {
+    "binance": 5703120,
+    "candles": 2816698,
+    "lab": 1622,
+    "plans": 28001
+   },
+   "s": 395.7,
+   "when": "2026-10-27 18:26 UTC"
   }
  ],
  "lab": {
@@ -21939,35 +21940,32 @@
    },
    "candles": {
     "1d": {
-     "complete": 454,
-     "covered": 454,
+     "complete": 453,
+     "covered": 453,
      "no_data": 2,
      "rows_added": 0,
      "symbols_updated": 0,
-     "universe": 465
+     "universe": 464
     },
     "4h": {
-     "complete": 463,
-     "covered": 463,
+     "complete": 462,
+     "covered": 462,
      "no_data": 2,
-     "rows_added": 919,
-     "symbols_updated": 463,
-     "universe": 465
+     "rows_added": 462,
+     "symbols_updated": 462,
+     "universe": 464
     }
    },
    "lab": {
-    "chosen": "gbm",
-    "examples": 998215,
-    "seconds": 761.7,
-    "snapshots_added": 60,
-    "state": "SHADOW"
+    "skipped": "antrenat acum 5 ore (o data pe zi)",
+    "snapshots_added": 30
    },
    "plans": {
     "partitions_written": 1,
-    "plans": 28003
+    "plans": 28001
    },
    "universe": {
-    "skipped": "masurat acum 14 ore (o data pe zi)"
+    "skipped": "masurat acum 19 ore (o data pe zi)"
    },
    "verdict": {
     "from": "2018-06-10",
@@ -21976,23 +21974,23 @@
     "tokens": 231
    }
   },
-  "duration_s": 1369.9,
+  "duration_s": 395.7,
   "errors": [],
-  "finished": "2026-10-27 13:03 UTC",
-  "started": "2026-10-27 12:40 UTC"
+  "finished": "2026-10-27 18:26 UTC",
+  "started": "2026-10-27 18:20 UTC"
  },
  "probe": {
   "binance_vision": {
    "detail": "31 lumanari BTCUSDT 1d ianuarie 2024",
    "ok": true,
-   "s": 0.6
+   "s": 0.4
   },
   "cpu": 4,
   "disk_free_gb": 91.5,
   "exchange": {
    "id": "okx",
    "ok": true,
-   "s": 4.1
+   "s": 4.0
   },
   "ram_gb": 16.4
  },
@@ -22204,7 +22202,7 @@
   "obs": 158870,
   "to": "2026-10-19",
   "tokens": 231,
-  "when": "2026-10-27 12:43 UTC"
+  "when": "2026-10-27 18:22 UTC"
  },
  "where": "hdmihai/scanner"
 }
