@@ -24,18 +24,20 @@
     }
   },
   "rebuild_removed_live": [],
-  "when": "2026-10-27 07:57 UTC",
-  "ts": 1793087866.1050668,
-  "checked": 28005,
+  "when": "2026-10-27 08:58 UTC",
+  "ts": 1793091482.018824,
+  "checked": 28007,
   "reevaluated": 164,
-  "live_flagged": 0,
-  "removed_now": 0,
+  "live_flagged": 5,
+  "removed_now": 5,
   "blocked": null,
   "backtest_flagged": 0,
   "backtest_examples": [],
-  "by_reason": {},
+  "by_reason": {
+    "rezultat contrazis de lumanarile reale": 5
+  },
   "pending_live": [],
-  "retrained": false,
+  "retrained": true,
   "epoch": 2,
   "removed": [
     {
@@ -1045,6 +1047,66 @@
       "created_ts": 1791748359.7100308,
       "reason": "rezultat contrazis de lumanarile reale: SL_HIT 0.628R in memorie, SL_HIT -1.039R la reevaluare",
       "removed": "2026-10-27 04:51 UTC"
+    },
+    {
+      "id": 293315,
+      "symbol": "AVAX/USDT",
+      "direction": "LONG",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": -1.043,
+      "created_ts": 1791346867.4677036,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.043R in memorie, NO_ENTRY 0.0R la reevaluare",
+      "removed": "2026-10-27 08:58 UTC"
+    },
+    {
+      "id": 293333,
+      "symbol": "XRP/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": -1.045,
+      "created_ts": 1791499878.402869,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.045R in memorie, EXPIRED 2.592R la reevaluare",
+      "removed": "2026-10-27 08:58 UTC"
+    },
+    {
+      "id": 314986,
+      "symbol": "ZEN/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": -1.051,
+      "created_ts": 1791679108.9071984,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.051R in memorie, TP2_HIT 3.989R la reevaluare",
+      "removed": "2026-10-27 08:58 UTC"
+    },
+    {
+      "id": 314988,
+      "symbol": "FLOW/USDT",
+      "direction": "LONG",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "TP2_HIT",
+      "realized_r": 2.949,
+      "created_ts": 1791705871.5332127,
+      "reason": "rezultat contrazis de lumanarile reale: TP2_HIT 2.949R in memorie, SL_HIT 0.699R la reevaluare",
+      "removed": "2026-10-27 08:58 UTC"
+    },
+    {
+      "id": 314990,
+      "symbol": "MANA/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": -1.044,
+      "created_ts": 1791705874.513852,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.044R in memorie, EXPIRED 6.429R la reevaluare",
+      "removed": "2026-10-27 08:58 UTC"
     }
   ]
 }
