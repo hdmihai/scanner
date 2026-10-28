@@ -24,18 +24,20 @@
     }
   },
   "rebuild_removed_live": [],
-  "when": "2026-10-28 15:59 UTC",
-  "ts": 1793203172.4267843,
-  "checked": 28004,
-  "reevaluated": 120,
-  "live_flagged": 0,
-  "removed_now": 0,
+  "when": "2026-10-28 17:01 UTC",
+  "ts": 1793206864.9121168,
+  "checked": 28007,
+  "reevaluated": 161,
+  "live_flagged": 1,
+  "removed_now": 1,
   "blocked": null,
   "backtest_flagged": 0,
   "backtest_examples": [],
-  "by_reason": {},
+  "by_reason": {
+    "rezultat contrazis de lumanarile reale": 1
+  },
   "pending_live": [],
-  "retrained": false,
+  "retrained": true,
   "epoch": 2,
   "removed": [
     {
@@ -1129,6 +1131,18 @@
       "created_ts": 1791621870.303257,
       "reason": "rezultat contrazis de lumanarile reale: NO_ENTRY 0.0R in memorie, SL_HIT -1.026R la reevaluare",
       "removed": "2026-10-27 16:30 UTC"
+    },
+    {
+      "id": 314989,
+      "symbol": "POL/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": -1.052,
+      "created_ts": 1791705873.4669309,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.052R in memorie, NO_ENTRY 0.0R la reevaluare",
+      "removed": "2026-10-28 17:01 UTC"
     }
   ]
 }
