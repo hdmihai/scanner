@@ -24,18 +24,20 @@
     }
   },
   "rebuild_removed_live": [],
-  "when": "2026-10-29 07:59 UTC",
-  "ts": 1793260770.502715,
-  "checked": 28010,
-  "reevaluated": 165,
-  "live_flagged": 0,
-  "removed_now": 0,
+  "when": "2026-10-29 08:59 UTC",
+  "ts": 1793264389.4546616,
+  "checked": 28011,
+  "reevaluated": 163,
+  "live_flagged": 1,
+  "removed_now": 1,
   "blocked": null,
   "backtest_flagged": 0,
   "backtest_examples": [],
-  "by_reason": {},
+  "by_reason": {
+    "rezultat contrazis de lumanarile reale": 1
+  },
   "pending_live": [],
-  "retrained": false,
+  "retrained": true,
   "epoch": 2,
   "removed": [
     {
@@ -1165,6 +1167,18 @@
       "created_ts": 1791922470.1570685,
       "reason": "rezultat contrazis de lumanarile reale: SL_HIT 0.499R in memorie, NO_ENTRY 0.0R la reevaluare",
       "removed": "2026-10-29 04:53 UTC"
+    },
+    {
+      "id": 342756,
+      "symbol": "FIL/USDT",
+      "direction": "LONG",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": 1.028,
+      "created_ts": 1791836118.1513174,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT 1.028R in memorie, SL_HIT -1.024R la reevaluare",
+      "removed": "2026-10-29 08:59 UTC"
     }
   ]
 }
