@@ -24,18 +24,20 @@
     }
   },
   "rebuild_removed_live": [],
-  "when": "2026-10-29 15:11 UTC",
-  "ts": 1793286684.0291047,
-  "checked": 28011,
-  "reevaluated": 155,
-  "live_flagged": 0,
-  "removed_now": 0,
+  "when": "2026-10-29 16:11 UTC",
+  "ts": 1793290283.3916588,
+  "checked": 28012,
+  "reevaluated": 112,
+  "live_flagged": 1,
+  "removed_now": 1,
   "blocked": null,
   "backtest_flagged": 0,
   "backtest_examples": [],
-  "by_reason": {},
+  "by_reason": {
+    "rezultat contrazis de lumanarile reale": 1
+  },
   "pending_live": [],
-  "retrained": false,
+  "retrained": true,
   "epoch": 2,
   "removed": [
     {
@@ -1177,6 +1179,18 @@
       "created_ts": 1791836118.1513174,
       "reason": "rezultat contrazis de lumanarile reale: SL_HIT 1.028R in memorie, SL_HIT -1.024R la reevaluare",
       "removed": "2026-10-29 08:59 UTC"
+    },
+    {
+      "id": 293328,
+      "symbol": "ALGO/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": -1.044,
+      "created_ts": 1791395236.1462064,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.044R in memorie, EXPIRED 1.17R la reevaluare",
+      "removed": "2026-10-29 16:11 UTC"
     }
   ]
 }
