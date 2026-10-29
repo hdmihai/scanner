@@ -1,4 +1,50 @@
 {
-  "scan_time": "2026-10-28 23:00 UTC",
-  "decisions": {}
+  "scan_time": "2026-10-29 00:01 UTC",
+  "decisions": {
+    "XRP/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; dovada walk-forward a portii e evaluata in auto-audit",
+      "calibrated_prob": 28.9,
+      "agent_prob": 0.1943,
+      "elliott_bias": 0.0455,
+      "next_entry": null
+    },
+    "FIL/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; dovada walk-forward a portii e evaluata in auto-audit",
+      "calibrated_prob": 39.5,
+      "agent_prob": 0.3291,
+      "elliott_bias": null,
+      "next_entry": null
+    },
+    "ADA/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; dovada walk-forward a portii e evaluata in auto-audit",
+      "calibrated_prob": 39.5,
+      "agent_prob": 0.2964,
+      "elliott_bias": 0.4,
+      "next_entry": null
+    },
+    "ALGO/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; dovada walk-forward a portii e evaluata in auto-audit",
+      "calibrated_prob": 39.5,
+      "agent_prob": 0.2511,
+      "elliott_bias": null,
+      "next_entry": null
+    },
+    "SUI/USDT": {
+      "action": "SKIP",
+      "mode": "ASTEAPTA_CORECTIA",
+      "reason": "Elliott contrazice planul SHORT (Primary Developing Motive W3 FORMING BULLISH 54%: unda 3 in formare - faza cea mai puternica a trendului). Filtrul ramane activ prin histerezis - efectul nu e distinct de zero (auto-diagnostic, ultimele 3000 planuri (2872 backtest, 128 live): contra Elliott -0.097R, fara conflict -0.023R, diferenta +0.073R (IC95 pe blocuri de timp -0.129..+0.270)). Nivel urmarit pentru intrare: ~0.964113.",
+      "calibrated_prob": 39.5,
+      "agent_prob": 0.2657,
+      "elliott_bias": -0.8536,
+      "next_entry": 0.9641132576
+    }
+  }
 }
