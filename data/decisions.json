@@ -1,4 +1,23 @@
 {
-  "scan_time": "2026-10-30 15:05 UTC",
-  "decisions": {}
+  "scan_time": "2026-10-30 16:05 UTC",
+  "decisions": {
+    "TRX/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; dovada walk-forward a portii e evaluata in auto-audit",
+      "calibrated_prob": 29.7,
+      "agent_prob": 0.2593,
+      "elliott_bias": null,
+      "next_entry": null
+    },
+    "SOL/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; dovada walk-forward a portii e evaluata in auto-audit",
+      "calibrated_prob": 39.6,
+      "agent_prob": 0.3934,
+      "elliott_bias": 0.2152,
+      "next_entry": 99.26
+    }
+  }
 }

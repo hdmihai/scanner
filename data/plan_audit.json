@@ -24,18 +24,20 @@
     }
   },
   "rebuild_removed_live": [],
-  "when": "2026-10-30 15:07 UTC",
-  "ts": 1793372829.7007082,
-  "checked": 28025,
-  "reevaluated": 183,
-  "live_flagged": 0,
-  "removed_now": 0,
+  "when": "2026-10-30 16:07 UTC",
+  "ts": 1793376442.6382654,
+  "checked": 28027,
+  "reevaluated": 180,
+  "live_flagged": 4,
+  "removed_now": 4,
   "blocked": null,
   "backtest_flagged": 0,
   "backtest_examples": [],
-  "by_reason": {},
+  "by_reason": {
+    "rezultat contrazis de lumanarile reale": 4
+  },
   "pending_live": [],
-  "retrained": false,
+  "retrained": true,
   "epoch": 2,
   "removed": [
     {
@@ -1225,6 +1227,54 @@
       "created_ts": 1791377880.293466,
       "reason": "rezultat contrazis de lumanarile reale: EXPIRED 5.402R in memorie, EXPIRED 4.005R la reevaluare",
       "removed": "2026-10-30 12:06 UTC"
+    },
+    {
+      "id": 293322,
+      "symbol": "XRP/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "TP2_HIT",
+      "realized_r": 7.106,
+      "created_ts": 1791346873.385173,
+      "reason": "rezultat contrazis de lumanarile reale: TP2_HIT 7.106R in memorie, EXPIRED 5.653R la reevaluare",
+      "removed": "2026-10-30 16:07 UTC"
+    },
+    {
+      "id": 342764,
+      "symbol": "GRAM/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": 0.909,
+      "created_ts": 1791908916.2838447,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT 0.909R in memorie, EXPIRED 1.496R la reevaluare",
+      "removed": "2026-10-30 16:07 UTC"
+    },
+    {
+      "id": 342775,
+      "symbol": "XRP/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": 0.487,
+      "created_ts": 1792037552.3344672,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT 0.487R in memorie, SL_HIT -1.046R la reevaluare",
+      "removed": "2026-10-30 16:07 UTC"
+    },
+    {
+      "id": 342777,
+      "symbol": "DOGE/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": 0.532,
+      "created_ts": 1792037554.163093,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT 0.532R in memorie, SL_HIT -1.04R la reevaluare",
+      "removed": "2026-10-30 16:07 UTC"
     }
   ]
 }
