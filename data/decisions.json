@@ -1,14 +1,41 @@
 {
-  "scan_time": "2026-10-29 23:16 UTC",
+  "scan_time": "2026-10-30 00:17 UTC",
   "decisions": {
+    "THETA/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; dovada walk-forward a portii e evaluata in auto-audit",
+      "calibrated_prob": 44.3,
+      "agent_prob": 0.0753,
+      "elliott_bias": 0.476,
+      "next_entry": null
+    },
+    "SOL/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; dovada walk-forward a portii e evaluata in auto-audit",
+      "calibrated_prob": 39.6,
+      "agent_prob": 0.1453,
+      "elliott_bias": 0.2,
+      "next_entry": null
+    },
+    "AXS/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; dovada walk-forward a portii e evaluata in auto-audit",
+      "calibrated_prob": 39.6,
+      "agent_prob": 0.1474,
+      "elliott_bias": 0.2,
+      "next_entry": null
+    },
     "XRP/USDT": {
-      "action": "SKIP",
-      "mode": "ASTEAPTA_CORECTIA",
-      "reason": "Elliott contrazice planul SHORT (Primary Developing Harmonic D FORMING BEARISH 22%: D inca nu a ajuns in zona PRZ). Filtrul ramane activ prin histerezis - efectul nu e distinct de zero (auto-diagnostic, ultimele 3000 planuri (2870 backtest, 130 live): contra Elliott -0.095R, fara conflict -0.026R, diferenta +0.069R (IC95 pe blocuri de timp -0.136..+0.256)). Nivel urmarit pentru intrare: ~1.2954.",
-      "calibrated_prob": 29.7,
-      "agent_prob": 0.3252,
-      "elliott_bias": -0.4,
-      "next_entry": 1.2954
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; dovada walk-forward a portii e evaluata in auto-audit",
+      "calibrated_prob": 39.6,
+      "agent_prob": 0.1717,
+      "elliott_bias": 0.2,
+      "next_entry": null
     }
   }
 }
