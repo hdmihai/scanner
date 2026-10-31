@@ -18,7 +18,7 @@
    "rows": 5703120
   },
   "candles": {
-   "bytes": 59441910,
+   "bytes": 59452902,
    "coverage": {
     "okx:1d": {
      "symbols": 465,
@@ -29,39 +29,29 @@
      "with_data": 463
     }
    },
-   "max_ts": 1793433600000,
+   "max_ts": 1793462400000,
    "min_ts": 1515628800000,
    "partitions": 18,
-   "rows": 2829172
+   "rows": 2830096
   },
   "lab": {
-   "bytes": 401668,
+   "bytes": 412044,
    "coverage": {},
-   "max_ts": 1793433600000,
+   "max_ts": 1793462400000,
    "min_ts": 1792339200000,
    "partitions": 1,
-   "rows": 2312
+   "rows": 2372
   },
   "plans": {
-   "bytes": 3014572,
+   "bytes": 3013867,
    "coverage": {},
-   "max_ts": 1793421822.837592,
+   "max_ts": 1793479331.9827633,
    "min_ts": 1518552000.0,
    "partitions": 10,
-   "rows": 28026
+   "rows": 28022
   }
  },
  "history": [
-  {
-   "errors": 0,
-   "rows": {
-    "binance": 5703120,
-    "candles": 2780062,
-    "plans": 27908
-   },
-   "s": 487.1,
-   "when": "2026-10-15 21:55 UTC"
-  },
   {
    "errors": 0,
    "rows": {
@@ -698,6 +688,17 @@
    },
    "s": 806.0,
    "when": "2026-10-31 13:17 UTC"
+  },
+  {
+   "errors": 0,
+   "rows": {
+    "binance": 5703120,
+    "candles": 2830096,
+    "lab": 2372,
+    "plans": 28022
+   },
+   "s": 497.3,
+   "when": "2026-10-31 21:59 UTC"
   }
  ],
  "lab": {
@@ -22065,18 +22066,17 @@
     }
    },
    "lab": {
-    "chosen": "gbm",
-    "examples": 998762,
-    "seconds": 433.6,
-    "snapshots_added": 60,
-    "state": "SHADOW"
+    "skipped": "antrenat acum 9 ore (o data pe zi)",
+    "snapshots_added": 60
    },
    "plans": {
     "partitions_written": 1,
-    "plans": 28026
+    "plans": 28022
    },
    "universe": {
-    "skipped": "masurat acum 15 ore (o data pe zi)"
+    "liquid": 287,
+    "plans": 182024,
+    "symbols": 389
    },
    "verdict": {
     "from": "2018-06-10",
@@ -22085,23 +22085,23 @@
     "tokens": 231
    }
   },
-  "duration_s": 806.0,
+  "duration_s": 497.3,
   "errors": [],
-  "finished": "2026-10-31 13:17 UTC",
-  "started": "2026-10-31 13:04 UTC"
+  "finished": "2026-10-31 21:59 UTC",
+  "started": "2026-10-31 21:51 UTC"
  },
  "probe": {
   "binance_vision": {
    "detail": "31 lumanari BTCUSDT 1d ianuarie 2024",
    "ok": true,
-   "s": 1.4
+   "s": 1.2
   },
   "cpu": 4,
   "disk_free_gb": 91.5,
   "exchange": {
    "id": "okx",
    "ok": true,
-   "s": 2.1
+   "s": 2.4
   },
   "ram_gb": 16.4
  },
@@ -22115,10 +22115,10 @@
  "store": "github-releases",
  "universe_backtest": {
   "all": {
-   "ci_high": 0.0156,
-   "ci_low": -0.0726,
-   "n": 139162,
-   "r": -0.0288,
+   "ci_high": 0.0157,
+   "ci_low": -0.0732,
+   "n": 139254,
+   "r": -0.029,
    "win": 32.0
   },
   "edge": {
@@ -22160,79 +22160,79 @@
      "r": -0.019
     },
     "2024": {
-     "ci_high": 0.143,
-     "ci_low": -0.097,
+     "ci_high": 0.149,
+     "ci_low": -0.099,
      "n": 12267,
      "r": 0.023
     },
     "2025": {
-     "ci_high": 0.025,
-     "ci_low": -0.173,
+     "ci_high": 0.038,
+     "ci_low": -0.177,
      "n": 11461,
      "r": -0.075
     },
     "2026": {
      "ci_high": 0.055,
-     "ci_low": -0.18,
-     "n": 5769,
+     "ci_low": -0.182,
+     "n": 5782,
      "r": -0.073
     }
    },
    "recent": {
-    "ci_high": 0.051,
+    "ci_high": 0.053,
     "ci_low": -0.176,
-    "n": 7283,
-    "r": -0.063
+    "n": 7262,
+    "r": -0.062
    },
    "recent_days": 365,
    "status": "neconcludent",
-   "until": "2026-10-30"
+   "until": "2026-10-31"
   },
-  "entered": 139162,
+  "entered": 139254,
   "exchange": "okx",
   "liquid": {
-   "ci_high": 0.052,
-   "ci_low": -0.0441,
-   "n": 59258,
-   "r": 0.0019,
+   "ci_high": 0.0463,
+   "ci_low": -0.0475,
+   "n": 59271,
+   "r": 0.0018,
    "win": 32.8
   },
   "long": {
-   "ci_high": 0.051,
-   "ci_low": -0.1042,
-   "n": 29785,
-   "r": -0.0262,
+   "ci_high": 0.0543,
+   "ci_low": -0.1003,
+   "n": 29787,
+   "r": -0.0263,
    "win": 32.4
   },
   "min_qv": 200000.0,
-  "plans": 181820,
+  "plans": 182024,
   "rest": {
-   "ci_high": 0.046,
-   "ci_low": -0.0465,
-   "n": 43269,
-   "r": -0.0022,
+   "ci_high": 0.0435,
+   "ci_low": -0.0505,
+   "n": 44159,
+   "r": -0.002,
    "win": 32.7
   },
   "rules": 2,
   "short": {
-   "ci_high": 0.1211,
-   "ci_low": -0.0483,
-   "n": 29473,
-   "r": 0.0303,
+   "ci_high": 0.1092,
+   "ci_low": -0.0441,
+   "n": 29484,
+   "r": 0.0302,
    "win": 33.2
   },
   "symbols": 389,
   "symbols_liquid": 287,
   "tf": "4h",
-  "ts": 1793400147.033456,
+  "ts": 1793483732.8695395,
   "watchlist": {
-   "ci_high": 0.0742,
-   "ci_low": -0.0401,
-   "n": 15989,
-   "r": 0.0129,
-   "win": 32.9
+   "ci_high": 0.0759,
+   "ci_low": -0.0397,
+   "n": 15112,
+   "r": 0.0131,
+   "win": 33.0
   },
-  "when": "2026-10-30 22:42 UTC"
+  "when": "2026-10-31 21:55 UTC"
  },
  "verdict_track": {
   "exchange": "okx",
@@ -22313,7 +22313,7 @@
   "obs": 159162,
   "to": "2026-10-23",
   "tokens": 231,
-  "when": "2026-10-31 13:05 UTC"
+  "when": "2026-10-31 21:53 UTC"
  },
  "where": "hdmihai/scanner"
 }
