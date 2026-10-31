@@ -24,18 +24,20 @@
     }
   },
   "rebuild_removed_live": [],
-  "when": "2026-10-31 11:32 UTC",
-  "ts": 1793446320.2148454,
+  "when": "2026-10-31 12:17 UTC",
+  "ts": 1793449033.9055235,
   "checked": 28028,
   "reevaluated": 180,
-  "live_flagged": 0,
-  "removed_now": 0,
+  "live_flagged": 2,
+  "removed_now": 2,
   "blocked": null,
   "backtest_flagged": 0,
   "backtest_examples": [],
-  "by_reason": {},
+  "by_reason": {
+    "rezultat contrazis de lumanarile reale": 2
+  },
   "pending_live": [],
-  "retrained": false,
+  "retrained": true,
   "epoch": 2,
   "removed": [
     {
@@ -1285,6 +1287,30 @@
       "created_ts": 1791979708.5625517,
       "reason": "rezultat contrazis de lumanarile reale: NO_ENTRY 0.0R in memorie, SL_HIT -1.031R la reevaluare",
       "removed": "2026-10-31 08:30 UTC"
+    },
+    {
+      "id": 314987,
+      "symbol": "AVAX/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": -1.052,
+      "created_ts": 1791694735.1379023,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.052R in memorie, EXPIRED 2.756R la reevaluare",
+      "removed": "2026-10-31 12:17 UTC"
+    },
+    {
+      "id": 342791,
+      "symbol": "AVAX/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": -1.038,
+      "created_ts": 1792124293.0646415,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.038R in memorie, TP2_HIT 2.945R la reevaluare",
+      "removed": "2026-10-31 12:17 UTC"
     }
   ]
 }
