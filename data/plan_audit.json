@@ -24,18 +24,20 @@
     }
   },
   "rebuild_removed_live": [],
-  "when": "2026-11-02 11:02 UTC",
-  "ts": 1793617354.4732804,
-  "checked": 28026,
+  "when": "2026-11-02 12:02 UTC",
+  "ts": 1793620959.467852,
+  "checked": 28027,
   "reevaluated": 183,
-  "live_flagged": 0,
-  "removed_now": 0,
+  "live_flagged": 1,
+  "removed_now": 1,
   "blocked": null,
   "backtest_flagged": 0,
   "backtest_examples": [],
-  "by_reason": {},
+  "by_reason": {
+    "rezultat contrazis de lumanarile reale": 1
+  },
   "pending_live": [],
-  "retrained": false,
+  "retrained": true,
   "epoch": 2,
   "removed": [
     {
@@ -1453,6 +1455,18 @@
       "created_ts": 1792182111.6590252,
       "reason": "rezultat contrazis de lumanarile reale: SL_HIT 0.63R in memorie, NO_ENTRY 0.0R la reevaluare",
       "removed": "2026-11-02 00:35 UTC"
+    },
+    {
+      "id": 314984,
+      "symbol": "SUI/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "EXPIRED",
+      "realized_r": 4.807,
+      "created_ts": 1791633900.4794102,
+      "reason": "rezultat contrazis de lumanarile reale: EXPIRED 4.807R in memorie, EXPIRED 5.49R la reevaluare",
+      "removed": "2026-11-02 12:02 UTC"
     }
   ]
 }
