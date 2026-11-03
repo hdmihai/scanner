@@ -24,18 +24,20 @@
     }
   },
   "rebuild_removed_live": [],
-  "when": "2026-11-02 23:28 UTC",
-  "ts": 1793662137.3799906,
-  "checked": 28027,
-  "reevaluated": 179,
-  "live_flagged": 0,
-  "removed_now": 0,
+  "when": "2026-11-03 00:31 UTC",
+  "ts": 1793665916.911378,
+  "checked": 28028,
+  "reevaluated": 186,
+  "live_flagged": 2,
+  "removed_now": 2,
   "blocked": null,
   "backtest_flagged": 0,
   "backtest_examples": [],
-  "by_reason": {},
+  "by_reason": {
+    "rezultat contrazis de lumanarile reale": 2
+  },
   "pending_live": [],
-  "retrained": false,
+  "retrained": true,
   "epoch": 2,
   "removed": [
     {
@@ -1477,6 +1479,30 @@
       "created_ts": 1792068592.9300787,
       "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.037R in memorie, SL_HIT 0.463R la reevaluare",
       "removed": "2026-11-02 16:39 UTC"
+    },
+    {
+      "id": 342759,
+      "symbol": "DOGE/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "TP2_HIT",
+      "realized_r": 3.458,
+      "created_ts": 1791866134.6540124,
+      "reason": "rezultat contrazis de lumanarile reale: TP2_HIT 3.458R in memorie, EXPIRED 2.34R la reevaluare",
+      "removed": "2026-11-03 00:31 UTC"
+    },
+    {
+      "id": 342763,
+      "symbol": "ETH/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "TP2_HIT",
+      "realized_r": 3.67,
+      "created_ts": 1791894442.5660138,
+      "reason": "rezultat contrazis de lumanarile reale: TP2_HIT 3.67R in memorie, EXPIRED 2.078R la reevaluare",
+      "removed": "2026-11-03 00:31 UTC"
     }
   ]
 }
