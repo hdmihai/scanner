@@ -1,4 +1,59 @@
 {
-  "scan_time": "2026-11-04 15:09 UTC",
-  "decisions": {}
+  "scan_time": "2026-11-04 16:09 UTC",
+  "decisions": {
+    "POL/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; dovada walk-forward a portii e evaluata in auto-audit",
+      "calibrated_prob": 39.5,
+      "agent_prob": 0.2849,
+      "elliott_bias": 0.2,
+      "next_entry": null
+    },
+    "ATOM/USDT": {
+      "action": "ISSUE",
+      "mode": "EXPLORARE_ELLIOTT",
+      "reason": "Elliott contrazice planul SHORT (Primary Motive W5 BEARISH 74%: impulsul pare complet - W5 a atins 1.378, iar pretul a retras 55% din ea; urmeaza corectia A-B-C). Emis pentru explorare, ca efectul sa ramana masurat.",
+      "calibrated_prob": 39.5,
+      "agent_prob": 0.3608,
+      "elliott_bias": -0.7,
+      "next_entry": 1.561585006
+    },
+    "CHZ/USDT": {
+      "action": "SKIP",
+      "mode": "ASTEAPTA_CORECTIA",
+      "reason": "Elliott contrazice planul SHORT (Primary Motive W5 BEARISH 67%: impulsul pare complet - W5 a atins 0.01141, iar pretul a retras 98% din ea; urmeaza corectia A-B-C). Filtrul ramane activ prin histerezis - efectul nu e distinct de zero (auto-diagnostic, ultimele 3000 planuri (2865 backtest, 135 live): contra Elliott -0.122R, fara conflict -0.022R, diferenta +0.100R (IC95 pe blocuri de timp -0.089..+0.273)). Nivel urmarit pentru intrare: ~0.0122007.",
+      "calibrated_prob": 39.5,
+      "agent_prob": 0.3702,
+      "elliott_bias": -0.7,
+      "next_entry": 0.012200746120000001
+    },
+    "GRAM/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; dovada walk-forward a portii e evaluata in auto-audit",
+      "calibrated_prob": 29.6,
+      "agent_prob": 0.3384,
+      "elliott_bias": 0.4,
+      "next_entry": null
+    },
+    "DASH/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; dovada walk-forward a portii e evaluata in auto-audit",
+      "calibrated_prob": 29.6,
+      "agent_prob": 0.3673,
+      "elliott_bias": null,
+      "next_entry": null
+    },
+    "NEAR/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; dovada walk-forward a portii e evaluata in auto-audit",
+      "calibrated_prob": 29.6,
+      "agent_prob": 0.4107,
+      "elliott_bias": null,
+      "next_entry": null
+    }
+  }
 }
