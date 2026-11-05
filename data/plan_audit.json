@@ -24,18 +24,20 @@
     }
   },
   "rebuild_removed_live": [],
-  "when": "2026-11-05 15:25 UTC",
-  "ts": 1793892345.5519419,
-  "checked": 28041,
-  "reevaluated": 127,
-  "live_flagged": 0,
-  "removed_now": 0,
+  "when": "2026-11-05 16:27 UTC",
+  "ts": 1793896074.303937,
+  "checked": 28045,
+  "reevaluated": 192,
+  "live_flagged": 3,
+  "removed_now": 3,
   "blocked": null,
   "backtest_flagged": 0,
   "backtest_examples": [],
-  "by_reason": {},
+  "by_reason": {
+    "rezultat contrazis de lumanarile reale": 3
+  },
   "pending_live": [],
-  "retrained": false,
+  "retrained": true,
   "epoch": 2,
   "removed": [
     {
@@ -1657,6 +1659,42 @@
       "created_ts": 1791951397.7743845,
       "reason": "rezultat contrazis de lumanarile reale: NO_ENTRY 0.0R in memorie, SL_HIT -1.036R la reevaluare",
       "removed": "2026-11-05 12:36 UTC"
+    },
+    {
+      "id": 342757,
+      "symbol": "ALGO/USDT",
+      "direction": "LONG",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": -1.027,
+      "created_ts": 1791850520.7689688,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.027R in memorie, EXPIRED -0.597R la reevaluare",
+      "removed": "2026-11-05 16:27 UTC"
+    },
+    {
+      "id": 342760,
+      "symbol": "DOT/USDT",
+      "direction": "LONG",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": -1.034,
+      "created_ts": 1791880579.0518365,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.034R in memorie, EXPIRED -0.721R la reevaluare",
+      "removed": "2026-11-05 16:27 UTC"
+    },
+    {
+      "id": 370632,
+      "symbol": "ICP/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "NO_ENTRY",
+      "realized_r": 0.0,
+      "created_ts": 1792399256.3931327,
+      "reason": "rezultat contrazis de lumanarile reale: NO_ENTRY 0.0R in memorie, TP2_HIT 3.152R la reevaluare",
+      "removed": "2026-11-05 16:27 UTC"
     }
   ]
 }
