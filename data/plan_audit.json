@@ -24,18 +24,20 @@
     }
   },
   "rebuild_removed_live": [],
-  "when": "2026-11-05 23:59 UTC",
-  "ts": 1793923170.7326858,
-  "checked": 28042,
-  "reevaluated": 187,
-  "live_flagged": 0,
-  "removed_now": 0,
+  "when": "2026-11-06 01:00 UTC",
+  "ts": 1793926815.5297868,
+  "checked": 28046,
+  "reevaluated": 196,
+  "live_flagged": 5,
+  "removed_now": 5,
   "blocked": null,
   "backtest_flagged": 0,
   "backtest_examples": [],
-  "by_reason": {},
+  "by_reason": {
+    "rezultat contrazis de lumanarile reale": 5
+  },
   "pending_live": [],
-  "retrained": false,
+  "retrained": true,
   "epoch": 2,
   "removed": [
     {
@@ -1729,6 +1731,66 @@
       "created_ts": 1792557293.672581,
       "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.046R in memorie, TP2_HIT 3.299R la reevaluare",
       "removed": "2026-11-05 20:28 UTC"
+    },
+    {
+      "id": 370630,
+      "symbol": "ALGO/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": -1.042,
+      "created_ts": 1792368239.6879668,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.042R in memorie, EXPIRED 2.209R la reevaluare",
+      "removed": "2026-11-06 01:00 UTC"
+    },
+    {
+      "id": 370631,
+      "symbol": "FET/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": -1.031,
+      "created_ts": 1792382973.801057,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.031R in memorie, EXPIRED 2.233R la reevaluare",
+      "removed": "2026-11-06 01:00 UTC"
+    },
+    {
+      "id": 370639,
+      "symbol": "AVAX/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": -1.043,
+      "created_ts": 1792442041.924136,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.043R in memorie, SL_HIT 0.63R la reevaluare",
+      "removed": "2026-11-06 01:00 UTC"
+    },
+    {
+      "id": 370641,
+      "symbol": "ADA/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": -1.047,
+      "created_ts": 1792513714.3161166,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.047R in memorie, TP2_HIT 3.066R la reevaluare",
+      "removed": "2026-11-06 01:00 UTC"
+    },
+    {
+      "id": 370646,
+      "symbol": "FIL/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": -1.034,
+      "created_ts": 1792543846.897986,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.034R in memorie, TP2_HIT 3.329R la reevaluare",
+      "removed": "2026-11-06 01:00 UTC"
     }
   ]
 }
