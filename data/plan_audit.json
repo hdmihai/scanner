@@ -24,18 +24,20 @@
     }
   },
   "rebuild_removed_live": [],
-  "when": "2026-11-07 07:47 UTC",
-  "ts": 1794037622.0043788,
-  "checked": 28039,
-  "reevaluated": 188,
-  "live_flagged": 0,
-  "removed_now": 0,
+  "when": "2026-11-07 08:47 UTC",
+  "ts": 1794041255.6709723,
+  "checked": 28042,
+  "reevaluated": 196,
+  "live_flagged": 3,
+  "removed_now": 3,
   "blocked": null,
   "backtest_flagged": 0,
   "backtest_examples": [],
-  "by_reason": {},
+  "by_reason": {
+    "rezultat contrazis de lumanarile reale": 3
+  },
   "pending_live": [],
-  "retrained": false,
+  "retrained": true,
   "epoch": 2,
   "removed": [
     {
@@ -1897,6 +1899,42 @@
       "created_ts": 1792137828.671296,
       "reason": "rezultat contrazis de lumanarile reale: SL_HIT 0.94R in memorie, EXPIRED 2.916R la reevaluare",
       "removed": "2026-11-07 04:46 UTC"
+    },
+    {
+      "id": 370637,
+      "symbol": "XRP/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": -1.063,
+      "created_ts": 1792427570.4299743,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.063R in memorie, SL_HIT 0.547R la reevaluare",
+      "removed": "2026-11-07 08:47 UTC"
+    },
+    {
+      "id": 370670,
+      "symbol": "EGLD/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": -1.045,
+      "created_ts": 1792670685.253099,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.045R in memorie, TP2_HIT 2.995R la reevaluare",
+      "removed": "2026-11-07 08:47 UTC"
+    },
+    {
+      "id": 370673,
+      "symbol": "SUI/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": -1.049,
+      "created_ts": 1792714676.71293,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.049R in memorie, TP2_HIT 2.788R la reevaluare",
+      "removed": "2026-11-07 08:47 UTC"
     }
   ]
 }
