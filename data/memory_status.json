@@ -18,7 +18,7 @@
    "rows": 5812977
   },
   "candles": {
-   "bytes": 59896376,
+   "bytes": 59917125,
    "coverage": {
     "okx:1d": {
      "symbols": 465,
@@ -29,40 +29,29 @@
      "with_data": 463
     }
    },
-   "max_ts": 1794096000000,
+   "max_ts": 1794139200000,
    "min_ts": 1515628800000,
    "partitions": 18,
-   "rows": 2854054
+   "rows": 2855434
   },
   "lab": {
-   "bytes": 640629,
+   "bytes": 656311,
    "coverage": {},
-   "max_ts": 1794096000000,
+   "max_ts": 1794139200000,
    "min_ts": 1792339200000,
    "partitions": 1,
-   "rows": 3692
+   "rows": 3782
   },
   "plans": {
-   "bytes": 3019240,
+   "bytes": 3020050,
    "coverage": {},
-   "max_ts": 1794112197.5272565,
+   "max_ts": 1794153749.229824,
    "min_ts": 1518552000.0,
    "partitions": 10,
-   "rows": 28040
+   "rows": 28042
   }
  },
  "history": [
-  {
-   "errors": 0,
-   "rows": {
-    "binance": 5703120,
-    "candles": 2793609,
-    "lab": 270,
-    "plans": 27988
-   },
-   "s": 434.5,
-   "when": "2026-10-20 05:24 UTC"
-  },
   {
    "errors": 0,
    "rows": {
@@ -711,6 +700,17 @@
    },
    "s": 439.5,
    "when": "2026-11-08 06:49 UTC"
+  },
+  {
+   "errors": 0,
+   "rows": {
+    "binance": 5812977,
+    "candles": 2855434,
+    "lab": 3782,
+    "plans": 28042
+   },
+   "s": 363.7,
+   "when": "2026-11-08 18:11 UTC"
   }
  ],
  "lab": {
@@ -22151,29 +22151,29 @@
      "complete": 460,
      "covered": 460,
      "no_data": 2,
-     "rows_added": 460,
-     "symbols_updated": 460,
+     "rows_added": 0,
+     "symbols_updated": 0,
      "universe": 462
     },
     "4h": {
      "complete": 460,
      "covered": 460,
      "no_data": 2,
-     "rows_added": 920,
+     "rows_added": 1380,
      "symbols_updated": 460,
      "universe": 462
     }
    },
    "lab": {
-    "skipped": "antrenat acum 8 ore (o data pe zi)",
-    "snapshots_added": 60
+    "skipped": "antrenat acum 20 ore (o data pe zi)",
+    "snapshots_added": 90
    },
    "plans": {
     "partitions_written": 1,
-    "plans": 28040
+    "plans": 28042
    },
    "universe": {
-    "skipped": "masurat acum 8 ore (o data pe zi)"
+    "skipped": "masurat acum 20 ore (o data pe zi)"
    },
    "verdict": {
     "from": "2018-06-10",
@@ -22182,10 +22182,10 @@
     "tokens": 232
    }
   },
-  "duration_s": 439.5,
+  "duration_s": 363.7,
   "errors": [],
-  "finished": "2026-11-08 06:49 UTC",
-  "started": "2026-11-08 06:42 UTC"
+  "finished": "2026-11-08 18:11 UTC",
+  "started": "2026-11-08 18:04 UTC"
  },
  "probe": {
   "binance_vision": {
@@ -22198,7 +22198,7 @@
   "exchange": {
    "id": "okx",
    "ok": true,
-   "s": 2.2
+   "s": 2.6
   },
   "ram_gb": 16.4
  },
@@ -22410,7 +22410,7 @@
   "obs": 159667,
   "to": "2026-10-31",
   "tokens": 232,
-  "when": "2026-11-08 06:45 UTC"
+  "when": "2026-11-08 18:06 UTC"
  },
  "where": "hdmihai/scanner"
 }
