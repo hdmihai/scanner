@@ -18,7 +18,7 @@
    "rows": 5812977
   },
   "candles": {
-   "bytes": 59930969,
+   "bytes": 59954073,
    "coverage": {
     "okx:1d": {
      "symbols": 465,
@@ -29,40 +29,29 @@
      "with_data": 463
     }
    },
-   "max_ts": 1794153600000,
+   "max_ts": 1794182400000,
    "min_ts": 1515628800000,
    "partitions": 18,
-   "rows": 2855894
+   "rows": 2857274
   },
   "lab": {
-   "bytes": 661416,
+   "bytes": 671676,
    "coverage": {},
-   "max_ts": 1794153600000,
+   "max_ts": 1794182400000,
    "min_ts": 1792339200000,
    "partitions": 1,
-   "rows": 3812
+   "rows": 3872
   },
   "plans": {
-   "bytes": 3020178,
+   "bytes": 3020627,
    "coverage": {},
-   "max_ts": 1794170307.2751703,
+   "max_ts": 1794199219.801685,
    "min_ts": 1518552000.0,
    "partitions": 10,
-   "rows": 28043
+   "rows": 28045
   }
  },
  "history": [
-  {
-   "errors": 0,
-   "rows": {
-    "binance": 5703120,
-    "candles": 2794920,
-    "lab": 360,
-    "plans": 27986
-   },
-   "s": 312.9,
-   "when": "2026-10-20 17:36 UTC"
-  },
   {
    "errors": 0,
    "rows": {
@@ -711,6 +700,17 @@
    },
    "s": 1325.5,
    "when": "2026-11-08 22:51 UTC"
+  },
+  {
+   "errors": 0,
+   "rows": {
+    "binance": 5812977,
+    "candles": 2857274,
+    "lab": 3872,
+    "plans": 28045
+   },
+   "s": 371.1,
+   "when": "2026-11-09 07:18 UTC"
   }
  ],
  "lab": {
@@ -22166,59 +22166,54 @@
      "complete": 460,
      "covered": 460,
      "no_data": 2,
-     "rows_added": 0,
-     "symbols_updated": 0,
+     "rows_added": 460,
+     "symbols_updated": 460,
      "universe": 462
     },
     "4h": {
      "complete": 460,
      "covered": 460,
      "no_data": 2,
-     "rows_added": 460,
+     "rows_added": 920,
      "symbols_updated": 460,
      "universe": 462
     }
    },
    "lab": {
-    "chosen": "gbm",
-    "examples": 1005317,
-    "seconds": 769.4,
-    "snapshots_added": 30,
-    "state": "ACTIV"
+    "skipped": "antrenat acum 9 ore (o data pe zi)",
+    "snapshots_added": 60
    },
    "plans": {
     "partitions_written": 1,
-    "plans": 28043
+    "plans": 28045
    },
    "universe": {
-    "liquid": 289,
-    "plans": 183620,
-    "symbols": 389
+    "skipped": "masurat acum 8 ore (o data pe zi)"
    },
    "verdict": {
     "from": "2018-06-10",
-    "obs": 159667,
-    "to": "2026-10-31",
+    "obs": 159725,
+    "to": "2026-11-01",
     "tokens": 232
    }
   },
-  "duration_s": 1325.5,
+  "duration_s": 371.1,
   "errors": [],
-  "finished": "2026-11-08 22:51 UTC",
-  "started": "2026-11-08 22:28 UTC"
+  "finished": "2026-11-09 07:18 UTC",
+  "started": "2026-11-09 07:11 UTC"
  },
  "probe": {
   "binance_vision": {
    "detail": "31 lumanari BTCUSDT 1d ianuarie 2024",
    "ok": true,
-   "s": 0.6
+   "s": 0.9
   },
   "cpu": 4,
   "disk_free_gb": 91.7,
   "exchange": {
    "id": "okx",
    "ok": true,
-   "s": 2.2
+   "s": 2.4
   },
   "ram_gb": 16.4
  },
@@ -22360,19 +22355,19 @@
      "beat": 35.2,
      "mean": -2.01,
      "median": -5.94,
-     "n": 69528
+     "n": 69536
     },
     "Bullish": {
      "beat": 33.1,
-     "mean": -1.53,
-     "median": -10.19,
-     "n": 21532
+     "mean": -1.54,
+     "median": -10.21,
+     "n": 21550
     },
     "Neutru": {
      "beat": 31.0,
      "mean": -3.02,
      "median": -8.81,
-     "n": 66988
+     "n": 67036
     },
     "by_year": {
      "2020": 7.36,
@@ -22381,33 +22376,33 @@
      "2023": 1.91,
      "2024": -0.53,
      "2025": -1.47,
-     "2026": -1.37
+     "2026": -1.39
     },
     "spread": {
-     "ci_high": 2.28,
+     "ci_high": 2.27,
      "ci_low": -2.14,
-     "days": 1361,
-     "mean": 0.03
+     "days": 1362,
+     "mean": 0.02
     }
    },
    "7": {
     "Bearish": {
      "beat": 40.2,
-     "mean": -0.74,
+     "mean": -0.75,
      "median": -1.78,
-     "n": 69884
+     "n": 69906
     },
     "Bullish": {
      "beat": 39.6,
      "mean": 0.77,
      "median": -3.14,
-     "n": 21767
+     "n": 21773
     },
     "Neutru": {
      "beat": 38.2,
      "mean": -0.7,
      "median": -2.41,
-     "n": 68016
+     "n": 68046
     },
     "by_year": {
      "2020": 5.55,
@@ -22416,21 +22411,21 @@
      "2023": 0.02,
      "2024": 1.82,
      "2025": 1.23,
-     "2026": -0.05
+     "2026": -0.04
     },
     "spread": {
      "ci_high": 1.69,
      "ci_low": 0.12,
-     "days": 1384,
+     "days": 1385,
      "mean": 0.88
     }
    }
   },
   "min_qv": 1000000.0,
-  "obs": 159667,
-  "to": "2026-10-31",
+  "obs": 159725,
+  "to": "2026-11-01",
   "tokens": 232,
-  "when": "2026-11-08 22:30 UTC"
+  "when": "2026-11-09 07:14 UTC"
  },
  "where": "hdmihai/scanner"
 }
