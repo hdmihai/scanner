@@ -24,18 +24,20 @@
     }
   },
   "rebuild_removed_live": [],
-  "when": "2026-11-10 15:45 UTC",
-  "ts": 1794325534.0656662,
+  "when": "2026-11-10 16:45 UTC",
+  "ts": 1794329146.813914,
   "checked": 28062,
-  "reevaluated": 218,
-  "live_flagged": 0,
-  "removed_now": 0,
+  "reevaluated": 194,
+  "live_flagged": 4,
+  "removed_now": 4,
   "blocked": null,
   "backtest_flagged": 0,
   "backtest_examples": [],
-  "by_reason": {},
+  "by_reason": {
+    "rezultat contrazis de lumanarile reale": 4
+  },
   "pending_live": [],
-  "retrained": false,
+  "retrained": true,
   "epoch": 2,
   "removed": [
     {
@@ -2005,6 +2007,54 @@
       "created_ts": 1792901332.4308367,
       "reason": "rezultat contrazis de lumanarile reale: NO_ENTRY 0.0R in memorie, SL_HIT 0.451R la reevaluare",
       "removed": "2026-11-10 12:44 UTC"
+    },
+    {
+      "id": 370695,
+      "symbol": "SUI/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": 0.457,
+      "created_ts": 1792917300.234968,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT 0.457R in memorie, NO_ENTRY 0.0R la reevaluare",
+      "removed": "2026-11-10 16:45 UTC"
+    },
+    {
+      "id": 370698,
+      "symbol": "SEI/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "TP2_HIT",
+      "realized_r": 4.921,
+      "created_ts": 1792973617.9687881,
+      "reason": "rezultat contrazis de lumanarile reale: TP2_HIT 4.921R in memorie, NO_ENTRY 0.0R la reevaluare",
+      "removed": "2026-11-10 16:45 UTC"
+    },
+    {
+      "id": 370699,
+      "symbol": "THETA/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "TP2_HIT",
+      "realized_r": 2.956,
+      "created_ts": 1792973618.8536499,
+      "reason": "rezultat contrazis de lumanarile reale: TP2_HIT 2.956R in memorie, NO_ENTRY 0.0R la reevaluare",
+      "removed": "2026-11-10 16:45 UTC"
+    },
+    {
+      "id": 370701,
+      "symbol": "ICP/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": -1.052,
+      "created_ts": 1793001918.4598546,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.052R in memorie, SL_HIT 0.448R la reevaluare",
+      "removed": "2026-11-10 16:45 UTC"
     }
   ]
 }
