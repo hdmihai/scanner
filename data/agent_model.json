@@ -1,50 +1,50 @@
 {
   "model": {
     "weights": {
-      "trend": 0.001853,
-      "momentum": 0.027183,
-      "volatility": -0.261805,
-      "volume": -0.120089,
+      "trend": 0.001983,
+      "momentum": 0.027547,
+      "volatility": -0.261417,
+      "volume": -0.119049,
       "persistence_n": 0.0,
-      "ev_ema_fast": -0.043851,
-      "ev_ema_stack": 0.282217,
-      "ev_supertrend": 0.004096,
-      "ev_macd": 0.186052,
-      "ev_vwap": 0.236298,
-      "ev_poc": 0.055254,
-      "ev_value_area": 0.061325,
-      "ev_rsi": -0.130251,
+      "ev_ema_fast": -0.043396,
+      "ev_ema_stack": 0.282771,
+      "ev_supertrend": 0.004275,
+      "ev_macd": 0.186989,
+      "ev_vwap": 0.236852,
+      "ev_poc": 0.055808,
+      "ev_value_area": 0.061713,
+      "ev_rsi": -0.129843,
       "ev_volume": 0.0,
       "ev_volatility": 0.0,
       "ev_order_flow": 0.0,
       "ev_book_imbalance": 0.0,
       "ev_liq_magnet": 0.0,
-      "ev_ichimoku": 0.045923,
-      "ev_ma_cross": 0.217489,
-      "ev_regime": 0.262085,
-      "ev_mtf_align": -0.098217,
-      "ev_elliott": 0.009774,
-      "ev_liq_struct": -0.005589,
-      "ev_liq_sweep": -0.02489,
-      "ev_altseason": -0.026311,
-      "ev_analyst": 0.056635,
-      "ev_fusion": 0.072306,
+      "ev_ichimoku": 0.045749,
+      "ev_ma_cross": 0.218043,
+      "ev_regime": 0.262106,
+      "ev_mtf_align": -0.097662,
+      "ev_elliott": 0.009098,
+      "ev_liq_struct": -0.005461,
+      "ev_liq_sweep": -0.024557,
+      "ev_altseason": -0.026039,
+      "ev_analyst": 0.057189,
+      "ev_fusion": 0.072294,
       "ob_imbalance": 0.001948,
       "funding_z": 0.0,
       "oi_change": -2.2e-05,
-      "liq_change": -0.054925
+      "liq_change": -0.055772
     },
-    "bias": -0.979883
+    "bias": -0.979328
   },
-  "samples_trained": 21265,
+  "samples_trained": 21267,
   "last_trained_scan_ts": 0.0,
   "agent": {
-    "correct": 14096,
-    "total": 21265
+    "correct": 14097,
+    "total": 21267
   },
   "baseline": {
-    "correct": 6936,
-    "total": 21265
+    "correct": 6937,
+    "total": 21267
   },
   "by_direction": {
     "LONG": {
@@ -53,23 +53,13 @@
       "total": 10300
     },
     "SHORT": {
-      "agent": 7206,
-      "baseline": 3619,
-      "total": 10965
+      "agent": 7207,
+      "baseline": 3620,
+      "total": 10967
     }
   },
   "first_scan_ts": 1518552000.0,
   "pairs": [
-    [
-      0.18981,
-      1.0,
-      5.992
-    ],
-    [
-      0.45111,
-      1.0,
-      0.489
-    ],
     [
       0.36454,
       0.0,
@@ -15059,11 +15049,19 @@
       0.4216,
       1.0,
       0.444
+    ],
+    [
+      0.4495,
+      0.0,
+      -1.058
+    ],
+    [
+      0.4483,
+      1.0,
+      0.457
     ]
   ],
   "recent": [
-    1,
-    1,
     0,
     1,
     1,
@@ -15261,11 +15259,11 @@
     1,
     1,
     0,
+    0,
+    1,
     0
   ],
   "recent_baseline": [
-    0,
-    0,
     1,
     0,
     0,
@@ -15463,6 +15461,8 @@
     0,
     0,
     1,
+    1,
+    0,
     1
   ],
   "curve": [
@@ -20571,14 +20571,6 @@
   "source": "plans-v6-4h",
   "feature_version": "f8",
   "score_pairs": [
-    [
-      0.48,
-      1.0
-    ],
-    [
-      0.73,
-      1.0
-    ],
     [
       0.57,
       0.0
@@ -32570,30 +32562,38 @@
     [
       0.71,
       1.0
+    ],
+    [
+      0.72,
+      0.0
+    ],
+    [
+      0.75,
+      1.0
     ]
   ],
-  "last_event_ts": 1794268800.0,
+  "last_event_ts": 1794283200.0,
   "learning_rate": 0.00424,
   "eval_version": "causal-v1",
   "live": {
-    "n": 151,
-    "auc": 0.582,
-    "ci_low": 0.477,
-    "ci_high": 0.704,
-    "avg_r": -0.2
+    "n": 153,
+    "auc": 0.583,
+    "ci_low": 0.486,
+    "ci_high": 0.7,
+    "avg_r": -0.201
   },
-  "status_reason": "AUC live 0.582 (IC95 0.477-0.704) pe 151 planuri live nu e peste hazard - filtrul nu se aplica",
-  "days_covered": 3191.17,
-  "balanced_agent": 66.30569906897054,
-  "balanced_baseline": 32.60444972750898,
+  "status_reason": "AUC live 0.583 (IC95 0.486-0.7) pe 153 planuri live nu e peste hazard - filtrul nu se aplica",
+  "days_covered": 3191.33,
+  "balanced_agent": 66.30426584254086,
+  "balanced_baseline": 32.60599937500055,
   "balanced_directions": [
     "LONG",
     "SHORT"
   ],
-  "auc": 0.5928811280001183,
-  "auc_score_baseline": 0.5576357123230617,
+  "auc": 0.5931348046166496,
+  "auc_score_baseline": 0.5576298254168716,
   "agent_superior": true,
-  "majority_baseline": 67.9,
+  "majority_baseline": 67.93333333333334,
   "learning_status": "STALLED",
   "stalled_days": 29,
   "predicted_positive_rate": 5.6,
@@ -32651,7 +32651,7 @@
       35
     ],
     "ev_ichimoku": [
-      79,
+      80,
       74
     ],
     "ev_ma_cross": [
@@ -32663,11 +32663,11 @@
       100
     ],
     "ev_mtf_align": [
-      91,
+      92,
       83
     ],
     "ev_elliott": [
-      74,
+      73,
       76
     ],
     "ev_liq_struct": [
@@ -32675,7 +32675,7 @@
       92
     ],
     "ev_liq_sweep": [
-      34,
+      35,
       7
     ],
     "ev_altseason": [
