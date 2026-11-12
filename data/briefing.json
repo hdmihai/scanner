@@ -1,27 +1,27 @@
 {
-  "text": "Din 21258 planuri inchise, rata de succes e 32.6%, cu -11.24R cumulat (-0.001R in medie pe plan) si profit factor 1.0. 21 planuri sunt inca deschise. Atentie: 21114 dintre ele sunt din backtest. LIVE, din 2026-09-30: 144 planuri inchise, castig 28.5% (IC 21.7-36.3%), R mediu -0.299R (IC95 -0.587..-0.042R), total -43.08R. Ultimele inchise: #370800 SOL/USDT +2.71R, #370834 ETH/USDT +2.68R, #370855 ICP/USDT -1.04R. R mediu pe intervalele de scor cu destule date (IC95 pe blocuri de timp) - toate (0-19, 20-39, 40-59, 60-79, 80-99) in marja zgomotului (IC95 al R-ului mediu include zero). Poarta pe aceste cifre e dezactivata (USE_DECISION_GATE=false; dovada walk-forward e in auto-audit): ele se afiseaza, dar nu decid emiterea planurilor. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (treimea de sus a agentului da -0.103R vs -0.056R pe toate - avantaj -0.047R, sub pragul de +0.05R. Filtrul nu adauga destula valoare.). Auto-auditul are 3 imbunatatiri deschise (1 mari, 2 medii, 0 mici); cea mai importanta: Semnalul nu are avantaj masurabil recent. Laboratorul (model invatat din memorie, linear): stare CERCETARE - walk-forward fara avantaj dovedit: +0.053R/alegere (IC95 -0.006..+0.117, n=9456). Walk-forward +0.053R (IC95 -0.006..+0.117) pe alegere, n=9456; perioada rezervata +0.053R (IC95 -0.067..+0.173); test inainte (live, tot universul): 191 alegeri incheiate, +0.346R (IC95 +0.010..+0.669).",
+  "text": "Din 21258 planuri inchise, rata de succes e 32.6%, cu -7.76R cumulat (-0.000R in medie pe plan) si profit factor 1.0. 20 planuri sunt inca deschise. Atentie: 21114 dintre ele sunt din backtest. LIVE, din 2026-09-30: 144 planuri inchise, castig 28.5% (IC 21.7-36.3%), R mediu -0.275R (IC95 -0.595..-0.012R), total -39.60R. Ultimele inchise: #370785 MANA/USDT +3.93R, #370800 SOL/USDT +2.71R, #370834 ETH/USDT +2.68R. R mediu pe intervalele de scor cu destule date (IC95 pe blocuri de timp) - toate (0-19, 20-39, 40-59, 60-79, 80-99) in marja zgomotului (IC95 al R-ului mediu include zero). Poarta pe aceste cifre e dezactivata (USE_DECISION_GATE=false; dovada walk-forward e in auto-audit): ele se afiseaza, dar nu decid emiterea planurilor. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (treimea de sus a agentului da -0.102R vs -0.055R pe toate - avantaj -0.047R, sub pragul de +0.05R. Filtrul nu adauga destula valoare.). Auto-auditul are 3 imbunatatiri deschise (1 mari, 2 medii, 0 mici); cea mai importanta: Semnalul nu are avantaj masurabil recent. Laboratorul (model invatat din memorie, gbm): stare ACTIV - confirmat live: +0.351R/alegere (IC95 +0.064..+0.662, n=199). Walk-forward +0.065R (IC95 +0.004..+0.126) pe alegere, n=8633; perioada rezervata +0.031R (IC95 -0.065..+0.129); test inainte (live, tot universul): 199 alegeri incheiate, +0.351R (IC95 +0.064..+0.662).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-11-12 19:53 UTC",
+    "scan_time": "2026-11-12 20:54 UTC",
     "universe_size": 30,
-    "plans_total": 28063,
-    "plans_open": 21,
+    "plans_total": 28062,
+    "plans_open": 20,
     "plans_closed": 21258,
     "legacy_closed": 0,
     "legacy_total_r": null,
     "win_rate": 32.6,
-    "total_r": -11.24,
-    "avg_r": -0.001,
+    "total_r": -7.76,
+    "avg_r": -0.0,
     "profit_factor": 1.0,
     "live": {
       "closed": 144,
       "win_rate": 28.5,
       "wr_ci_low": 21.7,
       "wr_ci_high": 36.3,
-      "avg_r": -0.299,
-      "avg_r_ci_low": -0.587,
-      "avg_r_ci_high": -0.042,
-      "total_r": -43.08,
+      "avg_r": -0.275,
+      "avg_r_ci_low": -0.595,
+      "avg_r_ci_high": -0.012,
+      "total_r": -39.6,
       "since": "2026-09-30"
     },
     "backtest": {
@@ -36,6 +36,13 @@
       "since": "2018-02-13"
     },
     "recent_closed": [
+      {
+        "id": 370785,
+        "symbol": "MANA/USDT",
+        "direction": "SHORT",
+        "state": "EXPIRAT dupa 48 bare",
+        "r": 3.934
+      },
       {
         "id": 370800,
         "symbol": "SOL/USDT",
@@ -63,13 +70,6 @@
         "direction": "LONG",
         "state": "SL HIT - INVALIDATED",
         "r": -1.041
-      },
-      {
-        "id": 370849,
-        "symbol": "DOT/USDT",
-        "direction": "SHORT",
-        "state": "TP1 HIT - SL LA BREAKEVEN (aceeasi bara)",
-        "r": 0.463
       }
     ],
     "open_now": [
@@ -161,10 +161,10 @@
         "range": "60-79",
         "total": 5858,
         "win_rate": 39.6,
-        "avg_r": 0.018,
+        "avg_r": 0.019,
         "r_ci": [
-          -0.05,
-          0.085
+          -0.049,
+          0.086
         ]
       },
       {
@@ -180,51 +180,51 @@
     ],
     "decision_gate": false,
     "agent_status": "SHADOW",
-    "agent_reason": "treimea de sus a agentului da -0.103R vs -0.056R pe toate - avantaj -0.047R, sub pragul de +0.05R. Filtrul nu adauga destula valoare.",
+    "agent_reason": "treimea de sus a agentului da -0.102R vs -0.055R pe toate - avantaj -0.047R, sub pragul de +0.05R. Filtrul nu adauga destula valoare.",
     "agent_samples": 21258,
     "agent_balanced": 66.33581530184978,
     "baseline_balanced": 32.57848856268506,
     "agent_weights": {
-      "trend": -0.005886,
-      "momentum": 0.021729,
-      "volatility": -0.273045,
-      "volume": -0.125858,
+      "trend": -0.005917,
+      "momentum": 0.020437,
+      "volatility": -0.272073,
+      "volume": -0.123466,
       "persistence_n": 0.0,
-      "ev_ema_fast": -0.048303,
-      "ev_ema_stack": 0.271848,
-      "ev_supertrend": -0.003567,
-      "ev_macd": 0.186733,
-      "ev_vwap": 0.225912,
-      "ev_poc": 0.043639,
-      "ev_value_area": 0.05637,
-      "ev_rsi": -0.131893,
+      "ev_ema_fast": -0.049679,
+      "ev_ema_stack": 0.273002,
+      "ev_supertrend": -0.004675,
+      "ev_macd": 0.184734,
+      "ev_vwap": 0.227026,
+      "ev_poc": 0.044809,
+      "ev_value_area": 0.057198,
+      "ev_rsi": -0.134296,
       "ev_volume": 0.0,
       "ev_volatility": 0.0,
       "ev_order_flow": 0.0,
       "ev_book_imbalance": 0.0,
       "ev_liq_magnet": 0.0,
-      "ev_ichimoku": 0.040561,
-      "ev_ma_cross": 0.221426,
-      "ev_regime": 0.254419,
-      "ev_mtf_align": -0.095126,
-      "ev_elliott": 0.011234,
-      "ev_liq_struct": -0.01099,
-      "ev_liq_sweep": -0.016283,
-      "ev_altseason": -0.031097,
-      "ev_analyst": 0.05906,
-      "ev_fusion": 0.064803,
+      "ev_ichimoku": 0.038701,
+      "ev_ma_cross": 0.224308,
+      "ev_regime": 0.25307,
+      "ev_mtf_align": -0.094029,
+      "ev_elliott": 0.012481,
+      "ev_liq_struct": -0.009309,
+      "ev_liq_sweep": -0.017561,
+      "ev_altseason": -0.030612,
+      "ev_analyst": 0.059895,
+      "ev_fusion": 0.065543,
       "ob_imbalance": -8.9e-05,
       "funding_z": 0.0,
       "oi_change": -4.7e-05,
-      "liq_change": -0.02641
+      "liq_change": -0.020777
     },
     "real": {
       "all": {
         "n": 144,
         "win_rate": 28.5,
-        "avg_r": -0.299,
-        "total_r": -43.08,
-        "profit_factor": 0.6
+        "avg_r": -0.275,
+        "total_r": -39.6,
+        "profit_factor": 0.63
       },
       "by_direction": {
         "LONG": {
@@ -237,14 +237,20 @@
         "SHORT": {
           "n": 85,
           "win_rate": 45.9,
-          "avg_r": 0.186,
-          "total_r": 15.82,
-          "profit_factor": 1.33
+          "avg_r": 0.227,
+          "total_r": 19.3,
+          "profit_factor": 1.4
         }
       },
       "no_entry": 76,
-      "open": 21,
+      "open": 20,
       "recent": [
+        {
+          "id": 370785,
+          "symbol": "MANA/USDT",
+          "direction": "SHORT",
+          "r": 3.934
+        },
         {
           "id": 370800,
           "symbol": "SOL/USDT",
@@ -256,22 +262,16 @@
           "symbol": "ETH/USDT",
           "direction": "SHORT",
           "r": 2.683
-        },
-        {
-          "id": 370855,
-          "symbol": "ICP/USDT",
-          "direction": "LONG",
-          "r": -1.04
         }
       ],
       "divergence": {
         "n_live": 144,
         "vs_all": {
-          "diff": -0.301,
-          "ci_low": -0.549,
-          "ci_high": 0.018,
+          "diff": -0.277,
+          "ci_low": -0.542,
+          "ci_high": 0.05,
           "status": "in_marja",
-          "live_r": -0.299,
+          "live_r": -0.275,
           "bt_r": 0.002
         },
         "n_live_window": 33,
@@ -290,10 +290,10 @@
       },
       "agent_live": {
         "n": 144,
-        "auc": 0.618,
-        "ci_low": 0.511,
+        "auc": 0.62,
+        "ci_low": 0.514,
         "ci_high": 0.734,
-        "avg_r": -0.299
+        "avg_r": -0.275
       }
     },
     "simulated": {
@@ -324,50 +324,50 @@
       "universe": {
         "symbols": 290,
         "liquid": {
-          "ci_high": 0.0512,
-          "ci_low": -0.0455,
-          "n": 59487,
-          "r": 0.0016,
+          "ci_high": 0.0473,
+          "ci_low": -0.0475,
+          "n": 59504,
+          "r": 0.0017,
           "win": 32.8
         },
         "rest": {
-          "ci_high": 0.0441,
-          "ci_low": -0.0475,
-          "n": 45865,
-          "r": -0.0021,
+          "ci_high": 0.0434,
+          "ci_low": -0.0515,
+          "n": 43487,
+          "r": -0.002,
           "win": 32.8
         },
         "recent": {
-          "ci_high": 0.04,
-          "ci_low": -0.166,
-          "n": 7158,
-          "r": -0.063
+          "ci_high": 0.049,
+          "ci_low": -0.165,
+          "n": 7134,
+          "r": -0.059
         },
         "status": "neconcludent",
-        "when": "2026-11-11 20:04 UTC",
+        "when": "2026-11-12 20:44 UTC",
         "rules": 2
       }
     },
     "audit_summary": "Auto-auditul are 3 imbunatatiri deschise (1 mari, 2 medii, 0 mici); cea mai importanta: Semnalul nu are avantaj masurabil recent.",
-    "lab_line": "Laboratorul (model invatat din memorie, linear): stare CERCETARE - walk-forward fara avantaj dovedit: +0.053R/alegere (IC95 -0.006..+0.117, n=9456). Walk-forward +0.053R (IC95 -0.006..+0.117) pe alegere, n=9456; perioada rezervata +0.053R (IC95 -0.067..+0.173); test inainte (live, tot universul): 191 alegeri incheiate, +0.346R (IC95 +0.010..+0.669)."
+    "lab_line": "Laboratorul (model invatat din memorie, gbm): stare ACTIV - confirmat live: +0.351R/alegere (IC95 +0.064..+0.662, n=199). Walk-forward +0.065R (IC95 +0.004..+0.126) pe alegere, n=8633; perioada rezervata +0.031R (IC95 -0.065..+0.129); test inainte (live, tot universul): 199 alegeri incheiate, +0.351R (IC95 +0.064..+0.662)."
   },
   "sections": {
     "real": [
-      "Pe piata reala din 2026-09-30: 144 planuri inchise, castig 28.5%, R mediu -0.299R (IC95 -0.587..-0.042R), total -43.08R, profit factor 0.6.",
-      "Pe directii: LONG 59 planuri -0.998R; SHORT 85 planuri +0.186R.",
-      "Real vs simulat: pe aceeasi perioada (2026-09-30 - 2026-10-16, 167 planuri simulate) -0.877R/plan (IC95 -1.303..-0.565), SEMNIFICATIV sub simulare; fata de tot istoricul simulat -0.301R/plan (IC95 -0.549..+0.018), in marja statistica.",
-      "Agentul pe date reale: AUC 0.618 (IC 0.511-0.734) pe 144/100 planuri necesare confirmarii.",
-      "Ultimele inchise live: #370800 SOL/USDT +2.71R, #370834 ETH/USDT +2.68R, #370855 ICP/USDT -1.04R.",
-      "Deschise acum: 21; anulate fara intrare (pretul nu a revenit): 76."
+      "Pe piata reala din 2026-09-30: 144 planuri inchise, castig 28.5%, R mediu -0.275R (IC95 -0.595..-0.012R), total -39.60R, profit factor 0.63.",
+      "Pe directii: LONG 59 planuri -0.998R; SHORT 85 planuri +0.227R.",
+      "Real vs simulat: pe aceeasi perioada (2026-09-30 - 2026-10-16, 167 planuri simulate) -0.877R/plan (IC95 -1.303..-0.565), SEMNIFICATIV sub simulare; fata de tot istoricul simulat -0.277R/plan (IC95 -0.542..+0.050), in marja statistica.",
+      "Agentul pe date reale: AUC 0.620 (IC 0.514-0.734) pe 144/100 planuri necesare confirmarii.",
+      "Ultimele inchise live: #370785 MANA/USDT +3.93R, #370800 SOL/USDT +2.71R, #370834 ETH/USDT +2.68R.",
+      "Deschise acum: 20; anulate fara intrare (pretul nu a revenit): 76."
     ],
     "simulated": [
       "Backtest 2018-02-13-azi (regenerat 2026-10-11 20:52 UTC): 21114 planuri inchise, castig 32.6%, R mediu +0.002R, total +31.85R, profit factor 1.0.",
       "Ultimele 12 luni simulate: -0.055R/plan (IC95 -0.177..+0.071) pe 3752 planuri - nu e distinct de zero.",
       "Calibrare (dominata de backtest): R mediu pe intervalele de scor cu destule date (IC95 pe blocuri de timp) - toate (0-19, 20-39, 40-59, 60-79, 80-99) in marja zgomotului (IC95 al R-ului mediu include zero).",
-      "Pe tot universul bursei (290 simboluri lichide, aceeasi strategie): +0.002R/plan (IC95 -0.045..+0.051, n=59487); ultimele 12 luni -0.063R/plan (IC95 -0.166..+0.040).",
+      "Pe tot universul bursei (290 simboluri lichide, aceeasi strategie): +0.002R/plan (IC95 -0.048..+0.047, n=59504); ultimele 12 luni -0.059R/plan (IC95 -0.165..+0.049).",
       "Rol: pre-antrenarea agentului, calibrarea si cercetarea regulilor - nu e rezultat pe piata reala."
     ],
-    "agent": "Agentul e in SHADOW: invata, dar nu filtreaza (treimea de sus a agentului da -0.103R vs -0.056R pe toate - avantaj -0.047R, sub pragul de +0.05R. Filtrul nu adauga destula valoare.)."
+    "agent": "Agentul e in SHADOW: invata, dar nu filtreaza (treimea de sus a agentului da -0.102R vs -0.055R pe toate - avantaj -0.047R, sub pragul de +0.05R. Filtrul nu adauga destula valoare.)."
   },
   "llm_error": "GEMINI_API_KEY lipseste"
 }
