@@ -1,4 +1,23 @@
 {
-  "scan_time": "2026-11-13 19:15 UTC",
-  "decisions": {}
+  "scan_time": "2026-11-13 20:15 UTC",
+  "decisions": {
+    "BTC/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; dovada walk-forward a portii e evaluata in auto-audit",
+      "calibrated_prob": 39.6,
+      "agent_prob": 0.458,
+      "elliott_bias": -0.0279,
+      "next_entry": 72727.3
+    },
+    "GRT/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; dovada walk-forward a portii e evaluata in auto-audit",
+      "calibrated_prob": 39.6,
+      "agent_prob": 0.4224,
+      "elliott_bias": 0.4,
+      "next_entry": null
+    }
+  }
 }
