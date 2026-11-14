@@ -1,30 +1,12 @@
 {
-  "scan_time": "2026-11-14 00:31 UTC",
+  "scan_time": "2026-11-14 01:31 UTC",
   "decisions": {
-    "SOL/USDT": {
-      "action": "ISSUE",
-      "mode": "POARTA_DEZACTIVATA",
-      "reason": "poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; dovada walk-forward a portii e evaluata in auto-audit",
-      "calibrated_prob": 44.5,
-      "agent_prob": 0.4479,
-      "elliott_bias": 0.1852,
-      "next_entry": null
-    },
-    "ETH/USDT": {
-      "action": "ISSUE",
-      "mode": "POARTA_DEZACTIVATA",
-      "reason": "poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; dovada walk-forward a portii e evaluata in auto-audit",
-      "calibrated_prob": 39.6,
-      "agent_prob": 0.457,
-      "elliott_bias": -0.0991,
-      "next_entry": 2007.6744
-    },
     "EGLD/USDT": {
       "action": "SKIP",
       "mode": "ASTEAPTA_CORECTIA",
-      "reason": "Elliott contrazice planul SHORT (Primary Developing Motive W5 FORMING BEARISH 24%: W5 a atins deja tinta minima (2.79); finalul impulsului e aproape - potentialul ramas e mic, corectia A-B-C urmeaza). Filtrul ramane activ prin histerezis - efectul nu e distinct de zero (auto-diagnostic, ultimele 3000 planuri (2860 backtest, 140 live): contra Elliott -0.100R, fara conflict -0.029R, diferenta +0.071R (IC95 pe blocuri de timp -0.117..+0.253)). Nivel urmarit pentru intrare: ~3.21356.",
+      "reason": "Elliott contrazice planul SHORT (Primary Developing Motive W5 FORMING BEARISH 24%: W5 a atins deja tinta minima (2.79); finalul impulsului e aproape - potentialul ramas e mic, corectia A-B-C urmeaza). Filtrul ramane activ prin histerezis - efectul nu e distinct de zero (auto-diagnostic, ultimele 3000 planuri (2860 backtest, 140 live): contra Elliott -0.099R, fara conflict -0.029R, diferenta +0.070R (IC95 pe blocuri de timp -0.118..+0.252)). Nivel urmarit pentru intrare: ~3.21356.",
       "calibrated_prob": 39.6,
-      "agent_prob": 0.4234,
+      "agent_prob": 0.4179,
       "elliott_bias": -0.4,
       "next_entry": 3.2135559679999997
     }
