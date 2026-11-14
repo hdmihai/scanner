@@ -1,14 +1,32 @@
 {
-  "scan_time": "2026-11-14 03:06 UTC",
+  "scan_time": "2026-11-14 04:07 UTC",
   "decisions": {
-    "EGLD/USDT": {
-      "action": "SKIP",
-      "mode": "ASTEAPTA_CORECTIA",
-      "reason": "Elliott contrazice planul SHORT (Primary Developing Motive W5 FORMING BEARISH 24%: W5 a atins deja tinta minima (2.79); finalul impulsului e aproape - potentialul ramas e mic, corectia A-B-C urmeaza). Filtrul ramane activ prin histerezis - efectul nu e distinct de zero (auto-diagnostic, ultimele 3000 planuri (2860 backtest, 140 live): contra Elliott -0.099R, fara conflict -0.029R, diferenta +0.070R (IC95 pe blocuri de timp -0.118..+0.252)). Nivel urmarit pentru intrare: ~3.21356.",
+    "FIL/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; dovada walk-forward a portii e evaluata in auto-audit",
       "calibrated_prob": 39.6,
-      "agent_prob": 0.4178,
-      "elliott_bias": -0.4,
-      "next_entry": 3.2135559679999997
+      "agent_prob": 0.4763,
+      "elliott_bias": 0.6523,
+      "next_entry": null
+    },
+    "AXS/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; dovada walk-forward a portii e evaluata in auto-audit",
+      "calibrated_prob": 39.6,
+      "agent_prob": 0.4434,
+      "elliott_bias": 0.7061,
+      "next_entry": null
+    },
+    "MANA/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; dovada walk-forward a portii e evaluata in auto-audit",
+      "calibrated_prob": 39.6,
+      "agent_prob": 0.4235,
+      "elliott_bias": 0.5544,
+      "next_entry": null
     }
   }
 }
