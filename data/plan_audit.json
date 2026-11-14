@@ -24,18 +24,20 @@
     }
   },
   "rebuild_removed_live": [],
-  "when": "2026-11-13 23:33 UTC",
-  "ts": 1794612824.4981065,
-  "checked": 28059,
-  "reevaluated": 213,
-  "live_flagged": 0,
-  "removed_now": 0,
+  "when": "2026-11-14 00:33 UTC",
+  "ts": 1794616393.9662936,
+  "checked": 28061,
+  "reevaluated": 198,
+  "live_flagged": 3,
+  "removed_now": 3,
   "blocked": null,
   "backtest_flagged": 0,
   "backtest_examples": [],
-  "by_reason": {},
+  "by_reason": {
+    "rezultat contrazis de lumanarile reale": 3
+  },
   "pending_live": [],
-  "retrained": false,
+  "retrained": true,
   "epoch": 2,
   "removed": [
     {
@@ -2401,6 +2403,42 @@
       "created_ts": 1793264299.095986,
       "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.049R in memorie, TP2_HIT 2.701R la reevaluare",
       "removed": "2026-11-13 20:16 UTC"
+    },
+    {
+      "id": 342793,
+      "symbol": "TRX/USDT",
+      "direction": "LONG",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": -1.167,
+      "created_ts": 1792152294.384658,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.167R in memorie, TP2_HIT 3.95R la reevaluare",
+      "removed": "2026-11-14 00:33 UTC"
+    },
+    {
+      "id": 370702,
+      "symbol": "EGLD/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": -1.041,
+      "created_ts": 1793001919.65946,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.041R in memorie, SL_HIT 0.459R la reevaluare",
+      "removed": "2026-11-14 00:33 UTC"
+    },
+    {
+      "id": 370724,
+      "symbol": "AVAX/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": -1.049,
+      "created_ts": 1793249543.5124075,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.049R in memorie, SL_HIT 0.451R la reevaluare",
+      "removed": "2026-11-14 00:33 UTC"
     }
   ]
 }
