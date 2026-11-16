@@ -1,11 +1,11 @@
 {
-  "text": "Din 21252 planuri inchise, rata de succes e 32.6%, cu +7.07R cumulat (+0.000R in medie pe plan) si profit factor 1.0. 24 planuri sunt inca deschise. Atentie: 21114 dintre ele sunt din backtest. LIVE, din 2026-09-30: 138 planuri inchise, castig 30.4% (IC 23.4-38.6%), R mediu -0.180R (IC95 -0.536..+0.156R), total -24.78R. Ultimele inchise: #370895 ATOM/USDT -1.03R, #370848 XRP/USDT +2.71R, #370880 AXS/USDT +2.71R. R mediu pe intervalele de scor cu destule date (IC95 pe blocuri de timp) - toate (0-19, 20-39, 40-59, 60-79, 80-99) in marja zgomotului (IC95 al R-ului mediu include zero). Poarta pe aceste cifre e dezactivata (USE_DECISION_GATE=false; dovada walk-forward e in auto-audit): ele se afiseaza, dar nu decid emiterea planurilor. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (treimea de sus a agentului da -0.079R vs -0.050R pe toate - avantaj -0.029R, sub pragul de +0.05R. Filtrul nu adauga destula valoare.). Auto-auditul are 3 imbunatatiri deschise (1 mari, 2 medii, 0 mici); cea mai importanta: Semnalul nu are avantaj masurabil recent. Laboratorul (model invatat din memorie, gbm): stare ACTIV - confirmat live: +0.585R/alegere (IC95 +0.268..+0.879, n=236). Walk-forward +0.081R (IC95 +0.026..+0.140) pe alegere, n=8444; perioada rezervata +0.053R (IC95 -0.064..+0.164); test inainte (live, tot universul): 236 alegeri incheiate, +0.585R (IC95 +0.268..+0.879).",
+  "text": "Din 21252 planuri inchise, rata de succes e 32.6%, cu +7.07R cumulat (+0.000R in medie pe plan) si profit factor 1.0. 23 planuri sunt inca deschise. Atentie: 21114 dintre ele sunt din backtest. LIVE, din 2026-09-30: 138 planuri inchise, castig 30.4% (IC 23.4-38.6%), R mediu -0.180R (IC95 -0.536..+0.156R), total -24.78R. Ultimele inchise: #370895 ATOM/USDT -1.03R, #370848 XRP/USDT +2.71R, #370880 AXS/USDT +2.71R. R mediu pe intervalele de scor cu destule date (IC95 pe blocuri de timp) - toate (0-19, 20-39, 40-59, 60-79, 80-99) in marja zgomotului (IC95 al R-ului mediu include zero). Poarta pe aceste cifre e dezactivata (USE_DECISION_GATE=false; dovada walk-forward e in auto-audit): ele se afiseaza, dar nu decid emiterea planurilor. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (treimea de sus a agentului da -0.079R vs -0.050R pe toate - avantaj -0.029R, sub pragul de +0.05R. Filtrul nu adauga destula valoare.). Auto-auditul are 3 imbunatatiri deschise (1 mari, 2 medii, 0 mici); cea mai importanta: Semnalul nu are avantaj masurabil recent. Laboratorul (model invatat din memorie, gbm): stare ACTIV - confirmat live: +0.585R/alegere (IC95 +0.268..+0.879, n=236). Walk-forward +0.081R (IC95 +0.026..+0.140) pe alegere, n=8444; perioada rezervata +0.053R (IC95 -0.064..+0.164); test inainte (live, tot universul): 236 alegeri incheiate, +0.585R (IC95 +0.268..+0.879).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-11-16 11:29 UTC",
+    "scan_time": "2026-11-16 12:29 UTC",
     "universe_size": 30,
-    "plans_total": 28080,
-    "plans_open": 24,
+    "plans_total": 28081,
+    "plans_open": 23,
     "plans_closed": 21252,
     "legacy_closed": 0,
     "legacy_total_r": null,
@@ -74,6 +74,12 @@
     ],
     "open_now": [
       {
+        "id": 370914,
+        "symbol": "ZEN/USDT",
+        "direction": "SHORT",
+        "state": "ASTEAPTA PULLBACK la zona de intrare"
+      },
+      {
         "id": 370913,
         "symbol": "DOT/USDT",
         "direction": "SHORT",
@@ -94,12 +100,6 @@
       {
         "id": 370910,
         "symbol": "EGLD/USDT",
-        "direction": "SHORT",
-        "state": "ASTEAPTA PULLBACK la zona de intrare"
-      },
-      {
-        "id": 370909,
-        "symbol": "FLOW/USDT",
         "direction": "SHORT",
         "state": "ASTEAPTA PULLBACK la zona de intrare"
       }
@@ -242,8 +242,8 @@
           "profit_factor": 1.89
         }
       },
-      "no_entry": 96,
-      "open": 24,
+      "no_entry": 98,
+      "open": 23,
       "recent": [
         {
           "id": 370895,
@@ -358,7 +358,7 @@
       "Real vs simulat: pe aceeasi perioada (2026-09-30 - 2026-10-16, 167 planuri simulate) -0.877R/plan (IC95 -1.303..-0.565), SEMNIFICATIV sub simulare; fata de tot istoricul simulat -0.181R/plan (IC95 -0.500..+0.236), in marja statistica.",
       "Agentul pe date reale: AUC 0.729 (IC 0.628-0.823) pe 138/100 planuri necesare confirmarii.",
       "Ultimele inchise live: #370895 ATOM/USDT -1.03R, #370848 XRP/USDT +2.71R, #370880 AXS/USDT +2.71R.",
-      "Deschise acum: 24; anulate fara intrare (pretul nu a revenit): 96."
+      "Deschise acum: 23; anulate fara intrare (pretul nu a revenit): 98."
     ],
     "simulated": [
       "Backtest 2018-02-13-azi (regenerat 2026-10-11 20:52 UTC): 21114 planuri inchise, castig 32.6%, R mediu +0.002R, total +31.85R, profit factor 1.0.",
