@@ -24,18 +24,20 @@
     }
   },
   "rebuild_removed_live": [],
-  "when": "2026-11-18 11:13 UTC",
-  "ts": 1795000401.194093,
-  "checked": 28088,
-  "reevaluated": 217,
-  "live_flagged": 0,
-  "removed_now": 0,
+  "when": "2026-11-18 12:13 UTC",
+  "ts": 1795004004.6169114,
+  "checked": 28089,
+  "reevaluated": 243,
+  "live_flagged": 3,
+  "removed_now": 3,
   "blocked": null,
   "backtest_flagged": 0,
   "backtest_examples": [],
-  "by_reason": {},
+  "by_reason": {
+    "rezultat contrazis de lumanarile reale": 3
+  },
   "pending_live": [],
-  "retrained": false,
+  "retrained": true,
   "epoch": 2,
   "removed": [
     {
@@ -2629,6 +2631,42 @@
       "created_ts": 1793521513.6322737,
       "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.046R in memorie, NO_ENTRY 0.0R la reevaluare",
       "removed": "2026-11-17 08:46 UTC"
+    },
+    {
+      "id": 370697,
+      "symbol": "ZEC/USDT",
+      "direction": "LONG",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": -1.032,
+      "created_ts": 1792973617.0876544,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.032R in memorie, EXPIRED 0.199R la reevaluare",
+      "removed": "2026-11-18 12:13 UTC"
+    },
+    {
+      "id": 370743,
+      "symbol": "XRP/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "NO_ENTRY",
+      "realized_r": 0.0,
+      "created_ts": 1793347432.2347698,
+      "reason": "rezultat contrazis de lumanarile reale: NO_ENTRY 0.0R in memorie, SL_HIT -1.046R la reevaluare",
+      "removed": "2026-11-18 12:13 UTC"
+    },
+    {
+      "id": 370753,
+      "symbol": "XRP/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "NO_ENTRY",
+      "realized_r": 0.0,
+      "created_ts": 1793463385.8322098,
+      "reason": "rezultat contrazis de lumanarile reale: NO_ENTRY 0.0R in memorie, SL_HIT -1.053R la reevaluare",
+      "removed": "2026-11-18 12:13 UTC"
     }
   ]
 }
