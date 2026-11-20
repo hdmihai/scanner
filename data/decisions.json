@@ -1,21 +1,12 @@
 {
-  "scan_time": "2026-11-20 08:03 UTC",
+  "scan_time": "2026-11-20 09:03 UTC",
   "decisions": {
-    "FIL/USDT": {
-      "action": "ISSUE",
-      "mode": "POARTA_DEZACTIVATA",
-      "reason": "poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; dovada walk-forward a portii e evaluata in auto-audit",
-      "calibrated_prob": 39.6,
-      "agent_prob": 0.4953,
-      "elliott_bias": 0.0279,
-      "next_entry": null
-    },
     "CHZ/USDT": {
       "action": "SKIP",
       "mode": "ASTEAPTA_CORECTIA",
       "reason": "Elliott contrazice planul SHORT (Primary Developing Harmonic D FORMING BEARISH 45%: D inca nu a ajuns in zona PRZ). Filtrul ramane activ prin histerezis - efectul nu e distinct de zero (auto-diagnostic, ultimele 3000 planuri (2856 backtest, 144 live): contra Elliott -0.081R, fara conflict -0.029R, diferenta +0.051R (IC95 pe blocuri de timp -0.153..+0.230)). Nivel urmarit pentru intrare: ~0.01034.",
       "calibrated_prob": 39.6,
-      "agent_prob": 0.4636,
+      "agent_prob": 0.4626,
       "elliott_bias": -0.4,
       "next_entry": 0.01034
     }
