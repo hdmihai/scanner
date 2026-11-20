@@ -1,14 +1,32 @@
 {
-  "scan_time": "2026-11-20 11:26 UTC",
+  "scan_time": "2026-11-20 12:24 UTC",
   "decisions": {
-    "CHZ/USDT": {
-      "action": "SKIP",
-      "mode": "ASTEAPTA_CORECTIA",
-      "reason": "Elliott contrazice planul SHORT (Primary Developing Harmonic D FORMING BEARISH 45%: D inca nu a ajuns in zona PRZ). Filtrul ramane activ prin histerezis - efectul nu e distinct de zero (auto-diagnostic, ultimele 3000 planuri (2856 backtest, 144 live): contra Elliott -0.081R, fara conflict -0.029R, diferenta +0.051R (IC95 pe blocuri de timp -0.153..+0.230)). Nivel urmarit pentru intrare: ~0.01034.",
+    "FLOW/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; dovada walk-forward a portii e evaluata in auto-audit",
       "calibrated_prob": 39.6,
-      "agent_prob": 0.4663,
-      "elliott_bias": -0.4,
-      "next_entry": 0.01034
+      "agent_prob": 0.5125,
+      "elliott_bias": 0.4853,
+      "next_entry": null
+    },
+    "ICP/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; dovada walk-forward a portii e evaluata in auto-audit",
+      "calibrated_prob": 39.6,
+      "agent_prob": 0.5123,
+      "elliott_bias": 0.6189,
+      "next_entry": null
+    },
+    "SEI/USDT": {
+      "action": "ISSUE",
+      "mode": "POARTA_DEZACTIVATA",
+      "reason": "poarta de calibrare dezactivata (USE_DECISION_GATE=false) - planul se emite; dovada walk-forward a portii e evaluata in auto-audit",
+      "calibrated_prob": 39.6,
+      "agent_prob": 0.4966,
+      "elliott_bias": 1.0,
+      "next_entry": null
     }
   }
 }
