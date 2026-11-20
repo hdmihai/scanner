@@ -342,6 +342,19 @@
       "missing": [],
       "results": [
         {
+          "symbol": "CHZ/USDT",
+          "direction": "SHORT",
+          "score": 87,
+          "price": 0.00909,
+          "atr": 0.00021214286,
+          "components": {
+            "trend": 0.684,
+            "momentum": 0.951,
+            "volatility": 0.833,
+            "volume": 1.0
+          }
+        },
+        {
           "symbol": "SOL/USDT",
           "direction": "SHORT",
           "score": 84,
@@ -433,32 +446,6 @@
           }
         },
         {
-          "symbol": "GRT/USDT",
-          "direction": "SHORT",
-          "score": 69,
-          "price": 0.0156,
-          "atr": 0.00046285714,
-          "components": {
-            "trend": 0.376,
-            "momentum": 0.858,
-            "volatility": 0.516,
-            "volume": 1.0
-          }
-        },
-        {
-          "symbol": "THETA/USDT",
-          "direction": "SHORT",
-          "score": 68,
-          "price": 0.1255,
-          "atr": 0.0032357143,
-          "components": {
-            "trend": 0.402,
-            "momentum": 0.614,
-            "volatility": 0.711,
-            "volume": 1.0
-          }
-        },
-        {
           "symbol": "NEAR/USDT",
           "direction": "SHORT",
           "score": 67,
@@ -469,6 +456,32 @@
             "momentum": 0.893,
             "volatility": 0.0,
             "volume": 1.0
+          }
+        },
+        {
+          "symbol": "GRT/USDT",
+          "direction": "SHORT",
+          "score": 67,
+          "price": 0.01568,
+          "atr": 0.000495,
+          "components": {
+            "trend": 0.441,
+            "momentum": 0.801,
+            "volatility": 0.422,
+            "volume": 1.0
+          }
+        },
+        {
+          "symbol": "THETA/USDT",
+          "direction": "SHORT",
+          "score": 61,
+          "price": 0.1249,
+          "atr": 0.0034214286,
+          "components": {
+            "trend": 0.441,
+            "momentum": 0.644,
+            "volatility": 0.63,
+            "volume": 0.725
           }
         },
         {
@@ -560,20 +573,29 @@
         },
         "THETA/USDT": {
           "supertrend": "BEARISH",
-          "vwap": 0.13792089212787867,
+          "vwap": 0.1376732950350618,
           "poc": 0.1303375,
           "vah": 0.19219583,
           "val": 0.12557917,
-          "macd_hist": -0.00022713,
+          "macd_hist": -0.00049824,
           "position": "SUB VAL"
         },
         "GRT/USDT": {
           "supertrend": "BEARISH",
-          "vwap": 0.017467693286509697,
+          "vwap": 0.017399802355529227,
           "poc": 0.01681479,
           "vah": 0.02418688,
           "val": 0.01568063,
-          "macd_hist": -0.00015921,
+          "macd_hist": -0.00018109,
+          "position": "SUB VAL"
+        },
+        "CHZ/USDT": {
+          "supertrend": "BEARISH",
+          "vwap": 0.010547787778017096,
+          "poc": 0.01203313,
+          "vah": 0.01468437,
+          "val": 0.01056021,
+          "macd_hist": -5.05e-05,
           "position": "SUB VAL"
         },
         "FLOW/USDT": {
@@ -591,8 +613,8 @@
       "primary": false,
       "analysis": "completa",
       "proposals": 8,
-      "duration_s": 14.8,
-      "scan_time": "2026-11-20 20:03 UTC"
+      "duration_s": 15.1,
+      "scan_time": "2026-11-20 21:03 UTC"
     },
     "gate": {
       "resolved": [
@@ -618,7 +640,7 @@
         "MANA/USDT",
         "NEAR/USDT",
         "POL/USDT",
-        "SEI/USDC",
+        "SEI/USDT",
         "SOL/USDT",
         "SUI/USDT",
         "THETA/USDT",
@@ -902,8 +924,8 @@
       "primary": false,
       "analysis": "completa",
       "proposals": 8,
-      "duration_s": 18.3,
-      "scan_time": "2026-11-20 20:03 UTC"
+      "duration_s": 20.2,
+      "scan_time": "2026-11-20 21:03 UTC"
     },
     "mexc": {
       "resolved": [
@@ -1191,8 +1213,8 @@
       "primary": false,
       "analysis": "completa",
       "proposals": 8,
-      "duration_s": 15.4,
-      "scan_time": "2026-11-20 20:03 UTC"
+      "duration_s": 16.2,
+      "scan_time": "2026-11-20 21:03 UTC"
     },
     "kraken": {
       "resolved": [
@@ -1481,7 +1503,7 @@
       "analysis": "completa",
       "proposals": 8,
       "duration_s": 80.8,
-      "scan_time": "2026-11-20 20:03 UTC"
+      "scan_time": "2026-11-20 21:03 UTC"
     }
   },
   "primary": "okx",
