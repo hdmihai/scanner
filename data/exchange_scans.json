@@ -1295,8 +1295,8 @@
       "primary": false,
       "analysis": "completa",
       "proposals": 8,
-      "duration_s": 16.6,
-      "scan_time": "2026-11-21 12:42 UTC"
+      "duration_s": 15.0,
+      "scan_time": "2026-11-21 13:42 UTC"
     },
     "gate": {
       "resolved": [
@@ -1936,8 +1936,8 @@
       "primary": false,
       "analysis": "completa",
       "proposals": 8,
-      "duration_s": 19.1,
-      "scan_time": "2026-11-21 12:42 UTC"
+      "duration_s": 26.9,
+      "scan_time": "2026-11-21 13:42 UTC"
     },
     "mexc": {
       "resolved": [
@@ -1962,7 +1962,7 @@
         "MANA/USDT",
         "NEAR/USDT",
         "POL/USDT",
-        "SEI/USDC",
+        "SEI/USDT",
         "SOL/USDT",
         "SUI/USDT",
         "TRX/USDT",
@@ -2025,6 +2025,19 @@
             "momentum": 0.903,
             "volatility": 0.315,
             "volume": 0.856
+          }
+        },
+        {
+          "symbol": "SEI/USDT",
+          "direction": "SHORT",
+          "score": 77,
+          "price": 0.03377,
+          "atr": 0.0011471429,
+          "components": {
+            "trend": 1.0,
+            "momentum": 0.999,
+            "volatility": 0.302,
+            "volume": 0.783
           }
         },
         {
@@ -2522,6 +2535,15 @@
           "macd_hist": -0.00014689,
           "position": "IN VALUE AREA"
         },
+        "SEI/USDT": {
+          "supertrend": "BEARISH",
+          "vwap": 0.04280679029392724,
+          "poc": 0.06262687,
+          "vah": 0.07072062,
+          "val": 0.04805813,
+          "macd_hist": -0.00040255,
+          "position": "SUB VAL"
+        },
         "AXS/USDT": {
           "supertrend": "BEARISH",
           "vwap": 0.7473452246792729,
@@ -2555,8 +2577,8 @@
       "primary": false,
       "analysis": "completa",
       "proposals": 8,
-      "duration_s": 17.6,
-      "scan_time": "2026-11-21 12:42 UTC"
+      "duration_s": 14.7,
+      "scan_time": "2026-11-21 13:42 UTC"
     },
     "kraken": {
       "resolved": [
@@ -2958,15 +2980,6 @@
           "macd_hist": -0.04921461,
           "position": "SUB VAL"
         },
-        "LINK/USD": {
-          "supertrend": "BEARISH",
-          "vwap": 9.582660908830677,
-          "poc": 11.53146896,
-          "vah": 13.14437687,
-          "val": 9.91856104,
-          "macd_hist": -0.04691453,
-          "position": "SUB VAL"
-        },
         "DOGE/USD": {
           "supertrend": "BEARISH",
           "vwap": 0.06213923185105157,
@@ -2975,6 +2988,15 @@
           "val": 0.05307679,
           "macd_hist": -0.00041393,
           "position": "IN VALUE AREA"
+        },
+        "LINK/USD": {
+          "supertrend": "BEARISH",
+          "vwap": 9.582660908830677,
+          "poc": 11.53146896,
+          "vah": 13.14437687,
+          "val": 9.91856104,
+          "macd_hist": -0.04691453,
+          "position": "SUB VAL"
         },
         "ADA/USD": {
           "supertrend": "BEARISH",
@@ -3003,15 +3025,6 @@
           "macd_hist": -0.00077461,
           "position": "SUB VAL"
         },
-        "ICP/USD": {
-          "supertrend": "BEARISH",
-          "vwap": 2.337331653961902,
-          "poc": 2.5926875,
-          "vah": 3.0079375,
-          "val": 2.1774375,
-          "macd_hist": -0.02401759,
-          "position": "SUB VAL"
-        },
         "DASH/USD": {
           "supertrend": "BEARISH",
           "vwap": 39.90420096010549,
@@ -3019,6 +3032,15 @@
           "vah": 55.36272917,
           "val": 48.0369375,
           "macd_hist": -0.40419947,
+          "position": "SUB VAL"
+        },
+        "ICP/USD": {
+          "supertrend": "BEARISH",
+          "vwap": 2.337331653961902,
+          "poc": 2.5926875,
+          "vah": 3.0079375,
+          "val": 2.1774375,
+          "macd_hist": -0.02401759,
           "position": "SUB VAL"
         },
         "ALGO/USD": {
@@ -3109,7 +3131,7 @@
       "analysis": "completa",
       "proposals": 8,
       "duration_s": 80.8,
-      "scan_time": "2026-11-21 12:42 UTC"
+      "scan_time": "2026-11-21 13:42 UTC"
     }
   },
   "primary": "okx",
