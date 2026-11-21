@@ -24,18 +24,20 @@
     }
   },
   "rebuild_removed_live": [],
-  "when": "2026-11-21 11:41 UTC",
-  "ts": 1795261300.773912,
-  "checked": 28090,
-  "reevaluated": 129,
-  "live_flagged": 0,
-  "removed_now": 0,
+  "when": "2026-11-21 12:42 UTC",
+  "ts": 1795264924.4792368,
+  "checked": 28094,
+  "reevaluated": 226,
+  "live_flagged": 4,
+  "removed_now": 4,
   "blocked": null,
   "backtest_flagged": 0,
   "backtest_examples": [],
-  "by_reason": {},
+  "by_reason": {
+    "rezultat contrazis de lumanarile reale": 4
+  },
   "pending_live": [],
-  "retrained": false,
+  "retrained": true,
   "epoch": 2,
   "removed": [
     {
@@ -2929,6 +2931,54 @@
       "created_ts": 1793895976.8447866,
       "reason": "rezultat contrazis de lumanarile reale: SL_HIT 0.459R in memorie, TP2_HIT 2.709R la reevaluare",
       "removed": "2026-11-21 00:05 UTC"
+    },
+    {
+      "id": 370772,
+      "symbol": "ZEN/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": -1.054,
+      "created_ts": 1793721829.705341,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.054R in memorie, TP2_HIT 3.435R la reevaluare",
+      "removed": "2026-11-21 12:42 UTC"
+    },
+    {
+      "id": 370787,
+      "symbol": "ZEN/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": 1.447,
+      "created_ts": 1793823047.3060231,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT 1.447R in memorie, TP2_HIT 3.697R la reevaluare",
+      "removed": "2026-11-21 12:42 UTC"
+    },
+    {
+      "id": 370789,
+      "symbol": "ZEC/USDT",
+      "direction": "LONG",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": 0.681,
+      "created_ts": 1793839041.5690453,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT 0.681R in memorie, NO_ENTRY 0.0R la reevaluare",
+      "removed": "2026-11-21 12:42 UTC"
+    },
+    {
+      "id": 370801,
+      "symbol": "THETA/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "EXPIRED",
+      "realized_r": 1.704,
+      "created_ts": 1793910423.8052301,
+      "reason": "rezultat contrazis de lumanarile reale: EXPIRED 1.704R in memorie, EXPIRED 1.756R la reevaluare",
+      "removed": "2026-11-21 12:42 UTC"
     }
   ]
 }
