@@ -2,7 +2,7 @@
   "text": "Din 21267 planuri inchise, rata de succes e 32.7%, cu +54.86R cumulat (+0.003R in medie pe plan) si profit factor 1.0. 16 planuri sunt inca deschise. Atentie: 21114 dintre ele sunt din backtest. LIVE, din 2026-09-30: 153 planuri inchise, castig 39.9% (IC 32.5-47.8%), R mediu +0.150R (IC95 -0.243..+0.596R), total +23.02R. Ultimele inchise: #370896 FET/USDT +2.73R, #370906 MANA/USDT +2.72R, #370908 LINK/USDT +3.57R. R mediu pe intervalele de scor cu destule date (IC95 pe blocuri de timp) - toate (0-19, 20-39, 40-59, 60-79, 80-99) in marja zgomotului (IC95 al R-ului mediu include zero). Poarta pe aceste cifre e dezactivata (USE_DECISION_GATE=false; dovada walk-forward e in auto-audit): ele se afiseaza, dar nu decid emiterea planurilor. Agentul cu invatare online e in modul SHADOW - invata si isi masoara performanta, dar nu influenteaza inca deciziile (treimea de sus a agentului da -0.037R vs -0.038R pe toate - avantaj +0.000R, sub pragul de +0.05R. Filtrul nu adauga destula valoare.). Auto-auditul are 2 imbunatatiri deschise (1 mari, 1 medii, 0 mici); cea mai importanta: Semnalul nu are avantaj masurabil recent. Laboratorul (model invatat din memorie, gbm): stare ACTIV - confirmat live: +0.563R/alegere (IC95 +0.296..+0.846, n=275). Walk-forward +0.077R (IC95 +0.021..+0.136) pe alegere, n=8617; perioada rezervata +0.077R (IC95 -0.029..+0.187); test inainte (live, tot universul): 275 alegeri incheiate, +0.563R (IC95 +0.296..+0.846).",
   "source": "determinist",
   "facts": {
-    "scan_time": "2026-11-21 09:29 UTC",
+    "scan_time": "2026-11-21 09:40 UTC",
     "universe_size": 30,
     "plans_total": 28090,
     "plans_open": 16,
