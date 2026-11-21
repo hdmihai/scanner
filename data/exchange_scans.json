@@ -651,6 +651,19 @@
           }
         },
         {
+          "symbol": "FLOW/USDT",
+          "direction": "SHORT",
+          "score": 59,
+          "price": 0.0137,
+          "atr": 0.00061428571,
+          "components": {
+            "trend": 1.0,
+            "momentum": 0.946,
+            "volatility": 0.0,
+            "volume": 0.414
+          }
+        },
+        {
           "symbol": "TRX/USDT",
           "direction": "SHORT",
           "score": 48,
@@ -826,6 +839,15 @@
           "val": 0.7954375,
           "macd_hist": -0.00597486,
           "position": "SUB VAL"
+        },
+        "FLOW/USDT": {
+          "supertrend": "BEARISH",
+          "vwap": 0.01794639741649199,
+          "poc": 0.0354375,
+          "vah": 0.0374875,
+          "val": 0.0221125,
+          "macd_hist": -7.326e-05,
+          "position": "SUB VAL"
         }
       },
       "truncated": false,
@@ -833,8 +855,8 @@
       "primary": false,
       "analysis": "completa",
       "proposals": 8,
-      "duration_s": 15.1,
-      "scan_time": "2026-11-21 08:31 UTC"
+      "duration_s": 16.1,
+      "scan_time": "2026-11-21 09:31 UTC"
     },
     "gate": {
       "resolved": [
@@ -1320,8 +1342,8 @@
       "primary": false,
       "analysis": "completa",
       "proposals": 8,
-      "duration_s": 17.6,
-      "scan_time": "2026-11-21 08:31 UTC"
+      "duration_s": 25.9,
+      "scan_time": "2026-11-21 09:31 UTC"
     },
     "mexc": {
       "resolved": [
@@ -1329,7 +1351,7 @@
         "ALGO/USDT",
         "ATOM/USDT",
         "AVAX/USDT",
-        "AXS/USDT",
+        "AXS/USDC",
         "BTC/USDT",
         "CHZ/USDT",
         "DOGE/USDT",
@@ -1641,15 +1663,6 @@
           "macd_hist": -0.00390489,
           "position": "SUB VAL"
         },
-        "NEAR/USDT": {
-          "supertrend": "BEARISH",
-          "vwap": 3.494902171632149,
-          "poc": 4.92403125,
-          "vah": 5.35441875,
-          "val": 4.35018125,
-          "macd_hist": -0.0601482,
-          "position": "SUB VAL"
-        },
         "ZEC/USDT": {
           "supertrend": "BEARISH",
           "vwap": 1071.3653663862262,
@@ -1657,6 +1670,15 @@
           "vah": 1291.67854167,
           "val": 1112.99604167,
           "macd_hist": -20.28292716,
+          "position": "SUB VAL"
+        },
+        "NEAR/USDT": {
+          "supertrend": "BEARISH",
+          "vwap": 3.494902171632149,
+          "poc": 4.92403125,
+          "vah": 5.35441875,
+          "val": 4.35018125,
+          "macd_hist": -0.0601482,
           "position": "SUB VAL"
         },
         "ICP/USDT": {
@@ -1719,8 +1741,8 @@
       "primary": false,
       "analysis": "completa",
       "proposals": 8,
-      "duration_s": 21.5,
-      "scan_time": "2026-11-21 08:31 UTC"
+      "duration_s": 15.3,
+      "scan_time": "2026-11-21 09:31 UTC"
     },
     "kraken": {
       "resolved": [
@@ -2084,15 +2106,6 @@
           "macd_hist": -0.00094414,
           "position": "SUB VAL"
         },
-        "ALGO/USD": {
-          "supertrend": "BEARISH",
-          "vwap": 0.08320651910830106,
-          "poc": 0.07849458,
-          "vah": 0.11338875,
-          "val": 0.07312625,
-          "macd_hist": -0.00047683,
-          "position": "SUB VAL"
-        },
         "ICP/USD": {
           "supertrend": "BEARISH",
           "vwap": 2.3441966299840833,
@@ -2102,13 +2115,13 @@
           "macd_hist": -0.02558681,
           "position": "SUB VAL"
         },
-        "POL/USD": {
+        "ALGO/USD": {
           "supertrend": "BEARISH",
-          "vwap": 0.08399708644163212,
-          "poc": 0.09174,
-          "vah": 0.10368667,
-          "val": 0.08726,
-          "macd_hist": -0.00071217,
+          "vwap": 0.08320651910830106,
+          "poc": 0.07849458,
+          "vah": 0.11338875,
+          "val": 0.07312625,
+          "macd_hist": -0.00047683,
           "position": "SUB VAL"
         },
         "FIL/USD": {
@@ -2118,6 +2131,15 @@
           "vah": 1.225625,
           "val": 0.86354167,
           "macd_hist": -0.00395413,
+          "position": "SUB VAL"
+        },
+        "POL/USD": {
+          "supertrend": "BEARISH",
+          "vwap": 0.08399708644163212,
+          "poc": 0.09174,
+          "vah": 0.10368667,
+          "val": 0.08726,
+          "macd_hist": -0.00071217,
           "position": "SUB VAL"
         },
         "GRT/USD": {
@@ -2163,7 +2185,7 @@
       "analysis": "completa",
       "proposals": 8,
       "duration_s": 80.8,
-      "scan_time": "2026-11-21 08:31 UTC"
+      "scan_time": "2026-11-21 09:31 UTC"
     }
   },
   "primary": "okx",
