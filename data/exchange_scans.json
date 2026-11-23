@@ -816,19 +816,6 @@
           }
         },
         {
-          "symbol": "MANA/USDT",
-          "direction": "SHORT",
-          "score": 59,
-          "price": 0.05595,
-          "atr": 0.0015728571,
-          "components": {
-            "trend": 0.986,
-            "momentum": 0.452,
-            "volatility": 0.594,
-            "volume": 0.316
-          }
-        },
-        {
           "symbol": "FET/USDT",
           "direction": "SHORT",
           "score": 57,
@@ -839,6 +826,19 @@
             "momentum": 0.787,
             "volatility": 0.262,
             "volume": 0.223
+          }
+        },
+        {
+          "symbol": "MANA/USDT",
+          "direction": "SHORT",
+          "score": 57,
+          "price": 0.05614,
+          "atr": 0.0013121429,
+          "components": {
+            "trend": 0.958,
+            "momentum": 0.408,
+            "volatility": 0.831,
+            "volume": 0.1
           }
         },
         {
@@ -1089,6 +1089,19 @@
           }
         },
         {
+          "symbol": "FLOW/USDT",
+          "direction": "SHORT",
+          "score": 38,
+          "price": 0.0147,
+          "atr": 0.00051428571,
+          "components": {
+            "trend": 1.0,
+            "momentum": 0.272,
+            "volatility": 0.251,
+            "volume": 0.002
+          }
+        },
+        {
           "symbol": "NEAR/USDT",
           "direction": "SHORT",
           "score": 37,
@@ -1099,19 +1112,6 @@
             "momentum": 0.216,
             "volatility": 0.099,
             "volume": 0.192
-          }
-        },
-        {
-          "symbol": "FLOW/USDT",
-          "direction": "SHORT",
-          "score": 35,
-          "price": 0.0148,
-          "atr": 0.00055714286,
-          "components": {
-            "trend": 1.0,
-            "momentum": 0.225,
-            "volatility": 0.118,
-            "volume": 0.058
           }
         },
         {
@@ -1372,6 +1372,15 @@
           "macd_hist": 0.00367174,
           "position": "SUB VAL"
         },
+        "MANA/USDT": {
+          "supertrend": "BEARISH",
+          "vwap": 0.06310214677366277,
+          "poc": 0.08865604,
+          "vah": 0.09648437,
+          "val": 0.07104229,
+          "macd_hist": 0.00029649,
+          "position": "SUB VAL"
+        },
         "GRT/USDT": {
           "supertrend": "BEARISH",
           "vwap": 0.01693161398523067,
@@ -1381,22 +1390,13 @@
           "macd_hist": 4.987e-05,
           "position": "IN VALUE AREA"
         },
-        "MANA/USDT": {
-          "supertrend": "BEARISH",
-          "vwap": 0.06319562426762682,
-          "poc": 0.08865604,
-          "vah": 0.09648437,
-          "val": 0.07104229,
-          "macd_hist": 0.00025524,
-          "position": "SUB VAL"
-        },
         "FLOW/USDT": {
           "supertrend": "BEARISH",
-          "vwap": 0.017431027994910323,
+          "vwap": 0.017422232558656884,
           "poc": 0.0354375,
           "vah": 0.0374875,
           "val": 0.0221125,
-          "macd_hist": 0.00015846,
+          "macd_hist": 0.00015938,
           "position": "SUB VAL"
         }
       },
@@ -1405,8 +1405,8 @@
       "primary": false,
       "analysis": "completa",
       "proposals": 8,
-      "duration_s": 15.9,
-      "scan_time": "2026-11-23 00:22 UTC"
+      "duration_s": 17.4,
+      "scan_time": "2026-11-23 00:49 UTC"
     },
     "gate": {
       "resolved": [
@@ -2048,15 +2048,6 @@
           "macd_hist": 0.00368928,
           "position": "SUB VAL"
         },
-        "GRT/USDT": {
-          "supertrend": "BEARISH",
-          "vwap": 0.016971688784288532,
-          "poc": 0.01974673,
-          "vah": 0.0219899,
-          "val": 0.0152604,
-          "macd_hist": 4.482e-05,
-          "position": "IN VALUE AREA"
-        },
         "EGLD/USDT": {
           "supertrend": "BEARISH",
           "vwap": 2.65446274053682,
@@ -2075,6 +2066,15 @@
           "macd_hist": 0.00026173,
           "position": "SUB VAL"
         },
+        "GRT/USDT": {
+          "supertrend": "BEARISH",
+          "vwap": 0.016971688784288532,
+          "poc": 0.01974673,
+          "vah": 0.0219899,
+          "val": 0.0152604,
+          "macd_hist": 4.482e-05,
+          "position": "IN VALUE AREA"
+        },
         "FLOW/USDT": {
           "supertrend": "BEARISH",
           "vwap": 0.018345631976927707,
@@ -2090,8 +2090,8 @@
       "primary": false,
       "analysis": "completa",
       "proposals": 8,
-      "duration_s": 20.4,
-      "scan_time": "2026-11-23 00:22 UTC"
+      "duration_s": 18.3,
+      "scan_time": "2026-11-23 00:49 UTC"
     },
     "mexc": {
       "resolved": [
@@ -2753,8 +2753,8 @@
       "primary": false,
       "analysis": "completa",
       "proposals": 8,
-      "duration_s": 15.1,
-      "scan_time": "2026-11-23 00:22 UTC"
+      "duration_s": 15.4,
+      "scan_time": "2026-11-23 00:49 UTC"
     },
     "kraken": {
       "resolved": [
@@ -3253,15 +3253,6 @@
           "macd_hist": 0.00029171,
           "position": "SUB VAL"
         },
-        "DOT/USD": {
-          "supertrend": "BEARISH",
-          "vwap": 0.7709635584896501,
-          "poc": 1.131075,
-          "vah": 1.186575,
-          "val": 0.853575,
-          "macd_hist": 0.00369488,
-          "position": "SUB VAL"
-        },
         "DASH/USD": {
           "supertrend": "BULLISH",
           "vwap": 38.52938024092524,
@@ -3269,6 +3260,15 @@
           "vah": 55.36272917,
           "val": 46.99039583,
           "macd_hist": 0.38653513,
+          "position": "SUB VAL"
+        },
+        "DOT/USD": {
+          "supertrend": "BEARISH",
+          "vwap": 0.7709635584896501,
+          "poc": 1.131075,
+          "vah": 1.186575,
+          "val": 0.853575,
+          "macd_hist": 0.00369488,
           "position": "SUB VAL"
         },
         "ICP/USD": {
@@ -3394,8 +3394,8 @@
       "primary": false,
       "analysis": "completa",
       "proposals": 8,
-      "duration_s": 80.7,
-      "scan_time": "2026-11-23 00:22 UTC"
+      "duration_s": 80.9,
+      "scan_time": "2026-11-23 00:49 UTC"
     }
   },
   "primary": "okx",
