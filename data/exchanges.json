@@ -15,9 +15,9 @@
         "trades_live"
       ],
       "connected": true,
-      "markets": 4945,
+      "markets": 4947,
       "error": null,
-      "checked_at": "2026-11-24 19:30 UTC"
+      "checked_at": "2026-11-24 20:30 UTC"
     },
     {
       "id": "kucoin",
@@ -36,7 +36,7 @@
       "connected": true,
       "markets": 1694,
       "error": null,
-      "checked_at": "2026-11-24 19:30 UTC"
+      "checked_at": "2026-11-24 20:30 UTC"
     },
     {
       "id": "gate",
@@ -55,7 +55,7 @@
       "connected": true,
       "markets": 6502,
       "error": null,
-      "checked_at": "2026-11-24 19:30 UTC"
+      "checked_at": "2026-11-24 20:30 UTC"
     },
     {
       "id": "mexc",
@@ -66,11 +66,15 @@
         "trades_live",
         "open_interest"
       ],
-      "available": [],
-      "connected": false,
-      "markets": 0,
-      "error": "mexc GET https://api.mexc.com/api/v1/contract/detail",
-      "checked_at": "2026-11-24 19:30 UTC"
+      "available": [
+        "ohlcv",
+        "orderbook_live",
+        "trades_live"
+      ],
+      "connected": true,
+      "markets": 2872,
+      "error": null,
+      "checked_at": "2026-11-24 20:31 UTC"
     },
     {
       "id": "kraken",
@@ -89,7 +93,7 @@
       "connected": true,
       "markets": 1436,
       "error": null,
-      "checked_at": "2026-11-24 19:31 UTC"
+      "checked_at": "2026-11-24 20:31 UTC"
     },
     {
       "id": "bybit",
@@ -106,7 +110,7 @@
       "connected": false,
       "markets": 0,
       "error": "bybit GET https://api.bybit.com/v5/market/instruments-info?category=spot 403 Forbidden {\n    error:The Amazon CloudFront distribution is configured to block access from your countr",
-      "checked_at": "2026-11-24 19:31 UTC"
+      "checked_at": "2026-11-24 20:31 UTC"
     }
   ],
   "used": "okx",
