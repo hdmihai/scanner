@@ -24,18 +24,20 @@
     }
   },
   "rebuild_removed_live": [],
-  "when": "2026-11-24 12:00 UTC",
-  "ts": 1795521630.7808948,
+  "when": "2026-11-24 13:00 UTC",
+  "ts": 1795525252.4030619,
   "checked": 28100,
-  "reevaluated": 204,
-  "live_flagged": 0,
-  "removed_now": 0,
+  "reevaluated": 242,
+  "live_flagged": 3,
+  "removed_now": 3,
   "blocked": null,
   "backtest_flagged": 0,
   "backtest_examples": [],
-  "by_reason": {},
+  "by_reason": {
+    "rezultat contrazis de lumanarile reale": 3
+  },
   "pending_live": [],
-  "retrained": false,
+  "retrained": true,
   "epoch": 2,
   "removed": [
     {
@@ -3109,6 +3111,42 @@
       "created_ts": 1793938748.7491198,
       "reason": "rezultat contrazis de lumanarile reale: SL_HIT 0.477R in memorie, NO_ENTRY 0.0R la reevaluare",
       "removed": "2026-11-22 08:06 UTC"
+    },
+    {
+      "id": 370820,
+      "symbol": "FLOW/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "NO_ENTRY",
+      "realized_r": 0.0,
+      "created_ts": 1794112197.5272565,
+      "reason": "rezultat contrazis de lumanarile reale: NO_ENTRY 0.0R in memorie, SL_HIT 0.75R la reevaluare",
+      "removed": "2026-11-24 13:00 UTC"
+    },
+    {
+      "id": 370821,
+      "symbol": "EGLD/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": 0.451,
+      "created_ts": 1794141703.7205164,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT 0.451R in memorie, SL_HIT -1.049R la reevaluare",
+      "removed": "2026-11-24 13:00 UTC"
+    },
+    {
+      "id": 370826,
+      "symbol": "SEI/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": 0.445,
+      "created_ts": 1794184791.5766768,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT 0.445R in memorie, SL_HIT -1.055R la reevaluare",
+      "removed": "2026-11-24 13:00 UTC"
     }
   ]
 }
