@@ -742,19 +742,6 @@
           }
         },
         {
-          "symbol": "FLOW/USDT",
-          "direction": "SHORT",
-          "score": 63,
-          "price": 0.0144,
-          "atr": 0.0003,
-          "components": {
-            "trend": 0.779,
-            "momentum": 0.458,
-            "volatility": 0.958,
-            "volume": 0.324
-          }
-        },
-        {
           "symbol": "ETH/USDT",
           "direction": "SHORT",
           "score": 61,
@@ -960,6 +947,19 @@
             "momentum": 0.063,
             "volatility": 0.443,
             "volume": 0.871
+          }
+        },
+        {
+          "symbol": "FLOW/USDT",
+          "direction": "SHORT",
+          "score": 47,
+          "price": 0.0149,
+          "atr": 0.00031428571,
+          "components": {
+            "trend": 0.735,
+            "momentum": 0.093,
+            "volatility": 0.945,
+            "volume": 0.106
           }
         },
         {
@@ -1348,11 +1348,11 @@
         },
         "FLOW/USDT": {
           "supertrend": "BEARISH",
-          "vwap": 0.016802041471296256,
+          "vwap": 0.01678752763988575,
           "poc": 0.01551458,
           "vah": 0.02651042,
           "val": 0.01382292,
-          "macd_hist": -1.587e-05,
+          "macd_hist": 1.061e-05,
           "position": "IN VALUE AREA"
         }
       },
@@ -1361,8 +1361,8 @@
       "primary": false,
       "analysis": "completa",
       "proposals": 8,
-      "duration_s": 13.3,
-      "scan_time": "2026-11-25 21:45 UTC"
+      "duration_s": 15.4,
+      "scan_time": "2026-11-25 22:28 UTC"
     },
     "gate": {
       "resolved": [
@@ -2024,8 +2024,8 @@
       "primary": false,
       "analysis": "completa",
       "proposals": 8,
-      "duration_s": 15.0,
-      "scan_time": "2026-11-25 21:45 UTC"
+      "duration_s": 16.1,
+      "scan_time": "2026-11-25 22:28 UTC"
     },
     "mexc": {
       "resolved": [
@@ -2542,15 +2542,6 @@
           "macd_hist": -0.00123378,
           "position": "IN VALUE AREA"
         },
-        "FIL/USDT": {
-          "supertrend": "BULLISH",
-          "vwap": 0.6140891955473634,
-          "poc": 1.02410833,
-          "vah": 1.177025,
-          "val": 0.68769167,
-          "macd_hist": -0.00045332,
-          "position": "SUB VAL"
-        },
         "DOT/USDT": {
           "supertrend": "BEARISH",
           "vwap": 0.7319787878402757,
@@ -2558,6 +2549,15 @@
           "vah": 1.20034583,
           "val": 0.8791375,
           "macd_hist": -0.00095786,
+          "position": "SUB VAL"
+        },
+        "FIL/USDT": {
+          "supertrend": "BULLISH",
+          "vwap": 0.6140891955473634,
+          "poc": 1.02410833,
+          "vah": 1.177025,
+          "val": 0.68769167,
+          "macd_hist": -0.00045332,
           "position": "SUB VAL"
         },
         "ICP/USDT": {
@@ -2605,15 +2605,6 @@
           "macd_hist": 1.529e-05,
           "position": "IN VALUE AREA"
         },
-        "AXS/USDT": {
-          "supertrend": "BULLISH",
-          "vwap": 0.68628415480554,
-          "poc": 0.85239375,
-          "vah": 0.92473125,
-          "val": 0.58715625,
-          "macd_hist": 0.00063452,
-          "position": "IN VALUE AREA"
-        },
         "GRT/USDT": {
           "supertrend": "BEARISH",
           "vwap": 0.01689314243387633,
@@ -2641,6 +2632,15 @@
           "macd_hist": -2.919e-05,
           "position": "SUB VAL"
         },
+        "AXS/USDT": {
+          "supertrend": "BULLISH",
+          "vwap": 0.68628415480554,
+          "poc": 0.85239375,
+          "vah": 0.92473125,
+          "val": 0.58715625,
+          "macd_hist": 0.00063452,
+          "position": "IN VALUE AREA"
+        },
         "SEI/USDC": {
           "supertrend": "BEARISH",
           "vwap": 0.03833107881879043,
@@ -2665,8 +2665,8 @@
       "primary": false,
       "analysis": "completa",
       "proposals": 8,
-      "duration_s": 13.8,
-      "scan_time": "2026-11-25 21:45 UTC"
+      "duration_s": 16.0,
+      "scan_time": "2026-11-25 22:28 UTC"
     },
     "kraken": {
       "resolved": [
@@ -3161,15 +3161,6 @@
           "macd_hist": -0.00113809,
           "position": "IN VALUE AREA"
         },
-        "ICP/USD": {
-          "supertrend": "BULLISH",
-          "vwap": 2.2447246692451204,
-          "poc": 2.54841667,
-          "vah": 2.65808333,
-          "val": 1.94525,
-          "macd_hist": 0.00118344,
-          "position": "IN VALUE AREA"
-        },
         "DASH/USD": {
           "supertrend": "BULLISH",
           "vwap": 37.31320530298944,
@@ -3178,6 +3169,15 @@
           "val": 45.94385417,
           "macd_hist": -0.03571792,
           "position": "SUB VAL"
+        },
+        "ICP/USD": {
+          "supertrend": "BULLISH",
+          "vwap": 2.2447246692451204,
+          "poc": 2.54841667,
+          "vah": 2.65808333,
+          "val": 1.94525,
+          "macd_hist": 0.00118344,
+          "position": "IN VALUE AREA"
         },
         "POL/USD": {
           "supertrend": "BEARISH",
@@ -3197,15 +3197,6 @@
           "macd_hist": 0.00039599,
           "position": "SUB VAL"
         },
-        "FIL/USD": {
-          "supertrend": "BULLISH",
-          "vwap": 0.59517068051055,
-          "poc": 1.14522917,
-          "vah": 1.1759375,
-          "val": 0.74602083,
-          "macd_hist": -0.00035939,
-          "position": "SUB VAL"
-        },
         "DOT/USD": {
           "supertrend": "BEARISH",
           "vwap": 0.7470940982172268,
@@ -3213,6 +3204,15 @@
           "vah": 1.19844375,
           "val": 0.87718125,
           "macd_hist": -0.00095071,
+          "position": "SUB VAL"
+        },
+        "FIL/USD": {
+          "supertrend": "BULLISH",
+          "vwap": 0.59517068051055,
+          "poc": 1.14522917,
+          "vah": 1.1759375,
+          "val": 0.74602083,
+          "macd_hist": -0.00035939,
           "position": "SUB VAL"
         },
         "MANA/USD": {
@@ -3285,7 +3285,7 @@
       "analysis": "completa",
       "proposals": 8,
       "duration_s": 80.9,
-      "scan_time": "2026-11-25 21:45 UTC"
+      "scan_time": "2026-11-25 22:28 UTC"
     }
   },
   "primary": "okx",
