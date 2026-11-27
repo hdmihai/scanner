@@ -24,18 +24,20 @@
     }
   },
   "rebuild_removed_live": [],
-  "when": "2026-11-27 15:15 UTC",
-  "ts": 1795792519.8045046,
-  "checked": 28109,
-  "reevaluated": 80,
-  "live_flagged": 0,
-  "removed_now": 0,
+  "when": "2026-11-27 16:15 UTC",
+  "ts": 1795796154.3715985,
+  "checked": 28112,
+  "reevaluated": 233,
+  "live_flagged": 3,
+  "removed_now": 3,
   "blocked": null,
   "backtest_flagged": 0,
   "backtest_examples": [],
-  "by_reason": {},
+  "by_reason": {
+    "rezultat contrazis de lumanarile reale": 3
+  },
   "pending_live": [],
-  "retrained": false,
+  "retrained": true,
   "epoch": 2,
   "removed": [
     {
@@ -3313,6 +3315,42 @@
       "created_ts": 1794355913.9441187,
       "reason": "rezultat contrazis de lumanarile reale: TP2_HIT 2.713R in memorie, NO_ENTRY 0.0R la reevaluare",
       "removed": "2026-11-27 00:47 UTC"
+    },
+    {
+      "id": 370785,
+      "symbol": "MANA/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "EXPIRED",
+      "realized_r": 3.934,
+      "created_ts": 1793823044.80808,
+      "reason": "rezultat contrazis de lumanarile reale: EXPIRED 3.934R in memorie, EXPIRED 3.596R la reevaluare",
+      "removed": "2026-11-27 16:15 UTC"
+    },
+    {
+      "id": 370851,
+      "symbol": "GRT/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": 0.459,
+      "created_ts": 1794387519.34764,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT 0.459R in memorie, NO_ENTRY 0.0R la reevaluare",
+      "removed": "2026-11-27 16:15 UTC"
+    },
+    {
+      "id": 370852,
+      "symbol": "AXS/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "TP2_HIT",
+      "realized_r": 3.248,
+      "created_ts": 1794387520.5246537,
+      "reason": "rezultat contrazis de lumanarile reale: TP2_HIT 3.248R in memorie, NO_ENTRY 0.0R la reevaluare",
+      "removed": "2026-11-27 16:15 UTC"
     }
   ]
 }
