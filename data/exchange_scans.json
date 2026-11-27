@@ -465,15 +465,6 @@
           "macd_hist": -3.24e-05,
           "position": "SUB VAL"
         },
-        "SEI/USDT": {
-          "supertrend": "BULLISH",
-          "vwap": 0.038128292351584374,
-          "poc": 0.03794125,
-          "vah": 0.05316625,
-          "val": 0.03185125,
-          "macd_hist": 0.00052123,
-          "position": "IN VALUE AREA"
-        },
         "DOT/USDT": {
           "supertrend": "BULLISH",
           "vwap": 0.7132737072386676,
@@ -481,6 +472,15 @@
           "vah": 1.00245417,
           "val": 0.63107917,
           "macd_hist": 0.00260613,
+          "position": "IN VALUE AREA"
+        },
+        "SEI/USDT": {
+          "supertrend": "BULLISH",
+          "vwap": 0.038128292351584374,
+          "poc": 0.03794125,
+          "vah": 0.05316625,
+          "val": 0.03185125,
+          "macd_hist": 0.00052123,
           "position": "IN VALUE AREA"
         },
         "AVAX/USDT": {
@@ -780,6 +780,19 @@
           }
         },
         {
+          "symbol": "FLOW/USDT",
+          "direction": "SHORT",
+          "score": 54,
+          "price": 0.0144,
+          "atr": 0.00025,
+          "components": {
+            "trend": 0.485,
+            "momentum": 0.429,
+            "volatility": 0.868,
+            "volume": 0.361
+          }
+        },
+        {
           "symbol": "ZEC/USDT",
           "direction": "SHORT",
           "score": 51,
@@ -972,19 +985,6 @@
             "momentum": 0.445,
             "volatility": 0.0,
             "volume": 0.756
-          }
-        },
-        {
-          "symbol": "FLOW/USDT",
-          "direction": "SHORT",
-          "score": 30,
-          "price": 0.0149,
-          "atr": 0.00019285714,
-          "components": {
-            "trend": 0.477,
-            "momentum": 0.057,
-            "volatility": 0.647,
-            "volume": 0.028
           }
         }
       ],
@@ -1216,11 +1216,11 @@
         },
         "FLOW/USDT": {
           "supertrend": "BEARISH",
-          "vwap": 0.01642848438440337,
+          "vwap": 0.01641106730767953,
           "poc": 0.0154625,
           "vah": 0.0261875,
           "val": 0.0138125,
-          "macd_hist": 3.209e-05,
+          "macd_hist": 3.83e-06,
           "position": "IN VALUE AREA"
         }
       },
@@ -1229,8 +1229,8 @@
       "primary": false,
       "analysis": "completa",
       "proposals": 12,
-      "duration_s": 18.7,
-      "scan_time": "2026-11-27 17:16 UTC"
+      "duration_s": 21.6,
+      "scan_time": "2026-11-27 18:16 UTC"
     },
     "gate": {
       "resolved": [
@@ -1793,15 +1793,6 @@
           "macd_hist": 0.00194444,
           "position": "SUB VAL"
         },
-        "EGLD/USDT": {
-          "supertrend": "BULLISH",
-          "vwap": 2.49803402836179,
-          "poc": 3.286,
-          "vah": 3.78066667,
-          "val": 2.65,
-          "macd_hist": 0.01069314,
-          "position": "SUB VAL"
-        },
         "GRT/USDT": {
           "supertrend": "BEARISH",
           "vwap": 0.016579123618871566,
@@ -1810,6 +1801,15 @@
           "val": 0.01568525,
           "macd_hist": 4.181e-05,
           "position": "IN VALUE AREA"
+        },
+        "EGLD/USDT": {
+          "supertrend": "BULLISH",
+          "vwap": 2.49803402836179,
+          "poc": 3.286,
+          "vah": 3.78066667,
+          "val": 2.65,
+          "macd_hist": 0.01069314,
+          "position": "SUB VAL"
         },
         "FLOW/USDT": {
           "supertrend": "BULLISH",
@@ -1826,8 +1826,8 @@
       "primary": false,
       "analysis": "completa",
       "proposals": 12,
-      "duration_s": 19.9,
-      "scan_time": "2026-11-27 17:16 UTC"
+      "duration_s": 22.5,
+      "scan_time": "2026-11-27 18:16 UTC"
     },
     "mexc": {
       "resolved": [
@@ -1866,19 +1866,6 @@
       ],
       "results": [
         {
-          "symbol": "BTC/USDT",
-          "direction": "SHORT",
-          "score": 62,
-          "price": 60121.6,
-          "atr": 1138.5021,
-          "components": {
-            "trend": 0.249,
-            "momentum": 0.297,
-            "volatility": 0.947,
-            "volume": 1.0
-          }
-        },
-        {
           "symbol": "ETH/USDT",
           "direction": "SHORT",
           "score": 62,
@@ -1888,6 +1875,19 @@
             "trend": 0.29,
             "momentum": 0.362,
             "volatility": 0.842,
+            "volume": 1.0
+          }
+        },
+        {
+          "symbol": "BTC/USDT",
+          "direction": "SHORT",
+          "score": 62,
+          "price": 60121.6,
+          "atr": 1138.5021,
+          "components": {
+            "trend": 0.249,
+            "momentum": 0.297,
+            "volatility": 0.947,
             "volume": 1.0
           }
         },
@@ -2179,15 +2179,6 @@
         }
       ],
       "details": {
-        "BTC/USDT": {
-          "supertrend": "BEARISH",
-          "vwap": 62575.473380967705,
-          "poc": 81809.375,
-          "vah": 84281.875,
-          "val": 63265.625,
-          "macd_hist": 151.50696959,
-          "position": "SUB VAL"
-        },
         "ETH/USDT": {
           "supertrend": "BEARISH",
           "vwap": 1755.7149501027334,
@@ -2196,6 +2187,15 @@
           "val": 1560.52083333,
           "macd_hist": 3.66434701,
           "position": "IN VALUE AREA"
+        },
+        "BTC/USDT": {
+          "supertrend": "BEARISH",
+          "vwap": 62575.473380967705,
+          "poc": 81809.375,
+          "vah": 84281.875,
+          "val": 63265.625,
+          "macd_hist": 151.50696959,
+          "position": "SUB VAL"
         },
         "XRP/USDT": {
           "supertrend": "BULLISH",
@@ -2269,15 +2269,6 @@
           "macd_hist": 1.493e-05,
           "position": "IN VALUE AREA"
         },
-        "ATOM/USDT": {
-          "supertrend": "BEARISH",
-          "vwap": 1.2701494202507693,
-          "poc": 1.39991667,
-          "vah": 1.60175,
-          "val": 1.14041667,
-          "macd_hist": -0.00097284,
-          "position": "IN VALUE AREA"
-        },
         "ZEC/USDT": {
           "supertrend": "BEARISH",
           "vwap": 860.344874794857,
@@ -2286,6 +2277,15 @@
           "val": 1106.09666667,
           "macd_hist": 5.38922948,
           "position": "SUB VAL"
+        },
+        "ATOM/USDT": {
+          "supertrend": "BEARISH",
+          "vwap": 1.2701494202507693,
+          "poc": 1.39991667,
+          "vah": 1.60175,
+          "val": 1.14041667,
+          "macd_hist": -0.00097284,
+          "position": "IN VALUE AREA"
         },
         "DOT/USDT": {
           "supertrend": "BULLISH",
@@ -2368,15 +2368,6 @@
           "macd_hist": 4.099e-05,
           "position": "IN VALUE AREA"
         },
-        "ZEN/USDT": {
-          "supertrend": "BULLISH",
-          "vwap": 3.979522687908865,
-          "poc": 5.9329375,
-          "vah": 6.3403125,
-          "val": 4.84660417,
-          "macd_hist": 0.01688505,
-          "position": "SUB VAL"
-        },
         "MANA/USDT": {
           "supertrend": "BEARISH",
           "vwap": 0.06015003494651277,
@@ -2384,6 +2375,15 @@
           "vah": 0.09038562,
           "val": 0.06188937,
           "macd_hist": 0.00021534,
+          "position": "SUB VAL"
+        },
+        "ZEN/USDT": {
+          "supertrend": "BULLISH",
+          "vwap": 3.979522687908865,
+          "poc": 5.9329375,
+          "vah": 6.3403125,
+          "val": 4.84660417,
+          "macd_hist": 0.01688505,
           "position": "SUB VAL"
         },
         "FLOW/USDT": {
@@ -2401,8 +2401,8 @@
       "primary": false,
       "analysis": "completa",
       "proposals": 11,
-      "duration_s": 17.0,
-      "scan_time": "2026-11-27 17:16 UTC"
+      "duration_s": 21.7,
+      "scan_time": "2026-11-27 18:16 UTC"
     },
     "kraken": {
       "resolved": [
@@ -2898,15 +2898,6 @@
           "macd_hist": 0.13348525,
           "position": "SUB VAL"
         },
-        "ATOM/USD": {
-          "supertrend": "BEARISH",
-          "vwap": 1.2796080960157956,
-          "poc": 1.31365208,
-          "vah": 1.57153958,
-          "val": 1.14172708,
-          "macd_hist": -0.00116745,
-          "position": "IN VALUE AREA"
-        },
         "FIL/USD": {
           "supertrend": "BULLISH",
           "vwap": 0.5809480836850824,
@@ -2914,6 +2905,15 @@
           "vah": 0.9916875,
           "val": 0.50035417,
           "macd_hist": -0.00011853,
+          "position": "IN VALUE AREA"
+        },
+        "ATOM/USD": {
+          "supertrend": "BEARISH",
+          "vwap": 1.2796080960157956,
+          "poc": 1.31365208,
+          "vah": 1.57153958,
+          "val": 1.14172708,
+          "macd_hist": -0.00116745,
           "position": "IN VALUE AREA"
         },
         "MANA/USD": {
@@ -2977,7 +2977,7 @@
       "analysis": "completa",
       "proposals": 11,
       "duration_s": 98.8,
-      "scan_time": "2026-11-27 17:16 UTC"
+      "scan_time": "2026-11-27 18:16 UTC"
     }
   },
   "primary": "okx",
