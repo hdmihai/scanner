@@ -24,18 +24,20 @@
     }
   },
   "rebuild_removed_live": [],
-  "when": "2026-11-28 03:58 UTC",
-  "ts": 1795838334.9318025,
+  "when": "2026-11-28 04:59 UTC",
+  "ts": 1795841963.136276,
   "checked": 28114,
-  "reevaluated": 223,
-  "live_flagged": 0,
-  "removed_now": 0,
+  "reevaluated": 244,
+  "live_flagged": 2,
+  "removed_now": 2,
   "blocked": null,
   "backtest_flagged": 0,
   "backtest_examples": [],
-  "by_reason": {},
+  "by_reason": {
+    "rezultat contrazis de lumanarile reale": 2
+  },
   "pending_live": [],
-  "retrained": false,
+  "retrained": true,
   "epoch": 2,
   "removed": [
     {
@@ -3361,6 +3363,30 @@
       "created_ts": 1794026681.1495798,
       "reason": "rezultat contrazis de lumanarile reale: NO_ENTRY 0.0R in memorie, SL_HIT 0.669R la reevaluare",
       "removed": "2026-11-27 20:57 UTC"
+    },
+    {
+      "id": 370860,
+      "symbol": "POL/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": -1.049,
+      "created_ts": 1794459242.2728016,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT -1.049R in memorie, TP2_HIT 2.885R la reevaluare",
+      "removed": "2026-11-28 04:59 UTC"
+    },
+    {
+      "id": 370861,
+      "symbol": "ZEN/USDT",
+      "direction": "SHORT",
+      "source": "live",
+      "geometry": "v6-4h-obf",
+      "state": "SL_HIT",
+      "realized_r": 0.459,
+      "created_ts": 1794488176.103706,
+      "reason": "rezultat contrazis de lumanarile reale: SL_HIT 0.459R in memorie, NO_ENTRY 0.0R la reevaluare",
+      "removed": "2026-11-28 04:59 UTC"
     }
   ]
 }
